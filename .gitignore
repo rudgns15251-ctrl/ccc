@@ -1,0 +1,5 @@
+# Godot-generated imports, editor state and caches.
+/.godot/
+
+# Build output (create this directory only when exporting).
+/builds/

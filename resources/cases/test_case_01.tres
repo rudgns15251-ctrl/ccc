@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="CaseData" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
+[ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
+[ext_resource type="Script" path="res://scripts/data/cctv_data.gd" id="3_cctv"]
+[ext_resource type="Script" path="res://scripts/data/experiment_data.gd" id="4_experiment"]
+
+[sub_resource type="Resource" id="Resource_profile"]
+script = ExtResource("2_profile")
+profile_id = "TEST_PROFILE_01"
+subject_name = "TEST SUBJECT"
+classification = "TEST CLASSIFICATION"
+basic_description = "Temporary profile data for prototype validation."
+
+[sub_resource type="Resource" id="Resource_cctv"]
+script = ExtResource("3_cctv")
+camera_id = "TEST_CAM_01"
+observation_text = "Temporary CCTV observation data for prototype validation."
+
+[sub_resource type="Resource" id="Resource_experiment_01"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_EXP_01"
+display_name = "TEST EXPERIMENT 01"
+description = "Temporary experiment 01 data for prototype validation."
+
+[sub_resource type="Resource" id="Resource_experiment_02"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_EXP_02"
+display_name = "TEST EXPERIMENT 02"
+description = "Temporary experiment 02 data for prototype validation."
+
+[sub_resource type="Resource" id="Resource_experiment_03"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_EXP_03"
+display_name = "TEST EXPERIMENT 03"
+description = "Temporary experiment 03 data for prototype validation."
+
+[resource]
+script = ExtResource("1_case")
+case_id = "TEST_CASE_01"
+display_name = "TEST CASE 01"
+profile_data = SubResource("Resource_profile")
+cctv_data = SubResource("Resource_cctv")
+available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02"), SubResource("Resource_experiment_03")])
