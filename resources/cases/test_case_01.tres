@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=14 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=28 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
 [ext_resource type="Script" path="res://scripts/data/cctv_data.gd" id="3_cctv"]
 [ext_resource type="Script" path="res://scripts/data/experiment_data.gd" id="4_experiment"]
 [ext_resource type="Script" path="res://scripts/data/containment_data.gd" id="5_containment"]
+[ext_resource type="Script" path="res://scripts/data/monitoring_stage_data.gd" id="6_stage"]
+[ext_resource type="Script" path="res://scripts/data/monitoring_outcome_data.gd" id="7_outcome"]
 
 [sub_resource type="Resource" id="Resource_profile"]
 script = ExtResource("2_profile")
@@ -57,6 +59,66 @@ room_id = "TEST_ROOM_03"
 display_name = "TEST ROOM 03"
 description = "Temporary containment room 03 for prototype validation."
 
+[sub_resource type="Resource" id="Resource_stage_01_A"]
+script = ExtResource("6_stage")
+time_offset = 0
+observation_text = "Temporary monitoring state 01-A."
+
+[sub_resource type="Resource" id="Resource_stage_01_B"]
+script = ExtResource("6_stage")
+time_offset = 10
+observation_text = "Temporary monitoring state 01-B."
+
+[sub_resource type="Resource" id="Resource_stage_01_C"]
+script = ExtResource("6_stage")
+time_offset = 20
+observation_text = "Temporary monitoring state 01-C."
+
+[sub_resource type="Resource" id="Resource_outcome_01"]
+script = ExtResource("7_outcome")
+room_id = "TEST_ROOM_01"
+stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_01_A"), SubResource("Resource_stage_01_B"), SubResource("Resource_stage_01_C")])
+
+[sub_resource type="Resource" id="Resource_stage_02_A"]
+script = ExtResource("6_stage")
+time_offset = 0
+observation_text = "Temporary monitoring state 02-A."
+
+[sub_resource type="Resource" id="Resource_stage_02_B"]
+script = ExtResource("6_stage")
+time_offset = 10
+observation_text = "Temporary monitoring state 02-B."
+
+[sub_resource type="Resource" id="Resource_stage_02_C"]
+script = ExtResource("6_stage")
+time_offset = 20
+observation_text = "Temporary monitoring state 02-C."
+
+[sub_resource type="Resource" id="Resource_outcome_02"]
+script = ExtResource("7_outcome")
+room_id = "TEST_ROOM_02"
+stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_02_A"), SubResource("Resource_stage_02_B"), SubResource("Resource_stage_02_C")])
+
+[sub_resource type="Resource" id="Resource_stage_03_A"]
+script = ExtResource("6_stage")
+time_offset = 0
+observation_text = "Temporary monitoring state 03-A."
+
+[sub_resource type="Resource" id="Resource_stage_03_B"]
+script = ExtResource("6_stage")
+time_offset = 10
+observation_text = "Temporary monitoring state 03-B."
+
+[sub_resource type="Resource" id="Resource_stage_03_C"]
+script = ExtResource("6_stage")
+time_offset = 20
+observation_text = "Temporary monitoring state 03-C."
+
+[sub_resource type="Resource" id="Resource_outcome_03"]
+script = ExtResource("7_outcome")
+room_id = "TEST_ROOM_03"
+stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_03_A"), SubResource("Resource_stage_03_B"), SubResource("Resource_stage_03_C")])
+
 [resource]
 script = ExtResource("1_case")
 case_id = "TEST_CASE_01"
@@ -66,3 +128,4 @@ profile_data = SubResource("Resource_profile")
 cctv_data = SubResource("Resource_cctv")
 available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02"), SubResource("Resource_experiment_03")])
 available_containment_rooms = Array[ExtResource("5_containment")]([SubResource("Resource_room_01"), SubResource("Resource_room_02"), SubResource("Resource_room_03")])
+containment_outcomes = Array[ExtResource("7_outcome")]([SubResource("Resource_outcome_01"), SubResource("Resource_outcome_02"), SubResource("Resource_outcome_03")])

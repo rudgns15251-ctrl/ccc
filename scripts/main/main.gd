@@ -5,6 +5,7 @@ const ProfileView = preload("res://scripts/views/profile_view.gd")
 const CCTVView = preload("res://scripts/views/cctv_view.gd")
 const ExperimentView = preload("res://scripts/views/experiment_view.gd")
 const ContainmentView = preload("res://scripts/views/containment_view.gd")
+const MonitoringView = preload("res://scripts/views/monitoring_view.gd")
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT }
 
@@ -67,11 +68,45 @@ func _show_view(stage: int) -> void:
 		)
 	elif stage == Stage.CONTAINMENT:
 		var containment_view: ContainmentView = _current_view as ContainmentView
-		containment_view.setup(current_case.available_containment_rooms if current_case != null else [])
+		containment_view.containment_confirmation_requested.connect(_on_containment_confirmation_requested.bind(containment_view))
+		containment_view.setup(
+			current_case.available_containment_rooms if current_case != null else [],
+			case_runtime.get_confirmed_containment_room_id()
+		)
+	elif stage == Stage.MONITORING:
+		var monitoring_view: MonitoringView = _current_view as MonitoringView
+		monitoring_view.setup(_get_monitoring_outcome())
 	view_host.add_child(_current_view)
 
 
+func _get_monitoring_outcome() -> MonitoringOutcomeData:
+	var room_id: String = case_runtime.get_confirmed_containment_room_id()
+	if room_id.strip_edges().is_empty():
+		push_warning("Main: no confirmed containment room for Monitoring.")
+		return null
+	if current_case == null:
+		push_warning("Main: current_case is missing for Monitoring.")
+		return null
+	if current_case.containment_outcomes.is_empty():
+		push_warning("Main: containment_outcomes is empty for room %s." % room_id)
+		return null
+	for index in range(current_case.containment_outcomes.size()):
+		var outcome: MonitoringOutcomeData = current_case.containment_outcomes[index]
+		if outcome == null:
+			push_warning("Main: MonitoringOutcomeData at index %d is missing." % index)
+			continue
+		if outcome.room_id.strip_edges().is_empty():
+			push_warning("Main: MonitoringOutcomeData.room_id at index %d is empty." % index)
+			continue
+		if outcome.room_id == room_id:
+			return outcome
+	push_warning("Main: no MonitoringOutcomeData for confirmed room %s." % room_id)
+	return null
+
+
 func _on_advance_requested() -> void:
+	if _current_stage == Stage.CONTAINMENT and not case_runtime.has_confirmed_containment():
+		return
 	_show_view((_current_stage + 1) % VIEW_SCENES.size())
 
 
@@ -86,6 +121,17 @@ func _on_experiment_execution_requested(experiment_id: String, experiment_view: 
 		case_runtime.get_remaining_experiment_count(limit),
 		limit
 	)
+
+
+func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:
+	if containment_view != _current_view:
+		return
+	if current_case != null and not room_id.strip_edges().is_empty():
+		for room: ContainmentData in current_case.available_containment_rooms:
+			if room != null and room.room_id == room_id:
+				case_runtime.try_confirm_containment_room(room_id)
+				break
+	containment_view.update_confirmation_state(case_runtime.get_confirmed_containment_room_id())
 
 
 func _validate_case() -> void:

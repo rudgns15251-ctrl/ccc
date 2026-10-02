@@ -5,7 +5,10 @@ Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
-CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하며 선택이나 판정은 없습니다.
+CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나를 임시 선택할 수 있습니다.
+선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다.
+확정 이후에만 MONITORING으로 진행하며 정답 판정은 없습니다.
+MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개되어야 RESULT로 진행할 수 있습니다.
 실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
@@ -23,9 +26,16 @@ CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하며 선택�
    **Experiments Remaining**으로 남은 횟수를 확인합니다. 0이면 모든 항목과 Run이 비활성화됩니다.
    선택만 하면 기록하지 않으며, 정상 실행할 때마다 이력에 ID 하나를 추가합니다.
    CONTAINMENT에는 available_containment_rooms 배열의 후보 이름과 설명이 표시됩니다.
-   후보는 표시 전용입니다. 기존 **Next: MONITORING** 버튼으로 계속 진행합니다.
+   이름 옆 선택 Control을 클릭하면 하나만 선택되며 재클릭해도 유지됩니다.
+   초기 상태에는 선택이 없고 Confirm과 **Next: MONITORING**이 비활성화됩니다.
+   Room을 선택한 뒤 **Confirm Containment**를 누르면 현재 Case 후보를 검증하고 한 번만 확정합니다.
+   확정된 후보는 **[Confirmed]**로 표시되며 후보 변경과 재확정은 불가능합니다.
+   확정 후 **Next: MONITORING**으로 진행합니다. 재진입하면 Runtime의 확정 상태를 복원합니다.
+   MONITORING에는 확정 Room ID와 전체 Stage 개수가 표시됩니다. 테스트 기록은 진입 직후, 10초 후, 20초 후 하나씩 누적됩니다.
+   미래 Stage 내용은 공개하지 않으며, 마지막 Stage 재생 후 **Next: RESULT**가 활성화됩니다.
+   다시 진입하면 Monitoring만 처음부터 재생합니다. 없는 데이터는 경고와 대체 문구를 표시하고 Next를 비활성화합니다.
 4. RESULT의 **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
-   이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력은 유지됩니다.
+   이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력과 격리 확정은 유지됩니다.
 5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
 
 각 View Scene을 따로 F6 실행하면 해당 임시 화면만 표시됩니다. 다음 화면의
@@ -35,6 +45,7 @@ PROFILE / CCTV를 단독 실행하면 상위 계층이 데이터를 전달하지
 버튼의 진행 요청 기능은 유지됩니다.
 EXPERIMENT를 단독 실행하면 빈 목록 경고와 `No experiments available`이 표시됩니다.
 CONTAINMENT를 단독 실행하면 빈 목록 경고와 `No containment rooms available`이 표시됩니다.
+MONITORING을 단독 실행하면 Outcome 누락 경고와 `Monitoring data unavailable`이 표시됩니다.
 
 ## 프로젝트 설정
 
@@ -66,7 +77,7 @@ cap/
 ├── resources/
 │   ├── .gitkeep
 │   └── cases/
-│       └── test_case_01.tres # CaseData와 내장 Profile/CCTV, Experiment 3개, Containment 3개
+│       └── test_case_01.tres # 기존 콘텐츠와 Room별 Monitoring Outcome 3개 / Stage 총9개
 ├── scenes/
 │   ├── main/
 │   │   └── main.tscn       # 기존 기반 UI와 ViewHost
@@ -87,23 +98,29 @@ cap/
     │   ├── containment_data.gd.uid
     │   ├── experiment_data.gd
     │   ├── experiment_data.gd.uid
+    │   ├── monitoring_outcome_data.gd
+    │   ├── monitoring_outcome_data.gd.uid
+    │   ├── monitoring_stage_data.gd
+    │   ├── monitoring_stage_data.gd.uid
     │   ├── profile_data.gd
     │   └── profile_data.gd.uid
     ├── main/
-    │   ├── main.gd         # 창 크기 표시, View 전환, 현재 CaseRuntimeState 소유/연결
+    │   ├── main.gd         # 창 크기 표시, View 전환, Runtime 연결, 격리 후보 검증/진행 보호
     │   └── main.gd.uid
     ├── runtime/
-    │   ├── case_runtime_state.gd # 메모리 Case ID와 Experiment 실행 이력
+    │   ├── case_runtime_state.gd # 메모리 Case ID, Experiment 실행 이력, 확정된 격리 Room ID
     │   └── case_runtime_state.gd.uid
     └── views/
         ├── flow_view.gd    # 버튼 입력을 진행 요청 signal로 전달
         ├── flow_view.gd.uid
         ├── cctv_view.gd    # 전달받은 CCTVData 표시
         ├── cctv_view.gd.uid
-        ├── containment_view.gd # 전달받은 ContainmentData 배열을 표시만 함
+        ├── containment_view.gd # 목록/임시 선택/확정 요청, Runtime snapshot 표시
         ├── containment_view.gd.uid
         ├── experiment_view.gd # 전달받은 ExperimentData 배열을 동적 목록으로 표시
         ├── experiment_view.gd.uid
+        ├── monitoring_view.gd # 전달된 Outcome의 Room ID와 Timer 기반 누적 Stage 재생
+        ├── monitoring_view.gd.uid
         ├── profile_view.gd # 전달받은 ProfileData 표시
         └── profile_view.gd.uid
 ```
@@ -128,18 +145,21 @@ Main (Control, main.gd)
                 ├── ScreenTitle
                 ├── SubjectName / Classification (PROFILE만)
                 ├── CameraId (CCTV만)
+                ├── RoomId (MONITORING만)
                 ├── Description
                 ├── Workspace (EXPERIMENT만)
                 │   ├── ExperimentScroll / ExperimentList (동적 항목)
                 │   └── Execution / RemainingCount / RunButton / ResultTitle / ResultText
-                ├── RoomScroll / RoomList (CONTAINMENT만, 동적 이름/설명 Label)
-                └── NextButton
+                ├── RoomScroll / RoomList (CONTAINMENT만, 동적 이름 CheckBox / 설명 Label)
+                ├── Actions / ConfirmButton / NextButton (CONTAINMENT만)
+                ├── StageScroll / StageList (MONITORING만, 동적 시간/관찰 Label)
+                └── NextButton (나머지 View)
 ```
 
-화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT 콘텐츠는 Resource에
-있고 나머지 화면은 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
-모든 View는 Control 기반 독립 Scene입니다. Monitoring / Result는 기존 `flow_view.gd`를
-그대로 사용하며, Profile / CCTV / Experiment / Containment 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
+화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / MONITORING 콘텐츠는 Resource에
+있고 RESULT는 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
+모든 View는 Control 기반 독립 Scene입니다. Result는 기존 `flow_view.gd`를
+그대로 사용하며, Profile / CCTV / Experiment / Containment / Monitoring 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
 별도의 Scene 상속이나 추상 Base Class 계층은 없습니다.
 
 `NextButton.pressed → advance_requested → Main._on_advance_requested() → 다음 View`로
@@ -152,6 +172,8 @@ Main (Control, main.gd)
 기존 창 크기 표시 함수와 연결은 보존했습니다.
 Main._ready()에서 현재 Case ID로 CaseRuntimeState를 한 번 생성합니다.
 일반 View 전환, RESULT → PROFILE, ExperimentView.setup()은 런타임 상태를 초기화하지 않습니다.
+Containment → Monitoring은 Runtime에 확정된 Room이 있어야 진행됩니다.
+View 버튼 disabled 상태뿐 아니라 Main의 진행 요청 처리에서도 확정 여부를 검사합니다.
 
 `flow_view.gd`는 버튼 signal 연결, 버튼의 초기 키보드 포커스, 진행 요청
 signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과 판정을 하지 않습니다.
@@ -159,27 +181,31 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 ## 테스트 Resource와 데이터 전달
 
 [Godot Resource](https://docs.godotengine.org/en/4.7/tutorials/scripting/resources.html)를
-데이터 컨테이너로 사용합니다. 다섯 콘텐츠 클래스는 `class_name`과 typed export 필드만 정의합니다.
+데이터 컨테이너로 사용합니다. 일곱 콘텐츠 클래스는 `class_name`과 typed export 필드만 정의합니다.
 
 | 파일 | 책임 / 필드 |
 | --- | --- |
-| `scripts/data/case_data.gd` | CaseData: 기존 필드와 available_containment_rooms: Array[ContainmentData] |
+| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData] |
 | `scripts/data/profile_data.gd` | ProfileData: profile_id, subject_name, classification, basic_description |
 | `scripts/data/cctv_data.gd` | CCTVData: camera_id, observation_text만 정의 |
 | `scripts/data/experiment_data.gd` | ExperimentData: experiment_id, display_name, description, result_text만 정의 |
 | `scripts/data/containment_data.gd` | ContainmentData: room_id, display_name, description만 정의 |
-| `resources/cases/test_case_01.tres` | TEST_CASE_01 / TEST CASE 01, 내장 Profile/CCTV, Experiment 3개와 Containment 3개, 검증용 문구 |
+| `scripts/data/monitoring_stage_data.gd` | MonitoringStageData: time_offset: int(초), observation_text: String |
+| `scripts/data/monitoring_outcome_data.gd` | MonitoringOutcomeData: room_id: String, stages: Array[MonitoringStageData] |
+| `resources/cases/test_case_01.tres` | 기존 테스트 콘텐츠, Room별 Outcome 3개와 각 Stage 3개(0/10/20초), 검증용 문구 |
 | `scenes/main/main.tscn` | 테스트 Case Resource를 Main.current_case에 연결 |
-| `scripts/main/main.gd` | 기존 데이터 전달/전환, CaseRuntimeState 소유, 실행 signal을 기록 API로 전달 |
-| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증과 승인 기록/조회 |
+| `scripts/main/main.gd` | 데이터 전달/전환, CaseRuntimeState 소유, 실행 승인, 격리 후보 검증 및 확정 전 진행 차단 |
+| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증, 격리 ID 한 번 확정/조회/reset |
 | `scripts/views/profile_view.gd` | setup(ProfileData), 3개 표시 필드 반영, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/profile_view.tscn` | 제목·데이터 Label·기존 진행 버튼 레이아웃 |
 | `scripts/views/cctv_view.gd` | setup(CCTVData), 두 필드 표시, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/cctv_view.tscn` | 제목·CameraId·Description·기존 진행 버튼 레이아웃 |
 | `scripts/views/experiment_view.gd` | 목록/선택, experiment_execution_requested(ID), 승인 후 결과와 전달된 실행 상태 표시 |
 | `scenes/views/experiment_view.tscn` | 제목·목록·RemainingCount·RunButton·결과 영역·기존 진행 버튼 |
-| `scripts/views/containment_view.gd` | setup(rooms), 동적 이름/설명 Label 표시, 빈 목록/null/빈 필드 경고와 대체 문구 |
-| `scenes/views/containment_view.tscn` | 제목·개수 설명·RoomScroll/RoomList·기존 진행 버튼 |
+| `scripts/views/containment_view.gd` | setup(rooms, confirmed_room_id), 후보/선택/확정 요청, snapshot 표시, 누락 처리 |
+| `scenes/views/containment_view.tscn` | 기존 제목·개수·목록, Actions의 Confirm Containment / Next: MONITORING |
+| `scripts/views/monitoring_view.gd` | setup(outcome), View 내부 재생 상태, Timer 순차 공개/누적 기록/Next 보호, 누락·시간 오류 경고 |
+| `scenes/views/monitoring_view.tscn` | 기존 제목/진행 버튼, RoomId/Description/StageScroll/StageList, one-shot PlaybackTimer |
 | `scripts/views/flow_view.gd` | 기존 진행 기능만 담당, 이번 단계 수정 없음 |
 
 ```text
@@ -206,25 +232,76 @@ ExperimentList에 이름 CheckBox / 설명 Label 묶음을 배열 길이만큼 �
 
 Main.current_case.available_containment_rooms (내장 ContainmentData 배열)
             ↓
-ContainmentView.setup(rooms)
+ContainmentView.setup(rooms, case_runtime.get_confirmed_containment_room_id())
             ↓
-RoomList에 이름 Label / 설명 Label 묶음을 배열 길이만큼 생성
+RoomList에 이름 CheckBox / 설명 Label 묶음을 배열 길이만큼 생성
+
+CaseRuntimeState.get_confirmed_containment_room_id()
+            ↓
+Main._get_monitoring_outcome(): current_case.containment_outcomes의 room_id 일치 검색
+            ↓
+MonitoringView.setup(outcome)
+            ↓
+RoomId / 전체 개수 / StageList에 시간 Label + 관찰 Label 묶음 생성
 ```
 
-Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 네 전용 View는 데이터를
+Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 다섯 전용 View는 데이터를
 보관하고 `_ready()`에서 기본 진행 기능의 `super._ready()`를 호출한 뒤 표시합니다.
 트리에 들어간 후 `setup()`을 다시 호출하는 경우에도 표시를 갱신하도록 했습니다.
-네 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
+다섯 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
 순환 후 View를 새로 만들 때에도 동일한 Case의 데이터를 다시 전달합니다.
 
-ContainmentView는 배열 순서대로 VBoxContainer와 이름/설명 Label 두 개를 생성합니다.
-Scene에 Room1/2/3을 고정하지 않았고 별도 Item Scene이나 선택 Control은 없습니다.
-재표시 전에 이전 항목을 제거/해제하고 스크롤을 처음으로 되돌립니다. 기본 3개는 한 화면에
+ContainmentView는 배열 순서대로 VBoxContainer와 이름 CheckBox / 설명 Label을 생성합니다.
+ExperimentView와 같은 ButtonGroup 패턴을 사용하며 별도 Item Scene은 없습니다.
+선택 인덱스 `_selected_room_index`는 View 안의 임시 상태이며 -1은 선택 없음입니다.
+ButtonGroup.allow_unpress=false로 최대 하나만 선택되고 같은 후보 재클릭은 선택을 유지합니다.
+선택 변경만으로 Main이나 CaseRuntimeState에 기록하지 않습니다.
+재진입과 setup() 재호출 시 임시 선택 인덱스와 그룹을 초기화하고 이전 항목을 제거/해제하며
+스크롤을 처음으로 되돌립니다. 기본 3개는 한 화면에
 표시되며 4개부터 스크롤로 볼 수 있습니다. 빈 배열은 `No containment rooms available`,
 null은 `[Missing ContainmentData]`, 빈 이름/설명은 `[Missing display_name]` / `[Missing description]`으로
-표시합니다. room_id가 빈 문자열/공백이면 경고만 출력하며 다음 View 진행은 유지합니다.
+표시합니다. null이나 빈 문자열/공백 room_id는 경고와 선택 비활성화로 처리합니다.
+정상 ID의 이름/설명이 비면 대체 문구를 표시하고 선택은 가능합니다.
+선택 없음일 때 Confirm은 비활성화되며 유효한 후보 선택 시 활성화됩니다.
 후보를 수정하려면 테스트 Case의 available_containment_rooms 배열이나 각 Resource의 세 필드를 편집합니다.
-CaseRuntimeState에는 Containment 상태를 추가하지 않았습니다.
+Confirm 입력은 `containment_confirmation_requested(room_id)`를 Main에 전달합니다.
+Main은 현재 View에서 온 요청인지와 현재 Case 후보 배열에 ID가 실제 존재하는지 확인한 뒤
+Runtime의 `try_confirm_containment_room()`을 호출합니다. null/빈·공백 ID/없는 후보는 기록하지 않습니다.
+승인/거부 후 모두 실제 Runtime ID를 `update_confirmation_state()`로 전달합니다.
+View는 Runtime을 직접 탐색하지 않고 snapshot만 표시합니다.
+확정 시 해당 이름에 `[Confirmed]`를 붙이고 후보 전체와 Confirm을 잠그며 Next를 활성화합니다.
+같은 Case 재진입과 반복 setup에서는 Runtime의 확정 ID를 그대로 전달해 이 표시를 복원합니다.
+격리 확정은 최종 결정으로 취급하며 같은 ID 요청도 두 번째 확정은 거부합니다.
+Main에는 격리 상태 사본이나 결과/정답 판정이 없습니다.
+
+Main은 MONITORING 생성 시 확정된 Room ID로 현재 Case의 containment_outcomes를 검색합니다.
+배열 인덱스나 첫 Outcome으로 대신 연결하지 않으며, ID가 일치하는 첫 유효 Outcome을 전달합니다.
+확정 Room/Case/목록/일치 Outcome이 없으면 경고와 null을 전달합니다. null Outcome과 빈 ID 항목은 경고하고 건너뜁니다.
+MonitoringView는 Room ID, 전체 Stage 개수와 공개된 관찰 기록만 표시합니다.
+Stage마다 기존 VBoxContainer와 시간/관찰 Label 두 개를 추가하며 이미 공개한 기록은 남깁니다.
+시간 표기는 기존 `[0s]`, `[10s]`, `[20s]`를 사용합니다. 기본 세 항목은 한 화면에 표시되고 더 많으면 스크롤합니다.
+
+Main은 setup(outcome)을 Tree 추가 전에 호출하므로 setup은 데이터를 저장하고 인덱스/이전 offset/active/completed를 초기화합니다.
+_ready()에서 공용 진행 버튼과 PlaybackTimer.timeout을 한 번 연결하고 재생을 시작합니다.
+이미 준비된 View의 setup은 기존 Timer를 중단하고 행을 제거/해제한 뒤 스크롤과 Next를 초기화하여 새 Outcome을 재생합니다.
+Tree 밖에서는 Timer.start()를 호출하지 않습니다. _exit_tree()에서 Timer를 정지하고 진행을 차단합니다.
+자식 Timer와 연결은 View 해제 시 함께 해제되며 비동기 await나 지연 callback을 만들지 않습니다.
+
+Scene의 PlaybackTimer 하나를 one_shot으로 재사용합니다. time_offset은 시작 시점 기준 상대 초입니다.
+이전 유효 Stage offset(첫 Stage는 0)과 현재 offset의 차이를 구하고 실제 대기값을 max(차이, 0)으로 제한합니다.
+양수이면 Timer가 기다린 뒤 현재 Stage를 추가하고, 0이면 while 반복문으로 배열 순서대로 즉시 공개합니다.
+음수 offset과 역행은 경고하되 원래 Resource/배열은 수정하거나 정렬하지 않습니다.
+잘못된 음수 첫 offset -1은 즉시 공개되며 다음 offset 1은 원래 값의 차이인 2초를 기다립니다.
+역행 Stage는 대기 없이 공개됩니다. 이는 잘못된 데이터의 안전 처리이며 정상 데이터의 절대 시간 의미를 대체하지 않습니다.
+
+null Outcome/빈 Stage 배열/전부 null인 배열은 경고, `Monitoring data unavailable`, 정지된 Timer와 disabled Next로 처리합니다.
+일부 null Stage는 경고하고 건너뛰며 한 개 이상의 유효 Stage를 모두 공개하면 완료할 수 있습니다.
+빈 관찰 문구는 `[Missing observation_text]`로 표시하되 해당 Stage는 유효하게 처리합니다.
+재생 중 Next는 disabled이며 pressed를 직접 발생시켜도 View 내부 완료 검사로 진행 요청을 차단합니다.
+마지막 유효 Stage 이후 Timer 정지, active=false, completed=true, `Monitoring sequence complete`, Next 활성화 상태가 됩니다.
+재진입 시 새 View가 0부터 다시 재생합니다. 재생 상태는 CaseRuntimeState나 Resource에 저장하지 않습니다.
+Main/공용 flow_view/Runtime/ContainmentData/기존 ID 검색은 이번 단계에서 변경하지 않았습니다.
+진행률이나 Success/Failure 판정은 없습니다.
 
 ExperimentView는 배열 순서대로 `VBoxContainer`와 이름 CheckBox / 설명 Label을 생성합니다.
 기존 이름 Label만 CheckBox로 바꿨으며 별도 Component Scene이나 Script는 없습니다.
@@ -255,8 +332,12 @@ Runtime에서 계산한 남은 횟수, Case 콘텐츠 제한을 전달합니다.
 snapshot이며 실행 최종 권한을 갖지 않습니다. Runtime snapshot을 생략하면 안전하게 실행 불가입니다.
 재진입 또는 setup 재호출 시 임시 선택/결과를 초기화하고 전달된 완료 상태/남은 횟수를 다시 반영합니다.
 
-CaseRuntimeState는 `case_id: String`, `_experiment_execution_history: Array[String]`만 보유합니다.
-생성 시 Case ID를 지정할 수 있고 `reset(case_identifier = "")`은 ID를 지정하고 이력을 비웁니다.
+CaseRuntimeState는 `case_id: String`, `_experiment_execution_history: Array[String]`,
+`_confirmed_containment_room_id: String`을 보유합니다.
+생성 시 Case ID를 지정할 수 있고 `reset(case_identifier = "")`은 기존 ID 지정 정책대로 이력과 확정 ID를 비웁니다.
+`try_confirm_containment_room(room_id)`는 빈·공백 ID와 두 번째 확정을 거부하고 최초 정상 ID만 기록합니다.
+`has_confirmed_containment()`와 `get_confirmed_containment_room_id()`로 확정 상태를 조회합니다.
+현재 Case 후보 여부 검증은 Main이 담당하며 Runtime은 콘텐츠 Resource를 참조하지 않습니다.
 `try_record_experiment_execution(experiment_id, limit)`는 빈/공백 ID, 중복, 소진된 제한을 거부하고
 검증과 기록을 하나의 동기 API로 수행합니다. 이전의 무제한 기록 API는 이 안전한 API로 교체했습니다.
 정상 ID는 원래 문자열로 추가하며 승인된 실행 순서를 보존합니다.
@@ -341,7 +422,7 @@ export template 설정은 배포 단계에서 추가합니다.
 
 검증용 스크립트, 격리 프로필, 로그, 캡처는 Git에서 제외되는
 `.godot/verification/`에만 있습니다. 게임에서 로드하지 않는 로컬 검증 자료입니다.
-UID 파일은 Git 보존 대상이며 최초 커밋은 아직 만들지 않았습니다.
+UID 파일은 Git 보존 대상입니다. 10단계까지 커밋되어 있으며 11·12·13·14단계 변경은 미커밋 상태입니다.
 
 ## 2단계 UI 흐름 검증 결과
 
@@ -370,6 +451,194 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 14단계 Monitoring Playback 검증 결과
+
+이번 변경은 Monitoring View의 Timer 기반 순차 공개와 누적 기록, 재생 완료 후 진행까지만 구현했습니다.
+아래 검사는 Godot **4.7.1.stable.official.a13da4feb**, Windows Compatibility renderer에서 수행했습니다.
+
+| 번호 | 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 저장소 | 실제 소스44개(설정1, Scene7, GDScript15, UID15, Resource1, 문서/구성/자리표시5), 전체 폴더/설정/콘텐츠/전환/신호/검증 조사. HEAD d029272, master→origin/main. 11~13단계의 기존 수정8개/미추적6개 보존. 기존 검증 Script110개 SHA-256 기록 |
+| 2 | Playback 방식 | Outcome 배열 순서대로 Stage를 공개하고 이전 기록을 남김. 미래 observation_text는 UI Node로 만들지 않음 |
+| 3 | Timer | Monitoring Scene에 one-shot PlaybackTimer 하나 추가. 양수 delay에만 재사용, autostart 없음, timeout 연결 한 개 |
+| 4 | setup / ready | setup은 Outcome 저장과 인덱스/offset/active/completed 초기화. _ready는 공용 버튼과 Timer 연결 후 표시·재생 |
+| 5 | Tree 진입 전 | Main이 setup 이후 ViewHost.add_child를 호출함을 확인. Tree 밖 setup에서는 Timer 시작 없음, 실제 pre-tree 검사 통과 |
+| 6 | Stage 상태 | 인덱스, 이전 offset, active, completed가 MonitoringView 안에만 존재. Runtime/콘텐츠 필드 추가 없음 |
+| 7 | time_offset | 시작 기준 상대 초. 정상 0/10/20이면 즉시/약10초/약20초 공개 |
+| 8 | delay | 현재 offset − 이전 유효 Stage offset, 첫 기준0. 실제 wait는 max(차이,0). 원래 배열/값 보존 |
+| 9 | 0초 Stage | 시작 동기 호출에서 즉시 공개. 0 delay는 while로 연속 처리, 256개 즉시 Stage도 정지/재귀 문제 없음 |
+| 10 | 누적 UI | 기존 StageList에 시간/관찰 Label 두 개로 구성된 행을 추가. 기본 3개와 기존 스크롤/레이아웃 유지 |
+| 11 | 미래 숨김 | A만 → A+B → A+B+C 실제 Timer와 화면 캡처로 확인. 다음 관찰 문구가 UI에 미리 표시되지 않음 |
+| 12 | Next 보호 | Scene 기본 disabled, 재생 중 disabled. pressed를 직접 발생시켜도 완료 전 진행 요청 없음. 완료 후에만 활성화 |
+| 13 | 완료 조건 | 한 개 이상 유효 Stage가 있고 모두 공개된 경우 Timer 정지/active=false/completed=true/Next 활성화. 문구는 Monitoring sequence complete |
+| 14 | 재진입 | 새 Monitoring View가 같은 ID의 원래 Outcome으로 0부터 시작. Next가 다시 잠기고 A만 표시됨 |
+| 15 | 중간 setup | OLD 0/1 재생 중 NEW 0/2 setup. 기존 행 해제, Next/상태 초기화, 예전 1초 callback 시점에도 NEW_1 조기 공개 없음 |
+| 16 | 제거/free | 재생 중 remove_child에서 Timer 정지. 1.1초 후에도 행 추가 없음. queue_free 후 View/Timer 모두 해제, callback/Node 접근 오류 없음 |
+| 17 | 없는 데이터 | null Outcome/빈 배열/전부 null은 경고+대체 UI, Timer 정지/Next disabled/완료 false. 일부 null은 경고하고 건너뛰며 나머지 유효 Stage 완료 가능 |
+| 18 | 음수 offset | -1/1에서 경고. 첫 Stage 즉시, 다음 Stage는 원래 차이 2초로 대기, 음수 duration 없음. 원래 -1 값과 표시 유지 |
+| 19 | 역행 offset | 0/2/1에서 경고. 0 즉시, 2초 뒤 두 나머지 Stage를 원래 순서로 공개. 음수 대기는0, 자동 정렬/Resource 보정 없음 |
+| 20 | 동일 offset | 0/0/1에서 처음 두 Stage 즉시/배열 순서 유지, 마지막 Stage 약1초 후 완료. 무한 대기 없음 |
+| 21 | 0/1/2 검증 | 별도 in-memory Outcome 사용. 대표 headless B=1.021초/C=2.029초, Windows GPU B=1.018초/C=2.011초. ±0.35초 tolerance로 순서/누적/미래 숨김/Next 통과 |
+| 22 | 실제 Resource | 원본 3 Room × 0/10/20와 Stage 순서/문구 SHA-256 동일. Room02 실제 재생: headless B=10.012초/C=20.023초, GPU B=10.002초/C=20.015초. ±0.5초 tolerance 통과 |
+| 23 | Room 매핑 | 3 Room × 3해상도 × headless/GPU, 테스트 Case의 Outcome 배열을 역순으로 해도 정확한 confirmed ID의 원래 Outcome 선택. index 검색으로 변경하지 않음 |
+| 24 | Experiment Runtime | EXP01/03 이력, remaining0, 승인 결과, 중복/제한 거부, 선택만으로 기록 없음, setup/재진입/전체 흐름 복원 통과 |
+| 25 | Containment Runtime | 단일 선택/Confirm, 후보 검증, 확정 전 버튼·signal 진행 차단, ID 저장/잠금/중복 거부/재진입 복원/reset 회귀 통과 |
+| 26 | 불변성 | Stage/Outcome/Case/Containment/test_case_01.tres와 기존 Runtime/설정/Main/UID는 작업 시작 SHA-256과 동일. 검증 동안 production GDScript도 동일 |
+| 27 | 전체 회귀 | Profile/CCTV/Experiment/Containment/Monitoring/Result 순환, 재시작, 한 View, 이전 View 해제, signal 단일 연결 통과. 1920×1080/1280×720/1024×768의 layout/stretch/scaling 유지 |
+| 28 | 파싱/실행 | editor import1 + GDScript --check-only15 + headless/Windows GPU 실행·정상·오류 입력 검사30 = 총46건 통과. 기본 run/main_scene으로 PROFILE 시작 확인. F5 키 자체는 자동 조작하지 않음 |
+| 29 | 문제와 해결 | 모든 Room/해상도를 한 GPU 프로세스로 검사하던 검증이45초 제한을 초과. 검증만 해상도별 실행으로 분리해9조합 모두 통과. 미해결 프로젝트 오류 없음. 잘못된 입력 검사의 예정된 warning과 Git README 줄바꿈 안내는 오류가 아님 |
+| 30 | 실제 파일 | 이번 단계 수정3개: scripts/views/monitoring_view.gd, scenes/views/monitoring_view.tscn, README.md. production 생성/삭제0. 검증 자료는 Git 제외 .godot/verification/step14에만 생성 |
+| 31 | 기존 변경 보존 | Step14 시작 사본과 별도 incremental diff로 비교. 다른41소스, 이전 검증110개, 기존13단계 이하 보고, 기존 미커밋 범위를 보존. 커밋/push 없음 |
+| 32 | 미구현 | 정답/Success/Failure/is_success/final_state/breach/Incident/Broadcast/Monitoring Runtime 저장/Save·Load/progress bar/animation/audio/CCTV 변화/Research Log/Case Result/GameState·Manager/Campaign/최종 Theme 없음 |
+| 33 | 다음 확장 지점 | MonitoringStageData/OutcomeData → Main ID 검색 → MonitoringView.setup/재생 완료 경계. 다음 요구사항에서 필요한 표시나 완료 후 연결만 추가하며 판정 시스템은 아직 없음 |
+
+검증의 정상 데이터에서는 warning0입니다. 오류 입력 검사는 Monitoring17개, 기존 Containment9개,
+기존 Experiment17개의 예정된 warning을 headless/GPU 각각 확인했습니다.
+검증 코드·로그·원본 사본·GPU 캡처·SHA-256 manifest·`step14-only.diff`와
+`combined-step11-through-step14.diff`는 `.godot/verification/step14/`에 있습니다.
+이전 검증은 수정하지 않고 복사본의 전체 흐름에만 in-memory 0초 Stage를 전달했습니다.
+실제 시간 검사는 별도로 0/1/2와 원본 0/10/20을 기다렸으며 production speed API는 없습니다.
+
+## 13단계 Monitoring 콘텐츠와 Room별 데이터 전달 검증 결과
+
+이번 단계는 Monitoring 콘텐츠 Resource와 확정 Room에 대응하는 읽기 전용 표시만 추가했습니다.
+Runtime/Containment/Experiment 승인 및 확정 전 진행 보호는 유지했습니다. Timer나 판정은 없습니다.
+
+| 번호 | 보고 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 저장소 | 소스38개와 전체 Scene/Script/Resource/UID/설정, setup/전환/확정/공용 흐름/기존 검증 조사. HEAD d029272, master→origin/main, 기존 11·12단계 5개 파일 미커밋. Monitoring Scene은 있었으나 전용 Script는 없음 |
+| 2 | MonitoringStageData | class_name Resource, 개별 표시 상태 정의 |
+| 3 | MonitoringOutcomeData | class_name Resource, Room에 대응하는 Stage 묶음 정의 |
+| 4 | 필드 | Stage: time_offset:int(초), observation_text:String. Outcome: room_id:String, stages:Array[MonitoringStageData]. 추가 결과/에셋/상태 필드 없음 |
+| 5 | CaseData | containment_outcomes:Array[MonitoringOutcomeData] 한 필드 추가, 기존 필드 유지 |
+| 6 | 테스트 .tres | Room01/02/03 Outcome 각1개, 각 Stage3개(0/10/20초), 총 Outcome3/Stage9. 서로 다른 Temporary monitoring state XX-A/B/C 문구. 기존 콘텐츠 보존 |
+| 7 | Room→Outcome | 확정된 room_id와 Outcome.room_id 문자열 일치로 연결. 배열 인덱스 결합 없음 |
+| 8 | Main 검색 | _get_monitoring_outcome()에서 현재 확정 ID/Case/목록 확인 후 같은 ID의 첫 유효 Outcome 반환. null/빈 ID 경고 후 건너뜀, 매칭 없으면 경고+null |
+| 9 | 전달 | Main이 MONITORING 생성 전에 MonitoringView.setup(outcome) 호출. View의 직접 load/Main 탐색/Runtime 접근 없음 |
+| 10 | UI | 기존 Control/제목/Next 유지, RoomId/전체 개수/StageScroll→StageList 추가. 각 Stage는 VBoxContainer→시간 Label/관찰 Label |
+| 11 | 동적 목록 | stages.size()만큼 기본 Control 생성. Item Scene/Manager/고정 Stage 노드 없음 |
+| 12 | Room01 매핑 | Room01 확정 후 Room01 Outcome/01-A/B/C 표시, Outcome 배열 역순에서도 동일 |
+| 13 | Room02 매핑 | Room02 확정 후 Room02 Outcome/02-A/B/C 표시, 배열 순서와 무관 |
+| 14 | Room03 매핑 | Room03 확정 후 Room03 Outcome/03-A/B/C 표시, 배열 역순에서도 동일 |
+| 15 | 3→4 | .tres의 Room02 Stage만 4개로 임시 변경, headless/Windows GPU에서 개수4 및 30초 02-D 스크롤 표시 성공. GDScript15개 SHA-256 동일 |
+| 16 | 3→2 | .tres에서 Room02 Stage 하나 제거, 양쪽에서 개수2 표시 성공. 검증 후 원래 3개 Resource 바이트/SHA-256 복원, 복원 후 재실행 성공 |
+| 17 | 없는 Outcome | Room02 확정 후 Outcome01만 있는 경우 경고와 Monitoring data unavailable, 목록0개. 다른 Room으로 대체하지 않음 |
+| 18 | 누락 데이터 | 미확정/없는 Case/빈 Outcome 배열/null Outcome/빈·공백 ID/빈 stages/null Stage/빈·공백 관찰 문구 모두 경고·대체 UI로 처리. 정상 매칭 항목은 표시 가능 |
+| 19 | 시간 오류 | 음수와 역행 offset 경고, 원래 숫자/배열 순서 유지. 자동 정렬/클램프 없음 |
+| 20 | 반복 setup | 이전 항목 제거/해제, 스크롤 초기화, 새 목록 생성. 반복 진입/재호출 후 중복 목록/signal 없음 |
+| 21 | Experiment Runtime | EXP01/03 실행 이력과 remaining0가 Monitoring 표시/setup/전환/재진입 동안 유지 |
+| 22 | Containment Runtime | 확정 ID 및 잠금 상태 유지. 확정 전 Next/직접 signal 우회 차단 유지. Runtime Script와 Containment Script/Scene/Resource 변경 없음 |
+| 23 | Resource 불변성 | 콘텐츠 전체 snapshot과 실행 전후 .tres/스키마 SHA-256 동일. Resource 임시 편집 검사만 명시적으로 변경하고 복원. View는 읽기 전용 |
+| 24 | 기존 회귀 | Profile/CCTV 표시, Experiment 선택/실행/result/제한/중복 거부/완료 복원, Containment 선택/Confirm/재확정 거부/reset 통과 |
+| 25 | 전체 흐름 | PROFILE→CCTV→EXPERIMENT→CONTAINMENT→확정→MONITORING→RESULT→PROFILE 및 재진입 통과. 한 View/이전 View 해제/signal1회 확인 |
+| 26 | 파싱/실행 | Godot4.7.1 editor import1 + 전체 GDScript check-only15 + headless/Windows GPU 실행·회귀22 + Resource-only5, 총43개 성공. 1920×1080/1280×720/1024×768 및 기존 canvas_items/keep/Scaling 정상 |
+| 27 | 문제/해결 | 초기 스크롤 높이가 기본 Stage3개보다 작아 Monitoring 내부 글자/간격/스크롤 높이만 조정. Resource 생성 스크립트 형식 지정 오류도 수정. 미해결 파싱/실행 오류 없음 |
+| 28 | 실제 파일 | 새 Script3개(MonitoringStageData/OutcomeData/View)+Godot UID3개. 수정5개(CaseData/Main/test_case_01.tres/Monitoring Scene/README). 삭제 없음, 최종 소스44개 |
+| 29 | 기존 변경 보호 | 이전 11·12단계 변경 기준 사본/diff 저장, 그 위에 필요한 부분만 추가. 기존 소스33개/이전 검증 Script96개 동일, 이전 단계 보고 보존. 이번 변경만의 diff 별도 저장, 커밋/push 없음 |
+| 30 | 미구현 | Timer/자동 Stage 전환/Monitoring Runtime 필드/진행률/Animation·Audio·CCTV 변화/정답·Success·Failure/Breach/Incident/Broadcast/Case Result/Research Log/Save·Load/GameState·Manager/Campaign/최종 UI |
+| 31 | 다음 확장 지점 | MonitoringStageData/OutcomeData, Main의 ID 검색, MonitoringView.setup 경계. 실제 재생 규칙은 다음 요구사항이 정해졌을 때 추가 |
+
+정상 검사에는 오류·경고가 없습니다. 부정 데이터 검사에는 예상 경고만
+Monitoring27개, 기존 Containment9개, 기존 Experiment17개가 발생했습니다.
+9개 Room/창 크기 조합과 Outcome 역순 검증, 반복 진입, 기존 격리 승인/거부/reset 검사를 수행했습니다.
+GPU 캡처에서 기본3개/확정 Room/작은 창/네 번째 Stage 스크롤을 직접 확인했습니다.
+1024×768의 콘텐츠 렌더 영역은 기존 비율 유지에 따라 1024×576입니다.
+F5 키 자체를 조작하지 않았으며 같은 run/main_scene의 기본 프로젝트 실행을 양쪽에서 검증했습니다.
+
+검증 사본/전용 Script/실행기/로그/PNG/작업 전 사본/해시/결과 JSON과
+기존 변경 diff 및 Step13만의 diff는 Git 제외 `.godot/verification/step13/`에 있습니다.
+이 자료는 게임에서 로드하지 않습니다. 기존 검증 Script는 수정하지 않았습니다.
+
+## 12단계 Containment 확정 및 Runtime 기록 검증 결과
+
+이번 단계는 명시적 확정과 Room ID 기록, 확정 전 Monitoring 진행 차단만 추가했습니다.
+후보가 정답인지 판단하지 않습니다. Main은 현재 후보 여부를 검증하고 Runtime은 최초 확정만 기록합니다.
+
+| 번호 | 보고 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 저장소 | 실제 소스 38개와 모든 Scene/Script/Resource/UID/설정, 기존 검증 코드, 선택/진행/setup/해제/Experiment 승인 연결 조사. HEAD d029272, master → origin/main. 11단계 README/ContainmentView 두 파일 미커밋 상태 |
+| 2 | 확정 흐름 | Room 선택 → Confirm → confirmation_requested(ID) → Main 후보 검증 → Runtime 최초 기록 → snapshot 반영 → Next 활성화 |
+| 3 | 추가 Runtime 상태 | private `_confirmed_containment_room_id: String = ""` 하나. 임시 선택은 View 내부 유지 |
+| 4 | Runtime API | try_confirm_containment_room(room_id) → bool / has_confirmed_containment() / get_confirmed_containment_room_id() |
+| 5 | 후보 검증 | Main._on_containment_confirmation_requested(): 현재 View만 허용, current_case의 실제 배열과 ID 일치 확인, null/빈 ID/없는 후보 거부 |
+| 6 | Confirm 버튼 | Containment Scene의 Actions HBox에 ConfirmButton 추가, 기존 Next와 한 줄 배치. 선택 없음 disabled, 유효 선택 enabled |
+| 7 | 진행 보호 | View의 Next disabled + Main의 Runtime 확정 검사. 클릭/pressed/advance_requested 직접 호출과 조작된 UI snapshot에서도 확정 전 이동 불가 |
+| 8 | signal | containment_confirmation_requested(room_id: String), View는 Runtime을 읽거나 탐색하지 않음 |
+| 9 | Main 연결 | 현재 ContainmentView에 signal 1회 연결, setup에 확정 ID 전달, 처리 후 실제 Runtime ID로 update_confirmation_state() 호출 |
+| 10 | 정상 선택 | 초기 없음, 01→02→03→03→02, 최대 하나만 선택 및 재클릭 유지. 유효 후보 01/02/03 모두 확정 가능 |
+| 11 | 선택과 Runtime | 후보 선택/변경만으로 확정 ID 및 Experiment 이력/남은 횟수 변경 없음 |
+| 12 | 확정 성공 | TEST_ROOM_02 선택 후 Confirm으로 Runtime에 TEST_ROOM_02 한 번 기록 |
+| 13 | 확정 UI | 해당 후보 [Confirmed]와 선택 표시, 임시 선택 인덱스 -1, Confirm disabled, Next enabled |
+| 14 | 후보 변경 차단 | 확정 후 모든 후보 disabled, 다른 후보 클릭해도 확정 ID와 UI 유지 |
+| 15 | 재확정 차단 | 같은/다른 ID의 두 번째 요청을 Runtime API 자체에서 false로 거부. Main signal 직접 요청도 기존 확정 유지 |
+| 16 | 없는 ID | TEST_ROOM_NOT_EXISTS 및 stale UI 후보 요청 거부, Runtime 변경 없음, Next 잠금 유지. 실제 Case 배열에서 후보가 제거된 뒤 오래된 UI 행이 남아 있어도 안전하게 거부 |
+| 17 | 빈 ID | 빈 문자열/공백 ID를 View·Main·Runtime 단계에서 거부. null/선택 없음/선택 후 데이터 무효화도 기록 불가 |
+| 18 | 재진입 | 확정 후 전체 6개 View 순환, 동일 State/확정 ID/Experiment 이력 유지. 확정 표시와 잠금/Next 활성화 복원 |
+| 19 | 반복 setup | 확정 전/후 각각 2회 재호출, 목록/버튼/그룹 새로 생성, 이전 노드 해제, 임시 선택 초기화, snapshot 확정 복원, signal 중복 없음. 트리 진입 전 setup도 확인 |
+| 20 | reset | 기존 case_id 지정/기본 빈 ID 정책 유지. Experiment 이력과 확정 ID 동시 초기화, reset 이후 새 확정 가능 |
+| 21 | Runtime 독립성 | limit 2: TEST_EXP_01 실행 → remaining1, TEST_EXP_03 → remaining0, 이어 Room02 확정. history 01/03 및 remaining0 유지 |
+| 22 | 콘텐츠 불변성 | Case/Profile/CCTV/Experiment/Containment 필드 snapshot 동일. CaseData/ContainmentData/test_case_01.tres SHA-256 동일. Resource 런타임 필드 추가 없음 |
+| 23 | 기존 회귀 | Profile/CCTV 표시, Experiment 목록/선택/실행/result_text/제한/중복 거부/완료 복원 통과. 기존 Experiment 승인 코드 보존 |
+| 24 | 전체 흐름 | PROFILE → CCTV → EXPERIMENT → CONTAINMENT → 확정 → MONITORING → RESULT → PROFILE 통과. View 하나, 이전 View 해제, 중복 signal 없음 |
+| 25 | 파싱/실행 | Godot 4.7.1 editor import1 + 전체 GDScript check-only12 + headless/Windows GPU 실행·회귀20, 총33개 성공. 1920×1080/1280×720/1024×768 및 기존 canvas_items/keep/Scaling 유지 |
+| 26 | 문제/해결 | 검증 코드가 전체 순환 후 해제된 이전 View를 참조하던 문제는 새 View 참조 갱신으로 해결. 후보 배열 축소 시 오래된 UI 행의 배열 범위 접근도 방어하고 관련 검사 재실행 성공. 미해결 오류 없음 |
+| 27 | 파일 변경 | 이번 작업은 Main Script, Runtime Script, Containment Script/Scene, README 총5개 수정. 소스 생성/삭제 없음. 기존 Next 위치만 Actions 안으로 이동, unique name/API 유지 |
+| 28 | 기존 변경 보존 | 11단계 변경 파일을 작업 전 사본으로 저장하고 그 위에 필요한 부분 추가. 이전 단계 문서와 기존 검증 Script84개 보존. 이번 변경과 기존 diff를 별도 저장 |
+| 29 | 미구현 | 정답/오답/Success·Failure/환경 조건/Monitoring 데이터·Timer·상태 변화/Breach/Incident/Broadcast/Research Log/Case Result/Save·Load/Campaign/Manager/GameState/최종 Theme |
+| 30 | 다음 확장 지점 | Runtime 확정 ID 조회와 Resource → Main → View.setup 경계. Monitoring이나 판정 요구사항이 정해지면 상위 계층에서 명시적으로 연결 |
+
+정상 경로에는 오류·경고가 없으며 부정 데이터 검사에는 예상 경고만 9개(격리 데이터),
+17개(기존 Experiment 제한) 발생했습니다. 초기/선택/확정/재진입 GPU 캡처와 작은 창 화면을 확인했습니다.
+1024×768에서 콘텐츠는 기존 비율 유지에 따라 1024×576으로 렌더합니다.
+F5 키 자체를 자동 조작하지 않았으며 동일한 run/main_scene의 기본 프로젝트 실행을 양쪽에서 검증했습니다.
+
+로컬 검증 사본/확정 전용 Script/실행기/로그/PNG/변경 전 사본/SHA-256/결과 JSON과
+기존 11단계 diff 및 이번 작업만의 diff는 Git 제외 `.godot/verification/step12/`에 있습니다.
+이 자료는 게임에서 로드하지 않습니다. 커밋과 push는 하지 않았습니다.
+
+## 11단계 Containment 단일 선택 검증 결과
+
+이번 단계는 후보 단일 선택만 추가했습니다. 기존 `containment_view.gd`와 이 README만 수정했으며
+소스 파일/Scene/Resource/UID의 생성·삭제는 없습니다. 커밋과 push는 하지 않았습니다.
+
+| 번호 | 보고 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 저장소 | 소스 38개와 전체 Scene/Script/Resource/UID, Main/setup/signal/해제, Experiment ButtonGroup, 설정, 기존 검증 코드 조사. master → origin/main, HEAD d029272, 변경 없음 |
+| 2 | 선택 방식 | Experiment와 동일한 CheckBox + ButtonGroup, allow_unpress=false |
+| 3 | 항목 Node | RoomList → VBoxContainer → 이름 CheckBox / 설명 Label |
+| 4 | 별도 Item Scene | 생성하지 않음. 기본 Control 두 개와 선택 연결만 필요 |
+| 5 | 선택 저장 | ContainmentView._selected_room_index, -1은 선택 없음. 그룹도 View 내부 |
+| 6 | 콘텐츠 분리 | ContainmentData는 기존 room_id/display_name/description 세 필드만 유지. Main/Runtime 선택 상태 없음 |
+| 7 | 선택 표시 | Godot 기본 그룹 선택 표시 사용. 별도 Theme/색상 없음 |
+| 8 | 초기 진입 | 후보 3개, 선택 인덱스 -1, 눌린 버튼 없음 |
+| 9 | Room 01 | TEST_ROOM_01만 선택, 인덱스 0 |
+| 10 | Room 02 변경 | 01 해제, TEST_ROOM_02만 선택, 인덱스 1 |
+| 11 | 동일 후보 재클릭 | Room 03 재클릭 후 선택 유지. 선택 해제 Toggle 없음 |
+| 12 | 최대 선택 수 | 모든 클릭 단계에서 정확히 하나만 선택, 초기 상태는 0개 |
+| 13 | View 재진입 | 새 View의 후보 3개, 선택 없음. 이전 View 해제, 목록/signal 중복 없음 |
+| 14 | 반복 setup | 선택 후 2회 반복, 인덱스/그룹 초기화. 이전 항목/버튼 해제와 이전 그룹의 버튼 0개 확인. 트리 진입 전 setup도 확인 |
+| 15 | 잘못된 데이터 | 빈 배열/null/빈·공백 ID/이름/설명 대체 문구 유지. null/빈 ID 선택 비활성화. 혼합 목록의 정상 후보 선택 가능, 정상 ID의 누락 이름/설명도 선택 가능 |
+| 16 | Resource 불변성 | Case/Experiment/Containment 필드 snapshot 동일. test_case_01.tres 및 CaseData/ContainmentData SHA-256 동일. 선택 상태 필드 추가 없음 |
+| 17 | Experiment Runtime | limit 2에서 TEST_EXP_01 → remaining 1, TEST_EXP_03 → 0. 이력 01/03 유지, Containment 선택/setup/전환으로 변경 없음. 오래된 UI의 중복/제한 초과 요청 거부도 유지 |
+| 18 | 기존 콘텐츠/실험 | Profile/CCTV 표시, Experiment 목록/선택/실행/result_text/완료 상태/제한/재진입 회귀 통과 |
+| 19 | 전체 흐름 | PROFILE → CCTV → EXPERIMENT → CONTAINMENT → MONITORING → RESULT → PROFILE 통과. 선택 없이도, 선택 후에도 진행. View 한 개/이전 View 해제 확인 |
+| 20 | 파싱/실행 | Godot 4.7.1 editor import 1개 + 전체 GDScript check-only 12개 + headless/Windows GPU 실행·회귀 18개, 총 31개 성공. 1920×1080/1280×720/1024×768, canvas_items/keep/Scaling 유지 |
+| 21 | 문제/해결 | 혼합 목록 검증 코드가 스크롤 밖 후보 위치를 클릭해 진행 버튼을 누름. ensure_control_visible() 후 클릭하도록 검증 코드만 수정하고 재검증 통과. 제품 코드 오류 및 미해결 오류 없음 |
+| 22 | 실제 변경 범위 | containment_view.gd: 이름 Label을 CheckBox로 교체, 폰트 18로 기존 Experiment 패턴 적용, 그룹/인덱스/선택 핸들러 추가. README: 현재 동작과 결과 갱신. 기존 Scene/설정/UID 유지 |
+| 23 | 기존 변경 보존 | 시작 시 미커밋 변경 없음. 나머지 소스 36개 및 기존 검증 Script 73개 SHA-256 동일. 이전 단계 결과 문서 보존 |
+| 24 | 구현하지 않은 것 | 격리 확정/선택 필수/Runtime 격리 기록/정답/환경 조건/Monitoring/Success·Failure/Incident/Broadcast/Research Log/Save·Load/Manager/GameState/Campaign/최종 Theme |
+| 25 | 다음 확장 지점 | ContainmentView 선택 처리와 기존 Resource → Main → View.setup 경계. 확정 규칙 및 상태 전달은 다음 요청에서 결정 |
+
+정상 경로에는 오류와 경고가 없습니다. 부정 데이터 검사는 예상 경고만 각각 9개(혼합 선택),
+8개(기존 Containment 누락), 17개(기존 Experiment/제한)로 확인했습니다.
+GPU 캡처에서 기본 세 후보/선택 표시/설명/진행 버튼을 직접 확인했습니다.
+1024×768의 실제 콘텐츠 렌더 영역은 기존 비율 유지 설정에 따라 1024×576입니다.
+F5 키 자체는 자동 조작하지 않았으며 동일한 run/main_scene의 기본 프로젝트 실행을 검증했습니다.
+
+이번 로컬 검증 Script, 실행기, 로그, PNG, 변경 전 사본, SHA-256 manifest, 결과 JSON과 diff는
+Git 제외 경로 `.godot/verification/step11/`에 있습니다. 게임에서는 로드하지 않습니다.
+기존 검증 Script는 그대로 보존하고 이번 경로에 회귀 검사 사본과 선택 전용 검사를 추가했습니다.
 
 ## 10단계 Containment Resource 동적 후보 목록 검증 결과
 
@@ -800,11 +1069,12 @@ Resource, Autoload, 기존 콘텐츠는 없었습니다. Git은 `master` 브랜�
 현재 구현은 임시 Main UI, 창 크기 표시, 6개 View의 순차 이동과 테스트 Resource의
 PROFILE / CCTV 텍스트, EXPERIMENT 목록·단일 선택·즉시 결과 텍스트 표시와
 현재 Case의 메모리 실행 ID 이력, ID별 1회와 Case 횟수 제한, 완료/남은 횟수 표시입니다.
-CONTAINMENT의 Resource 후보 목록 표시도 포함합니다.
+CONTAINMENT의 Resource 후보 목록, 임시 단일 선택, 명시적 확정과 메모리 Runtime 기록도 포함합니다.
+MONITORING은 확정 Room ID별 Outcome을 Timer로 순차 재생하고 시간/관찰 기록을 누적하며 완료 후 Next를 활성화합니다.
 테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
-CCTV 이미지·영상·상태 변화·환경 수치, Experiment 결과 이미지/오디오, Containment 선택·확정·환경 조건·판정,
-Monitoring 상태 변화, Success/Failure, Campaign, Case 로직,
-Monitoring 로직, Incident, Broadcast, Research Log,
+CCTV 이미지·영상·상태 변화·환경 수치, Experiment 결과 이미지/오디오, Containment 환경 조건·정답 판정,
+Monitoring Runtime 저장, Success/Failure, Campaign, Case 로직,
+Incident, Broadcast, Research Log,
 Save/Load, Settings, Horror Event, 검열·이미지 시스템, CRT/Shader, Audio, Animation,
 GameState Singleton, CaseManager, CampaignManager, 최종 UI/폰트/에셋은 구현하지 않았습니다.
 
@@ -815,4 +1085,8 @@ Resource와 표시 Script만 추가하는 지점이 적합합니다. 아직 사�
 Experiment 표시 확장은 `experiment_data.gd`와 `experiment_view.gd`에서 시작할 수 있습니다.
 현재 선택과 결과는 View 내부에만 있으며 실행 ID 이력은 Main이 소유하는 CaseRuntimeState에 있습니다.
 이력 조회를 다른 UI/로직에 연결하는 작업은 다음 단계의 요구사항이 정해졌을 때 추가합니다.
-현재 단계에는 Research Log·Timer·진행률이 없습니다. 테스트 limit 2는 최종 게임 밸런스가 아닙니다.
+현재 단계에는 Research Log·진행률이 없습니다. 테스트 limit 2는 최종 게임 밸런스가 아닙니다.
+Containment 확장은 `containment_view.gd`의 선택 처리에서 시작할 수 있습니다.
+확정 ID 조회와 현재 Resource → Main → View.setup 경계에서 다음 요구사항을 확장할 수 있습니다.
+Monitoring 확장은 MonitoringStageData/MonitoringOutcomeData와 MonitoringView.setup 및 재생 완료 경계에서 시작할 수 있습니다.
+다음 단계 요구사항이 정해지면 이 경계에만 필요한 동작을 추가합니다. 완료는 Stage 재생 종료만 의미합니다.

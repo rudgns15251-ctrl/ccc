@@ -8,3 +8,4 @@ extends Resource
 @export var available_experiments: Array[ExperimentData] = []
 @export var experiment_limit: int = 0
 @export var available_containment_rooms: Array[ContainmentData] = []
+@export var containment_outcomes: Array[MonitoringOutcomeData] = []

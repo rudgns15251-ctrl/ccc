@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/views/flow_view.gd" id="1_flow"]
+[ext_resource type="Script" path="res://scripts/views/monitoring_view.gd" id="1_monitoring"]
 
 [node name="MonitoringView" type="Control"]
 layout_mode = 3
@@ -9,7 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_flow")
+script = ExtResource("1_monitoring")
 
 [node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -22,7 +22,7 @@ grow_vertical = 2
 [node name="Content" type="VBoxContainer" parent="Center"]
 custom_minimum_size = Vector2(900, 0)
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 2
 
 [node name="ScreenTitle" type="Label" parent="Center/Content"]
 unique_name_in_owner = true
@@ -31,12 +31,30 @@ theme_override_font_sizes/font_size = 40
 text = "MONITORING"
 horizontal_alignment = 1
 
-[node name="Description" type="Label" parent="Center/Content"]
+[node name="RoomId" type="Label" parent="Center/Content"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "Placeholder for the Monitoring step. No live state changes are simulated."
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="Center/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="StageScroll" type="ScrollContainer" parent="Center/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(900, 180)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="StageList" type="VBoxContainer" parent="Center/Content/StageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
 [node name="NextButton" type="Button" parent="Center/Content"]
 unique_name_in_owner = true
@@ -44,4 +62,9 @@ custom_minimum_size = Vector2(360, 64)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 28
+disabled = true
 text = "Next: RESULT"
+
+[node name="PlaybackTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
