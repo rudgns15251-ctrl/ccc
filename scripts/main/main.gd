@@ -18,6 +18,8 @@ const VIEW_SCENES: Array[PackedScene] = [
 
 @export var current_case: CaseData
 
+var case_runtime: CaseRuntimeState
+
 @onready var window_size_label: Label = %WindowSize
 @onready var view_host: Control = %ViewHost
 
@@ -29,6 +31,7 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_update_window_size)
 	_update_window_size()
 	_validate_case()
+	case_runtime = CaseRuntimeState.new(current_case.case_id if current_case != null else "")
 	_show_view(Stage.PROFILE)
 
 
@@ -53,12 +56,17 @@ func _show_view(stage: int) -> void:
 		cctv_view.setup(current_case.cctv_data if current_case != null else null)
 	elif stage == Stage.EXPERIMENT:
 		var experiment_view: ExperimentView = _current_view as ExperimentView
+		experiment_view.experiment_executed.connect(_on_experiment_executed)
 		experiment_view.setup(current_case.available_experiments if current_case != null else [])
 	view_host.add_child(_current_view)
 
 
 func _on_advance_requested() -> void:
 	_show_view((_current_stage + 1) % VIEW_SCENES.size())
+
+
+func _on_experiment_executed(experiment_id: String) -> void:
+	case_runtime.record_experiment_execution(experiment_id)
 
 
 func _validate_case() -> void:
