@@ -4,6 +4,7 @@ const FlowView = preload("res://scripts/views/flow_view.gd")
 const ProfileView = preload("res://scripts/views/profile_view.gd")
 const CCTVView = preload("res://scripts/views/cctv_view.gd")
 const ExperimentView = preload("res://scripts/views/experiment_view.gd")
+const ContainmentView = preload("res://scripts/views/containment_view.gd")
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT }
 
@@ -56,8 +57,17 @@ func _show_view(stage: int) -> void:
 		cctv_view.setup(current_case.cctv_data if current_case != null else null)
 	elif stage == Stage.EXPERIMENT:
 		var experiment_view: ExperimentView = _current_view as ExperimentView
-		experiment_view.experiment_executed.connect(_on_experiment_executed)
-		experiment_view.setup(current_case.available_experiments if current_case != null else [])
+		experiment_view.experiment_execution_requested.connect(_on_experiment_execution_requested.bind(experiment_view))
+		var limit: int = current_case.experiment_limit if current_case != null else 0
+		experiment_view.setup(
+			current_case.available_experiments if current_case != null else [],
+			case_runtime.get_experiment_execution_history(),
+			case_runtime.get_remaining_experiment_count(limit),
+			limit
+		)
+	elif stage == Stage.CONTAINMENT:
+		var containment_view: ContainmentView = _current_view as ContainmentView
+		containment_view.setup(current_case.available_containment_rooms if current_case != null else [])
 	view_host.add_child(_current_view)
 
 
@@ -65,8 +75,17 @@ func _on_advance_requested() -> void:
 	_show_view((_current_stage + 1) % VIEW_SCENES.size())
 
 
-func _on_experiment_executed(experiment_id: String) -> void:
-	case_runtime.record_experiment_execution(experiment_id)
+func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
+	if experiment_view != _current_view:
+		return
+	var limit: int = current_case.experiment_limit if current_case != null else 0
+	var approved: bool = case_runtime.try_record_experiment_execution(experiment_id, limit)
+	experiment_view.show_execution_result(experiment_id, approved)
+	experiment_view.update_execution_state(
+		case_runtime.get_experiment_execution_history(),
+		case_runtime.get_remaining_experiment_count(limit),
+		limit
+	)
 
 
 func _validate_case() -> void:
@@ -77,3 +96,5 @@ func _validate_case() -> void:
 		push_warning("Main: current_case.case_id is empty.")
 	if current_case.display_name.strip_edges().is_empty():
 		push_warning("Main: current_case.display_name is empty.")
+	if current_case.experiment_limit < 0:
+		push_warning("Main: current_case.experiment_limit is negative; treating it as zero.")

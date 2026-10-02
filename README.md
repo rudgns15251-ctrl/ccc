@@ -1,9 +1,11 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-6개 임시 화면의 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT 표시를 구현했습니다.
+6개 임시 화면의 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT / CONTAINMENT 표시를 구현했습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
-유효한 실행 ID는 Main이 소유하는 메모리 CaseRuntimeState에 순서와 중복을 유지해 기록됩니다.
+각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
+Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
+CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하며 선택이나 판정은 없습니다.
 실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
@@ -16,8 +18,12 @@ EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트
    EXPERIMENT에는 available_experiments 배열의 이름과 설명이 동적 목록으로 표시됩니다.
    이름 옆 선택 Control을 클릭하면 해당 항목만 선택됩니다. 재클릭해도 선택이 유지됩니다.
    선택 후 **Run Experiment**를 누르면 해당 Resource의 result_text가 표시됩니다.
-   다른 항목을 선택하면 이전 결과가 초기화됩니다. 같은 실험은 반복 실행할 수 있습니다.
+   다른 실행 가능한 항목을 선택하면 이전 결과가 초기화됩니다.
+   실행 완료 항목은 **[Executed]**와 disabled 상태로 표시되며 재선택·재실행할 수 없습니다.
+   **Experiments Remaining**으로 남은 횟수를 확인합니다. 0이면 모든 항목과 Run이 비활성화됩니다.
    선택만 하면 기록하지 않으며, 정상 실행할 때마다 이력에 ID 하나를 추가합니다.
+   CONTAINMENT에는 available_containment_rooms 배열의 후보 이름과 설명이 표시됩니다.
+   후보는 표시 전용입니다. 기존 **Next: MONITORING** 버튼으로 계속 진행합니다.
 4. RESULT의 **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
    이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력은 유지됩니다.
 5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
@@ -28,6 +34,7 @@ PROFILE / CCTV를 단독 실행하면 상위 계층이 데이터를 전달하지
 누락 경고와 `Profile data unavailable` / `CCTV data unavailable`이 표시됩니다.
 버튼의 진행 요청 기능은 유지됩니다.
 EXPERIMENT를 단독 실행하면 빈 목록 경고와 `No experiments available`이 표시됩니다.
+CONTAINMENT를 단독 실행하면 빈 목록 경고와 `No containment rooms available`이 표시됩니다.
 
 ## 프로젝트 설정
 
@@ -59,7 +66,7 @@ cap/
 ├── resources/
 │   ├── .gitkeep
 │   └── cases/
-│       └── test_case_01.tres # CaseData와 내장 ProfileData / CCTVData / ExperimentData 3개
+│       └── test_case_01.tres # CaseData와 내장 Profile/CCTV, Experiment 3개, Containment 3개
 ├── scenes/
 │   ├── main/
 │   │   └── main.tscn       # 기존 기반 UI와 ViewHost
@@ -76,6 +83,8 @@ cap/
     │   ├── case_data.gd.uid
     │   ├── cctv_data.gd
     │   ├── cctv_data.gd.uid
+    │   ├── containment_data.gd
+    │   ├── containment_data.gd.uid
     │   ├── experiment_data.gd
     │   ├── experiment_data.gd.uid
     │   ├── profile_data.gd
@@ -91,6 +100,8 @@ cap/
         ├── flow_view.gd.uid
         ├── cctv_view.gd    # 전달받은 CCTVData 표시
         ├── cctv_view.gd.uid
+        ├── containment_view.gd # 전달받은 ContainmentData 배열을 표시만 함
+        ├── containment_view.gd.uid
         ├── experiment_view.gd # 전달받은 ExperimentData 배열을 동적 목록으로 표시
         ├── experiment_view.gd.uid
         ├── profile_view.gd # 전달받은 ProfileData 표시
@@ -120,14 +131,15 @@ Main (Control, main.gd)
                 ├── Description
                 ├── Workspace (EXPERIMENT만)
                 │   ├── ExperimentScroll / ExperimentList (동적 항목)
-                │   └── Execution / RunButton / ResultTitle / ResultText
+                │   └── Execution / RemainingCount / RunButton / ResultTitle / ResultText
+                ├── RoomScroll / RoomList (CONTAINMENT만, 동적 이름/설명 Label)
                 └── NextButton
 ```
 
-화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT의 콘텐츠는 Resource에
+화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT 콘텐츠는 Resource에
 있고 나머지 화면은 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
-모든 View는 Control 기반 독립 Scene입니다. 다른 3개 View는 기존 `flow_view.gd`를
-그대로 사용하며, Profile / CCTV / Experiment 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
+모든 View는 Control 기반 독립 Scene입니다. Monitoring / Result는 기존 `flow_view.gd`를
+그대로 사용하며, Profile / CCTV / Experiment / Containment 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
 별도의 Scene 상속이나 추상 Base Class 계층은 없습니다.
 
 `NextButton.pressed → advance_requested → Main._on_advance_requested() → 다음 View`로
@@ -147,24 +159,27 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 ## 테스트 Resource와 데이터 전달
 
 [Godot Resource](https://docs.godotengine.org/en/4.7/tutorials/scripting/resources.html)를
-데이터 컨테이너로 사용합니다. 네 클래스는 `class_name`과 typed export 필드만 정의합니다.
+데이터 컨테이너로 사용합니다. 다섯 콘텐츠 클래스는 `class_name`과 typed export 필드만 정의합니다.
 
 | 파일 | 책임 / 필드 |
 | --- | --- |
-| `scripts/data/case_data.gd` | CaseData: case_id, display_name, profile_data, cctv_data, available_experiments: Array[ExperimentData] |
+| `scripts/data/case_data.gd` | CaseData: 기존 필드와 available_containment_rooms: Array[ContainmentData] |
 | `scripts/data/profile_data.gd` | ProfileData: profile_id, subject_name, classification, basic_description |
 | `scripts/data/cctv_data.gd` | CCTVData: camera_id, observation_text만 정의 |
 | `scripts/data/experiment_data.gd` | ExperimentData: experiment_id, display_name, description, result_text만 정의 |
-| `resources/cases/test_case_01.tres` | TEST_CASE_01 / TEST CASE 01, 내장 ProfileData / CCTVData / ExperimentData 3개, 검증용 표시 문구 |
+| `scripts/data/containment_data.gd` | ContainmentData: room_id, display_name, description만 정의 |
+| `resources/cases/test_case_01.tres` | TEST_CASE_01 / TEST CASE 01, 내장 Profile/CCTV, Experiment 3개와 Containment 3개, 검증용 문구 |
 | `scenes/main/main.tscn` | 테스트 Case Resource를 Main.current_case에 연결 |
 | `scripts/main/main.gd` | 기존 데이터 전달/전환, CaseRuntimeState 소유, 실행 signal을 기록 API로 전달 |
-| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, case_id와 실행 ID 배열, 초기화·기록·조회만 담당 |
+| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증과 승인 기록/조회 |
 | `scripts/views/profile_view.gd` | setup(ProfileData), 3개 표시 필드 반영, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/profile_view.tscn` | 제목·데이터 Label·기존 진행 버튼 레이아웃 |
 | `scripts/views/cctv_view.gd` | setup(CCTVData), 두 필드 표시, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/cctv_view.tscn` | 제목·CameraId·Description·기존 진행 버튼 레이아웃 |
-| `scripts/views/experiment_view.gd` | 기존 목록/선택/즉시 결과 표시, 정상 실행 후 experiment_executed(ID) signal |
-| `scenes/views/experiment_view.tscn` | 제목·목록·RunButton·결과 영역·기존 진행 버튼 |
+| `scripts/views/experiment_view.gd` | 목록/선택, experiment_execution_requested(ID), 승인 후 결과와 전달된 실행 상태 표시 |
+| `scenes/views/experiment_view.tscn` | 제목·목록·RemainingCount·RunButton·결과 영역·기존 진행 버튼 |
+| `scripts/views/containment_view.gd` | setup(rooms), 동적 이름/설명 Label 표시, 빈 목록/null/빈 필드 경고와 대체 문구 |
+| `scenes/views/containment_view.tscn` | 제목·개수 설명·RoomScroll/RoomList·기존 진행 버튼 |
 | `scripts/views/flow_view.gd` | 기존 진행 기능만 담당, 이번 단계 수정 없음 |
 
 ```text
@@ -188,13 +203,28 @@ Main.current_case.available_experiments (내장 ExperimentData 배열)
 ExperimentView.setup(experiments)
             ↓
 ExperimentList에 이름 CheckBox / 설명 Label 묶음을 배열 길이만큼 생성
+
+Main.current_case.available_containment_rooms (내장 ContainmentData 배열)
+            ↓
+ContainmentView.setup(rooms)
+            ↓
+RoomList에 이름 Label / 설명 Label 묶음을 배열 길이만큼 생성
 ```
 
-Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 세 전용 View는 데이터를
+Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 네 전용 View는 데이터를
 보관하고 `_ready()`에서 기본 진행 기능의 `super._ready()`를 호출한 뒤 표시합니다.
 트리에 들어간 후 `setup()`을 다시 호출하는 경우에도 표시를 갱신하도록 했습니다.
-세 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
+네 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
 순환 후 View를 새로 만들 때에도 동일한 Case의 데이터를 다시 전달합니다.
+
+ContainmentView는 배열 순서대로 VBoxContainer와 이름/설명 Label 두 개를 생성합니다.
+Scene에 Room1/2/3을 고정하지 않았고 별도 Item Scene이나 선택 Control은 없습니다.
+재표시 전에 이전 항목을 제거/해제하고 스크롤을 처음으로 되돌립니다. 기본 3개는 한 화면에
+표시되며 4개부터 스크롤로 볼 수 있습니다. 빈 배열은 `No containment rooms available`,
+null은 `[Missing ContainmentData]`, 빈 이름/설명은 `[Missing display_name]` / `[Missing description]`으로
+표시합니다. room_id가 빈 문자열/공백이면 경고만 출력하며 다음 View 진행은 유지합니다.
+후보를 수정하려면 테스트 Case의 available_containment_rooms 배열이나 각 Resource의 세 필드를 편집합니다.
+CaseRuntimeState에는 Containment 상태를 추가하지 않았습니다.
 
 ExperimentView는 배열 순서대로 `VBoxContainer`와 이름 CheckBox / 설명 Label을 생성합니다.
 기존 이름 Label만 CheckBox로 바꿨으며 별도 Component Scene이나 Script는 없습니다.
@@ -208,23 +238,34 @@ View 내부 `ButtonGroup`과 기본 선택 표시를 사용해 최대 하나만 
 ExperimentData에는 선택 상태 필드가 없으며 콘텐츠를 수정하지 않습니다.
 진행 버튼은 스크롤 영역 밖에 있으며 선택 여부와 관계없이 다음 View로 이동합니다.
 
-실행 버튼은 선택 없음일 때 비활성화됩니다. 유효한 항목을 선택하면 활성화되며,
+실행 버튼은 선택 없음일 때 비활성화됩니다. 미실행이며 남은 횟수가 있는 항목을 선택하면 활성화되며,
 `RunButton.pressed → _on_run_experiment_pressed()`에서 선택 인덱스와 Resource를 확인하고
-비어 있지 않은 experiment_id를 확인한 뒤 `result_text`를 ResultText Label에 즉시 반영합니다.
+비어 있지 않은 experiment_id를 확인한 뒤 `experiment_execution_requested(ID)`를 보냅니다.
+Main은 `CaseRuntimeState.try_record_experiment_execution(ID, limit)`으로 승인과 기록을 요청합니다.
+성공한 경우에만 `show_execution_result(ID, true)`가 Resource의 result_text를 표시합니다.
+거부되면 결과를 표시하지 않으며 어느 경우든 Main이 최신 실행 상태를 View에 전달합니다.
 비동기 처리나 대기 시간은 없습니다.
 결과 상태는 View 안의 Label 표시 값뿐이고 Resource에 기록하지 않습니다.
 다른 항목 선택, setup() 재호출, View 재진입 시 `No experiment has been executed.`로 초기화합니다.
-같은 항목 재클릭은 선택과 결과를 유지하고, 재실행은 같은 결과를 다시 표시합니다.
-이후 `experiment_executed(experiment_id)`를 보내면 Main이 현재 CaseRuntimeState의
-`record_experiment_execution()`에 전달합니다. Main은 결과 텍스트나 실행 UI를 처리하지 않습니다.
+같은 미실행 항목 재클릭은 선택을 유지합니다. 승인된 항목은 선택을 해제하고 재실행을 차단하며
+결과는 화면에 유지합니다. Main은 결과 텍스트나 실행 UI를 처리하지 않습니다.
 ExperimentView는 Runtime State를 소유하거나 탐색하지 않으며 flow_view.gd는 그대로입니다.
+`setup(experiments, executed_ids, remaining_count, experiment_limit)`에 현재 이력 복사본과
+Runtime에서 계산한 남은 횟수, Case 콘텐츠 제한을 전달합니다. View의 이력/횟수 값은 표시용
+snapshot이며 실행 최종 권한을 갖지 않습니다. Runtime snapshot을 생략하면 안전하게 실행 불가입니다.
+재진입 또는 setup 재호출 시 임시 선택/결과를 초기화하고 전달된 완료 상태/남은 횟수를 다시 반영합니다.
 
 CaseRuntimeState는 `case_id: String`, `_experiment_execution_history: Array[String]`만 보유합니다.
 생성 시 Case ID를 지정할 수 있고 `reset(case_identifier = "")`은 ID를 지정하고 이력을 비웁니다.
-`record_experiment_execution(experiment_id)`는 빈/공백 ID를 거부하고 성공 여부를 반환합니다.
-정상 ID는 원래 문자열로 추가하며 순서와 중복을 보존합니다.
+`try_record_experiment_execution(experiment_id, limit)`는 빈/공백 ID, 중복, 소진된 제한을 거부하고
+검증과 기록을 하나의 동기 API로 수행합니다. 이전의 무제한 기록 API는 이 안전한 API로 교체했습니다.
+정상 ID는 원래 문자열로 추가하며 승인된 실행 순서를 보존합니다.
+`has_executed_experiment()`와 `can_execute_experiment()`로 현재 상태를 조회합니다.
+`get_remaining_experiment_count(limit)`는 제한과 이력 크기에서 0 이상 값을 계산합니다.
 `get_experiment_execution_history()`는 복사본을 반환하고,
-`get_experiment_execution_count()`는 배열 크기에서 계산합니다. 별도의 count 필드는 없습니다.
+`get_experiment_execution_count()`는 배열 크기에서 계산합니다. 별도의 count/remaining 필드는 없습니다.
+CaseData.experiment_limit의 기본값은 0입니다. 테스트 Case는 검증용 임시 값 2이며 최종 밸런스가 아닙니다.
+0은 실행 불가, 음수는 경고와 실행 불가로 처리하며 Resource의 원래 값은 수정하지 않습니다.
 State는 .tres나 디스크에 저장하지 않으며 Main이 해제되거나 프로그램을 종료하면 사라집니다.
 
 테스트 Resource 교체는 `main.tscn`의 **Main**을 선택하고 Inspector의
@@ -249,6 +290,7 @@ Experiment 배열이 비면 `No experiments available`을 표시합니다. null 
 선택이 없거나 Resource가 null이면 실행을 방지하고, 강제 실행 요청에도 경고와 초기 문구를
 표시합니다. result_text가 빈 문자열 또는 공백뿐이면 경고와 `[Missing result_text]`를 표시합니다.
 유효한 ID의 빈 결과는 기존 정책대로 실행 성공으로 취급해 이력에 기록합니다.
+이 경우에도 Runtime이 중복/제한을 승인한 경우에만 대체 결과를 표시하고 1회를 소비합니다.
 
 ## 명령행 검사
 
@@ -328,6 +370,123 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 10단계 Containment Resource 동적 후보 목록 검증 결과
+
+작업 전에 소스 34개, 모든 Scene/Script/콘텐츠 Resource/UID, 설정, Main의 setup/signal/View 해제,
+동적 Experiment 목록과 Runtime, 기존 검증 코드를 조사했습니다. Containment Scene은 존재했으나
+전용 Script는 없었고 flow_view.gd 기반 임시 설명과 진행 버튼만 있었습니다.
+Step 9 미커밋 변경 7개를 사본·해시·diff로 보관했습니다. 커밋/HEAD와 기존 변경을 되돌리지 않았습니다.
+
+생성은 containment_data.gd / containment_view.gd와 Godot가 생성한 UID 두 개, 총 4개입니다.
+수정은 CaseData, 테스트 .tres, Main Script, 기존 Containment Scene, README 총 5개이며 삭제는 없습니다.
+기존 Scene을 재사용하고 NextButton·advance_requested·6개 흐름을 유지했습니다.
+목록 공간은 Containment Scene 내부 간격과 개수 설명 크기만 조정해 확보했습니다.
+Main Scene의 360 높이 ViewHost, project.godot, 해상도/Stretch를 변경하지 않았습니다.
+
+ContainmentData는 `room_id: String`, `display_name: String`, `description: String`의 세 export만 가집니다.
+CaseData에 `available_containment_rooms: Array[ContainmentData]`를 추가했고 기존 필드는 보존했습니다.
+테스트 .tres에는 TEST_ROOM_01/02/03의 임시 이름/설명을 내장 Resource로 추가했습니다.
+새 Script와 sub_resource에 맞춰 load_steps만 10→14로 갱신했고 기존 Profile/CCTV/Experiment 값과 limit 2는 유지했습니다.
+정답·환경 조건·선택·실행 상태를 콘텐츠에 추가하지 않았습니다.
+
+```text
+CaseData.available_containment_rooms → Main → ContainmentView.setup(rooms)
+    → RoomScroll / RoomList → 배열 길이만큼 VBoxContainer + Label 두 개 생성
+```
+
+표시만 필요한 단계여서 기존 목록 구현과 같은 단순한 Label/Container 방식을 사용했습니다.
+별도 Item Scene, Component 계층, Manager, Runtime 상태나 새로운 진행 signal은 필요하지 않았습니다.
+View는 Main이나 .tres를 탐색하지 않고 전달받은 콘텐츠를 읽기만 합니다.
+
+| 검증 | 결과 |
+| --- | --- |
+| 기본 후보 | 3개, 배열 순서/이름/설명 일치, 각 항목은 Label 2개, 선택 UI 없음 |
+| 반복 진입 | 창 크기마다 첫/두 번째/세 번째 진입 모두 같은 개수, 3→6→9 누적 없음 |
+| 반복 setup | 이전 항목 해제, 배열 개수 유지, 스크롤 초기화, signal 중복 없음 |
+| Resource-only 3→4 | .tres만 수정, Headless/GPU에서 4개 표시, 네 번째 후보까지 스크롤 가능 |
+| Resource-only 3→2 | .tres만 수정, Headless/GPU에서 2개 표시 |
+| 복원 | 원래 3개 파일 바이트/SHA-256로 복원, 3개 재실행 성공 |
+| 코드 불변성 | 3/4/2 검증 동안 생산 GDScript 12개 해시 동일 |
+| 오류 처리 | 빈 목록, null, 빈/공백 ID·이름·설명에서 경고/대체 문구, MONITORING 진행 가능 |
+| Runtime 회귀 | 01 실행 후 remaining 1, 03 실행 후 0, Containment/setup/전환 중 history와 State 유지 |
+| 기존 기능 | Profile/CCTV, Experiment 목록/선택/승인/거부/result/완료/limit 회귀 통과 |
+| 전체 흐름 | 6개 View 순환, RESULT→PROFILE, 한 View, 이전 View 해제, 단일 signal 연결 |
+| 해상도 | 1920×1080 / 1280×720 / 1024×768, canvas_items/keep/Scaling 유지 |
+| 파싱 | Godot 4.7.1 import 성공, 생산 GDScript 12개 check-only exit 0 |
+| 실행 | Main Headless/GPU 성공, 최종 33개 검사 exit 0 |
+| 경고 | 정상 입력 오류/경고 없음, 후보 오류 시험 각 8개, 기존 Experiment 오류 시험 각 17개로 일치 |
+| GPU 화면 | AMD Radeon RX 6800 / OpenGL 3.3 Compatibility, 기본3/변경2/작은창4 스크롤 캡처 직접 확인 |
+
+F5 키 자체는 자동 조작하지 않았으며 같은 Main Scene을 명령행으로 실행했습니다.
+발견된 프로젝트 오류와 미해결 문제는 없습니다. Runtime/Experiment Script/Scene과 기존 검증 원본을 보존했습니다.
+검증용 Script는 이전 검사 사본과 작은 후보 목록 검사를 사용하며 별도 Framework를 추가하지 않았습니다.
+`.godot/verification/step10/`에 로그·캡처·사본·해시와 `resource-edit-evidence.json`, `validation-results.json`,
+`change-summary.json`을 보관합니다. `changes-step10.diff`는 Step 10 시작 시점과 비교한 변경,
+`changes-all-uncommitted.diff`는 Step 9를 포함한 현재 전체 변경입니다. 검증 파일은 Git에서 제외됩니다.
+
+이번 단계에는 Containment 선택·확정·정답·환경 판정, Monitoring 로직, Success/Failure,
+Incident/Broadcast/Research Log/Campaign/Save/Load, Audio/Animation/Shader/Theme/Manager를 추가하지 않았습니다.
+다음 단계는 요구사항이 확정되면 ContainmentData와 setup 경계를 유지하며 표시 항목이나 동작을 추가하기 좋습니다.
+현재는 후보 목록 표시만 담당합니다. 커밋과 push는 하지 않았습니다.
+
+## 9단계 A 규칙 Experiment 제한 검증 결과
+
+작업 전에 소스 34개, Case/ExperimentData, Runtime, Main, 실행 순서, 목록/선택/setup/signal,
+전체 Scene과 설정, UID, 기존 검증 코드를 조사했습니다. 작업 트리는 깨끗했으며 Step 6/7/8은
+직전 커밋 `a09c2b7a8fadea60b2f5298fc43918aef24f4703`에 포함되어 있었습니다.
+로컬 master는 origin/main보다 1개 커밋 앞서 있습니다. 이번 단계에서는 커밋/push를 하지 않았습니다.
+
+기존 Step 8의 중복 기록 허용 규칙은 이번 확정된 A 규칙으로 교체했습니다.
+하나의 Case에서 ID별 최대 1회 실행, 승인마다 limit 1회 소비, 소진 후 미실행 ID도 실행 불가입니다.
+콘텐츠 Resource는 정의만 보유하고 Runtime이 유일한 실행 이력 원본입니다.
+Main에는 중복 이력/횟수 필드나 실행 규칙을 추가하지 않았습니다.
+
+```text
+ExperimentView → experiment_execution_requested(ID) → Main
+    → Runtime.try_record_experiment_execution(ID, current_case.experiment_limit)
+    → 승인·기록 성공 후 View 결과 표시 → 최신 snapshot으로 UI 갱신
+```
+
+| 검증 | 결과 |
+| --- | --- |
+| 테스트 콘텐츠 | 후보 01/02/03 유지, experiment_limit = 2만 추가, 최종 밸런스 미확정 |
+| 초기 / 선택만 | history [], remaining 2, 선택 변경/선택 후 전체 순환에도 소비 없음 |
+| 첫 실행 | TEST_EXP_01 승인, history [01], remaining 1, 결과 즉시 표시 |
+| 중복 차단 | 완료 항목 disabled, 오래된 UI를 일부러 전달한 실제 Run 요청도 Runtime에서 거부 |
+| 재진입 1회 | 01 Executed/disabled, 02/03 가능, remaining 1, 선택 없음/결과 초기화 |
+| 두 번째 실행 | TEST_EXP_03 승인, history [01,03], remaining 0 |
+| 제한 소진 | 02는 미실행이나 disabled, 오래된 UI의 02 Run도 거부, 이력/횟수 불변 |
+| 재진입 0회 | 01/03 Executed, 모든 항목과 Run disabled, remaining 0 |
+| setup 반복 | 현재 snapshot으로 복원, 이전 항목 해제, 단일 ButtonGroup/연결 유지, State 불변 |
+| 승인 순서 | 결과 선표시 제거, Runtime 거부 시 결과 없음 확인 |
+| State 직접 검사 | A true → A false → B true → C false, history A/B, count 2, remaining 0 |
+| 잘못된 데이터 | 빈/공백 ID, null, 빈 목록, 0/음수 limit, 선택 Resource 변경 후 강제 Run 방어 |
+| 빈 결과 정책 | Runtime 승인한 빈/공백 result_text는 기존 [Missing result_text] 표시와 1회 소비 |
+| Resource 불변성 | CaseData/ExperimentData Script와 .tres 실행 전후 해시 동일, 공유 콘텐츠 필드 값 불변 |
+| 회귀 | Profile/CCTV 표시, 동적 세 항목, 단일 선택, 전체 6개 흐름, 한 View, 이전 View 해제 |
+| 크기 / Stretch | 1920×1080, 1280×720, 1024×768, 논리 UI/keep/canvas_items 유지 |
+| 파싱 / 실행 | Godot 4.7.1 import 성공, 생산 GDScript 10개 check-only 성공, Headless/GPU 실행 성공 |
+| GPU | AMD Radeon RX 6800 / OpenGL 3.3 Compatibility, 실제 상태별 화면 캡처 확인 |
+| 최종 검사 | 24개 exit 0, 정상 입력 오류/경고 없음, 잘못된 데이터 시험은 각 환경에서 예상 경고 17개 |
+
+F5 키 자체는 자동 조작하지 않았으며 같은 설정된 Main Scene을 명령행으로 실행했습니다.
+새 검증 Script에서 동적 setup 호출에 넘긴 빈 배열이 untyped였던 문제는 `Array[String]`을
+명시해 수정했습니다. 최종 검증은 통과했으며 프로젝트 미해결 오류는 없습니다.
+이전 단계의 검증 Script 원본은 보존했습니다. 중복 허용/결과 선표시를 가정하던 검사는
+새 규칙에 맞는 작은 개발 검사로 대체했고, 기존 Profile/CCTV/전체 흐름 검사는 출력 경로만 바꾼 사본을 실행했습니다.
+
+수정한 프로젝트 파일은 CaseData, 테스트 Case .tres, CaseRuntimeState, Main Script,
+ExperimentView Script/Scene, README의 7개입니다. 프로젝트 소스 생성/삭제는 없습니다.
+기존 설정, Main Scene, 다른 View/Data, flow_view.gd, UID와 과거 단계 보고는 그대로입니다.
+검증용 파일·로그·캡처와 시작 시점 사본/해시는 Git 제외 경로 `.godot/verification/step9/`에 있습니다.
+`validation-results.json`, `resource-immutability.json`, `change-summary.json`, `changes-step9.diff`로
+실행과 이번 단계 변경 범위를 확인할 수 있습니다.
+
+Research Log/Entry, Tag/Flag, 실험 시간/비용, Animation/Audio, Containment/Monitoring 로직,
+Success/Failure, Incident/Broadcast, Campaign, Save/Load, Singleton/Manager, 최종 Theme는 추가하지 않았습니다.
+다음 단계는 필요한 화면 데이터·규칙이 확정되면 기존 Resource → Main → View 경계를 확장하는 지점입니다.
+실험 승인 및 제한의 최종 권한은 Runtime에 유지합니다.
 
 ## 8단계 Case Runtime State와 Experiment 실행 이력 검증 결과
 
@@ -640,10 +799,12 @@ Resource, Autoload, 기존 콘텐츠는 없었습니다. Git은 `master` 브랜�
 
 현재 구현은 임시 Main UI, 창 크기 표시, 6개 View의 순차 이동과 테스트 Resource의
 PROFILE / CCTV 텍스트, EXPERIMENT 목록·단일 선택·즉시 결과 텍스트 표시와
-현재 Case의 메모리 실행 ID 이력입니다. 테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
-CCTV 이미지·영상·상태 변화·환경 수치, Experiment 제한·사용 목록 UI·결과 이미지/오디오, Containment 데이터·판정,
+현재 Case의 메모리 실행 ID 이력, ID별 1회와 Case 횟수 제한, 완료/남은 횟수 표시입니다.
+CONTAINMENT의 Resource 후보 목록 표시도 포함합니다.
+테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
+CCTV 이미지·영상·상태 변화·환경 수치, Experiment 결과 이미지/오디오, Containment 선택·확정·환경 조건·판정,
 Monitoring 상태 변화, Success/Failure, Campaign, Case 로직,
-Containment, Monitoring, Incident, Broadcast, Research Log,
+Monitoring 로직, Incident, Broadcast, Research Log,
 Save/Load, Settings, Horror Event, 검열·이미지 시스템, CRT/Shader, Audio, Animation,
 GameState Singleton, CaseManager, CampaignManager, 최종 UI/폰트/에셋은 구현하지 않았습니다.
 
@@ -654,4 +815,4 @@ Resource와 표시 Script만 추가하는 지점이 적합합니다. 아직 사�
 Experiment 표시 확장은 `experiment_data.gd`와 `experiment_view.gd`에서 시작할 수 있습니다.
 현재 선택과 결과는 View 내부에만 있으며 실행 ID 이력은 Main이 소유하는 CaseRuntimeState에 있습니다.
 이력 조회를 다른 UI/로직에 연결하는 작업은 다음 단계의 요구사항이 정해졌을 때 추가합니다.
-현재 단계에는 횟수 제한·Research Log·Timer·진행률이 없습니다.
+현재 단계에는 Research Log·Timer·진행률이 없습니다. 테스트 limit 2는 최종 게임 밸런스가 아닙니다.

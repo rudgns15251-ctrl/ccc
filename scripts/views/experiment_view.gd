@@ -1,20 +1,27 @@
 extends "res://scripts/views/flow_view.gd"
 
-signal experiment_executed(experiment_id: String)
+signal experiment_execution_requested(experiment_id: String)
 
 @onready var description_label: Label = %Description
 @onready var experiment_list: VBoxContainer = %ExperimentList
 @onready var experiment_scroll: ScrollContainer = %ExperimentScroll
 @onready var run_button: Button = %RunButton
 @onready var result_label: Label = %ResultText
+@onready var remaining_label: Label = %RemainingCount
 
 var _experiments: Array[ExperimentData] = []
 var _selected_experiment_index: int = -1
 var _selection_group: ButtonGroup
+var _executed_ids: Array[String] = []
+var _remaining_count: int = 0
+var _experiment_limit: int = 0
 
 
-func setup(experiments: Array[ExperimentData]) -> void:
+func setup(experiments: Array[ExperimentData], executed_ids: Array[String] = [], remaining_count: int = 0, experiment_limit: int = 0) -> void:
 	_experiments = experiments
+	_executed_ids = executed_ids.duplicate()
+	_remaining_count = maxi(remaining_count, 0)
+	_experiment_limit = maxi(experiment_limit, 0)
 	_selected_experiment_index = -1
 	if is_node_ready():
 		_display_experiments()
@@ -36,6 +43,7 @@ func _display_experiments() -> void:
 		experiment_list.remove_child(item)
 		item.queue_free()
 	experiment_scroll.scroll_vertical = 0
+	_update_execution_ui()
 	if _experiments.is_empty():
 		push_warning("ExperimentView.setup(): available_experiments is empty.")
 		description_label.text = "No experiments available"
@@ -55,6 +63,7 @@ func _display_experiments() -> void:
 			_text_or_placeholder(experiment.description, "description", index),
 			index
 		)
+	_update_execution_ui()
 
 
 func _append_item(display_name: String, description: String, index: int, selectable: bool = true) -> void:
@@ -76,10 +85,12 @@ func _append_item(display_name: String, description: String, index: int, selecta
 
 
 func _on_experiment_selected(index: int) -> void:
+	if not _can_select_experiment(index):
+		return
 	if _selected_experiment_index != index:
 		_reset_result()
 	_selected_experiment_index = index
-	run_button.disabled = _get_selected_experiment() == null
+	run_button.disabled = false
 
 
 func _get_selected_experiment() -> ExperimentData:
@@ -99,8 +110,48 @@ func _on_run_experiment_pressed() -> void:
 		_reset_result()
 		push_warning("ExperimentView: cannot execute an Experiment with an empty experiment_id.")
 		return
-	result_label.text = _text_or_placeholder(experiment.result_text, "result_text", _selected_experiment_index)
-	experiment_executed.emit(experiment.experiment_id)
+	experiment_execution_requested.emit(experiment.experiment_id)
+
+
+func show_execution_result(experiment_id: String, approved: bool) -> void:
+	var experiment: ExperimentData = _get_selected_experiment()
+	if approved and experiment != null and experiment.experiment_id == experiment_id:
+		result_label.text = _text_or_placeholder(experiment.result_text, "result_text", _selected_experiment_index)
+
+
+func update_execution_state(executed_ids: Array[String], remaining_count: int, experiment_limit: int) -> void:
+	_executed_ids = executed_ids.duplicate()
+	_remaining_count = maxi(remaining_count, 0)
+	_experiment_limit = maxi(experiment_limit, 0)
+	if is_node_ready():
+		_update_execution_ui()
+
+
+func _can_select_experiment(index: int) -> bool:
+	if index < 0 or index >= _experiments.size():
+		return false
+	var experiment: ExperimentData = _experiments[index]
+	return experiment != null and not experiment.experiment_id.strip_edges().is_empty() and not _executed_ids.has(experiment.experiment_id) and _remaining_count > 0
+
+
+func _update_execution_ui() -> void:
+	remaining_label.text = "Experiments Remaining: %d / %d" % [_remaining_count, _experiment_limit]
+	for index in range(experiment_list.get_child_count()):
+		var button: CheckBox = experiment_list.get_child(index).get_child(0) as CheckBox
+		var experiment: ExperimentData = _experiments[index]
+		button.disabled = not _can_select_experiment(index)
+		if experiment != null:
+			button.text = experiment.display_name if not experiment.display_name.strip_edges().is_empty() else "[Missing display_name]"
+			if _executed_ids.has(experiment.experiment_id):
+				button.text += " [Executed]"
+	if not _can_select_experiment(_selected_experiment_index):
+		_selected_experiment_index = -1
+		var selected_button: BaseButton = _selection_group.get_pressed_button()
+		if selected_button != null:
+			_selection_group.allow_unpress = true
+			selected_button.set_pressed_no_signal(false)
+			_selection_group.allow_unpress = false
+	run_button.disabled = not _can_select_experiment(_selected_experiment_index)
 
 
 func _reset_result() -> void:

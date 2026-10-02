@@ -6,3 +6,5 @@ extends Resource
 @export var profile_data: ProfileData
 @export var cctv_data: CCTVData
 @export var available_experiments: Array[ExperimentData] = []
+@export var experiment_limit: int = 0
+@export var available_containment_rooms: Array[ContainmentData] = []

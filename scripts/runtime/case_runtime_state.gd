@@ -14,12 +14,29 @@ func reset(case_identifier: String = "") -> void:
 	_experiment_execution_history.clear()
 
 
-func record_experiment_execution(experiment_id: String) -> bool:
+func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
 	if experiment_id.strip_edges().is_empty():
 		push_warning("CaseRuntimeState: cannot record an empty experiment_id.")
 		return false
+	if limit < 0:
+		push_warning("CaseRuntimeState: experiment_limit is negative; treating it as zero.")
+		return false
+	if not can_execute_experiment(experiment_id, limit):
+		return false
 	_experiment_execution_history.append(experiment_id)
 	return true
+
+
+func has_executed_experiment(experiment_id: String) -> bool:
+	return _experiment_execution_history.has(experiment_id)
+
+
+func get_remaining_experiment_count(limit: int) -> int:
+	return maxi(maxi(limit, 0) - get_experiment_execution_count(), 0)
+
+
+func can_execute_experiment(experiment_id: String, limit: int) -> bool:
+	return not experiment_id.strip_edges().is_empty() and not has_executed_experiment(experiment_id) and get_remaining_experiment_count(limit) > 0
 
 
 func get_experiment_execution_history() -> Array[String]:
