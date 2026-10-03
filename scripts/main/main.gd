@@ -6,6 +6,7 @@ const CCTVView = preload("res://scripts/views/cctv_view.gd")
 const ExperimentView = preload("res://scripts/views/experiment_view.gd")
 const ContainmentView = preload("res://scripts/views/containment_view.gd")
 const MonitoringView = preload("res://scripts/views/monitoring_view.gd")
+const IncidentView = preload("res://scripts/views/incident_view.gd")
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT }
 
@@ -78,6 +79,9 @@ func _show_view(stage: int) -> void:
 		var monitoring_view: MonitoringView = _current_view as MonitoringView
 		monitoring_view.monitoring_playback_completed.connect(_on_monitoring_playback_completed.bind(monitoring_view))
 		monitoring_view.setup(_get_monitoring_outcome(), case_runtime.get_monitoring_result())
+	elif stage == Stage.INCIDENT:
+		var incident_view: IncidentView = _current_view as IncidentView
+		incident_view.setup(_get_current_incident_data())
 	view_host.add_child(_current_view)
 
 
@@ -106,10 +110,50 @@ func _get_monitoring_outcome() -> MonitoringOutcomeData:
 	return null
 
 
+func _get_current_incident_data() -> IncidentData:
+	if case_runtime.get_monitoring_result() != MonitoringOutcomeData.Result.FAILURE:
+		return null
+	if current_case == null:
+		push_warning("Main: current_case is missing for Incident.")
+		return null
+	if not case_runtime.has_confirmed_containment():
+		push_warning("Main: no confirmed containment room for Incident.")
+		return null
+	var outcome: MonitoringOutcomeData = _get_monitoring_outcome()
+	if outcome == null:
+		return null
+	if outcome.room_id != case_runtime.get_confirmed_containment_room_id():
+		push_warning("Main: Incident Outcome room_id does not match the confirmed room.")
+		return null
+	if outcome.final_result != MonitoringOutcomeData.Result.FAILURE:
+		push_warning("Main: Incident Outcome final_result is not FAILURE.")
+		return null
+	if outcome.incident_id.strip_edges().is_empty():
+		push_warning("Main: Incident Outcome incident_id is empty.")
+		return null
+	if current_case.incidents.is_empty():
+		push_warning("Main: incidents is empty for Incident %s." % outcome.incident_id)
+		return null
+	for index in range(current_case.incidents.size()):
+		var incident: IncidentData = current_case.incidents[index]
+		if incident == null:
+			push_warning("Main: IncidentData at index %d is missing." % index)
+			continue
+		if incident.incident_id.strip_edges().is_empty():
+			push_warning("Main: IncidentData.incident_id at index %d is empty." % index)
+			continue
+		if incident.incident_id == outcome.incident_id:
+			return incident
+	push_warning("Main: no IncidentData for incident_id %s." % outcome.incident_id)
+	return null
+
+
 func _on_advance_requested(view: FlowView) -> void:
 	if view != _current_view or not view.is_inside_tree() or view.is_queued_for_deletion():
 		return
 	if _current_stage == Stage.CONTAINMENT and not case_runtime.has_confirmed_containment():
+		return
+	if _current_stage == Stage.INCIDENT and _get_current_incident_data() == null:
 		return
 	var next_stage: int = _get_next_stage(_current_stage)
 	if next_stage != -1:

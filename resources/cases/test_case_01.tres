@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=28 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/data/containment_data.gd" id="5_containment"]
 [ext_resource type="Script" path="res://scripts/data/monitoring_stage_data.gd" id="6_stage"]
 [ext_resource type="Script" path="res://scripts/data/monitoring_outcome_data.gd" id="7_outcome"]
+[ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="8_incident"]
 
 [sub_resource type="Resource" id="Resource_profile"]
 script = ExtResource("2_profile")
@@ -78,6 +79,7 @@ observation_text = "Temporary monitoring state 01-C."
 script = ExtResource("7_outcome")
 room_id = "TEST_ROOM_01"
 final_result = 2
+incident_id = "TEST_INCIDENT_01"
 stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_01_A"), SubResource("Resource_stage_01_B"), SubResource("Resource_stage_01_C")])
 
 [sub_resource type="Resource" id="Resource_stage_02_A"]
@@ -99,6 +101,7 @@ observation_text = "Temporary monitoring state 02-C."
 script = ExtResource("7_outcome")
 room_id = "TEST_ROOM_02"
 final_result = 1
+incident_id = ""
 stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_02_A"), SubResource("Resource_stage_02_B"), SubResource("Resource_stage_02_C")])
 
 [sub_resource type="Resource" id="Resource_stage_03_A"]
@@ -120,7 +123,20 @@ observation_text = "Temporary monitoring state 03-C."
 script = ExtResource("7_outcome")
 room_id = "TEST_ROOM_03"
 final_result = 2
+incident_id = "TEST_INCIDENT_03"
 stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_03_A"), SubResource("Resource_stage_03_B"), SubResource("Resource_stage_03_C")])
+
+[sub_resource type="Resource" id="Resource_incident_01"]
+script = ExtResource("8_incident")
+incident_id = "TEST_INCIDENT_01"
+display_name = "TEST INCIDENT 01"
+description = "Temporary incident data for TEST_ROOM_01 failure."
+
+[sub_resource type="Resource" id="Resource_incident_03"]
+script = ExtResource("8_incident")
+incident_id = "TEST_INCIDENT_03"
+display_name = "TEST INCIDENT 03"
+description = "Temporary incident data for TEST_ROOM_03 failure."
 
 [resource]
 script = ExtResource("1_case")
@@ -132,3 +148,4 @@ cctv_data = SubResource("Resource_cctv")
 available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02"), SubResource("Resource_experiment_03")])
 available_containment_rooms = Array[ExtResource("5_containment")]([SubResource("Resource_room_01"), SubResource("Resource_room_02"), SubResource("Resource_room_03")])
 containment_outcomes = Array[ExtResource("7_outcome")]([SubResource("Resource_outcome_01"), SubResource("Resource_outcome_02"), SubResource("Resource_outcome_03")])
+incidents = Array[ExtResource("8_incident")]([SubResource("Resource_incident_01"), SubResource("Resource_incident_03")])
