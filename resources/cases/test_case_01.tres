@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=57 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=73 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
@@ -236,64 +236,192 @@ script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_PROFILE_01"
 source_kind = 0
 source_id = "TEST_PROFILE_01"
-title = "TEST RESEARCH: profile 01"
-body_text = "Research note override for profile 01. Development validation content only."
+title = "Subject identification record"
+body_text = "TEST SUBJECT is listed under TEST CLASSIFICATION. The profile provides provisional identification information."
 
 [sub_resource type="Resource" id="Resource_research_cctv"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_CCTV_01"
 source_kind = 1
 source_id = "TEST_CAM_01"
-title = "TEST RESEARCH: CCTV 01"
-body_text = "Research note override for CCTV 01. Development validation content only."
+title = "Camera 01 observation record"
+body_text = "Camera 01 supplied the provisional observation recorded for this Case."
 
 [sub_resource type="Resource" id="Resource_research_experiment"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_EXP_01"
 source_kind = 2
 source_id = "TEST_EXP_01"
-title = "TEST RESEARCH: experiment 01"
-body_text = "Research note override for experiment 01. Development validation content only."
+title = "Experiment 01: finding recorded"
+body_text = "Experiment 01 completed with its provisional test finding recorded."
 
 [sub_resource type="Resource" id="Resource_research_room"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_ROOM_02"
 source_kind = 3
 source_id = "TEST_ROOM_02"
-title = "TEST RESEARCH: room 02"
-body_text = "Research note override for room 02. Development validation content only."
+title = "Containment choice: room 02"
+body_text = "Room 02 was confirmed as the containment arrangement for this Case."
 
 [sub_resource type="Resource" id="Resource_research_incident"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_INCIDENT_01"
 source_kind = 4
 source_id = "TEST_INCIDENT_01"
-title = "TEST RESEARCH: incident 01"
-body_text = "Research note override for incident 01. Development validation content only."
+title = "Incident 01: room 01 record"
+body_text = "The incident screen reported the provisional incident associated with the room 01 failure."
 
 [sub_resource type="Resource" id="Resource_research_broadcast"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_BROADCAST_01"
 source_kind = 5
 source_id = "TEST_BROADCAST_01"
-title = "TEST RESEARCH: broadcast 01"
-body_text = "Research note override for broadcast 01. Development validation content only."
+title = "Broadcast 01: response requested"
+body_text = "The emergency prompt for incident 01 was presented for a response."
 
 [sub_resource type="Resource" id="Resource_research_option"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_01_B"
 source_kind = 6
 source_id = "TEST_OPTION_01_B"
-title = "TEST RESEARCH: option 01-B"
-body_text = "Research note override for option 01-B. Development validation content only."
+title = "Broadcast 01: response B confirmed"
+body_text = "Response 01-B was chosen and confirmed for broadcast 01."
 
 [sub_resource type="Resource" id="Resource_research_result"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_01_B"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_01_B"
-title = "TEST RESEARCH: incident result 01-B"
-body_text = "Research note override for incident result 01-B. Development validation content only."
+title = "Incident 01: response B follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 01-B."
+
+[sub_resource type="Resource" id="Resource_research_experiment_02"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_EXP_02"
+source_kind = 2
+source_id = "TEST_EXP_02"
+title = "Experiment 02: test result logged"
+body_text = "Test 02 returned its provisional result, which was recorded as the experiment 02 finding."
+
+[sub_resource type="Resource" id="Resource_research_experiment_03"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_EXP_03"
+source_kind = 2
+source_id = "TEST_EXP_03"
+title = "Experiment 03: observation noted"
+body_text = "The provisional result from test 03 was entered as the experiment 03 observation."
+
+[sub_resource type="Resource" id="Resource_research_room_01"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_ROOM_01"
+source_kind = 3
+source_id = "TEST_ROOM_01"
+title = "Containment choice: room 01"
+body_text = "Room 01 was confirmed as the containment arrangement for this Case."
+
+[sub_resource type="Resource" id="Resource_research_room_03"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_ROOM_03"
+source_kind = 3
+source_id = "TEST_ROOM_03"
+title = "Containment choice: room 03"
+body_text = "Room 03 was confirmed as the containment arrangement for this Case."
+
+[sub_resource type="Resource" id="Resource_research_incident_03"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_INCIDENT_03"
+source_kind = 4
+source_id = "TEST_INCIDENT_03"
+title = "Incident 03: room 03 record"
+body_text = "The incident screen reported the provisional incident associated with the room 03 failure."
+
+[sub_resource type="Resource" id="Resource_research_broadcast_03"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_BROADCAST_03"
+source_kind = 5
+source_id = "TEST_BROADCAST_03"
+title = "Broadcast 03: response requested"
+body_text = "The emergency prompt for incident 03 was presented for a response."
+
+[sub_resource type="Resource" id="Resource_research_option_01_A"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_OPTION_01_A"
+source_kind = 6
+source_id = "TEST_OPTION_01_A"
+title = "Broadcast 01: response A confirmed"
+body_text = "Response 01-A was chosen and confirmed for broadcast 01."
+
+[sub_resource type="Resource" id="Resource_research_option_01_C"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_OPTION_01_C"
+source_kind = 6
+source_id = "TEST_OPTION_01_C"
+title = "Broadcast 01: response C confirmed"
+body_text = "Response 01-C was chosen and confirmed for broadcast 01."
+
+[sub_resource type="Resource" id="Resource_research_option_03_A"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_OPTION_03_A"
+source_kind = 6
+source_id = "TEST_OPTION_03_A"
+title = "Broadcast 03: response A confirmed"
+body_text = "Response 03-A was chosen and confirmed for broadcast 03."
+
+[sub_resource type="Resource" id="Resource_research_option_03_B"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_OPTION_03_B"
+source_kind = 6
+source_id = "TEST_OPTION_03_B"
+title = "Broadcast 03: response B confirmed"
+body_text = "Response 03-B was chosen and confirmed for broadcast 03."
+
+[sub_resource type="Resource" id="Resource_research_option_03_C"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_OPTION_03_C"
+source_kind = 6
+source_id = "TEST_OPTION_03_C"
+title = "Broadcast 03: response C confirmed"
+body_text = "Response 03-C was chosen and confirmed for broadcast 03."
+
+[sub_resource type="Resource" id="Resource_research_result_01_A"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_RESULT_01_A"
+source_kind = 7
+source_id = "TEST_INCIDENT_RESULT_01_A"
+title = "Incident 01: response A follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 01-A."
+
+[sub_resource type="Resource" id="Resource_research_result_01_C"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_RESULT_01_C"
+source_kind = 7
+source_id = "TEST_INCIDENT_RESULT_01_C"
+title = "Incident 01: response C follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 01-C."
+
+[sub_resource type="Resource" id="Resource_research_result_03_A"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_RESULT_03_A"
+source_kind = 7
+source_id = "TEST_INCIDENT_RESULT_03_A"
+title = "Incident 03: response A follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 03-A."
+
+[sub_resource type="Resource" id="Resource_research_result_03_B"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_RESULT_03_B"
+source_kind = 7
+source_id = "TEST_INCIDENT_RESULT_03_B"
+title = "Incident 03: response B follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 03-B."
+
+[sub_resource type="Resource" id="Resource_research_result_03_C"]
+script = ExtResource("12_research")
+entry_id = "TEST_RESEARCH_RESULT_03_C"
+source_kind = 7
+source_id = "TEST_INCIDENT_RESULT_03_C"
+title = "Incident 03: response C follow-up"
+body_text = "The follow-up screen reported the provisional incident result associated with response 03-C."
 
 [resource]
 script = ExtResource("1_case")
@@ -308,4 +436,4 @@ containment_outcomes = Array[ExtResource("7_outcome")]([SubResource("Resource_ou
 incidents = Array[ExtResource("8_incident")]([SubResource("Resource_incident_01"), SubResource("Resource_incident_03")])
 emergency_broadcasts = Array[ExtResource("10_broadcast")]([SubResource("Resource_broadcast_01"), SubResource("Resource_broadcast_03")])
 incident_results = Array[ExtResource("11_incident_result")]([SubResource("Resource_incident_result_01_A"), SubResource("Resource_incident_result_01_B"), SubResource("Resource_incident_result_01_C"), SubResource("Resource_incident_result_03_A"), SubResource("Resource_incident_result_03_B"), SubResource("Resource_incident_result_03_C")])
-research_entries = Array[ExtResource("12_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_cctv"), SubResource("Resource_research_experiment"), SubResource("Resource_research_room"), SubResource("Resource_research_incident"), SubResource("Resource_research_broadcast"), SubResource("Resource_research_option"), SubResource("Resource_research_result")])
+research_entries = Array[ExtResource("12_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_cctv"), SubResource("Resource_research_experiment"), SubResource("Resource_research_room"), SubResource("Resource_research_incident"), SubResource("Resource_research_broadcast"), SubResource("Resource_research_option"), SubResource("Resource_research_result"), SubResource("Resource_research_experiment_02"), SubResource("Resource_research_experiment_03"), SubResource("Resource_research_room_01"), SubResource("Resource_research_room_03"), SubResource("Resource_research_incident_03"), SubResource("Resource_research_broadcast_03"), SubResource("Resource_research_option_01_A"), SubResource("Resource_research_option_01_C"), SubResource("Resource_research_option_03_A"), SubResource("Resource_research_option_03_B"), SubResource("Resource_research_option_03_C"), SubResource("Resource_research_result_01_A"), SubResource("Resource_research_result_01_C"), SubResource("Resource_research_result_03_A"), SubResource("Resource_research_result_03_B"), SubResource("Resource_research_result_03_C")])

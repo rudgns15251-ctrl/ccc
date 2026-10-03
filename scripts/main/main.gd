@@ -54,22 +54,25 @@ func _update_window_size() -> void:
 	window_size_label.text = "Window: %d × %d" % [window_size.x, window_size.y]
 
 
-func _show_view(stage: int) -> void:
+func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	if is_instance_valid(_current_view):
 		view_host.remove_child(_current_view)
 		_current_view.queue_free()
 
 	_current_stage = stage
 	_current_view = VIEW_SCENES[stage].instantiate()
+	var displayed_source: Resource
 	_current_view.research_log_requested.connect(_on_research_log_requested.bind(_current_view, stage))
 	if stage != Stage.RESEARCH_LOG:
 		_current_view.advance_requested.connect(_on_advance_requested.bind(_current_view))
 	if stage == Stage.PROFILE:
 		var profile_view: ProfileView = _current_view as ProfileView
 		profile_view.setup(current_case.profile_data if current_case != null else null)
+		displayed_source = current_case.profile_data if current_case != null else null
 	elif stage == Stage.CCTV:
 		var cctv_view: CCTVView = _current_view as CCTVView
 		cctv_view.setup(current_case.cctv_data if current_case != null else null)
+		displayed_source = current_case.cctv_data if current_case != null else null
 	elif stage == Stage.EXPERIMENT:
 		var experiment_view: ExperimentView = _current_view as ExperimentView
 		experiment_view.experiment_execution_requested.connect(_on_experiment_execution_requested.bind(experiment_view))
@@ -96,17 +99,22 @@ func _show_view(stage: int) -> void:
 		var incident: IncidentData = _get_current_incident_data()
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast() if incident != null else null
 		incident_view.setup(incident, _has_valid_broadcast_options(broadcast))
+		displayed_source = incident
 	elif stage == Stage.BROADCAST:
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
+		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
 		broadcast_view.setup(
-			_get_current_emergency_broadcast(),
+			broadcast,
 			case_runtime.get_confirmed_broadcast_id(),
 			case_runtime.get_confirmed_broadcast_option_id()
 		)
+		displayed_source = broadcast
 	elif stage == Stage.INCIDENT_RESULT:
 		var incident_result_view: IncidentResultView = _current_view as IncidentResultView
-		incident_result_view.setup(_get_current_incident_result())
+		var incident_result: IncidentResultData = _get_current_incident_result()
+		incident_result_view.setup(incident_result)
+		displayed_source = incident_result
 	elif stage == Stage.RESULT:
 		var result_view: ResultView = _current_view as ResultView
 		result_view.setup(_build_result_summary())
@@ -115,6 +123,8 @@ func _show_view(stage: int) -> void:
 		research_log_view.advance_requested.connect(_on_research_log_back_requested.bind(research_log_view))
 		research_log_view.setup(_build_research_log_snapshot())
 	view_host.add_child(_current_view)
+	if discover_displayed_source and displayed_source != null:
+		_discover_displayed_research_entry(_current_view, stage, displayed_source)
 
 
 func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
@@ -134,7 +144,7 @@ func _on_research_log_back_requested(research_log_view: ResearchLogView) -> void
 		return
 	var return_stage: int = _research_log_return_stage
 	_research_log_return_stage = -1
-	_show_view(return_stage)
+	_show_view(return_stage, false)
 
 
 func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
@@ -256,7 +266,46 @@ func _find_research_entry(entries: Array[ResearchEntryData], source_kind: int, s
 
 func _append_source_research_entry(snapshot: ResearchLogView.Snapshot, entries: Array[ResearchEntryData], source_kind: int, category: String, source_id: String, title: String, body_text: String) -> void:
 	var authored: ResearchEntryData = _find_research_entry(entries, source_kind, source_id)
+	if authored != null and (not _has_current_case_runtime() or not case_runtime.has_discovered_research_entry(authored.entry_id)):
+		authored = null
 	_append_research_entry(snapshot, category, source_id, authored.title if authored != null else title, authored.body_text if authored != null else body_text)
+
+
+func _has_current_case_runtime() -> bool:
+	return current_case != null and case_runtime != null and not current_case.case_id.strip_edges().is_empty() and not current_case.display_name.strip_edges().is_empty() and case_runtime.case_id == current_case.case_id
+
+
+func _try_discover_research_entry(source_kind: int, source_id: String) -> bool:
+	if not _has_current_case_runtime() or source_id.strip_edges().is_empty():
+		return false
+	var authored: ResearchEntryData = _find_research_entry(_get_valid_research_entries(), source_kind, source_id)
+	return authored != null and case_runtime.try_discover_research_entry(authored.entry_id)
+
+
+func _discover_displayed_research_entry(view: FlowView, stage: int, source: Resource) -> void:
+	if stage != _current_stage or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime():
+		return
+	match stage:
+		Stage.PROFILE:
+			var profile: ProfileData = source as ProfileData
+			if view is ProfileView and profile != null and profile == current_case.profile_data and not profile.subject_name.strip_edges().is_empty() and not profile.classification.strip_edges().is_empty() and not profile.basic_description.strip_edges().is_empty():
+				_try_discover_research_entry(ResearchEntryData.SourceKind.PROFILE, profile.profile_id)
+		Stage.CCTV:
+			var cctv: CCTVData = source as CCTVData
+			if view is CCTVView and cctv != null and cctv == current_case.cctv_data and not cctv.observation_text.strip_edges().is_empty():
+				_try_discover_research_entry(ResearchEntryData.SourceKind.CCTV, cctv.camera_id)
+		Stage.INCIDENT:
+			var incident: IncidentData = source as IncidentData
+			if view is IncidentView and incident != null and current_case.incidents.has(incident) and case_runtime.get_monitoring_result() == MonitoringOutcomeData.Result.FAILURE and not incident.display_name.strip_edges().is_empty() and not incident.description.strip_edges().is_empty():
+				_try_discover_research_entry(ResearchEntryData.SourceKind.INCIDENT, incident.incident_id)
+		Stage.BROADCAST:
+			var broadcast: EmergencyBroadcastData = source as EmergencyBroadcastData
+			if view is BroadcastView and broadcast != null and current_case.emergency_broadcasts.has(broadcast) and case_runtime.get_monitoring_result() == MonitoringOutcomeData.Result.FAILURE and not broadcast.display_name.strip_edges().is_empty() and not broadcast.prompt_text.strip_edges().is_empty() and _has_valid_broadcast_options(broadcast):
+				_try_discover_research_entry(ResearchEntryData.SourceKind.BROADCAST, broadcast.broadcast_id)
+		Stage.INCIDENT_RESULT:
+			var incident_result: IncidentResultData = source as IncidentResultData
+			if view is IncidentResultView and incident_result != null and current_case.incident_results.has(incident_result) and case_runtime.get_monitoring_result() == MonitoringOutcomeData.Result.FAILURE and case_runtime.has_confirmed_broadcast_option() and not incident_result.display_name.strip_edges().is_empty() and not incident_result.description.strip_edges().is_empty():
+				_try_discover_research_entry(ResearchEntryData.SourceKind.INCIDENT_RESULT, incident_result.result_id)
 
 
 func _append_research_entry(snapshot: ResearchLogView.Snapshot, category: String, source_id: String, title: String, body_text: String) -> void:
@@ -450,13 +499,14 @@ func _get_current_incident_result() -> IncidentResultData:
 
 
 func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
-	if _current_stage != Stage.BROADCAST or not _is_active_view(broadcast_view):
+	if _current_stage != Stage.BROADCAST or not _is_active_view(broadcast_view) or not _has_current_case_runtime():
 		return
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == broadcast_id:
 		var option: BroadcastOptionData = _get_broadcast_option(broadcast, option_id)
 		if _get_incident_result_for_option(option) != null:
-			case_runtime.try_confirm_broadcast_option(broadcast_id, option_id)
+			if case_runtime.try_confirm_broadcast_option(broadcast_id, option_id):
+				_try_discover_research_entry(ResearchEntryData.SourceKind.BROADCAST_OPTION, option_id)
 	broadcast_view.update_confirmation_state(case_runtime.get_confirmed_broadcast_id(), case_runtime.get_confirmed_broadcast_option_id())
 
 
@@ -536,10 +586,17 @@ func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
 
 
 func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
-	if not _is_active_view(experiment_view):
+	if _current_stage != Stage.EXPERIMENT or not _is_active_view(experiment_view) or not _has_current_case_runtime():
 		return
-	var limit: int = current_case.experiment_limit if current_case != null else 0
-	var approved: bool = case_runtime.try_record_experiment_execution(experiment_id, limit)
+	var valid_source: bool = false
+	for experiment: ExperimentData in current_case.available_experiments:
+		if experiment != null and not experiment_id.strip_edges().is_empty() and experiment.experiment_id == experiment_id:
+			valid_source = true
+			break
+	var limit: int = current_case.experiment_limit
+	var approved: bool = valid_source and case_runtime.try_record_experiment_execution(experiment_id, limit)
+	if approved:
+		_try_discover_research_entry(ResearchEntryData.SourceKind.EXPERIMENT, experiment_id)
 	experiment_view.show_execution_result(experiment_id, approved)
 	experiment_view.update_execution_state(
 		case_runtime.get_experiment_execution_history(),
@@ -549,12 +606,13 @@ func _on_experiment_execution_requested(experiment_id: String, experiment_view: 
 
 
 func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:
-	if not _is_active_view(containment_view):
+	if _current_stage != Stage.CONTAINMENT or not _is_active_view(containment_view) or not _has_current_case_runtime():
 		return
 	if current_case != null and not room_id.strip_edges().is_empty():
 		for room: ContainmentData in current_case.available_containment_rooms:
 			if room != null and room.room_id == room_id:
-				case_runtime.try_confirm_containment_room(room_id)
+				if case_runtime.try_confirm_containment_room(room_id):
+					_try_discover_research_entry(ResearchEntryData.SourceKind.CONTAINMENT, room_id)
 				break
 	containment_view.update_confirmation_state(case_runtime.get_confirmed_containment_room_id())
 

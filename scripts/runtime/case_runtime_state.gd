@@ -7,6 +7,7 @@ var _confirmed_containment_room_id: String = ""
 var _monitoring_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED
 var _confirmed_broadcast_id: String = ""
 var _confirmed_broadcast_option_id: String = ""
+var _discovered_research_entry_ids: Array[String] = []
 
 
 func _init(case_identifier: String = "") -> void:
@@ -20,6 +21,7 @@ func reset(case_identifier: String = "") -> void:
 	_monitoring_result = MonitoringOutcomeData.Result.UNDEFINED
 	_confirmed_broadcast_id = ""
 	_confirmed_broadcast_option_id = ""
+	_discovered_research_entry_ids.clear()
 
 
 func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
@@ -105,3 +107,18 @@ func get_confirmed_broadcast_id() -> String:
 
 func get_confirmed_broadcast_option_id() -> String:
 	return _confirmed_broadcast_option_id
+
+
+func try_discover_research_entry(entry_id: String) -> bool:
+	if entry_id.strip_edges().is_empty() or has_discovered_research_entry(entry_id):
+		return false
+	_discovered_research_entry_ids.append(entry_id)
+	return true
+
+
+func has_discovered_research_entry(entry_id: String) -> bool:
+	return _discovered_research_entry_ids.has(entry_id)
+
+
+func get_discovered_research_entry_ids() -> Array[String]:
+	return _discovered_research_entry_ids.duplicate()
