@@ -211,6 +211,8 @@ RESULT=5, INCIDENT=6, BROADCAST=7, INCIDENT_RESULT=8입니다. 새 Stage를 배�
 _get_next_stage(stage)의 match가 다음 Stage를 명시적으로 반환하고, -1이면 전환하지 않습니다.
 진행 signal에는 발신 View를 bind합니다. 현재 View와 다른 객체, Tree 밖 객체,
 queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident / Broadcast / IncidentResult의 중복 전환을 차단합니다.
+Main._is_active_view()가 이 생명주기 검사를 공통으로 수행하며 화면 진행, Experiment 실행,
+Containment/Broadcast 확정, Monitoring 완료 요청 모두 같은 검사를 통과해야 합니다.
 Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
 INCIDENT는 기존 FlowView를 사용하는 Control → CenterContainer → VBoxContainer에
 제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene의 기존 구성을 보존했습니다. Broadcast Scene의 기존 Actions/ConfirmButton/NextButton을 유지하고 Next 문구만 바꿨습니다. Runtime의 기존 Broadcast/Option 확정 ID 문자열 두 개를 유지하며 별도 Result 필드는 추가하지 않았습니다.
@@ -475,8 +477,10 @@ GDScript에는 테스트 Resource 경로가 없으므로 Script를 수정할 필
 테스트 결과를 바꾸려면 해당 Experiment의 result_text를 편집하고 저장한 뒤 다시 실행합니다.
 Resource를 실행 중 자동 갱신하는 기능은 추가하지 않았습니다.
 
-데이터가 null이면 경고와 대체 문구를 표시합니다. 빈 문자열 또는 공백만 있는 값은
-필드 이름이 포함된 경고와 `[Missing 필드명]`으로 표시하며, 진행 버튼은 계속 동작합니다.
+데이터가 null이면 경고와 대체 문구를 표시합니다. 빈 문자열 또는 공백만 있는 표시 값은
+필드 이름이 포함된 경고와 `[Missing 필드명]`으로 표시합니다. PROFILE/CCTV와 실험을 건너뛰는
+Next는 정보성 진행이므로 유지하지만, 격리 확정·Monitoring 완료·Broadcast 확정·결과 연결 등
+진행 전제가 필요한 화면은 해당 상태가 없으면 View와 Main에서 진행을 차단합니다.
 `case_id`, `display_name`, `profile_id`가 비어 있을 때도 해당 필드 경고를 출력합니다.
 별도 Content Validator 시스템은 없습니다.
 Experiment 배열이 비면 `No experiments available`을 표시합니다. null 항목은 해당 위치에
@@ -537,7 +541,7 @@ export template 설정은 배포 단계에서 추가합니다.
 
 검증용 스크립트, 격리 프로필, 로그, 캡처는 Git에서 제외되는
 `.godot/verification/`에만 있습니다. 게임에서 로드하지 않는 로컬 검증 자료입니다.
-UID 파일은 Git 보존 대상입니다. 18단계까지 ceb548b에 커밋·push되어 있으며 현재 19~22단계 변경은 미커밋 상태입니다.
+UID 파일은 Git 보존 대상입니다. 22단계까지 `6dbc42a`에 커밋·push되어 있으며 이번 23단계 변경은 미커밋 상태입니다.
 
 ## 2단계 UI 흐름 검증 결과
 
@@ -566,6 +570,173 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 23단계 단일 Case Core 구조 감사와 최소 정리
+
+이번 단계의 판단은 **Main + Resource + CaseRuntimeState + View를 유지**하는 것입니다.
+정상 게임 규칙·콘텐츠·Route는 변경하지 않았습니다. 실제 재현된 비활성 View 요청의
+Runtime 변경만 Main의 작은 private helper로 차단했습니다. 새로운 게임 기능은 없습니다.
+
+재개 시 HEAD는 `6dbc42af1c21ab1bd416302a070c269235d7215a`이며 작업 트리는 깨끗했습니다.
+사용자 요청으로 19~22단계 변경이 이미 이 커밋에 포함된 상태입니다. 이전 감사 시작 시의
+미커밋 수정9/신규7과 혼동하지 않도록 재개 시 Git 상태를 다시 보관했습니다.
+소스 63개, GDScript/UID 각각23개, Scene10개(Main+View9개), 콘텐츠 .tres1개,
+콘텐츠 Resource Script11개를 조사했습니다. Autoload/플러그인은 없습니다.
+작업 전 소스 사본·해시와 이전 로컬 검증 파일355개의 해시를 보관했습니다.
+
+Main은 작업 전405줄·20함수, 작업 후409줄·21함수입니다. 빈 줄/주석도 라인 수에 포함합니다.
+책임은 (1) 시작 시 Case 기본 검사·Runtime 생성, (2) 창 크기 표시,
+(3) View 생성/제거와 setup 전달, (4) ID 기반 콘텐츠 연결 검색,
+(5) 실행/확정/완료 요청을 Runtime 승인에 연결, (6) Route 선택,
+(7) 읽기 전용 Result Summary 생성입니다. 별도 Manager로 분리할 필요는 현재 없습니다.
+View setup 분기는9개, Route의 Stage 분기는9개이며 Monitoring 안의 결과 분기2개와
+미정의/알 수 없는 Stage의 -1 반환을 갖습니다. 현재 결합은 작고 명시적이며 실제 매핑 검사로 보호합니다.
+
+| 경계 | 감사 판단 |
+| --- | --- |
+| Data Resource | 콘텐츠 필드만 존재. selected/confirmed/실행 이력 등의 플레이 상태 없음. Outcome.final_result는 콘텐츠의 예정 결과이며 실제 완료 여부와 다름. |
+| CaseRuntimeState | 이번 Case에서 확정한 사실만 보관. UI Node/선택 인덱스/Timer/Resource/.tres 참조 없음. |
+| View | 받은 Resource와 표시용 snapshot, 임시 선택·재생·Label·버튼 상태만 관리. Runtime/Main 탐색과 특정 .tres load 없음. |
+| Main | 콘텐츠 문구/테스트 ID 하드코딩 없음. 현재 Case 연결, 승인, 생명주기, 전환을 조정. |
+| Result Summary | 표시 시 값/이력 사본과 현재 콘텐츠 참조를 전달하는 수명이 짧은 RefCounted. Resource 복제·장기 보관·두 번째 Runtime·게임 규칙 의존 없음. 읽기 전용은 사용 방식의 계약이며 불변 타입을 새로 만들지 않음. |
+
+| Runtime 필드 | 유지 이유 |
+| --- | --- |
+| case_id | 플레이 상태가 어느 Case에 속하는지 나타내는 식별자. CaseData.case_id와 초기 값이 같아도 Runtime의 소속을 보존하는 메타데이터. |
+| _experiment_execution_history | 실제 승인된 실행 ID와 순서. count/remaining은 조회할 때 계산하므로 중복 필드 없음. |
+| _confirmed_containment_room_id | 실제 확정한 선택. 후보 콘텐츠만으로 재계산할 수 없음. |
+| _monitoring_result | 실제 완료 후 한 번 확정한 결과. Resource의 final_result만으로 재생 완료/UNDEFINED 상태를 알 수 없음. |
+| _confirmed_broadcast_id | 확정 Option이 속하는 Broadcast 맥락. Option ID는 Broadcast 내부에서만 유일하면 되므로 필요한 식별자. |
+| _confirmed_broadcast_option_id | 실제 확정한 응답. IncidentResult ID는 현재 Resource 관계에서 파생하므로 별도로 저장하지 않음. |
+
+직접 ID 검색 loop를 가진 private helper는5개입니다:
+`_get_monitoring_outcome`, `_get_current_incident_data`, `_get_current_emergency_broadcast`,
+`_get_broadcast_option`, `_get_incident_result_for_option`.
+`_get_current_confirmed_broadcast_option`과 `_get_current_incident_result`는 이를 연결하는
+간접 검색 helper2개입니다. Summary의 Experiment/Room 매핑2곳과 Containment 승인 loop1곳도 조사했습니다.
+확정 Room 검색은 승인과 요약에서 짧게 반복되고 확정 Option 검색도 현재 검증/조회 과정에서
+반복되지만, 경계와 오류 정책이 다르고 현재 비용이 작아 이번에 통합하지 않았습니다.
+Main과 View의 Option 유효성 검사도 승인 경계와 전달 snapshot의 UI 경계가 달라 유지합니다.
+비슷한 for 패턴을 범용 Repository나 ID Database로 바꾸지 않았습니다.
+
+실제 발견하고 수정한 Core 문제는 생명주기 보호의 차이입니다.
+기존 Experiment/Containment 요청은 발신 객체 동일성만 검사했고 Monitoring 완료는
+동일성과 Stage만 검사했습니다. 테스트에서 현재 View를 Tree 밖으로 빼거나 queue_free한 뒤
+signal을 보내면 Experiment/Containment의 detached·queued4개와 Monitoring의 queued1개에서
+Runtime이 바뀌는 것을 수정 전에 재현했습니다. 정상 UI 클릭의 결과를 바꾼 수정이 아닙니다.
+`_is_active_view(view)`는 유효 객체, 현재 View, Tree 내부, 삭제 예정 아님을 검사합니다.
+기존 Broadcast/advance의 중복 검사를 이 helper로 옮기고 위 세 요청에도 적용했습니다.
+Stage/데이터 검증/Runtime 승인/Route/public API는 그대로입니다.
+수정 후 detached/queued/replaced9개는 상태를 바꾸지 않으며 정상 요청은 한 번만 기록합니다.
+Monitoring의 Timer 중지/완료 snapshot/재진입과 반복 setup의 기존 보호도 유지했습니다.
+
+현재 콘텐츠의 모든 ID와 참조가 유효했습니다. Experiment3/Room3/Outcome3/Incident2/
+Broadcast2/각 Option3(총6)/IncidentResult6, 각 Outcome의 Stage3(총9)를 확인했습니다.
+각 컬렉션 ID와 Broadcast 내부 Option ID는 비어 있지 않고 중복이 없습니다.
+Room마다 Outcome 하나, FAILURE Outcome→Incident, Incident→Broadcast, Option→IncidentResult가
+모두 존재합니다. Stage offset도 0/10/20 순서입니다. 정상 .tres는 수정하지 않았습니다.
+전용 개발용 Content Validator의 도입 시점은 **다중 Case 제작 시작 시**로 판단합니다.
+현재 단일 Case는 이번 참조 감사와 기존 진행 검증으로 충분하지만, 여러 Case를 제작하면
+진입하지 않은 분기의 중복 ID/누락 연결도 편집 단계에서 검사할 필요가 있습니다.
+이번에는 제품 Validator·캐시·Manager를 만들지 않았습니다.
+
+다른 Case 내용 때문에 Core를 바꿀 필요가 있는지도 실행으로 확인했습니다.
+검증용 메모리 Case의37개 Resource(Case 자신 포함)를 독립 복제한 것을 먼저 확인한 뒤
+모든 ID·문구를 ALT로 바꾸고 주요 배열과 Option 배열을 역순으로 배치했습니다.
+Main.current_case를 ready 이전에 전달하여 PROFILE부터 실제 선택·Run·Confirm·진행 버튼을 눌렀습니다.
+SUCCESS1개와 Room01/03 A/B/C FAILURE6개, 총7경로×세 해상도에서 결과 요약과 상태 유지까지 통과했습니다.
+검증 Case의 Stage만0초로 바꿨으며 제품의0/10/20초 Timer는 별도 기존 회귀에서 실제로 검증했습니다.
+새 콘텐츠 .tres나 Case 선택/로딩/Campaign 기능은 추가하지 않았습니다.
+
+Null 처리의 차이는 화면별 전제에서 나옵니다. PROFILE/CCTV의 안내와 Experiment의 선택적 실행은
+경고·대체 문구를 보여주고 정보성 Next를 유지합니다. Containment/Monitoring/Incident/Broadcast/
+IncidentResult는 필요한 확정·참조가 없으면 Next와 Main 진행을 차단합니다.
+Result는 이미 확정된 사실의 요약이므로 일부 FAILURE 정보가 없어도 unavailable로 표시하고
+PROFILE 복귀를 허용합니다. 미정의/빈 Summary는 Next가 비활성화됩니다.
+의미가 다른 정책을 강제로 동일 Base Class에 넣지 않았으며 README의 포괄적인 Next 설명만 바로잡았습니다.
+
+자동 검증에도 기술 부채가 있습니다. 기존 로컬 .gd/.ps1 파일355개 중 단계 경로만 정규화하면
+동일한 파일을 가진52개 그룹/255개 파일이 있습니다. 과거 단계 보관본이 포함된 숫자이며
+이를 모두 현재 회귀 검사로 실행하면 과거 API/Route 기대값과 충돌할 수 있습니다.
+최신 Step22의34개 .gd를 재사용했고, 이번에는 전체 검증 Script를 다시 복제하지 않았습니다.
+상속된 `_validate`, `_snapshot`, `_advance`, `_assert_rows` 등의 의도적 override와 내부 필드/
+private helper/Node 구조 검사에 결합된 부분이 있습니다. 현재 실행 충돌은 없지만 향후 공통 helper로
+정리할 대상입니다. 회귀의 동작 검사와 소스/Git/해시 감사는 별도 실행 단계로 유지했습니다.
+기존 실행기의 Resume은 로그만으로 성공을 추정할 수 있어 이번 Step23 실행기에서는
+실제 종료 코드0, 입력 코드 해시, 로그 해시, 실행 인자/모드/예상 warning이 일치하는 성공 기록이
+있을 때만 재사용하도록 보강했습니다. 기존 검증 파일355개는 수정하지 않았습니다.
+
+성능 감사에서는 실제 FAILURE Summary 생성 helper를 각 모드에서10,000번 호출했습니다.
+headless 평균21.5561µs, Windows GPU 평균21.694µs였습니다. 현재 컬렉션 크기에서만 측정한 값입니다.
+100회 실제 View 교체 후 프레임 대기를 포함한 시간은 각각 약2.06/2.12초이며 항상 ViewHost 자식1개입니다.
+프레임 대기를 포함하므로 이 값을 순수 View 생성 시간으로 해석하지 않습니다.
+현재는 선형 검색·동적 작은 목록·one-shot Timer에 의미 있는 성능 문제를 확인하지 못했습니다.
+다수 항목/동시 View가 실제 요구될 때 프로파일링 후 필요한 최적화만 고려합니다.
+
+| 번호 | 요청 보고 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD6dbc42a, 재개 시 clean. 19~22단계는 이미 사용자 요청으로 커밋됨. |
+| 2 | 전체 구조 | 소스63, GD/UID23씩, Scene10, Data Script11, 콘텐츠 .tres1. 기존 폴더 유지. |
+| 3 | Main 크기 | 405줄/20함수→409줄/21함수. setup9, Stage Route9+결과2. |
+| 4 | Main 책임 | 초기 검사/Runtime 생성, 창 표시, View lifecycle/setup, ID 검색, 승인 연결, Route, Summary. |
+| 5 | Main 분리 | 현재 필요 없음. 단일 Case 조정자의 일관된 책임. |
+| 6 | 책임 경계 | Data/Runtime/View/Main 경계 유지. 위 경계 표 참조. |
+| 7 | View Runtime 접근 | 없음. getter 탐색이나 소유 없이 전달 snapshot만 사용. |
+| 8 | View .tres load | 없음. 특정 테스트 Resource 경로는 Main Scene Inspector 연결에만 존재. |
+| 9 | Resource 상태 혼입 | 없음. 선택·확정·실행 상태는 콘텐츠 필드에 없음. |
+| 10 | ID 검색 helper | 직접5/간접2, Summary 매핑2/격리 승인loop1 추가 조사. |
+| 11 | 실제 중복 검색 | Room 승인/요약 loop와 Option 검증/조회 반복. 다른 컬렉션 for 문은 서로 다른 관계. |
+| 12 | 중복 제거 판단 | ID 검색 유지. 실제 불일치가 있던 lifecycle 검증만 공통 private helper로 정리. |
+| 13 | Experiment ID | 3개 모두 유효·유일. |
+| 14 | Room ID | 3개 모두 유효·유일. |
+| 15 | Room→Outcome | 각 Room에 정확히 Outcome1개, 고아/중복 없음. |
+| 16 | Outcome→Incident | FAILURE2개가 실제 Incident01/03에 연결. |
+| 17 | Incident→Broadcast | Incident2개 모두 정확한 Broadcast01/03 연결. |
+| 18 | Option ID | 각 Broadcast3개 유효·해당 Broadcast 내부 유일. |
+| 19 | Option→Result | 6개 모두 실제 IncidentResult에 연결. |
+| 20 | 중복 ID | 모든 해당 컬렉션/Option 범위 중복0. |
+| 21 | Validator 시점 | 다중 Case 제작 시작 시 필요. 현재 제품 시스템 추가 없음. |
+| 22 | Runtime 필드 | 소속 ID, 실행 순서, 확정 Room, 완료 결과, 확정 Broadcast/Option 맥락. 위 필드 표 참조. |
+| 23 | Runtime 중복 | 불필요한 count/remaining/result_id/UI 상태 없음. 6필드 유지. |
+| 24 | Summary | ResultView 표시용, 게임 규칙/장기 저장/두 번째 Runtime 아님. 그대로 유지. |
+| 25 | Route | 기존 SUCCESS/FAILURE와 UNDEFINED=-1 보호 유지. |
+| 26 | enum/Scene 위험 | 인덱스 결합은 있으나9개 명시적 목록과 실제 전체 매핑 검사로 현재 관리 가능. Router 재설계 없음. |
+| 27 | lifecycle | 비활성 요청 Runtime 변경5개 재현·차단. Timer 종료/반복 setup/기존 stale 보호 회귀 통과. |
+| 28 | 새 Case | 메모리 독립 Case를 ready 전 전달, 모든 값이 달라도 Core 추가 수정 없이7경로 통과. |
+| 29 | 배열 순서 | 주요 배열/Option 역순에서도 ID 기반 연결 유지. UI 목록만 전달 배열 순서대로 표시. |
+| 30 | Null 정책 | 정보성 진행/확정 전제/읽기 전용 종료에 맞는 정책 차이. 실제 모순 없음, 문서 설명 수정. |
+| 31 | 자동 검증 | 과거 복제/긴 상속/내부 결합 확인. 최신 검사 재사용, Step23 Resume 성공 증거 보강, 기존 파일 보존. |
+| 32 | 성능 | 현재 Summary 평균약22µs, 100교체 후 View1개. 현재 최적화 필요 없음. |
+| 33 | 발견 문제 | 세 승인 callback의 약한 lifecycle 보호와 실행기의 불충분한 Resume 성공 근거. |
+| 34 | 실제 수정 | Main private helper1개/guard5곳, README 경계·Next 정책·감사 보고, 로컬 Step23 실행기. |
+| 35 | 유지한 구조 | Runtime/Data/모든 View/Scene/Route/ID 검색/Summary/설정. 기능과 참조 검사 정상. |
+| 36 | 미래 정리 | 다중 Case Validator, 협업 시 공유 테스트/짧은 helper, 측정 후 검색 최적화, 요구 시 Case 시작/저장 경계. |
+| 37 | SUCCESS 회귀 | Room02 실제 흐름과 독립 ALT Case 모두 M→RESULT→PROFILE 통과. |
+| 38 | FAILURE 회귀 | Room01/03, A/B/C 모두 M→Incident→Broadcast→IncidentResult→RESULT→PROFILE 통과. |
+| 39 | 전체 기능 회귀 | Profile/CCTV/실험 목록·선택·실행·limit·이력/격리·Confirm/Timer·결과/각 매핑·확정/요약 통과. |
+| 40 | signal/stale | 비활성9사례, live3사례 승인·중복 기록 차단, 기존 stale/단일 View/반복 setup 연결1개 통과. |
+| 41 | 해상도 | 1920×1080/1280×720/1024×768, logical1920×1080·canvas_items·keep·scaling 그대로. |
+| 42 | 파싱/실행 | Godot4.7.1 import1 + 검사85 =86 성공. headless/Windows Compatibility GPU 모두. |
+| 43 | diff --check | 통과. 공백 오류 없음. |
+| 44 | 변경 파일 | Git 대상 Main/README2개 수정, 신규/삭제0. 로컬 검증 자료는 .godot/verification/step23에만. |
+| 45 | 기존 변경 보존 | 이전 단계 내용 보존, 기존 소스61/UID23/검증 파일355 동일. HEAD/staging 변경 없음. |
+| 46 | A: 유지 | Main/Resource/Runtime/View, typed Summary, 명시적 Stage/Route, ID 기반 관계. |
+| 47 | B: 현재 수정 | 실제 비활성 승인 방어와 그 공통 검사, 문서 정확성, 로컬 Resume 성공 근거. |
+| 48 | C: 미래 수정 | 다중 Case 제작 시 Validator, 규칙 증가 시 필요한 Main 분리, 협업/CI 시 검증 공통화, 측정 후 최적화. |
+| 49 | 다음 추천 | 다음 요청에서 읽기 전용 Research Log부터 현재 실행 이력 getter→Main 전달→독립 View 표시 경계를 사용. 이번에는 구현하지 않음. |
+
+검증 엔진은 `4.7.1.stable.official.a13da4feb`, Windows Compatibility/OpenGL3.3,
+AMD Radeon RX6800입니다. 정상 검사와 새 감사 검사는 경고·오류 없이 종료 코드0입니다.
+의도적 누락 데이터 검사는 기존 예상 warning 수를 유지하며 오류 없이 통과했습니다.
+F5 키 자체는 자동 조작하지 않았고 같은 application/run/main_scene 기본 실행을 검증했습니다.
+세 해상도의 ALT 결과 GPU 캡처21개를 만들고 SUCCESS/Room01·03 화면을 직접 확인했습니다.
+1024×768 창의 콘텐츠 렌더는 기존 keep 비율대로1024×576입니다.
+
+이번 단계의 게임 소스 변경은 Main의 최소 방어 수정뿐이며 README에49개 보고 항목을 기록했습니다.
+참조 검사/다른 Case/성능/stale 검증과 입력·로그 해시 증거, 전후 diff·보존 해시는
+Git에서 제외되는 `.godot/verification/step23/`에 있습니다. 기존 검증 소스는 그대로입니다.
+Research Log/Campaign/다음 Case/저장/Settings/경제·점수·피해·할당량/이벤트/연출/최종 UI는
+추가하지 않았고, 커밋·push도 수행하지 않았습니다.
 
 ## 22단계 읽기 전용 Case Result 요약 검증 결과
 

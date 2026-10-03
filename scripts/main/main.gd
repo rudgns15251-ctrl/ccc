@@ -288,7 +288,7 @@ func _get_current_incident_result() -> IncidentResultData:
 
 
 func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
-	if _current_stage != Stage.BROADCAST or broadcast_view != _current_view or not broadcast_view.is_inside_tree() or broadcast_view.is_queued_for_deletion():
+	if _current_stage != Stage.BROADCAST or not _is_active_view(broadcast_view):
 		return
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == broadcast_id:
@@ -298,8 +298,12 @@ func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: Strin
 	broadcast_view.update_confirmation_state(case_runtime.get_confirmed_broadcast_id(), case_runtime.get_confirmed_broadcast_option_id())
 
 
+func _is_active_view(view: FlowView) -> bool:
+	return is_instance_valid(view) and view == _current_view and view.is_inside_tree() and not view.is_queued_for_deletion()
+
+
 func _on_advance_requested(view: FlowView) -> void:
-	if view != _current_view or not view.is_inside_tree() or view.is_queued_for_deletion():
+	if not _is_active_view(view):
 		return
 	if _current_stage == Stage.CONTAINMENT and not case_runtime.has_confirmed_containment():
 		return
@@ -340,7 +344,7 @@ func _get_next_stage(stage: int) -> int:
 
 
 func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
-	if monitoring_view != _current_view or _current_stage != Stage.MONITORING:
+	if _current_stage != Stage.MONITORING or not _is_active_view(monitoring_view):
 		return
 	if current_case == null:
 		push_warning("Main: current_case is missing for Monitoring result.")
@@ -370,7 +374,7 @@ func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
 
 
 func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
-	if experiment_view != _current_view:
+	if not _is_active_view(experiment_view):
 		return
 	var limit: int = current_case.experiment_limit if current_case != null else 0
 	var approved: bool = case_runtime.try_record_experiment_execution(experiment_id, limit)
@@ -383,7 +387,7 @@ func _on_experiment_execution_requested(experiment_id: String, experiment_view: 
 
 
 func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:
-	if containment_view != _current_view:
+	if not _is_active_view(containment_view):
 		return
 	if current_case != null and not room_id.strip_edges().is_empty():
 		for room: ContainmentData in current_case.available_containment_rooms:
