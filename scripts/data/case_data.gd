@@ -10,3 +10,4 @@ extends Resource
 @export var available_containment_rooms: Array[ContainmentData] = []
 @export var containment_outcomes: Array[MonitoringOutcomeData] = []
 @export var incidents: Array[IncidentData] = []
+@export var emergency_broadcasts: Array[EmergencyBroadcastData] = []
