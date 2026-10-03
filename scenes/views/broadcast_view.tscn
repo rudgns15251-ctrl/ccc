@@ -62,11 +62,24 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="NextButton" type="Button" parent="Center/Content"]
+[node name="Actions" type="HBoxContainer" parent="Center/Content"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="ConfirmButton" type="Button" parent="Center/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+disabled = true
+text = "Confirm Broadcast"
+
+[node name="NextButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(360, 48)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 disabled = true
-text = "Next: RESULT"
+text = "Next: INCIDENT RESULT"

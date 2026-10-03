@@ -1,21 +1,22 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-8개 임시 화면의 명시적 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT / CONTAINMENT 표시를 구현했습니다.
+9개 임시 화면의 명시적 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT / CONTAINMENT 표시를 구현했습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
 CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나를 임시 선택할 수 있습니다.
 선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다.
 확정 이후에만 MONITORING으로 진행합니다. Room 자체에 정답 필드를 두지 않습니다.
-MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 결과를 확정합니다. SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData를 INCIDENT에, 연결된 EmergencyBroadcastData와 표시 전용 Option 목록을 BROADCAST에 표시한 뒤 RESULT로 진행합니다.
+MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 결과를 확정합니다. SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData를 INCIDENT에, 연결된 EmergencyBroadcastData와 단일 선택 Option 목록을 BROADCAST에 표시합니다. Confirm Broadcast가 승인되어 두 ID를 Runtime에 기록한 뒤 INCIDENT_RESULT에서 해당 결과 콘텐츠를 표시하고 RESULT로 진행합니다.
+RESULT는 Main이 전달한 표시용 snapshot으로 Case, 확정 결과/Room, 실제 실행 순서의 Experiment와 사용 수를 읽기 전용으로 요약합니다. FAILURE에는 현재 Incident/Broadcast/확정 Option/IncidentResult도 표시하며 SUCCESS에는 없음/해당 없음으로 표시합니다.
 실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
 
 1. Godot 4.7.1에서 이 폴더의 `project.godot`를 가져오거나 엽니다.
 2. `scenes/main/main.tscn`을 연 뒤 **F6**으로 해당 Scene을 실행하거나, **F5**로 프로젝트를 실행합니다.
-3. **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT → MONITORING** 순서로 이동합니다. 이후 SUCCESS는 RESULT, FAILURE는 INCIDENT → BROADCAST → RESULT입니다.
+3. **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT → MONITORING** 순서로 이동합니다. 이후 SUCCESS는 RESULT, FAILURE는 INCIDENT → BROADCAST → INCIDENT_RESULT → RESULT입니다.
    PROFILE에는 테스트 Resource의 subject_name, classification, basic_description이 표시됩니다.
    CCTV에는 camera_id, observation_text가 표시됩니다.
    EXPERIMENT에는 available_experiments 배열의 이름과 설명이 동적 목록으로 표시됩니다.
@@ -38,9 +39,11 @@ MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 �
    결과가 없는 재진입은 처음부터 재생합니다. 데이터 누락·미정의 결과·기록 실패는 경고와 함께 Next를 차단합니다.
    Monitoring의 기존 **Next: RESULT** 버튼은 진행 요청만 보냅니다. Main이 Runtime 결과에 따라 다음 화면을 결정합니다.
    FAILURE의 INCIDENT는 현재 Case에서 ID로 검색한 incident_id / display_name / description을 표시합니다. Room01은 TEST_INCIDENT_01, Room03은 TEST_INCIDENT_03입니다. 유효 Incident와 연결된 Broadcast/Option이 있어야 Next: BROADCAST를 활성화합니다. 누락 시 경고와 대체 문구 또는 진행 차단을 적용합니다.
-   BROADCAST는 broadcast_id / display_name / prompt_text와 options의 ID·문구를 Label로 표시합니다. Option 선택·확정은 없습니다. 유효 ID를 가진 Option이 하나 이상 있어야 Next: RESULT를 활성화합니다.
-4. RESULT의 **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
-   이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력, 격리 확정, Monitoring 결과는 유지됩니다.
+   BROADCAST는 broadcast_id / display_name / prompt_text와 options의 ID·문구를 Label로 표시합니다. 각 문구 옆 CheckBox로 하나를 임시 선택할 수 있고 재클릭해도 선택을 유지합니다. 처음에는 Confirm과 Next가 비활성화됩니다. 유효 Option을 선택하면 **Confirm Broadcast**만 활성화됩니다. Confirm 시 Main이 현재 Case/FAILURE/Incident/Broadcast와 Option ID, Option.result_id에 대응하는 실제 IncidentResultData까지 다시 확인하고 최초 ID 쌍만 Runtime에 기록합니다. 확정 항목은 **[Confirmed]**, 모든 Option과 Confirm은 disabled, **Next: INCIDENT RESULT**는 활성화됩니다. 같은 Broadcast 재진입은 이 상태를 복원합니다. 다른 Broadcast 또는 잘못된 snapshot은 경고와 함께 진행을 차단합니다. 연결된 결과가 없으면 Confirm을 거부하고 미확정 Next를 비활성 상태로 유지합니다. 피해/점수 판정은 없습니다.
+   INCIDENT_RESULT에는 확정 Option의 result_id로 검색한 결과 ID/이름/설명을 표시합니다. 정상 데이터에서 Next: RESULT가 활성화됩니다. 누락 데이터는 경고/대체 문구와 진행 차단을 적용합니다. 다른 결과를 대신 표시하지 않습니다.
+4. RESULT에서 Case ID/이름, **SUCCESS / FAILURE**, 확정 Room ID/이름, 실행 순서의 Experiment ID/이름, **Experiment Usage**를 확인합니다. FAILURE에는 연결된 Incident/Broadcast/확정 Option/IncidentResult의 ID와 이름·문구를 표시합니다. SUCCESS에는 Incident 없음, 나머지 실패 항목 해당 없음으로 표시합니다. 이력이 길어지면 요약 영역을 스크롤합니다.
+   **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
+   이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력, 격리 확정, Monitoring 결과, Broadcast 확정 ID 쌍은 유지됩니다. Runtime.reset()은 이 상태를 모두 초기화합니다.
 5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
 
 각 View Scene을 따로 F6 실행하면 해당 임시 화면만 표시됩니다. 다음 화면의
@@ -53,6 +56,8 @@ CONTAINMENT를 단독 실행하면 빈 목록 경고와 `No containment rooms av
 MONITORING을 단독 실행하면 Outcome 누락 경고와 `Monitoring data unavailable`이 표시됩니다.
 INCIDENT를 단독 실행하면 IncidentData 누락 경고와 `Incident data unavailable`, Next disabled 상태가 표시됩니다.
 BROADCAST를 단독 실행하면 Broadcast 누락 경고와 `Broadcast data unavailable`, 빈 Option 목록과 Next disabled 상태가 표시됩니다.
+INCIDENT_RESULT를 단독 실행하면 Result 누락 경고와 `Incident result data unavailable`, Next disabled 상태가 표시됩니다.
+RESULT를 단독 실행하면 summary 누락 경고와 `[Unavailable]` / `None`, 빈 실행 목록, Next disabled 상태가 표시됩니다.
 
 ## 프로젝트 설정
 
@@ -84,7 +89,7 @@ cap/
 ├── resources/
 │   ├── .gitkeep
 │   └── cases/
-│       └── test_case_01.tres # 기존 콘텐츠와 Outcome3개 / Stage9개 / Incident2개 / Broadcast2개 / Option6개
+│       └── test_case_01.tres # 기존 콘텐츠와 Outcome3개 / Stage9개 / Incident2개 / Broadcast2개 / Option6개 / IncidentResult6개
 ├── scenes/
 │   ├── main/
 │   │   └── main.tscn       # 기존 기반 UI와 ViewHost
@@ -96,11 +101,14 @@ cap/
 │       ├── monitoring_view.tscn
 │       ├── result_view.tscn
 │       ├── incident_view.tscn # IncidentData 표시, incident_view.gd 사용
-│       └── broadcast_view.tscn # EmergencyBroadcastData/Option Label 표시
+│       ├── broadcast_view.tscn # Option 목록, Confirm Broadcast / Next: INCIDENT RESULT
+│       └── incident_result_view.tscn # 결과 ID/이름/설명과 Next: RESULT
 └── scripts/
     ├── data/
     │   ├── broadcast_option_data.gd
     │   ├── broadcast_option_data.gd.uid
+    │   ├── incident_result_data.gd
+    │   ├── incident_result_data.gd.uid
     │   ├── emergency_broadcast_data.gd
     │   ├── emergency_broadcast_data.gd.uid
     │   ├── case_data.gd
@@ -123,15 +131,17 @@ cap/
     │   ├── main.gd         # 창 크기 표시, View 전환, Runtime 연결, 격리 후보 검증/진행 보호
     │   └── main.gd.uid
     ├── runtime/
-    │   ├── case_runtime_state.gd # 메모리 Case ID, Experiment 실행 이력, 확정 격리 ID, Monitoring 최종 결과
+    │   ├── case_runtime_state.gd # 메모리 Case ID, 실행 이력, 격리 ID, Monitoring 결과, Broadcast 확정 ID 쌍
     │   └── case_runtime_state.gd.uid
     └── views/
-        ├── broadcast_view.gd # 전달된 Broadcast/동적 Option 표시와 진행 보호
+        ├── broadcast_view.gd # 동적 Option/임시 선택/확정 요청, 확정 snapshot 복원과 UI 잠금
         ├── broadcast_view.gd.uid
         ├── flow_view.gd    # 버튼 입력을 진행 요청 signal로 전달
         ├── flow_view.gd.uid
         ├── incident_view.gd # IncidentData 표시/누락 처리/Next 보호
         ├── incident_view.gd.uid
+        ├── incident_result_view.gd # 전달된 IncidentResultData 표시/누락 처리/진행 요청
+        ├── incident_result_view.gd.uid
         ├── cctv_view.gd    # 전달받은 CCTVData 표시
         ├── cctv_view.gd.uid
         ├── containment_view.gd # 목록/임시 선택/확정 요청, Runtime snapshot 표시
@@ -140,6 +150,8 @@ cap/
         ├── experiment_view.gd.uid
         ├── monitoring_view.gd # 전달된 Outcome의 Room ID와 Timer 기반 누적 Stage 재생
         ├── monitoring_view.gd.uid
+        ├── result_view.gd # 표시용 Summary snapshot, 읽기 전용 요약/동적 실행 이력/누락 처리
+        ├── result_view.gd.uid
         ├── profile_view.gd # 전달받은 ProfileData 표시
         └── profile_view.gd.uid
 ```
@@ -166,39 +178,42 @@ Main (Control, main.gd)
                 ├── CameraId (CCTV만)
                 ├── DisplayName / IncidentId (INCIDENT만)
                 ├── BroadcastId / DisplayName (BROADCAST만)
-                ├── OptionScroll / OptionList (BROADCAST만, 동적 Label)
+                ├── ResultId / DisplayName (INCIDENT_RESULT만)
+                ├── OptionScroll / OptionList (BROADCAST만, 동적 HBox → CheckBox + Label)
                 ├── RoomId (MONITORING만)
                 ├── Description
                 ├── Workspace (EXPERIMENT만)
                 │   ├── ExperimentScroll / ExperimentList (동적 항목)
                 │   └── Execution / RemainingCount / RunButton / ResultTitle / ResultText
                 ├── RoomScroll / RoomList (CONTAINMENT만, 동적 이름 CheckBox / 설명 Label)
-                ├── Actions / ConfirmButton / NextButton (CONTAINMENT만)
+                ├── Actions / ConfirmButton / NextButton (CONTAINMENT, BROADCAST)
                 ├── StageScroll / StageList (MONITORING만, 동적 시간/관찰 Label)
+                ├── SummaryScroll / SummaryColumns (RESULT만)
+                │   ├── Common: Case / FinalResult / Containment / Usage / 동적 ExperimentList
+                │   └── FailureDetails: Incident / Broadcast / 확정 Option / IncidentResult
                 └── NextButton (나머지 View)
 ```
 
 화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / MONITORING 콘텐츠는 Resource에
-있습니다. INCIDENT와 BROADCAST도 Case Resource의 데이터를 표시하고 RESULT는 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
-모든 View는 Control 기반 독립 Scene입니다. Result는 기존 `flow_view.gd`를
-그대로 사용하며, Profile / CCTV / Experiment / Containment / Monitoring / Incident / Broadcast 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
+있습니다. INCIDENT, BROADCAST, INCIDENT_RESULT도 Case Resource의 데이터를 표시하고 RESULT는 확정된 Runtime과 현재 Case에서 파생한 snapshot을 표시합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
+모든 View는 Control 기반 독립 Scene입니다. Profile / CCTV / Experiment / Containment / Monitoring / Incident / Broadcast / IncidentResult / Result 전용 Script는 기존 `flow_view.gd`를 한 단계 상속해 진행 기능을 재사용합니다.
 별도의 Scene 상속이나 추상 Base Class 계층은 없습니다.
 
 `NextButton.pressed → advance_requested → Main._on_advance_requested() → 다음 View`로
 진행합니다. [Godot signal](https://docs.godotengine.org/en/4.7/getting_started/step_by_step/signals.html)을
 사용하며 개별 View는 Main이나 다른 View를 참조하지 않습니다.
 
-`main.gd`는 `Stage` enum, 이에 대응하는 8개 PackedScene 목록, 현재 단계와
+`main.gd`는 `Stage` enum, 이에 대응하는 9개 PackedScene 목록, 현재 단계와
 현재 View 참조, Inspector에서 지정한 `current_case`를 보유합니다. 전환 시 이전 View를 ViewHost에서 제거한 뒤
 `queue_free()`하고 다음 View 하나를 추가합니다. RESULT 다음은 PROFILE입니다.
 Stage enum은 PROFILE=0, CCTV=1, EXPERIMENT=2, CONTAINMENT=3, MONITORING=4,
-RESULT=5, INCIDENT=6, BROADCAST=7입니다. BROADCAST를 배열 끝에 추가해 기존 인덱스를 보존했습니다.
+RESULT=5, INCIDENT=6, BROADCAST=7, INCIDENT_RESULT=8입니다. 새 Stage를 배열 끝에 추가해 기존 인덱스를 보존했습니다.
 _get_next_stage(stage)의 match가 다음 Stage를 명시적으로 반환하고, -1이면 전환하지 않습니다.
 진행 signal에는 발신 View를 bind합니다. 현재 View와 다른 객체, Tree 밖 객체,
-queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident / Broadcast의 중복 전환을 차단합니다.
+queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident / Broadcast / IncidentResult의 중복 전환을 차단합니다.
 Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
 INCIDENT는 기존 FlowView를 사용하는 Control → CenterContainer → VBoxContainer에
-제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene은 기존 구성을 보존하고 진행 버튼 문구만 Next: BROADCAST로 변경했습니다. Broadcast Scene은 제목/이름/ID/문구/OptionScroll/NextButton을 둡니다. Runtime 필드는 추가하지 않았습니다.
+제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene의 기존 구성을 보존했습니다. Broadcast Scene의 기존 Actions/ConfirmButton/NextButton을 유지하고 Next 문구만 바꿨습니다. Runtime의 기존 Broadcast/Option 확정 ID 문자열 두 개를 유지하며 별도 Result 필드는 추가하지 않았습니다.
 기존 창 크기 표시 함수와 연결은 보존했습니다.
 Main._ready()에서 현재 Case ID로 CaseRuntimeState를 한 번 생성합니다.
 일반 View 전환, RESULT → PROFILE, ExperimentView.setup()은 런타임 상태를 초기화하지 않습니다.
@@ -211,11 +226,11 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 ## 테스트 Resource와 데이터 전달
 
 [Godot Resource](https://docs.godotengine.org/en/4.7/tutorials/scripting/resources.html)를
-데이터 컨테이너로 사용합니다. 열 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
+데이터 컨테이너로 사용합니다. 열한 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
 
 | 파일 | 책임 / 필드 |
 | --- | --- |
-| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData] |
+| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData], incident_results: Array[IncidentResultData] |
 | `scripts/data/profile_data.gd` | ProfileData: profile_id, subject_name, classification, basic_description |
 | `scripts/data/cctv_data.gd` | CCTVData: camera_id, observation_text만 정의 |
 | `scripts/data/experiment_data.gd` | ExperimentData: experiment_id, display_name, description, result_text만 정의 |
@@ -223,12 +238,13 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 | `scripts/data/monitoring_stage_data.gd` | MonitoringStageData: time_offset: int(초), observation_text: String |
 | `scripts/data/monitoring_outcome_data.gd` | MonitoringOutcomeData: Result enum(UNDEFINED/SUCCESS/FAILURE), room_id, stages, final_result, incident_id |
 | `scripts/data/incident_data.gd` | IncidentData: incident_id, display_name, description, broadcast_id |
-| `scripts/data/broadcast_option_data.gd` | BroadcastOptionData: option_id: String, display_text: String |
+| `scripts/data/broadcast_option_data.gd` | BroadcastOptionData: option_id: String, display_text: String, result_id: String |
+| `scripts/data/incident_result_data.gd` | IncidentResultData: result_id: String, display_name: String, description: String |
 | `scripts/data/emergency_broadcast_data.gd` | EmergencyBroadcastData: broadcast_id: String, display_name: String, prompt_text: String, options: Array[BroadcastOptionData] |
-| `resources/cases/test_case_01.tres` | 기존 테스트 콘텐츠, Room별 Outcome 3개와 각 Stage 3개(0/10/20초), 검증용 문구, Room01/03 FAILURE·Room02 SUCCESS, Incident01/03 → Broadcast01/03 ID 연결, 각각 표시 전용 Option3개 |
+| `resources/cases/test_case_01.tres` | 기존 테스트 콘텐츠, Room별 Outcome 3개와 각 Stage 3개(0/10/20초), 검증용 문구, Room01/03 FAILURE·Room02 SUCCESS, Incident01/03 → Broadcast01/03 ID 연결, 각각 Option3개와 result_id로 연결한 개발용 IncidentResult6개 |
 | `scenes/main/main.tscn` | 테스트 Case Resource를 Main.current_case에 연결 |
-| `scripts/main/main.gd` | 데이터 전달/전환, CaseRuntimeState 소유, 실행 승인, 격리 후보 검증/진행 차단, Monitoring 완료 시 Outcome 재검증과 결과 기록, Incident/Broadcast ID 검색과 현재 데이터/유효 Option 재검증 |
-| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증, 격리 ID 한 번 확정/조회, Monitoring 결과 한 번 확정/조회/reset |
+| `scripts/main/main.gd` | 데이터 전달/전환, CaseRuntimeState 소유, 실행 승인, 격리 후보 검증/진행 차단, Monitoring 완료 시 Outcome 재검증과 결과 기록, Incident/Broadcast ID 검색과 현재 데이터/유효 Option/Result 연결 재검증 |
+| `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증, 격리 ID/Monitoring 결과/Broadcast ID 쌍 한 번 확정·조회/reset |
 | `scripts/views/profile_view.gd` | setup(ProfileData), 3개 표시 필드 반영, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/profile_view.tscn` | 제목·데이터 Label·기존 진행 버튼 레이아웃 |
 | `scripts/views/cctv_view.gd` | setup(CCTVData), 두 필드 표시, 누락/빈 필드 경고와 대체 문구 |
@@ -241,8 +257,12 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 | `scenes/views/monitoring_view.tscn` | 기존 제목/진행 버튼, RoomId/Description/StageScroll/StageList, one-shot PlaybackTimer |
 | `scripts/views/incident_view.gd` | setup(IncidentData, can_advance=false), ID/이름/설명 표시, 누락 처리, Main이 전달한 Broadcast 가용성으로 Next 보호 |
 | `scenes/views/incident_view.tscn` | 기존 제목/Next와 DisplayName/IncidentId/Description Label |
-| `scripts/views/broadcast_view.gd` | setup(EmergencyBroadcastData), 표시/Option Label 동적 생성, 누락/유효 Option 검사, 반복 setup 초기화, 진행 요청 |
-| `scenes/views/broadcast_view.tscn` | Control → CenterContainer → VBoxContainer, 제목/이름/ID/문구/OptionScroll → OptionList/Next: RESULT |
+| `scripts/views/broadcast_view.gd` | setup(broadcast, confirmed_broadcast_id, confirmed_option_id), 동적 목록/임시 선택/확정 요청, snapshot 표시·복원·잠금, Next 보호 |
+| `scenes/views/broadcast_view.tscn` | 기존 Control/목록, Actions → Confirm Broadcast / Next: INCIDENT RESULT |
+| `scripts/views/incident_result_view.gd` | setup(IncidentResultData), ID/이름/설명 표시, 누락/빈 필드 처리, Next 요청 |
+| `scenes/views/incident_result_view.tscn` | Control/Center/VBox, 제목·ResultId·DisplayName·Description·Next: RESULT |
+| `scripts/views/result_view.gd` | setup(Summary), 공통/실패 요약, 실행 순서대로 동적 목록, 누락 경고·대체 표시, 기존 진행 signal |
+| `scenes/views/result_view.tscn` | 기존 Control/제목/Restart, SummaryScroll 안의 공통 정보·FailureDetails 두 열 |
 | `scripts/views/flow_view.gd` | 기존 진행 기능만 담당, 이번 단계 수정 없음 |
 
 ```text
@@ -282,10 +302,10 @@ MonitoringView.setup(outcome, case_runtime.get_monitoring_result())
 RoomId / 전체 개수 / StageList에 시간 Label + 관찰 Label 묶음 생성
 ```
 
-Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 일곱 전용 View는 데이터를
+Main은 View를 트리에 추가하기 전에 `setup()`을 호출합니다. 여덟 전용 View는 데이터를
 보관하고 `_ready()`에서 기본 진행 기능의 `super._ready()`를 호출한 뒤 표시합니다.
 트리에 들어간 후 `setup()`을 다시 호출하는 경우에도 표시를 갱신하도록 했습니다.
-일곱 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
+여덟 View는 특정 `.tres` 경로를 알거나 로드하지 않으며, 데이터를 수정하지 않습니다.
 순환 후 View를 새로 만들 때에도 동일한 Case의 데이터를 다시 전달합니다.
 
 Incident 데이터 전달은 Runtime FAILURE + 확정 Room → 해당 MonitoringOutcome → incident_id
@@ -295,7 +315,7 @@ Case/확정 Room/Outcome/Room 일치/Outcome FAILURE/비어 있지 않은 incide
 incidents 배열을 ID로 검색합니다. null·빈 ID 후보는 warning 후 건너뛰고, 없으면 null을 반환합니다.
 Incident01/03은 각각 Room01/03 Failure용 임시 문구입니다. SUCCESS Outcome의 incident_id는 빈 값입니다.
 SUCCESS에 실수로 Incident ID가 있어도 Route는 Runtime SUCCESS → RESULT이며 Incident와 Broadcast를 조회하거나 생성하지 않습니다.
-ContainmentData와 CaseRuntimeState는 변경하지 않았습니다. IncidentData에는 Broadcast 연결 ID만 추가했습니다. 트리거/Room/결과/피해 필드는 없습니다.
+ContainmentData와 IncidentData는 이번 단계에서 변경하지 않았습니다. IncidentData에는 기존 Broadcast 연결 ID만 있으며 트리거/Room/결과/피해 필드는 없습니다.
 
 IncidentView는 전달된 Resource만 표시하고 Case/Main/Runtime이나 특정 .tres를 탐색하지 않습니다.
 setup은 준비 전 데이터를 저장하며 _ready에서 표시합니다. 준비 후 반복 setup은 Label 전체와 Next를 갱신합니다.
@@ -307,13 +327,30 @@ Main은 disabled 상태나 이전 View snapshot을 믿지 않으며, 현재 Case
 읽기와 화면 전환은 Resource나 Experiment/격리/Monitoring Runtime 상태를 변경하지 않습니다.
 
 Broadcast 데이터는 Runtime FAILURE → 현재 Incident.broadcast_id → CaseData.emergency_broadcasts의 동일 ID
-→ Main → BroadcastView.setup(broadcast) 순서로 전달합니다. 배열 인덱스나 특정 테스트 ID로 연결하지 않습니다.
-각 Option은 입력 순서대로 Label 하나를 생성합니다. null Option은 warning 후 건너뛰고 빈 option_id는
-[Missing option_id]를 표시하며 유효 개수에 포함하지 않습니다. 빈 display_text는 warning/대체 문구를
-표시하되 ID가 유효하면 진행할 수 있습니다. 빈 이름/문구도 warning/대체 문구를 표시합니다.
+→ Main → BroadcastView.setup(broadcast, confirmed_broadcast_id, confirmed_option_id) 순서로 전달합니다. 배열 인덱스나 특정 테스트 ID로 연결하지 않습니다.
+각 Option은 입력 순서대로 HBoxContainer 안에 CheckBox와 기존 줄바꿈 Label을 생성합니다. null Option은 warning 후 건너뛰고 빈 option_id는
+[Missing option_id]를 표시하며 선택 버튼을 비활성화하고 유효 개수에 포함하지 않습니다. 빈 display_text는 warning/대체 문구를
+표시하되 ID가 유효하면 선택과 진행이 가능합니다. 빈 이름/문구도 warning/대체 문구를 표시합니다.
 null/빈 Broadcast ID/빈 options/유효 Option 0개는 Next disabled이며 Main도 최신 데이터를 재검증합니다.
-반복 setup은 기존 Option을 제거·해제하고 필드/버튼/스크롤을 초기화합니다. 재진입은 현재 데이터에서 다시 검색합니다.
-Broadcast 선택·확정·결과·Runtime 필드는 없으며 Resource와 기존 Runtime을 변경하지 않습니다.
+반복 setup은 기존 Option을 제거·해제하고 필드/버튼/스크롤/선택 인덱스/ButtonGroup/snapshot을 초기화합니다. 재진입은 현재 데이터와 실제 Runtime ID 쌍을 다시 전달해 미확정 선택 없음 또는 확정 잠금을 복원합니다.
+Broadcast 선택은 View의 _selected_option_index와 ButtonGroup에만 둡니다. Main/Resource/Runtime에는 저장하지 않습니다.
+ButtonGroup.allow_unpress=false와 표시 동기화로 최대 하나만 선택되고 같은 Option 재클릭은 선택을 유지합니다.
+programmatic pressed 요청도 그룹의 각 버튼을 set_pressed_no_signal로 동기화해 중복 선택/신호 재귀를 방지합니다.
+이전 그룹·Tree 밖·해제 예정 버튼/View의 요청과 무효 ID 선택을 거부합니다. Option 클릭은 Main에 signal을 보내지 않습니다.
+선택만으로는 Next를 활성화하거나 Runtime에 기록하지 않습니다. 유효 선택 시 Confirm만 활성화됩니다.
+`ConfirmButton.pressed → broadcast_confirmation_requested(broadcast_id, option_id) → Main` 순서로 요청합니다.
+Main은 현재 단계/발신 View/Tree/해제 예정 여부, 현재 Case/FAILURE/Incident 연결을 다시 검사하고 요청 Broadcast ID의 일치와 현재 options 안의 Option ID 존재 여부를 확인합니다. 배열 인덱스로 확정하지 않습니다.
+선택 Option.result_id가 빈·공백이 아니며 현재 Case.incident_results에 동일 ID의 데이터가 있는지까지 검사합니다.
+최초 정상 승인만 Runtime.try_confirm_broadcast_option()으로 두 ID를 함께 기록하며 기존 실험/격리/Monitoring 상태는 보존합니다.
+승인/거부 후 Main은 실제 두 ID를 update_confirmation_state()로 전달합니다. View는 Runtime이나 Main을 직접 읽지 않습니다.
+유효 확정 snapshot은 해당 항목에 [Confirmed]를 표시하고 모든 Option/Confirm을 잠그며 Next를 활성화합니다.
+다른 Broadcast/없는 Option/부분 ID 쌍은 경고와 함께 잠금 및 Next disabled로 처리합니다. 같은 Broadcast 재진입에서는 재기록하지 않습니다.
+View 버튼 검사와 Main의 Runtime 확정 ID 쌍·현재 Broadcast·현재 Option ID 재검증으로 미확정 직접 advance도 차단합니다.
+확정 쌍에서 파생한 실제 Option의 result_id로 IncidentResultData를 검색하고 IncidentResultView.setup(result)로 전달합니다. Runtime에 Result ID/완료 상태를 추가하지 않습니다.
+BROADCAST/INCIDENT_RESULT의 직접 advance에서도 이 현재 결과 연결이 유효해야 진행합니다. 없으면 warning/대체 UI/Next 차단, 다른 Result fallback은 없습니다.
+IncidentResultView는 받은 Resource의 ID/이름/설명만 표시합니다. null/빈 ID는 경고와 진행 차단, 정상 ID의 빈 이름/설명은 경고와 [Missing ...] 문구입니다.
+반복 setup은 모든 텍스트/Next를 갱신하며 signal은 _ready에서 한 번만 연결합니다. Main/Runtime/Case/.tres를 직접 찾지 않습니다.
+별도 Item Scene, 결과 평가, 피해/점수 필드는 없습니다. 실행 중 콘텐츠 Resource는 변경하지 않습니다.
 
 ContainmentView는 배열 순서대로 VBoxContainer와 이름 CheckBox / 설명 Label을 생성합니다.
 ExperimentView와 같은 ButtonGroup 패턴을 사용하며 별도 Item Scene은 없습니다.
@@ -370,13 +407,13 @@ Timer 시작이나 완료 signal 재전송, Runtime 결과 재기록은 없습�
 null Outcome/빈 배열/전부 null은 대체 UI, Timer 정지, Next disabled로 처리합니다.
 일부 null Stage는 경고하고 건너뛰며 빈 관찰 문구는 `[Missing observation_text]`를 표시합니다.
 final_result가 UNDEFINED여도 Stage 재생은 가능하지만 마지막에 Main이 경고하고 결과/Next를 미확정 상태로 유지합니다.
-Main._get_next_stage()는 Runtime SUCCESS → RESULT, FAILURE → INCIDENT, UNDEFINED → -1(진행 거부)를 반환합니다. INCIDENT → RESULT → PROFILE이며 순차 +1 계산을 사용하지 않습니다.
+Main._get_next_stage()는 Runtime SUCCESS → RESULT, FAILURE → INCIDENT, UNDEFINED → -1(진행 거부)를 반환합니다. FAILURE는 INCIDENT → BROADCAST(결과 연결 검증 후 확정) → INCIDENT_RESULT → RESULT → PROFILE이며 순차 +1 계산을 사용하지 않습니다.
 
 MonitoringOutcomeData.Result는 UNDEFINED=0, SUCCESS=1, FAILURE=2입니다.
 검증용 Case의 Room01/03 Outcome은 FAILURE, Room02 Outcome은 SUCCESS이며 정식 콘텐츠 정답을 뜻하지 않습니다.
 CaseRuntimeState의 _monitoring_result와 has/get/try_set_monitoring_result API로 결과를 한 번만 확정합니다.
 UNDEFINED/미지원값/이미 확정된 같은 값·다른 값은 거부합니다.
-reset()은 기존 Case ID 정책을 유지하면서 실험 이력/확정 Room/Monitoring 결과를 모두 초기화합니다.
+reset()은 기존 Case ID 정책을 유지하면서 실험 이력/확정 Room/Monitoring 결과/Broadcast 확정 ID 쌍을 모두 초기화합니다.
 Stage 진행 위치나 경과 시간은 Runtime에 넣지 않았습니다. ContainmentData/공용 flow_view/설정/UID는 변경하지 않았습니다.
 
 ExperimentView는 배열 순서대로 `VBoxContainer`와 이름 CheckBox / 설명 Label을 생성합니다.
@@ -409,7 +446,7 @@ snapshot이며 실행 최종 권한을 갖지 않습니다. Runtime snapshot을 
 재진입 또는 setup 재호출 시 임시 선택/결과를 초기화하고 전달된 완료 상태/남은 횟수를 다시 반영합니다.
 
 CaseRuntimeState는 `case_id: String`, `_experiment_execution_history: Array[String]`,
-`_confirmed_containment_room_id: String`을 보유합니다.
+`_confirmed_containment_room_id: String`, `_monitoring_result`, `_confirmed_broadcast_id: String`, `_confirmed_broadcast_option_id: String`을 보유합니다.
 생성 시 Case ID를 지정할 수 있고 `reset(case_identifier = "")`은 기존 ID 지정 정책대로 이력과 확정 ID를 비웁니다.
 `try_confirm_containment_room(room_id)`는 빈·공백 ID와 두 번째 확정을 거부하고 최초 정상 ID만 기록합니다.
 `has_confirmed_containment()`와 `get_confirmed_containment_room_id()`로 확정 상태를 조회합니다.
@@ -424,6 +461,7 @@ CaseRuntimeState는 `case_id: String`, `_experiment_execution_history: Array[Str
 CaseData.experiment_limit의 기본값은 0입니다. 테스트 Case는 검증용 임시 값 2이며 최종 밸런스가 아닙니다.
 0은 실행 불가, 음수는 경고와 실행 불가로 처리하며 Resource의 원래 값은 수정하지 않습니다.
 State는 .tres나 디스크에 저장하지 않으며 Main이 해제되거나 프로그램을 종료하면 사라집니다.
+Broadcast API는 `try_confirm_broadcast_option(broadcast_id, option_id) -> bool`, `has_confirmed_broadcast_option() -> bool`, `get_confirmed_broadcast_id() -> String`, `get_confirmed_broadcast_option_id() -> String`입니다. 초기 ID 쌍은 빈 문자열입니다. 빈·공백 ID 및 두 번째 같은/다른 쌍은 false로 거부하고 기존 쌍을 보존합니다. 최초 정상 쌍은 한 동기 호출에서 두 ID를 함께 기록합니다. 현재 Case 콘텐츠 검증은 Main의 책임이며 Runtime은 Resource를 참조하지 않습니다.
 
 테스트 Resource 교체는 `main.tscn`의 **Main**을 선택하고 Inspector의
 **Current Case (`current_case`)**에 다른 CaseData Resource를 지정한 뒤 Scene을 저장합니다.
@@ -461,6 +499,7 @@ $godotExe = 'C:\path\to\Godot_v4.7.1-stable_win64_console.exe'
 & $godotExe --headless --path . --script res://scripts/views/profile_view.gd --check-only
 & $godotExe --headless --path . --script res://scripts/views/cctv_view.gd --check-only
 & $godotExe --headless --path . --script res://scripts/views/experiment_view.gd --check-only
+& $godotExe --headless --path . --script res://scripts/views/result_view.gd --check-only
 & $godotExe --headless --path . --script res://scripts/data/profile_data.gd --check-only
 & $godotExe --headless --path . --script res://scripts/data/cctv_data.gd --check-only
 & $godotExe --headless --path . --script res://scripts/data/experiment_data.gd --check-only
@@ -498,7 +537,7 @@ export template 설정은 배포 단계에서 추가합니다.
 
 검증용 스크립트, 격리 프로필, 로그, 캡처는 Git에서 제외되는
 `.godot/verification/`에만 있습니다. 게임에서 로드하지 않는 로컬 검증 자료입니다.
-UID 파일은 Git 보존 대상입니다. 17단계까지 b8e697e에 커밋·push되어 있으며 이번 18단계 변경은 미커밋 상태입니다.
+UID 파일은 Git 보존 대상입니다. 18단계까지 ceb548b에 커밋·push되어 있으며 현재 19~22단계 변경은 미커밋 상태입니다.
 
 ## 2단계 UI 흐름 검증 결과
 
@@ -527,6 +566,353 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 22단계 읽기 전용 Case Result 요약 검증 결과
+
+작업 전 실제 저장소 전체, 설정, 모든 Scene/Script/Resource와 기존 검증 코드/UID를 조사했습니다.
+소스 61개, GDScript/UID 각각 22개, Scene 10개(Main + View 9개), 테스트 .tres 1개가 있었고
+Autoload/플러그인은 없습니다. HEAD는 `ceb548b57d816a4e3251ddd893f80238e7e2ad14`입니다.
+Step19~21의 기존 미커밋 파일은 수정 8개/신규 5개였습니다. 변경 전 사본·SHA-256·Git diff와
+이전 검증 파일 318개의 해시를 `.godot/verification/step22/`에 먼저 보관했습니다.
+
+이번 단계는 기존 파일 3개(Main Script, Result Scene, README)를 수정하고
+`scripts/views/result_view.gd`와 Godot 생성 UID만 추가했습니다. 삭제는 없습니다.
+CaseRuntimeState, 모든 Data Script/콘텐츠 .tres, 공용 flow_view, 다른 View, project.godot,
+Main Scene, 기존 UID 22개, 이전 검증 파일 318개는 작업 전과 동일합니다.
+최종 소스는 63개, GDScript/UID 각각 23개, Scene 10개입니다.
+Git 누적 상태는 수정 9개/신규 7개이며 기존 Step19~21 파일을 포함한 숫자입니다.
+커밋·push는 수행하지 않았습니다.
+
+Main._build_result_summary()는 Runtime의 Case ID/결과/확정 Room/실행 이력 사본과
+현재 Case의 display_name/limit, 정확한 ID로 찾은 Room/Experiment Resource를 전달합니다.
+12개의 표시 항목을 긴 인자 목록으로 전달하는 대신 ResultView 안에 작은 typed RefCounted
+`Summary`를 두었습니다. 콘텐츠 Resource, 저장 결과, Runtime 상태 타입이 아닙니다.
+FAILURE일 때만 기존 Incident/Broadcast/확정 Option/IncidentResult 검색 helper를 호출합니다.
+ResultView는 Main/Runtime/current_case/.tres를 탐색하거나 상태를 확정하지 않습니다.
+기존 enum/PackedScene 인덱스/Route/stale 방어와 RESULT→PROFILE 정책은 보존했습니다.
+
+```text
+ResultView (Control, result_view.gd → 기존 flow_view.gd)
+└── Center / Content (VBoxContainer)
+    ├── ScreenTitle: RESULT
+    ├── SummaryScroll (ScrollContainer, 900×220 기준)
+    │   └── SummaryColumns (HBoxContainer)
+    │       ├── Common (VBoxContainer)
+    │       │   ├── Description: Case ID/이름
+    │       │   ├── FinalResult / Containment / ExperimentUsage
+    │       │   ├── ExperimentTitle / ExperimentEmpty
+    │       │   └── ExperimentList (실행 순서의 동적 Label)
+    │       └── FailureDetails (VBoxContainer)
+    │           ├── IncidentInfo / BroadcastInfo
+    │           └── ResponseInfo / IncidentResultInfo
+    └── NextButton: Restart: PROFILE
+```
+
+| 번호 | 보고 항목 | 구현 및 검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD ceb548b, Step19~21 수정8/신규5. 작업 전 사본·해시·diff 보관. |
+| 2 | 기존 Result | flow_view.gd 기반 임시 설명과 Restart, 전용 Script 없음. |
+| 3 | 변경 Result | 기존 Control/제목/Restart 유지, 공통·실패 요약 2열과 최소 ScrollContainer. |
+| 4 | 전용 Script | result_view.gd와 UID 추가, 기존 flow_view.gd 한 단계 상속. |
+| 5 | 데이터 전달 | Main → 작은 typed Summary(RefCounted) → setup. View는 전달 내용만 읽음. |
+| 6 | CaseResult Resource | 생성하지 않음. 새 콘텐츠 타입/저장 결과/이력 없음. |
+| 7 | Runtime | 파일·필드·API 변경 없음. 확정과 reset 동작도 기존 그대로. |
+| 8 | Case 정보 | Runtime case_id와 현재 Case.display_name을 함께 표시. |
+| 9 | 최종 결과 | Runtime Monitoring SUCCESS/FAILURE 표시. UNDEFINED는 경고와 unavailable. |
+| 10 | Containment | 확정 ID를 현재 Case Room과 매핑, ID/이름 표시. |
+| 11 | 실행 이력 | Runtime history 사본을 기준으로 동적 Label 생성. 0/1/2/12개 검증. |
+| 12 | 순서 | 정렬 없음. 03→01 그대로 표시, Case 배열을 뒤집어도 ID 매핑 유지. |
+| 13 | 사용 수 | history.size / Case.experiment_limit. 기본 2/2, 향후 12/12 표시 검증. |
+| 14 | SUCCESS Incident | None (not occurred), Broadcast/응답/IncidentResult는 Not applicable. |
+| 15 | FAILURE Incident | 기존 Outcome→Incident ID helper로 찾은 정확한 ID/이름. |
+| 16 | Broadcast | Incident.broadcast_id로 검색한 Broadcast ID/이름. |
+| 17 | 확정 Option | Runtime 확정 ID 쌍에 대응하는 Option ID/display_text. 임시 선택은 사용 안 함. |
+| 18 | IncidentResult | 확정 Option.result_id로 검색한 Result ID/이름. 다른 결과 fallback 없음. |
+| 19 | Room02 SUCCESS | 실제 GUI Experiment01+03/Room02 확정/Monitoring 재생 후 공통 요약과 없음 표시. |
+| 20 | Room01 FAILURE | Incident01/Broadcast01/확정 Option/대응 Result 정확히 표시. |
+| 21 | Room03 FAILURE | Incident03/Broadcast03/각 03 Option/Result 표시, Room01 누출 없음. |
+| 22 | Broadcast01 A | TEST_OPTION_01_A / TEST_INCIDENT_RESULT_01_A 표시. |
+| 23 | Broadcast01 B | TEST_OPTION_01_B / TEST_INCIDENT_RESULT_01_B 표시. |
+| 24 | Broadcast01 C | TEST_OPTION_01_C / TEST_INCIDENT_RESULT_01_C 표시. |
+| 25 | Experiment 누락 | 실제 실행 ID·순서·사용 수 유지, [Unavailable]과 warning. 다른 이름 대체 없음. |
+| 26 | Room 누락 | Runtime 확정 ID 유지, [Unavailable]과 warning. 다른 Room 대체 없음. |
+| 27 | 일부 FAILURE 누락 | Incident/Broadcast/확정 Option/Result 각각 누락 검증. 해당 항목 unavailable, 크래시 없음. |
+| 28 | 반복 setup | SUCCESS↔FAILURE, Room01→03, 유효→누락→유효, 기존 Label 해제·문구 초기화·signal 1개. |
+| 29 | Runtime 불변성 | 생성/진입/재진입/setup 전후 객체·Case ID·이력·사용 수·Room·결과·확정 쌍·API 호출 수 동일. |
+| 30 | Restart | PROFILE로 이동만 수행. 같은 Runtime의 모든 상태 유지. stale Result 요청도 무시. |
+| 31 | Resource 불변성 | 모든 콘텐츠 필드 snapshot와 파일 SHA-256 동일. 표시 시 Resource에 쓰지 않음. |
+| 32 | Experiment 회귀 | 선택/실행/중복/limit/Runtime/재진입 통과. 실제 실행01+03 결과 요약도 검사. |
+| 33 | Containment 회귀 | 선택/Confirm/1회 확정/후보 검증/재진입/진행 보호 통과. |
+| 34 | Monitoring 회귀 | 실제 0/1/2초 및 제품 20초 Timer, 순차 공개/한 번 결과 확정/복원/UNDEFINED 차단 통과. |
+| 35 | Incident 회귀 | ID 매핑, 표시/누락 처리, Broadcast 가용성에 따른 Next 보호 통과. |
+| 36 | Broadcast 회귀 | ID 매핑/임시 단일 선택/Confirm/확정 쌍 기록/복원/잠금/누락 보호 통과. |
+| 37 | IncidentResult 회귀 | 6개 Option→Result ID 매핑, 역순 배열, 표시/누락/현재 연결 검증 통과. |
+| 38 | 전체 Route | SUCCESS M→R→PROFILE, FAILURE M→I→B→IR→R→PROFILE. enum/배열/분기 그대로. |
+| 39 | signal/stale | 주요 View 하나, 이전 View 해제, 반복 setup의 연결1개, stale/Tree 밖/삭제 예정 발신 방어. |
+| 40 | 해상도/Stretch | 1920×1080/1280×720/1024×768, 논리1920×1080, canvas_items/keep/resizable 유지. |
+| 41 | 파싱/실행 | Godot4.7.1 import 1개 + Script/회귀/새 요약 검사79개 성공. headless와 Windows GPU 실행. |
+| 42 | 문제/해결 | 최초 요약 높이의 ViewHost 초과를 Scroll 220으로 해결. 실패 항목 간격8로 기본 내용 전체 표시. 미해결 제품 오류 없음. |
+| 43 | 변경 파일 | 수정 Main/Result Scene/README 3개, 신규 Result Script/UID 2개, 삭제0. |
+| 44 | 기존 변경 보존 | Step19~21 내용/신규5개 유지. Main의 이번 추가를 제거하면 작업 전 내용과 동일. 기존 source58/UID22/검증318개 동일. |
+| 45 | 미구현 | Campaign/다음 Case/Restart reset/피해·사망·점수·보상·penalty·quota·economy/Research Log/저장/Settings/Manager/연출/최종UI 없음. |
+| 46 | 다음 확장 지점 | 현재 확정 상태 → Main._build_result_summary() → ResultView.setup(Summary)의 표시 경계. 저장/진행은 요구가 정해졌을 때 별도 설계. |
+
+Godot 검증 엔진은 `4.7.1.stable.official.a13da4feb`, Windows Compatibility/OpenGL3.3,
+AMD Radeon RX6800입니다. 정상 검사는 경고·오류 없이 종료 코드0입니다.
+의도적으로 잘못된 데이터를 넣는 edge 검사는 예상 warning만 있으며 오류 없이 통과했습니다.
+Step22 누락 검사는 headless/GPU 각각 warning31개를 명시적으로 검사합니다.
+이전 edge 검사의 RESULT 강제 진입에 새 요약이 적용되므로 네 검사의 예상 warning 수만
+81/27/126/108로 조정했고 실제 메시지 내용을 확인했습니다. 다른 회귀 기대값은 유지했습니다.
+새 검증 스크립트의 Array 타입 처리 오류도 수정 후 정상 통과했습니다.
+
+새 RESULT GPU 캡처는 기본7경로×세 창 크기21개와 12개 이력 top/bottom×세 크기6개,
+총27개입니다. 원본/작은 창의 SUCCESS/Room01·03 및 긴 목록 캡처를 직접 확인했습니다.
+1024×768 창의 렌더 콘텐츠는 기존 비율대로 1024×576이며 여백 유지 설정은 변경하지 않았습니다.
+F5 키 자체는 자동 조작하지 않았고 동일한 application/run/main_scene의 기본 실행을 양쪽 모드로 검사했습니다.
+검증 파일/로그/캡처/전후 비교는 Git 제외 경로 `.godot/verification/step22/`에만 있습니다.
+
+## 21단계 Broadcast Option과 Incident Result 연결 검증 결과
+
+작업 전 실제 저장소 전체와 현재 Git diff를 조사했습니다. 소스 56개, GDScript 20개/UID 20개,
+Scene 9개(Main + View 8개), 테스트 Case Resource 1개가 있었습니다. Autoload/플러그인은 없습니다.
+HEAD는 `ceb548b57d816a4e3251ddd893f80238e7e2ad14`이며 README, Broadcast Scene, Main,
+CaseRuntimeState, BroadcastView의 19·20단계 변경 5개가 미커밋 상태였습니다.
+이 상태의 소스 사본·SHA-256·Git diff와 기존 검증 코드 282개의 해시를 먼저 보관했습니다.
+
+이번 단계의 기존 파일 수정은 6개입니다.
+
+- `scripts/data/broadcast_option_data.gd`: result_id 필드 하나 추가.
+- `scripts/data/case_data.gd`: incident_results 배열 하나 추가.
+- `resources/cases/test_case_01.tres`: 각 Option의 ID 연결과 임시 결과 6개 추가, 기존 콘텐츠 보존.
+- `scripts/main/main.gd`: 확정 Option/Result ID 검색, Confirm 결과 연결 검사, Stage/진행 보호.
+- `scenes/views/broadcast_view.tscn`: 기존 Next의 문구만 Next: INCIDENT RESULT로 변경.
+- `README.md`: 현재 동작/구조/이번 보고 반영, 이전 단계 보고 보존.
+
+새 파일은 5개입니다.
+
+- `scripts/data/incident_result_data.gd`와 Godot가 생성한 `.gd.uid`.
+- `scripts/views/incident_result_view.gd`와 Godot가 생성한 `.gd.uid`.
+- `scenes/views/incident_result_view.tscn`.
+
+삭제 파일은 없습니다. Runtime과 BroadcastView Script는 이번 단계에서 변경하지 않았습니다.
+Git 누적 diff의 Runtime/View 변경은 기존 19·20단계 변경입니다. 최종 소스는 61개,
+GDScript 22개/UID 22개, Scene 10개(Main + View 9개)이며 해상도/Stretch 설정은 그대로입니다.
+
+연결은 `Runtime 확정 Broadcast ID/Option ID → 현재 Case의 Broadcast/Option 검색 → Option.result_id`
+`→ Case.incident_results의 동일 result_id 검색 → IncidentResultView.setup(result)`입니다.
+별도 Result Runtime 필드, 상태 완료 플래그, Manager나 결과 평가 시스템은 없습니다.
+Main은 선택 요청의 결과 연결을 확인한 뒤에만 Runtime에 최초 ID 쌍을 기록합니다.
+확정 전에 잘못된 연결을 거부해 다른 정상 Option을 다시 선택할 수 있습니다.
+확정 후에는 BROADCAST와 INCIDENT_RESULT 양쪽의 advance 처리에서 현재 결과 연결을 다시 검사합니다.
+잘못된 콘텐츠로 바뀌면 이미 표시된 유효 snapshot이나 직접 signal이 있어도 진행하지 않습니다.
+
+```text
+IncidentResultView (Control, incident_result_view.gd → 기존 flow_view.gd)
+└── Center (CenterContainer)
+    └── Content (VBoxContainer)
+        ├── ScreenTitle: INCIDENT RESULT
+        ├── DisplayName
+        ├── ResultId
+        ├── Description (줄바꿈)
+        └── NextButton: Next: RESULT
+```
+
+Godot `4.7.1.stable.official.a13da4feb`에서 에디터 import 1회와 정식 검증 74개를 통과했습니다.
+22개 GDScript check-only, headless/GPU Main 실행, 기존 회귀 및 새 정상/예외 검사를 포함합니다.
+6개 Option 각각을 세 창 크기에서 실제 입력/표시로 확인하고 결과 배열뿐 아니라 Broadcast/Option 배열도 뒤집었습니다.
+정상 검사는 오류·경고가 없으며 고의 누락/잘못된 데이터 검사에서만 예상 경고가 발생했습니다.
+Incident Result 예외의 경고는 실행 모드마다 79개, 기존 Broadcast Confirm 25개, Broadcast 109개,
+Incident 100개, Monitoring 결과 10개, Containment 9개, Experiment 제한 17개, Playback 17개로 예상값과 일치했습니다.
+기존 원본 0/10/20초 Monitoring 재생도 양쪽 모드에서 통과했습니다. F5 키를 직접 누르지는 않았고
+F5와 같은 설정된 Main Scene을 명령행으로 실행했습니다. GPU 캡처도 직접 확인했습니다.
+
+| 번호 | 요청 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD ceb548b, 기존 19·20단계 5개 수정. 사본/해시/diff 보관. staged·신규·삭제 없음. |
+| 2 | IncidentResultData | 기존 Resource 클래스 패턴으로 독립 class_name/Resource 구현. |
+| 3 | Result 필드 | result_id, display_name, description 세 String만 export. description은 multiline. |
+| 4 | BroadcastOptionData | result_id String 하나만 추가, 선택/확정 상태 필드 없음. |
+| 5 | CaseData | incident_results: Array[IncidentResultData] = [] 하나 추가. |
+| 6 | 테스트 Result | 01-A/B/C, 03-A/B/C를 구별하는 개발용 데이터 6개. |
+| 7 | Option 연결 | TEST_OPTION_01/03_A/B/C → TEST_INCIDENT_RESULT_01/03_A/B/C 각각 연결. |
+| 8 | 확정 Option 검색 | 현재 FAILURE/Incident/Broadcast와 Runtime 쌍 검증 후 options에서 ID 검색. |
+| 9 | Result 검색 | Option.result_id를 Case.incident_results의 result_id와 비교, 정확한 객체 반환. |
+| 10 | ID 매핑 | 배열 index 및 첫 Result fallback 없음, 배열 역순에서도 동일 ID. |
+| 11 | Confirm 강화 | 실제 Result 연결이 유효할 때만 Runtime 기록 API 호출. |
+| 12 | 빈 result_id | 빈 문자열·공백 모두 거부, Runtime/Next 미변경, 정상 Option 재선택 가능. |
+| 13 | 없는 result_id | 거부, 기록 API 호출 0, Next disabled, 크래시 없음. |
+| 14 | Runtime | 파일/필드/API/reset 모두 20단계와 동일, Result는 기존 쌍에서 파생. |
+| 15 | Stage | INCIDENT_RESULT=8을 끝에 추가, 기존 0~7 유지. PackedScene과 일치. |
+| 16 | FAILURE Route | MONITORING→INCIDENT→BROADCAST→INCIDENT_RESULT→RESULT→PROFILE. |
+| 17 | Scene | 독립 Control/Center/VBox, 제목·이름·ID·설명·Next만 구성. |
+| 18 | Script | FlowView 한 단계 상속, setup/표시/누락 처리/안전한 진행 요청만 담당. |
+| 19 | 데이터 전달 | Main이 현재 결과를 검색하고 setup(result) 전달. View는 Main/Runtime/Case/tres 탐색 안 함. |
+| 20 | Option01-A | TEST_INCIDENT_RESULT_01_A의 ID/이름/설명 정확히 표시. |
+| 21 | Option01-B | TEST_INCIDENT_RESULT_01_B 표시. |
+| 22 | Option01-C | TEST_INCIDENT_RESULT_01_C 표시. |
+| 23 | Broadcast03 | A/B/C 각각 03_A/B/C 표시, 01 결과 누출 없음. |
+| 24 | 배열 순서 변경 | Result/Broadcast/Option 배열을 역순으로 바꿔도 6개 매핑 모두 통과. |
+| 25 | 누락 Result | 빈 배열/없는 연결/일치 후보 없음은 warning, 대체 표시/Next 차단, fallback 없음. |
+| 26 | null Result | 검색 시 warning 후 건너뜀, View null은 이전 텍스트 초기화/Next disabled. |
+| 27 | 빈 필드 | 빈·공백 result_id 후보 제외. 정상 ID의 빈 이름/설명은 warning/[Missing ...], 표시/진행 허용. |
+| 28 | Next 보호 | 유효 Result에서만 View Next 활성, BROADCAST/INCIDENT_RESULT 둘 다 Main 최신 검증. |
+| 29 | 직접 signal | 직접 advance·강제 pressed·위조 유효 View snapshot도 실제 연결이 없으면 차단. |
+| 30 | Broadcast 재진입 | 기존 확정 잠금 복원, 재기록 없이 현재 Option.result_id로 정확한 결과 검색. |
+| 31 | 반복 setup | 준비 전/후, valid→null→valid, 01-A→03-C, 빈 필드/ID 갱신, 노드/signal 중복 없음. |
+| 32 | stale signal | 이전 Broadcast/IncidentResult 및 해제 예정/Tree 밖 View 요청 무시. |
+| 33 | Runtime 독립성 | 기존 실험 이력/남은 횟수·격리 Room·Monitoring 결과·확정 쌍 보존. |
+| 34 | Resource 불변성 | 콘텐츠 정의의 허용 추가 외 실행 중 파일 해시 및 메모리 콘텐츠 snapshot 변화 없음. |
+| 35 | SUCCESS Route | Room02는 RESULT 직행, Incident/Broadcast/Incident Result 검색·생성·기록 없음. |
+| 36 | FAILURE Route | Room01/03 모두 Confirm 이후 새 결과 화면을 거쳐 RESULT. |
+| 37 | Experiment | 동적 목록·선택·실행·결과·ID 중복·limit·Runtime 회귀 통과. |
+| 38 | Containment | 후보·선택·Confirm·1회 확정·Room·진행 보호 회귀 통과. |
+| 39 | Monitoring | Timer·누적 공개·결과 확정·재진입·SUCCESS/FAILURE·UNDEFINED 차단 회귀 통과. |
+| 40 | Incident | ID 연결·표시·누락·현재 데이터 재검증 회귀 통과. |
+| 41 | Broadcast | ID 연결·동적 목록·단일 선택·Confirm·잠금·Runtime 복원·우회 차단 통과. |
+| 42 | 전체 Route | 기존 주요 화면, 두 분기, RESULT→PROFILE, 한 주요 View만 유지. |
+| 43 | signal | 버튼/진행/확정 연결 수 1, 반복 setup/재진입/전환에서 중복 없음. |
+| 44 | 해상도/Stretch | 1920×1080, 1280×720, 1024×768에서 논리 UI 1920×1080 및 canvas_items/keep 유지. |
+| 45 | 파싱/실행 | 에디터 import + 74개 검사 통과, 파싱/GDScript 오류 없음, 실제 Main 실행/GPU 화면 확인. |
+| 46 | 문제/해결 | 제품 오류 없음. 기존 검증 코드의 Route 기대값만 새 Stage에 맞춘 복사본에서 갱신. |
+| 47 | 실제 변경 | 기존 파일 6개 수정, 새 파일 5개(UID2 포함), 삭제 0. 누적 Git에는 이전 단계 변경도 함께 표시. |
+| 48 | 보존 | 기존 소스 50개·기존 UID20개·검증282개·이전 보고·Runtime/BroadcastView 보존, commit/push 없음. |
+| 49 | 미구현 | 피해/사망/점수/보상/페널티/등급/Case Result/Research Log/Campaign/Save·Load/GameState/Manager/Audio/Animation/Shader/최종 UI. |
+| 50 | 다음 지점 | IncidentResultData → Main의 ID 검색 → IncidentResultView.setup 경계에서 다음 요구사항만 확장. |
+
+작업 전 사본, 이번 단계만의 diff, 누적 Git diff, 검증 코드/로그/캡처는 Git 제외
+`.godot/verification/step21/`에 보관합니다. 같은 Case의 RESULT→PROFILE은 기존 Runtime 유지 정책입니다.
+
+
+## 20단계 Broadcast Confirm과 Runtime 기록 검증 결과
+
+작업 전에 실제 저장소의 파일·Scene·Script·Resource·설정·Git 상태를 조사했습니다.
+소스 56개, GDScript 20개, Scene 9개(Main + View 8개), 테스트 Case Resource 1개가 있었습니다.
+HEAD는 `ceb548b57d816a4e3251ddd893f80238e7e2ad14`이며 README와 BroadcastView에 19단계 미커밋 변경이 있었습니다.
+작업 전 56개 파일 사본·SHA-256·Git diff와 기존 검증 코드 250개의 해시를 보관했습니다.
+
+이번 단계는 기존 프로젝트의 5개 파일을 수정했습니다. 새 프로젝트/소스 파일 생성과 파일 삭제는 없습니다.
+
+- `scripts/runtime/case_runtime_state.gd`: 확정 ID 문자열 2개, 한 번 기록/조회 API, reset 확장.
+- `scripts/main/main.gd`: 요청 연결, 현재 Broadcast/Option ID 검증, 실제 Runtime snapshot 전달, 확정 전 진행 차단.
+- `scripts/views/broadcast_view.gd`: 기존 동적 목록/임시 단일 선택을 보존하고 Confirm 요청·잠금·복원 추가.
+- `scenes/views/broadcast_view.tscn`: Actions/ConfirmButton 추가, 기존 NextButton을 Actions로 이동.
+- `README.md`: 현재 동작과 이번 검증 결과 반영. 아래 이전 단계 보고는 그대로 보존했습니다.
+
+Godot `4.7.1.stable.official.a13da4feb`에서 에디터 import 1회와 정식 검증 68개를 통과했습니다.
+20개 GDScript check-only, headless 및 실제 OpenGL GPU Main 실행, 정상/예외/전체 흐름 회귀를 포함합니다.
+정상 검사에는 오류·경고가 없고, 고의 누락/불일치 검사에서만 예상된 경고가 발생했습니다.
+Broadcast Confirm 예외 25개, 기존 Broadcast 105개, Incident 100개, Result 10개,
+Containment 9개, Experiment 제한 17개, Monitoring 재생 17개의 경고가 각 실행 모드에서 예상값과 일치했습니다.
+Room02의 원본 0/10/20초 재생도 headless/GPU 양쪽에서 그대로 검증했습니다.
+에디터 F5 키를 직접 누르지는 않았으며 F5와 같은 설정된 Main Scene을 명령행으로 실행했습니다.
+
+| 번호 | 요청 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD ceb548b, README/View 2개 수정, staged·신규·삭제 없음. 19단계 변경 사본 보관. |
+| 2 | Runtime 상태 | `_confirmed_broadcast_id`, `_confirmed_broadcast_option_id`: String, 초기 빈 문자열. |
+| 3 | Runtime API | try_confirm_broadcast_option / has_confirmed_broadcast_option / 두 ID getter, 명시적 bool/String 반환. |
+| 4 | reset | 두 ID를 함께 비우고 기존 Case ID 정책·실험 이력·격리·Monitoring 초기화 보존. |
+| 5 | Confirm 버튼 | Broadcast Scene Actions에 Confirm Broadcast 추가, 기존 Next 재사용. |
+| 6 | 초기 Confirm | disabled, 선택 없음. |
+| 7 | 초기 Next | 유효 목록이어도 disabled. |
+| 8 | Option 선택 | 하나만 임시 선택, Confirm enabled, Next disabled. 재클릭 유지. |
+| 9 | 선택 변경 | Runtime 전체 snapshot과 Resource가 그대로 유지됨. |
+| 10 | signal | View의 broadcast_confirmation_requested(Broadcast ID, Option ID) → Main, 발신 View bind. |
+| 11 | Broadcast 재검증 | Main이 현재 Case/FAILURE/확정 Room/Outcome/Incident 연결에서 다시 검색. 요청 ID 일치 필수. |
+| 12 | Option 재검증 | 현재 options의 ID 검색. 순서 변경·null·빈 ID 후보에도 인덱스로 기록하지 않음. |
+| 13 | 정상 Confirm | 최초 정상 쌍만 승인, 실제 Runtime 상태를 UI에 반영. |
+| 14 | Runtime 기록 | 두 ID 함께 1회 기록. 테스트 계수로 Main의 기록 API 호출 1회 확인. |
+| 15 | UI 잠금 | 모든 Option/Confirm disabled, 확정 항목만 [Confirmed] 및 선택 표시. |
+| 16 | 확정 Next | 일치하는 정상 snapshot에서 enabled, Main도 현재 데이터와 실제 Runtime 재검증. |
+| 17 | 두 번째 Confirm | 같은/다른 요청 거부, 최초 쌍과 기존 상태 보존. |
+| 18 | 없는 Option ID | 기록/진행 거부, 미확정 Next disabled 유지. |
+| 19 | Broadcast ID 불일치 | 다른/없는/빈·공백 ID 거부. |
+| 20 | 선택 없이 Next | 강제 pressed·직접 advance도 View/Main에서 차단. |
+| 21 | 선택만 후 Next | Runtime 미확정이므로 강제 pressed·직접 advance 차단. |
+| 22 | Broadcast01 | Room01 FAILURE → Incident01 → Broadcast01, A→B 선택/확정 → RESULT 검증. |
+| 23 | Broadcast03 | Room03 FAILURE → Incident03 → Broadcast03, A→B 선택/확정 → RESULT 검증. |
+| 24 | 재진입 | 같은 Broadcast의 잠금/표시/Next 복원, Runtime 재기록 없음. |
+| 25 | snapshot 불일치 | 다른 Broadcast/없는 Option/부분 ID 쌍은 warning, false 확정 표시 없음, Next 차단. |
+| 26 | 반복 setup | 준비 전/후, 같은/다른 Broadcast, null→정상, 3→4→2→4 Option 목록·선택·그룹·snapshot 초기화 확인. |
+| 27 | stale signal | 이전 View, Tree 밖, 해제 예정 View/이전 Option 그룹 요청 무시. |
+| 28 | SUCCESS | Room02는 RESULT 직행, Incident/Broadcast 검색·생성·확정 기록 없음. |
+| 29 | FAILURE | Room01/03은 Incident/Broadcast를 거치고 확정 후에만 RESULT 진입. |
+| 30 | Runtime 독립성 | 실험 이력/횟수·격리 Room·Monitoring FAILURE 보존, 독립 Runtime은 새 쌍 없음. |
+| 31 | Resource 불변성 | Data Script 및 test_case_01.tres 해시/메모리 콘텐츠 snapshot 보존. |
+| 32 | Experiment | 단일 선택/즉시 결과/ID 중복·Case 제한/이력/재진입 회귀 통과. |
+| 33 | Containment | 동적 후보/단일 선택/1회 확정/잠금/Room ID/진행 보호 회귀 통과. |
+| 34 | Monitoring | Timer 누적 표시/완료 검증/1회 결과/복원/UNDEFINED 차단 통과. |
+| 35 | Incident | ID 연결·누락·표시·Next/현재 데이터 재검증 회귀 통과. |
+| 36 | 전체 Route | PROFILE→CCTV→EXPERIMENT→CONTAINMENT→MONITORING, SUCCESS/FAILURE 경로, RESULT→PROFILE 통과. 한 주요 View만 유지. |
+| 37 | signal 중복 | 반복 setup/재진입에서도 버튼·요청 연결 수 1, 중복 전환·기록 없음. |
+| 38 | 해상도/Stretch | 1920×1080 / 1280×720 / 1024×768, 논리 UI 1920×1080, canvas_items/keep 유지. 실제 Main 캡처와 경계 검사 통과. |
+| 39 | 파싱/실행 | 에디터 import + 68개 검사 통과, Main 실행 가능, GDScript/파싱 오류 없음. |
+| 40 | 문제/해결 | 독립 View 테스트 캡처 뒤에 이전 Main이 남는 문제를 테스트에서 숨김 처리 후 재검증. 예상 경고 수를 실제 예외 사례와 일치시킴. 제품 오류는 발견하지 않음. |
+| 41 | 실제 변경 | 위 5개 파일. Git 전체 diff에는 기존 19단계 2개 파일 변경이 함께 포함됨. 소스 신규/삭제 없음. |
+| 42 | 기존 보존 | 19단계 선택/누락/동적 목록과 이전 보고 보존, project.godot/Main Scene/Resource/UID20개/기존 검증250개 보존. 커밋·push 없음. |
+| 43 | 미구현 | Option 결과/Incident 결과/피해/점수/Broadcast 성공·실패/Case Result/Research Log/Campaign/Save·Load/GameState/Manager/Audio/Animation/Shader/최종 UI. |
+| 44 | 다음 지점 | Runtime 확정 ID 쌍과 Main의 현재 Resource 검증 경계. 다음 요구사항이 정해지면 이 쌍을 입력으로 필요한 동작만 확장. |
+
+검증 코드·로그·캡처·작업 전 사본은 Git 제외 `.godot/verification/step20/`에 있습니다.
+실제 Main 확정 화면은 `selection_room1_confirmed_*` / `selection_room3_confirmed_*` 캡처에서 확인할 수 있습니다.
+일반 RESULT→PROFILE은 기존 정책대로 같은 Case 상태를 유지하며 새 Case 초기화는 Runtime.reset() 경계입니다.
+
+## 19단계 Broadcast Option 단일 선택 검증 결과
+
+Godot **4.7.1.stable.official.a13da4feb**에서 production Script20개 check-only,
+headless/Windows Compatibility GPU 실행·회귀·예외 검사48회, editor import1회로 최종 **69개 검사**를 통과했습니다.
+정상 입력은 오류·경고0이며, 의도적인 예외의 warning은 각 환경에서 선택5 / Broadcast103 /
+Incident100 / Result10 / 격리확정9 / 실험제한17 / Playback17건으로 예상과 일치했습니다.
+최종 수정 전후 테스트용 헬퍼 이름 충돌과 direct pressed 표시 문제를 수정하고 최종 코드 전체를 다시 검증했습니다.
+기본 프로젝트 Main 실행과 GPU GUI 마우스 이벤트로 검증했으며 F5 키 자체는 자동 조작하지 않았습니다.
+
+| 번호 | 보고 항목 | 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD ceb548b, master→origin/main, clean. Step18 이미 커밋·push, 미커밋 변경 없음. 전체56소스/Scene/Script/Resource/UID/설정과 Main setup/Next/Route/신호/해제, 기존 Experiment·Containment CheckBox/ButtonGroup, 이전 검증 조사 |
+| 2 | 선택 방식 | 기존 검증 패턴인 CheckBox + ButtonGroup. allow_unpress=false, 로컬 pressed 처리에서 그룹 표시를 동기화 |
+| 3 | Option Node | OptionList의 각 HBoxContainer → CheckBox + ID/문구 Label. 기존18px 줄바꿈 Label 유지, null은 기존대로 건너뜀 |
+| 4 | Item Scene | 생성하지 않음. 간단한 동적 Control 생성만으로 충분하고 다른 코드 중복을 줄일 필요가 없음 |
+| 5 | 상태 위치 | BroadcastView._selected_option_index=-1과 _selection_group만 사용. Main 선택 상태 없음 |
+| 6 | 콘텐츠/Runtime 분리 | Data Script/Resource/Main/CaseRuntimeState 수정 없음. 선택은 View 생성 동안의 임시 UI 상태 |
+| 7 | 선택 UI | Godot 기본 CheckBox 라디오 표시. 별도 Theme/색상/최종 디자인/선택 문구 없음 |
+| 8 | 초기 상태 | 준비 전 setup/최초 진입/반복 setup/재진입 모두 선택 없음. 첫 항목 자동 선택 없음 |
+| 9 | A 선택 | A만 표시되고 선택 index0 |
+| 10 | B 변경 | A 해제, B만 표시되고 index1 |
+| 11 | C 변경 | B 해제, C만 표시되고 index2 |
+| 12 | 같은 항목 재클릭 | C 재클릭에도 C 선택 유지. 클릭해서 해제되는 Toggle 없음 |
+| 13 | 최대 하나 | 빠른 GUI 클릭과 반복당90개 direct pressed 요청에서 모두 하나만 선택. set_pressed_no_signal로 재귀 signal 없이 동기화 |
+| 14 | Broadcast01 | A→B→C→C, 초기/선택 상태/Next/신호/콘텐츠 불변성 모두 세 크기에서 headless/native 통과 |
+| 15 | Broadcast03 | 같은 선택 규칙 통과, 01→03→01 반복 때 선택 누출 없음 |
+| 16 | 재진입 | Room01/03 각각3회 콘텐츠 정확히 복원, 선택은 없음으로 초기화. 이전 Runtime 상태 유지 |
+| 17 | 반복 setup | 01→03→01, 선택→null→유효, 3→4→2→4→3에서 목록/그룹/index/스크롤 초기화. 이전 행 해제와 이전 버튼 signal 무시 확인 |
+| 18 | null Option | 경고 후 행 생성 없이 건너뜀. 이후 유효 Option의 원본 배열 index와 선택이 정확함 |
+| 19 | 빈 option_id | 빈 문자열/공백 모두 disabled. GUI/직접 pressed/disabled 강제 변경 후 pressed도 로컬 데이터 검사로 차단 |
+| 20 | 빈 display_text | 경고/[Missing display_text at index N] 표시. 유효 ID이면 정상 선택 가능 |
+| 21 | 3→4 | 독립 Resource 복사본의 배열만 늘려4개 표시/선택/한 개 유지, production 코드나 .tres 변경 없음 |
+| 22 | 3→2 | 배열만 줄여2개 표시/선택/재클릭/한 개 유지. 이전 Option 누적 없음; 2→4도 통과 |
+| 23 | Resource 불변성 | BroadcastOption/EmergencyBroadcast/Incident/Case/원본 .tres와 나머지 Data Script 모두 작업 시작 SHA-256 동일. 선택 후 메모리 콘텐츠 snapshot도 동일 |
+| 24 | Runtime | CaseRuntimeState 파일 동일. 선택·전환·재진입 전후 Case ID/실험 이력·남은 횟수/격리 ID/Monitoring 결과와 객체 동일. Broadcast 필드 추가 없음 |
+| 25 | Next 유지 | 선택 없음과 선택 후 모두 유효 Broadcast+유효 Option≥1이면 Next 가능. 기존 _has_valid_options/_on_next_button_pressed/Main guard 정확히 보존 |
+| 26 | SUCCESS | Room02 Monitoring→SUCCESS→RESULT→PROFILE. 실수로 Incident ID가 있어도 Incident/Broadcast lookup0, View 생성 없음 |
+| 27 | FAILURE | Room01/03 Monitoring→FAILURE→각 Incident→각 Broadcast→RESULT→PROFILE. 선택 없이도 진행, 선택 후도 동일 |
+| 28 | 진행 보호 | 누락 Broadcast/무효 Option의 Incident·Broadcast UI/Main 차단, 직접 signal/위조 snapshot/최신 Case 변경 재검증 통과 |
+| 29 | Experiment | 동적 목록/단일 선택/실행/결과/ID 중복 방어/limit/남은 횟수/Runtime 이력/재진입 회귀 통과 |
+| 30 | Containment | 동적 목록/단일 선택/Confirm/확정 ID/확정 후 변경 차단/재진입 복원/Monitoring 진입 보호 통과 |
+| 31 | Monitoring | Room ID 매핑/Timer 순차 공개/미래 기록 비공개/한 번 결과 확정/복원/UNDEFINED·미완료 차단 통과. 복사본0/1/2초 전체 흐름과 원본0/10/20초 별도 실제 재생 |
+| 32 | signal/stale | Next 연결1개, 각 Option pressed 연결1개, 선택은 Main에 signal 없음. 이전 그룹/Tree 밖/해제 예정 버튼·View 요청 무시, 전환 시 단일 View/해제 확인 |
+| 33 | 크기/Stretch | 1920×1080·1280×720·1024×768 통과. 논리1920×1080/canvas_items/keep 유지. 1024×768의 콘텐츠 렌더는1024×576. 선택 상태21개 캡처 생성, 세 크기 직접 확인 |
+| 34 | 파싱/실행 | 최종69검사 통과, 모든 정상 로그 오류·경고0. AMD RX6800/OpenGL3.3 Compatibility GPU 실행/GUI 입력 검증 |
+| 35 | 문제/해결 | 테스트 헬퍼 _button이 상속된 기존 헬퍼와 충돌해 _option_button으로 변경. 직접 pressed 후 set_pressed_no_signal(true)만으로는 다른 버튼이 해제되지 않아 그룹 전체 표시 동기화 추가. 최종 전체 검사 통과, 미해결 오류 없음 |
+| 36 | 실제 파일 | production 수정2개: scripts/views/broadcast_view.gd, README.md. 생성/삭제0, Scene/Data/Main/Runtime/UID 추가 없음. 소스56개 유지 |
+| 37 | 기존 보존 | Step18 커밋 ceb548b 유지, 다른54소스와 UID20개/Main/모든Scene/모든Resource/설정/이전 검증221개/역사 보고 보존. diff --check 통과. staging/커밋/push 없음 |
+| 38 | 미구현 | Confirm Broadcast/선택 필수화/확정/Runtime 상태/Option 결과/피해/점수/Incident 결과/Case Result/Research Log/Campaign/Save Load/GameState/Managers/Audio/Animation/Shader/최종 Theme 없음 |
+| 39 | 다음 확장 | BroadcastView의 로컬 선택 처리와 현재 데이터 유효성 검사 경계. 확정 기능은 다음 요구사항에서만 추가; 이번 단계 Main/Runtime에 선택 전달 없음 |
+
+코드 변경은 선택 index/그룹 초기화, HBox+CheckBox+기존 Label 생성, index를 bind한 로컬 처리와
+현재 그룹·Tree·해제 상태·유효 Option 확인, 표시 동기화뿐입니다. 기존 표시 문구/누락 정책/Next 조건과
+Main의 Scene 등록·ID 조회·Route·진행 보호는 그대로입니다. 별도 Item Scene/Manager/Framework를 만들지 않았습니다.
+검증용 Script/프로필/로그/capture/baseline/SHA증거와 `step19-only.diff`는 Git 제외 `.godot/verification/step19/`에만 저장했습니다.
+`validation-results.json`, `immutability-evidence.json`, `audit-results.json`으로 실행·변경 범위를 확인할 수 있습니다.
 
 ## 18단계 Resource 기반 Emergency Broadcast 표시 검증 결과
 
@@ -1372,15 +1758,15 @@ Resource, Autoload, 기존 콘텐츠는 없었습니다. Git은 `master` 브랜�
 
 ## 범위와 다음 단계
 
-현재 구현은 임시 Main UI, 창 크기 표시, 8개 View의 명시적 Route와 테스트 Resource의
+현재 구현은 임시 Main UI, 창 크기 표시, 9개 View의 명시적 Route와 테스트 Resource의
 PROFILE / CCTV 텍스트, EXPERIMENT 목록·단일 선택·즉시 결과 텍스트 표시와
 현재 Case의 메모리 실행 ID 이력, ID별 1회와 Case 횟수 제한, 완료/남은 횟수 표시입니다.
 CONTAINMENT의 Resource 후보 목록, 임시 단일 선택, 명시적 확정과 메모리 Runtime 기록도 포함합니다.
 MONITORING은 확정 Room ID별 Outcome을 Timer로 순차 재생하고 시간/관찰 기록을 누적하며 완료 후 Main이 SUCCESS/FAILURE를 Runtime에 한 번 확정하고 결과 표시와 Next를 활성화합니다.
-SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData 표시 → Broadcast/Option 표시 → RESULT로 진행합니다. UNDEFINED는 Main에서 차단합니다. 테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
+SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData 표시 → Broadcast/Option 표시·선택·Confirm → Runtime ID 쌍 기록 → IncidentResultData 표시 → RESULT로 진행합니다. UNDEFINED와 미확정 진행은 Main에서 차단합니다. 테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
 CCTV 이미지·영상·상태 변화·환경 수치, Experiment 결과 이미지/오디오, Containment 환경 조건·정답 판정,
 Monitoring 진행 위치·경과시간 저장, 실제 Result 콘텐츠, Campaign, 정식 Case 로직,
-정식 Incident 콘텐츠·탈출/피해/대응·Runtime Incident 상태, Broadcast 선택·확정·결과·Runtime 상태, Research Log,
+정식 Incident 콘텐츠·탈출/피해/대응·Runtime Incident 상태, Broadcast Option 결과의 피해·점수·성공/실패 판정, Research Log,
 Save/Load, Settings, Horror Event, 검열·이미지 시스템, CRT/Shader, Audio, Animation,
 GameState Singleton, CaseManager, CampaignManager, 최종 UI/폰트/에셋은 구현하지 않았습니다.
 
@@ -1395,4 +1781,9 @@ Experiment 표시 확장은 `experiment_data.gd`와 `experiment_view.gd`에서 �
 Containment 확장은 `containment_view.gd`의 선택 처리에서 시작할 수 있습니다.
 확정 ID 조회와 현재 Resource → Main → View.setup 경계에서 다음 요구사항을 확장할 수 있습니다.
 Monitoring 확장은 MonitoringStageData/MonitoringOutcomeData와 MonitoringView.setup 및 재생 완료 경계에서 시작할 수 있습니다.
-다음 단계 요구사항이 정해지면 이 경계에만 필요한 동작을 추가합니다. Stage 재생 완료와 Runtime 결과 확정은 별개이며 이후 Route는 Main._get_next_stage()에서 결정합니다. Incident 표시 확장은 IncidentData → Main의 ID 검색 → IncidentView.setup() 경계에서 시작할 수 있습니다. Broadcast 확장은 EmergencyBroadcastData/OptionData → Main의 ID 검색 → BroadcastView.setup() 경계에서 시작합니다. 선택·확정·결과와 이벤트 트리거 등은 다음 요구사항이 있을 때 추가합니다.
+다음 단계 요구사항이 정해지면 이 경계에만 필요한 동작을 추가합니다. Stage 재생 완료와 Runtime 결과 확정은 별개이며 이후 Route는 Main._get_next_stage()에서 결정합니다. Incident 표시 확장은 IncidentData → Main의 ID 검색 → IncidentView.setup() 경계에서 시작할 수 있습니다. Broadcast 확장은 EmergencyBroadcastData/OptionData → Main의 ID 검색 → BroadcastView.setup() / confirmation signal → Runtime ID 쌍 경계에서 시작합니다. 피해/점수와 이벤트 트리거 등은 다음 요구사항이 있을 때 추가합니다.
+
+Broadcast Option 선택은 View 내부의 임시 상태이며, 현재 단계에서는 명시적 확정과 Runtime ID 쌍 기록이 Next의 필수 조건입니다. 다음 단계에서는 두 확정 ID와 현재 Case의 Resource 조회 경계에서 요구된 기능만 추가할 수 있습니다.
+
+Incident Result 표시는 BroadcastOptionData.result_id → Main의 ID 검색 → IncidentResultView.setup() 경계에서 확장할 수 있습니다. 별도의 Runtime Result 상태 없이 기존 확정 쌍에서 파생합니다.
+Case Result 표시는 기존 Runtime 조회 → Main._build_result_summary() → ResultView.setup(Summary) 경계에서 확장할 수 있습니다. 현재는 읽기 전용 표시이며, 저장 결과/다음 Case/피해·점수 요구사항은 구현하지 않았습니다.

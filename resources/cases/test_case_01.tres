@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=41 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=48 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="8_incident"]
 [ext_resource type="Script" path="res://scripts/data/broadcast_option_data.gd" id="9_option"]
 [ext_resource type="Script" path="res://scripts/data/emergency_broadcast_data.gd" id="10_broadcast"]
+[ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="11_incident_result"]
 
 [sub_resource type="Resource" id="Resource_profile"]
 script = ExtResource("2_profile")
@@ -146,16 +147,19 @@ broadcast_id = "TEST_BROADCAST_03"
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_A"
 display_text = "Temporary response 01-A"
+result_id = "TEST_INCIDENT_RESULT_01_A"
 
 [sub_resource type="Resource" id="Resource_option_01_B"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_B"
 display_text = "Temporary response 01-B"
+result_id = "TEST_INCIDENT_RESULT_01_B"
 
 [sub_resource type="Resource" id="Resource_option_01_C"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_C"
 display_text = "Temporary response 01-C"
+result_id = "TEST_INCIDENT_RESULT_01_C"
 
 [sub_resource type="Resource" id="Resource_broadcast_01"]
 script = ExtResource("10_broadcast")
@@ -168,16 +172,19 @@ options = Array[ExtResource("9_option")]([SubResource("Resource_option_01_A"), S
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_A"
 display_text = "Temporary response 03-A"
+result_id = "TEST_INCIDENT_RESULT_03_A"
 
 [sub_resource type="Resource" id="Resource_option_03_B"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_B"
 display_text = "Temporary response 03-B"
+result_id = "TEST_INCIDENT_RESULT_03_B"
 
 [sub_resource type="Resource" id="Resource_option_03_C"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_C"
 display_text = "Temporary response 03-C"
+result_id = "TEST_INCIDENT_RESULT_03_C"
 
 [sub_resource type="Resource" id="Resource_broadcast_03"]
 script = ExtResource("10_broadcast")
@@ -185,6 +192,42 @@ broadcast_id = "TEST_BROADCAST_03"
 display_name = "TEST BROADCAST 03"
 prompt_text = "Temporary emergency broadcast prompt for incident 03."
 options = Array[ExtResource("9_option")]([SubResource("Resource_option_03_A"), SubResource("Resource_option_03_B"), SubResource("Resource_option_03_C")])
+
+[sub_resource type="Resource" id="Resource_incident_result_01_A"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_01_A"
+display_name = "TEST INCIDENT RESULT 01-A"
+description = "Temporary incident result for option 01-A."
+
+[sub_resource type="Resource" id="Resource_incident_result_01_B"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_01_B"
+display_name = "TEST INCIDENT RESULT 01-B"
+description = "Temporary incident result for option 01-B."
+
+[sub_resource type="Resource" id="Resource_incident_result_01_C"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_01_C"
+display_name = "TEST INCIDENT RESULT 01-C"
+description = "Temporary incident result for option 01-C."
+
+[sub_resource type="Resource" id="Resource_incident_result_03_A"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_03_A"
+display_name = "TEST INCIDENT RESULT 03-A"
+description = "Temporary incident result for option 03-A."
+
+[sub_resource type="Resource" id="Resource_incident_result_03_B"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_03_B"
+display_name = "TEST INCIDENT RESULT 03-B"
+description = "Temporary incident result for option 03-B."
+
+[sub_resource type="Resource" id="Resource_incident_result_03_C"]
+script = ExtResource("11_incident_result")
+result_id = "TEST_INCIDENT_RESULT_03_C"
+display_name = "TEST INCIDENT RESULT 03-C"
+description = "Temporary incident result for option 03-C."
 
 [resource]
 script = ExtResource("1_case")
@@ -198,3 +241,4 @@ available_containment_rooms = Array[ExtResource("5_containment")]([SubResource("
 containment_outcomes = Array[ExtResource("7_outcome")]([SubResource("Resource_outcome_01"), SubResource("Resource_outcome_02"), SubResource("Resource_outcome_03")])
 incidents = Array[ExtResource("8_incident")]([SubResource("Resource_incident_01"), SubResource("Resource_incident_03")])
 emergency_broadcasts = Array[ExtResource("10_broadcast")]([SubResource("Resource_broadcast_01"), SubResource("Resource_broadcast_03")])
+incident_results = Array[ExtResource("11_incident_result")]([SubResource("Resource_incident_result_01_A"), SubResource("Resource_incident_result_01_B"), SubResource("Resource_incident_result_01_C"), SubResource("Resource_incident_result_03_A"), SubResource("Resource_incident_result_03_B"), SubResource("Resource_incident_result_03_C")])

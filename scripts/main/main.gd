@@ -8,8 +8,10 @@ const ContainmentView = preload("res://scripts/views/containment_view.gd")
 const MonitoringView = preload("res://scripts/views/monitoring_view.gd")
 const IncidentView = preload("res://scripts/views/incident_view.gd")
 const BroadcastView = preload("res://scripts/views/broadcast_view.gd")
+const IncidentResultView = preload("res://scripts/views/incident_result_view.gd")
+const ResultView = preload("res://scripts/views/result_view.gd")
 
-enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST }
+enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT }
 
 const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/profile_view.tscn"),
@@ -20,6 +22,7 @@ const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/result_view.tscn"),
 	preload("res://scenes/views/incident_view.tscn"),
 	preload("res://scenes/views/broadcast_view.tscn"),
+	preload("res://scenes/views/incident_result_view.tscn"),
 ]
 
 @export var current_case: CaseData
@@ -88,8 +91,47 @@ func _show_view(stage: int) -> void:
 		incident_view.setup(incident, _has_valid_broadcast_options(broadcast))
 	elif stage == Stage.BROADCAST:
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
-		broadcast_view.setup(_get_current_emergency_broadcast())
+		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
+		broadcast_view.setup(
+			_get_current_emergency_broadcast(),
+			case_runtime.get_confirmed_broadcast_id(),
+			case_runtime.get_confirmed_broadcast_option_id()
+		)
+	elif stage == Stage.INCIDENT_RESULT:
+		var incident_result_view: IncidentResultView = _current_view as IncidentResultView
+		incident_result_view.setup(_get_current_incident_result())
+	elif stage == Stage.RESULT:
+		var result_view: ResultView = _current_view as ResultView
+		result_view.setup(_build_result_summary())
 	view_host.add_child(_current_view)
+
+
+func _build_result_summary() -> ResultView.Summary:
+	var summary := ResultView.Summary.new()
+	summary.case_id = case_runtime.case_id
+	summary.monitoring_result = case_runtime.get_monitoring_result()
+	summary.room_id = case_runtime.get_confirmed_containment_room_id()
+	summary.experiment_ids = case_runtime.get_experiment_execution_history()
+	if current_case != null:
+		summary.case_display_name = current_case.display_name
+		summary.experiment_limit = current_case.experiment_limit
+		for room: ContainmentData in current_case.available_containment_rooms:
+			if room != null and not summary.room_id.strip_edges().is_empty() and room.room_id == summary.room_id:
+				summary.room = room
+				break
+		for id: String in summary.experiment_ids:
+			var match_experiment: ExperimentData
+			for experiment: ExperimentData in current_case.available_experiments:
+				if experiment != null and experiment.experiment_id == id:
+					match_experiment = experiment
+					break
+			summary.experiments.append(match_experiment)
+	if summary.monitoring_result == MonitoringOutcomeData.Result.FAILURE:
+		summary.incident = _get_current_incident_data()
+		summary.broadcast = _get_current_emergency_broadcast()
+		summary.option = _get_current_confirmed_broadcast_option()
+		summary.incident_result = _get_current_incident_result()
+	return summary
 
 
 func _get_monitoring_outcome() -> MonitoringOutcomeData:
@@ -195,6 +237,67 @@ func _has_valid_broadcast_options(broadcast: EmergencyBroadcastData) -> bool:
 	return false
 
 
+func _get_broadcast_option(broadcast: EmergencyBroadcastData, option_id: String) -> BroadcastOptionData:
+	if broadcast == null or broadcast.broadcast_id.strip_edges().is_empty() or option_id.strip_edges().is_empty():
+		return null
+	for option: BroadcastOptionData in broadcast.options:
+		if option != null and not option.option_id.strip_edges().is_empty() and option.option_id == option_id:
+			return option
+	return null
+
+
+func _has_current_broadcast_confirmation(broadcast: EmergencyBroadcastData) -> bool:
+	return case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == case_runtime.get_confirmed_broadcast_id() and _get_broadcast_option(broadcast, case_runtime.get_confirmed_broadcast_option_id()) != null
+
+
+func _get_current_confirmed_broadcast_option() -> BroadcastOptionData:
+	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
+	if not _has_current_broadcast_confirmation(broadcast):
+		return null
+	return _get_broadcast_option(broadcast, case_runtime.get_confirmed_broadcast_option_id())
+
+
+func _get_incident_result_for_option(option: BroadcastOptionData) -> IncidentResultData:
+	if option == null:
+		return null
+	if current_case == null:
+		push_warning("Main: current_case is missing for Incident Result.")
+		return null
+	if option.result_id.strip_edges().is_empty():
+		push_warning("Main: BroadcastOptionData.result_id is empty for option %s." % option.option_id)
+		return null
+	if current_case.incident_results.is_empty():
+		push_warning("Main: incident_results is empty for result %s." % option.result_id)
+		return null
+	for index in range(current_case.incident_results.size()):
+		var incident_result: IncidentResultData = current_case.incident_results[index]
+		if incident_result == null:
+			push_warning("Main: IncidentResultData at index %d is missing." % index)
+			continue
+		if incident_result.result_id.strip_edges().is_empty():
+			push_warning("Main: IncidentResultData.result_id at index %d is empty." % index)
+			continue
+		if incident_result.result_id == option.result_id:
+			return incident_result
+	push_warning("Main: no IncidentResultData for result_id %s." % option.result_id)
+	return null
+
+
+func _get_current_incident_result() -> IncidentResultData:
+	return _get_incident_result_for_option(_get_current_confirmed_broadcast_option())
+
+
+func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
+	if _current_stage != Stage.BROADCAST or broadcast_view != _current_view or not broadcast_view.is_inside_tree() or broadcast_view.is_queued_for_deletion():
+		return
+	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
+	if not case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == broadcast_id:
+		var option: BroadcastOptionData = _get_broadcast_option(broadcast, option_id)
+		if _get_incident_result_for_option(option) != null:
+			case_runtime.try_confirm_broadcast_option(broadcast_id, option_id)
+	broadcast_view.update_confirmation_state(case_runtime.get_confirmed_broadcast_id(), case_runtime.get_confirmed_broadcast_option_id())
+
+
 func _on_advance_requested(view: FlowView) -> void:
 	if view != _current_view or not view.is_inside_tree() or view.is_queued_for_deletion():
 		return
@@ -202,7 +305,7 @@ func _on_advance_requested(view: FlowView) -> void:
 		return
 	if _current_stage == Stage.INCIDENT and not _has_valid_broadcast_options(_get_current_emergency_broadcast()):
 		return
-	if _current_stage == Stage.BROADCAST and not _has_valid_broadcast_options(_get_current_emergency_broadcast()):
+	if (_current_stage == Stage.BROADCAST or _current_stage == Stage.INCIDENT_RESULT) and _get_current_incident_result() == null:
 		return
 	var next_stage: int = _get_next_stage(_current_stage)
 	if next_stage != -1:
@@ -228,6 +331,8 @@ func _get_next_stage(stage: int) -> int:
 		Stage.INCIDENT:
 			return Stage.BROADCAST
 		Stage.BROADCAST:
+			return Stage.INCIDENT_RESULT
+		Stage.INCIDENT_RESULT:
 			return Stage.RESULT
 		Stage.RESULT:
 			return Stage.PROFILE

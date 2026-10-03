@@ -5,6 +5,8 @@ var case_id: String = ""
 var _experiment_execution_history: Array[String] = []
 var _confirmed_containment_room_id: String = ""
 var _monitoring_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED
+var _confirmed_broadcast_id: String = ""
+var _confirmed_broadcast_option_id: String = ""
 
 
 func _init(case_identifier: String = "") -> void:
@@ -16,6 +18,8 @@ func reset(case_identifier: String = "") -> void:
 	_experiment_execution_history.clear()
 	_confirmed_containment_room_id = ""
 	_monitoring_result = MonitoringOutcomeData.Result.UNDEFINED
+	_confirmed_broadcast_id = ""
+	_confirmed_broadcast_option_id = ""
 
 
 func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
@@ -81,3 +85,23 @@ func try_set_monitoring_result(result: MonitoringOutcomeData.Result) -> bool:
 		return false
 	_monitoring_result = result
 	return true
+
+
+func try_confirm_broadcast_option(broadcast_id: String, option_id: String) -> bool:
+	if broadcast_id.strip_edges().is_empty() or option_id.strip_edges().is_empty() or has_confirmed_broadcast_option():
+		return false
+	_confirmed_broadcast_id = broadcast_id
+	_confirmed_broadcast_option_id = option_id
+	return true
+
+
+func has_confirmed_broadcast_option() -> bool:
+	return not _confirmed_broadcast_id.is_empty() and not _confirmed_broadcast_option_id.is_empty()
+
+
+func get_confirmed_broadcast_id() -> String:
+	return _confirmed_broadcast_id
+
+
+func get_confirmed_broadcast_option_id() -> String:
+	return _confirmed_broadcast_option_id
