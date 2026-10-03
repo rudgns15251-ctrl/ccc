@@ -1,5 +1,7 @@
 extends "res://scripts/views/flow_view.gd"
 
+signal research_log_requested
+
 class Summary extends RefCounted:
 	var case_id: String = ""
 	var case_display_name: String = ""
@@ -26,6 +28,7 @@ class Summary extends RefCounted:
 @onready var broadcast_label: Label = %BroadcastInfo
 @onready var option_label: Label = %ResponseInfo
 @onready var incident_result_label: Label = %IncidentResultInfo
+@onready var research_log_button: Button = %OpenResearchLogButton
 
 var _summary: Summary
 
@@ -38,11 +41,13 @@ func setup(summary: Summary) -> void:
 
 func _ready() -> void:
 	super._ready()
+	research_log_button.pressed.connect(_on_research_log_button_pressed)
 	_display_summary()
 
 
 func _display_summary() -> void:
 	next_button.disabled = true
+	research_log_button.disabled = true
 	summary_scroll.scroll_vertical = 0
 	for item: Node in experiment_list.get_children():
 		experiment_list.remove_child(item)
@@ -103,6 +108,7 @@ func _display_summary() -> void:
 		experiment_list.add_child(item)
 
 	next_button.disabled = _summary.monitoring_result != MonitoringOutcomeData.Result.SUCCESS and _summary.monitoring_result != MonitoringOutcomeData.Result.FAILURE
+	research_log_button.disabled = next_button.disabled
 	if not next_button.disabled:
 		next_button.grab_focus()
 
@@ -129,6 +135,11 @@ func _display_failure_details() -> void:
 func _on_next_button_pressed() -> void:
 	if not next_button.disabled:
 		super._on_next_button_pressed()
+
+
+func _on_research_log_button_pressed() -> void:
+	if not research_log_button.disabled:
+		research_log_requested.emit()
 
 
 func _entry_text(id: String, display_name: String, field_name: String) -> String:
