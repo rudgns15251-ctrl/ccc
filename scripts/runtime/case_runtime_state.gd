@@ -4,6 +4,7 @@ extends RefCounted
 var case_id: String = ""
 var _experiment_execution_history: Array[String] = []
 var _confirmed_containment_room_id: String = ""
+var _monitoring_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED
 
 
 func _init(case_identifier: String = "") -> void:
@@ -14,6 +15,7 @@ func reset(case_identifier: String = "") -> void:
 	case_id = case_identifier
 	_experiment_execution_history.clear()
 	_confirmed_containment_room_id = ""
+	_monitoring_result = MonitoringOutcomeData.Result.UNDEFINED
 
 
 func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
@@ -62,3 +64,20 @@ func has_confirmed_containment() -> bool:
 
 func get_confirmed_containment_room_id() -> String:
 	return _confirmed_containment_room_id
+
+
+func has_monitoring_result() -> bool:
+	return _monitoring_result != MonitoringOutcomeData.Result.UNDEFINED
+
+
+func get_monitoring_result() -> MonitoringOutcomeData.Result:
+	return _monitoring_result
+
+
+func try_set_monitoring_result(result: MonitoringOutcomeData.Result) -> bool:
+	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE:
+		return false
+	if has_monitoring_result():
+		return false
+	_monitoring_result = result
+	return true

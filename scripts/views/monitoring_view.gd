@@ -1,5 +1,7 @@
 extends "res://scripts/views/flow_view.gd"
 
+signal monitoring_playback_completed
+
 @onready var room_id_label: Label = %RoomId
 @onready var description_label: Label = %Description
 @onready var stage_list: VBoxContainer = %StageList
@@ -11,10 +13,15 @@ var _current_stage_index: int = 0
 var _previous_time_offset: int = 0
 var _playback_active: bool = false
 var _playback_completed: bool = false
+var _finalized_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED
 
 
-func setup(outcome: MonitoringOutcomeData) -> void:
+func setup(outcome: MonitoringOutcomeData, finalized_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED) -> void:
 	_outcome = outcome
+	_finalized_result = finalized_result
+	if finalized_result != MonitoringOutcomeData.Result.UNDEFINED and finalized_result != MonitoringOutcomeData.Result.SUCCESS and finalized_result != MonitoringOutcomeData.Result.FAILURE:
+		push_warning("MonitoringView.setup(): unsupported finalized_result; ignoring snapshot.")
+		_finalized_result = MonitoringOutcomeData.Result.UNDEFINED
 	_current_stage_index = 0
 	_previous_time_offset = 0
 	_playback_active = false
@@ -87,7 +94,7 @@ func _schedule_next_stage() -> void:
 		if _current_stage_index > 0 and stage.time_offset < _previous_time_offset:
 			push_warning("MonitoringView: time_offset at index %d goes backwards." % _current_stage_index)
 		var delay: int = maxi(stage.time_offset - _previous_time_offset, 0)
-		if delay > 0:
+		if delay > 0 and _finalized_result == MonitoringOutcomeData.Result.UNDEFINED:
 			playback_timer.start(float(delay))
 			return
 		_reveal_current_stage()
@@ -96,8 +103,27 @@ func _schedule_next_stage() -> void:
 		_playback_active = false
 		_playback_completed = true
 		description_label.text = "Monitoring sequence complete"
-		next_button.disabled = false
-		next_button.grab_focus()
+		if _finalized_result != MonitoringOutcomeData.Result.UNDEFINED:
+			apply_monitoring_result(_finalized_result)
+		else:
+			monitoring_playback_completed.emit()
+
+
+func has_completed_playback(outcome: MonitoringOutcomeData) -> bool:
+	return is_inside_tree() and _playback_completed and _outcome == outcome
+
+
+func apply_monitoring_result(result: MonitoringOutcomeData.Result) -> void:
+	if not is_inside_tree() or not _playback_completed:
+		return
+	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE:
+		return
+	if _finalized_result != MonitoringOutcomeData.Result.UNDEFINED and _finalized_result != result:
+		return
+	_finalized_result = result
+	description_label.text = "Monitoring Result: " + ("SUCCESS" if result == MonitoringOutcomeData.Result.SUCCESS else "FAILURE")
+	next_button.disabled = false
+	next_button.grab_focus()
 
 
 func _on_playback_timeout() -> void:
@@ -119,7 +145,7 @@ func _reveal_current_stage() -> void:
 
 
 func _on_next_button_pressed() -> void:
-	if _playback_completed:
+	if _playback_completed and _finalized_result != MonitoringOutcomeData.Result.UNDEFINED:
 		super._on_next_button_pressed()
 
 

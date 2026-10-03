@@ -75,7 +75,8 @@ func _show_view(stage: int) -> void:
 		)
 	elif stage == Stage.MONITORING:
 		var monitoring_view: MonitoringView = _current_view as MonitoringView
-		monitoring_view.setup(_get_monitoring_outcome())
+		monitoring_view.monitoring_playback_completed.connect(_on_monitoring_playback_completed.bind(monitoring_view))
+		monitoring_view.setup(_get_monitoring_outcome(), case_runtime.get_monitoring_result())
 	view_host.add_child(_current_view)
 
 
@@ -107,7 +108,39 @@ func _get_monitoring_outcome() -> MonitoringOutcomeData:
 func _on_advance_requested() -> void:
 	if _current_stage == Stage.CONTAINMENT and not case_runtime.has_confirmed_containment():
 		return
+	if _current_stage == Stage.MONITORING and (not case_runtime.has_monitoring_result() or _current_view.next_button.disabled):
+		return
 	_show_view((_current_stage + 1) % VIEW_SCENES.size())
+
+
+func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
+	if monitoring_view != _current_view or _current_stage != Stage.MONITORING:
+		return
+	if current_case == null:
+		push_warning("Main: current_case is missing for Monitoring result.")
+		return
+	var room_id: String = case_runtime.get_confirmed_containment_room_id()
+	if room_id.strip_edges().is_empty():
+		push_warning("Main: no confirmed containment room for Monitoring result.")
+		return
+	var outcome: MonitoringOutcomeData = _get_monitoring_outcome()
+	if outcome == null:
+		return
+	if outcome.room_id != room_id:
+		push_warning("Main: Monitoring Outcome room_id does not match the confirmed room.")
+		return
+	if not monitoring_view.has_completed_playback(outcome):
+		push_warning("Main: Monitoring playback is incomplete or belongs to a different Outcome.")
+		return
+	if outcome.final_result != MonitoringOutcomeData.Result.SUCCESS and outcome.final_result != MonitoringOutcomeData.Result.FAILURE:
+		push_warning("Main: Monitoring final_result is undefined or unsupported.")
+		return
+	if case_runtime.has_monitoring_result():
+		return
+	if not case_runtime.try_set_monitoring_result(outcome.final_result):
+		push_warning("Main: Monitoring result could not be recorded.")
+		return
+	monitoring_view.apply_monitoring_result(case_runtime.get_monitoring_result())
 
 
 func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
