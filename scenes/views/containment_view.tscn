@@ -57,7 +57,7 @@ theme_override_constants/separation = 16
 
 [node name="ConfirmButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
+custom_minimum_size = Vector2(300, 64)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 disabled = true
@@ -65,9 +65,16 @@ text = "Confirm Containment"
 
 [node name="NextButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
+custom_minimum_size = Vector2(300, 64)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 28
 disabled = true
 text = "Next: MONITORING"
+
+[node name="OpenResearchLogButton" type="Button" parent="Center/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Open Research Log"

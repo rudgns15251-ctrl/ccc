@@ -69,7 +69,7 @@ theme_override_constants/separation = 16
 
 [node name="ConfirmButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 48)
+custom_minimum_size = Vector2(300, 48)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 disabled = true
@@ -77,9 +77,16 @@ text = "Confirm Broadcast"
 
 [node name="NextButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 48)
+custom_minimum_size = Vector2(300, 48)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 24
 disabled = true
 text = "Next: INCIDENT RESULT"
+
+[node name="OpenResearchLogButton" type="Button" parent="Center/Content/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Open Research Log"

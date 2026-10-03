@@ -1,7 +1,7 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-9개 정규 화면의 명시적 이동 흐름과 RESULT에서 여는 Research Log 보조 화면을 구현했습니다.
+9개 정규 화면의 명시적 이동 흐름과 8개 화면에서 여는 Research Log 보조 화면을 구현했습니다. MONITORING에서는 Log를 열 수 없습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
@@ -10,7 +10,7 @@ CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나�
 확정 이후에만 MONITORING으로 진행합니다. Room 자체에 정답 필드를 두지 않습니다.
 MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 결과를 확정합니다. SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData를 INCIDENT에, 연결된 EmergencyBroadcastData와 단일 선택 Option 목록을 BROADCAST에 표시합니다. Confirm Broadcast가 승인되어 두 ID를 Runtime에 기록한 뒤 INCIDENT_RESULT에서 해당 결과 콘텐츠를 표시하고 RESULT로 진행합니다.
 RESULT는 Main이 전달한 표시용 snapshot으로 Case, 확정 결과/Room, 실제 실행 순서의 Experiment와 사용 수를 읽기 전용으로 요약합니다. FAILURE에는 현재 Incident/Broadcast/확정 Option/IncidentResult도 표시하며 SUCCESS에는 없음/해당 없음으로 표시합니다.
-RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설명·결과, 확정 Room, 완료된 Monitoring 관찰, FAILURE의 확정 응답·결과를 카테고리별로 읽기만 합니다. 영구 기록은 없습니다.
+RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설명·결과, 확정 Room, 완료된 Monitoring 관찰, FAILURE의 확정 응답·결과를 카테고리별로 읽기만 합니다. 유효한 ResearchEntryData가 있으면 Log 전용 title/body_text를 우선하고, 없거나 잘못된 매핑은 기존 문구를 사용합니다. 게임 화면 문구와 영구 기록은 변경하지 않습니다.
 실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
@@ -43,7 +43,7 @@ RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설�
    BROADCAST는 broadcast_id / display_name / prompt_text와 options의 ID·문구를 Label로 표시합니다. 각 문구 옆 CheckBox로 하나를 임시 선택할 수 있고 재클릭해도 선택을 유지합니다. 처음에는 Confirm과 Next가 비활성화됩니다. 유효 Option을 선택하면 **Confirm Broadcast**만 활성화됩니다. Confirm 시 Main이 현재 Case/FAILURE/Incident/Broadcast와 Option ID, Option.result_id에 대응하는 실제 IncidentResultData까지 다시 확인하고 최초 ID 쌍만 Runtime에 기록합니다. 확정 항목은 **[Confirmed]**, 모든 Option과 Confirm은 disabled, **Next: INCIDENT RESULT**는 활성화됩니다. 같은 Broadcast 재진입은 이 상태를 복원합니다. 다른 Broadcast 또는 잘못된 snapshot은 경고와 함께 진행을 차단합니다. 연결된 결과가 없으면 Confirm을 거부하고 미확정 Next를 비활성 상태로 유지합니다. 피해/점수 판정은 없습니다.
    INCIDENT_RESULT에는 확정 Option의 result_id로 검색한 결과 ID/이름/설명을 표시합니다. 정상 데이터에서 Next: RESULT가 활성화됩니다. 누락 데이터는 경고/대체 문구와 진행 차단을 적용합니다. 다른 결과를 대신 표시하지 않습니다.
 4. RESULT에서 Case ID/이름, **SUCCESS / FAILURE**, 확정 Room ID/이름, 실행 순서의 Experiment ID/이름, **Experiment Usage**를 확인합니다. FAILURE에는 연결된 Incident/Broadcast/확정 Option/IncidentResult의 ID와 이름·문구를 표시합니다. SUCCESS에는 Incident 없음, 나머지 실패 항목 해당 없음으로 표시합니다. 이력이 길어지면 요약 영역을 스크롤합니다.
-   **Open Research Log**로 현재 Case의 확인된 정보를 열람하고 **Back to Result**로 동일 요약에 돌아옵니다. 이 이동은 Runtime과 Resource를 변경하지 않습니다.
+   **Open Research Log**로 현재 Case의 확인된 정보를 열람하고 **Back**으로 동일 요약에 돌아옵니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / INCIDENT / BROADCAST / INCIDENT_RESULT에서도 열 수 있고, Back은 원래 화면으로 복귀합니다. 현재 Stage까지 공개 가능한 정보만 표시하며 MONITORING에는 Open 버튼이 없습니다. 이 이동은 Runtime과 Resource를 변경하지 않습니다. View를 재생성하므로 미확정 Experiment/Room/Option 임시 선택은 초기화되고 실행·확정 상태는 복원됩니다.
    **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
    이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력, 격리 확정, Monitoring 결과, Broadcast 확정 ID 쌍은 유지됩니다. Runtime.reset()은 이 상태를 모두 초기화합니다.
 5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
@@ -92,7 +92,7 @@ cap/
 ├── resources/
 │   ├── .gitkeep
 │   └── cases/
-│       └── test_case_01.tres # 기존 콘텐츠와 Outcome3개 / Stage9개 / Incident2개 / Broadcast2개 / Option6개 / IncidentResult6개
+│       └── test_case_01.tres # 기존 콘텐츠, Outcome3개/Stage9개/Incident2개/Broadcast2개/Option6개/IncidentResult6개/ResearchEntry8개
 ├── scenes/
 │   ├── main/
 │   │   └── main.tscn       # 기존 기반 UI와 ViewHost
@@ -106,7 +106,7 @@ cap/
 │       ├── incident_view.tscn # IncidentData 표시, incident_view.gd 사용
 │       ├── broadcast_view.tscn # Option 목록, Confirm Broadcast / Next: INCIDENT RESULT
 │       ├── incident_result_view.tscn # 결과 ID/이름/설명과 Next: RESULT
-│       └── research_log_view.tscn # RESULT에서 여는 보조 화면, 동적 Entry 목록과 Back
+│       └── research_log_view.tscn # 8개 Stage에서 여는 보조 화면, 동적 Entry 목록과 Back
 └── scripts/
     ├── data/
     │   ├── broadcast_option_data.gd
@@ -129,6 +129,8 @@ cap/
     │   ├── monitoring_outcome_data.gd.uid
     │   ├── monitoring_stage_data.gd
     │   ├── monitoring_stage_data.gd.uid
+    │   ├── research_entry_data.gd # Log 작성 문구: entry_id/source_kind/source_id/title/body_text
+    │   ├── research_entry_data.gd.uid
     │   ├── profile_data.gd
     │   └── profile_data.gd.uid
     ├── main/
@@ -140,7 +142,7 @@ cap/
     └── views/
         ├── broadcast_view.gd # 동적 Option/임시 선택/확정 요청, 확정 snapshot 복원과 UI 잠금
         ├── broadcast_view.gd.uid
-        ├── flow_view.gd    # 버튼 입력을 진행 요청 signal로 전달
+        ├── flow_view.gd    # 진행/Open 버튼 입력을 요청 signal로 전달
         ├── flow_view.gd.uid
         ├── incident_view.gd # IncidentData 표시/누락 처리/Next 보호
         ├── incident_view.gd.uid
@@ -192,14 +194,14 @@ Main (Control, main.gd)
                 │   ├── ExperimentScroll / ExperimentList (동적 항목)
                 │   └── Execution / RemainingCount / RunButton / ResultTitle / ResultText
                 ├── RoomScroll / RoomList (CONTAINMENT만, 동적 이름 CheckBox / 설명 Label)
-                ├── Actions / ConfirmButton / NextButton (CONTAINMENT, BROADCAST)
+                ├── Actions / ConfirmButton / NextButton / OpenResearchLogButton (CONTAINMENT, BROADCAST)
                 ├── StageScroll / StageList (MONITORING만, 동적 시간/관찰 Label)
                 ├── SummaryScroll / SummaryColumns (RESULT만)
                 │   ├── Common: Case / FinalResult / Containment / Usage / 동적 ExperimentList
                 │   └── FailureDetails: Incident / Broadcast / 확정 Option / IncidentResult
-                ├── Actions / OpenResearchLogButton / NextButton (RESULT)
+                ├── Actions / OpenResearchLogButton / NextButton (PROFILE, CCTV, EXPERIMENT, INCIDENT, INCIDENT_RESULT, RESULT)
                 ├── MonitoringResult / EntryScroll / EntryList (RESEARCH LOG)
-                └── NextButton (나머지 View)
+                └── NextButton (MONITORING, RESEARCH LOG)
 ```
 
 화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / MONITORING 콘텐츠는 Resource에
@@ -217,31 +219,32 @@ Main (Control, main.gd)
 Stage enum은 PROFILE=0, CCTV=1, EXPERIMENT=2, CONTAINMENT=3, MONITORING=4,
 RESULT=5, INCIDENT=6, BROADCAST=7, INCIDENT_RESULT=8, RESEARCH_LOG=9입니다. 새 Stage를 배열 끝에 추가해 기존 인덱스를 보존했습니다.
 _get_next_stage(stage)의 match가 다음 Stage를 명시적으로 반환하고, -1이면 전환하지 않습니다.
-RESEARCH_LOG는 이 정규 Route에 포함되지 않아 -1을 반환합니다. RESULT의 research_log_requested와 Log의 advance_requested는 Main의 전용 Open/Back handler에 연결하며, Stage와 활성 View를 확인한 뒤 명시적으로 RESULT ↔ RESEARCH_LOG만 이동합니다.
+RESEARCH_LOG는 이 정규 Route에 포함되지 않아 -1을 반환합니다. 각 View의 research_log_requested와 Log의 advance_requested는 Main의 전용 Open/Back handler에 연결합니다. Main은 8개 허용 Stage와 bind한 발신 Stage/활성 View를 검사하며, 복귀 Stage는 Main의 임시 정수 하나에만 저장합니다. Log에서는 다시 Log를 열 수 없으며 잘못된 복귀 Stage는 경고 후 차단합니다. 허용된 원래 Stage ↔ RESEARCH_LOG만 이동합니다.
 진행 signal에는 발신 View를 bind합니다. 현재 View와 다른 객체, Tree 밖 객체,
 queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident / Broadcast / IncidentResult의 중복 전환을 차단합니다.
 Main._is_active_view()가 이 생명주기 검사를 공통으로 수행하며 화면 진행, Experiment 실행,
 Containment/Broadcast 확정, Monitoring 완료, Research Log Open/Back 요청 모두 같은 검사를 통과해야 합니다.
 Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
 INCIDENT는 기존 FlowView를 사용하는 Control → CenterContainer → VBoxContainer에
-제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene의 기존 구성을 보존했습니다. Broadcast Scene의 기존 Actions/ConfirmButton/NextButton을 유지하고 Next 문구만 바꿨습니다. Runtime의 기존 Broadcast/Option 확정 ID 문자열 두 개를 유지하며 별도 Result 필드는 추가하지 않았습니다.
+제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene의 기존 콘텐츠를 보존하고 진행 버튼 옆에 Open을 추가했습니다. Broadcast Scene의 기존 Actions/ConfirmButton/NextButton에 Open 버튼을 추가했습니다. Runtime의 기존 Broadcast/Option 확정 ID 문자열 두 개를 유지하며 별도 Result 필드는 추가하지 않았습니다.
 기존 창 크기 표시 함수와 연결은 보존했습니다.
 Main._ready()에서 현재 Case ID로 CaseRuntimeState를 한 번 생성합니다.
 일반 View 전환, RESULT → PROFILE, ExperimentView.setup()은 런타임 상태를 초기화하지 않습니다.
 Containment → Monitoring은 Runtime에 확정된 Room이 있어야 진행됩니다.
 View 버튼 disabled 상태뿐 아니라 Main의 진행 요청 처리에서도 확정 여부를 검사합니다.
 
-`flow_view.gd`는 버튼 signal 연결, 버튼의 초기 키보드 포커스, 진행 요청
-signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과 판정을 하지 않습니다.
+`flow_view.gd`는 버튼 signal 연결, 버튼의 초기 키보드 포커스, 진행/Open 요청
+signal 전송만 담당합니다. Open 버튼이 없는 Scene은 연결하지 않습니다. 다음 단계 결정, 데이터 처리, 결과 판정을 하지 않습니다.
 
 ## 테스트 Resource와 데이터 전달
 
 [Godot Resource](https://docs.godotengine.org/en/4.7/tutorials/scripting/resources.html)를
-데이터 컨테이너로 사용합니다. 열한 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
+데이터 컨테이너로 사용합니다. 열두 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
 
 | 파일 | 책임 / 필드 |
 | --- | --- |
-| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData], incident_results: Array[IncidentResultData] |
+| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData], incident_results: Array[IncidentResultData], research_entries: Array[ResearchEntryData] |
+| `scripts/data/research_entry_data.gd` | ResearchEntryData: entry_id, SourceKind, source_id, title, body_text만; 해금/발견/저장 상태 없음 |
 | `scripts/data/profile_data.gd` | ProfileData: profile_id, subject_name, classification, basic_description |
 | `scripts/data/cctv_data.gd` | CCTVData: camera_id, observation_text만 정의 |
 | `scripts/data/experiment_data.gd` | ExperimentData: experiment_id, display_name, description, result_text만 정의 |
@@ -275,8 +278,8 @@ signal 전송만 담당합니다. 다음 단계 결정, 데이터 처리, 결과
 | `scripts/views/result_view.gd` | setup(Summary), 공통/실패 요약, 실행 순서대로 동적 목록, 누락 경고·대체 표시, 기존 진행 signal |
 | `scenes/views/result_view.tscn` | 기존 Control/제목/Restart, SummaryScroll 안의 공통 정보·FailureDetails 두 열 |
 | `scripts/views/research_log_view.gd` | 작은 typed RefCounted Snapshot/Entry, setup 후 동적 읽기 전용 표시·목록 정리·스크롤 초기화 |
-| `scenes/views/research_log_view.tscn` | Control/Center/VBox, 제목·Case·MonitoringResult·EntryScroll/EntryList·Back to Result |
-| `scripts/views/flow_view.gd` | 기존 진행 기능만 담당, 이번 단계 수정 없음 |
+| `scenes/views/research_log_view.tscn` | Control/Center/VBox, 제목·Case·MonitoringResult·EntryScroll/EntryList·Back |
+| `scripts/views/flow_view.gd` | 기존 진행 기능과 선택적 Open 버튼 요청만 담당; 데이터/복귀 위치/Stage 검증 없음 |
 
 ```text
 test_case_01.tres (CaseData)
@@ -552,7 +555,7 @@ export template 설정은 배포 단계에서 추가합니다.
 
 검증용 스크립트, 격리 프로필, 로그, 캡처는 Git에서 제외되는
 `.godot/verification/`에만 있습니다. 게임에서 로드하지 않는 로컬 검증 자료입니다.
-UID 파일은 Git 보존 대상입니다. 23단계까지 `c9b3074`에 커밋·push되어 있으며 이번 24단계 변경은 미커밋 상태입니다.
+UID 파일은 Git 보존 대상입니다. 24단계까지 `345d93f`에 커밋·push되어 있으며 25·26단계 변경은 미커밋 상태입니다.
 
 ## 2단계 UI 흐름 검증 결과
 
@@ -581,6 +584,270 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 26단계 선택적 Research Log 작성 콘텐츠
+
+작업 전 HEAD는 `345d93fe3539edee39657b9ee76ccd52765f9fcc`, master→origin/main이었습니다.
+25단계13파일 미커밋 변경을 확인하고 현재 원본66개/24GDScript/24UID/11Scene/11개 콘텐츠 Script,
+Main Snapshot·Stage gate·ID helper·typed Entry·Runtime·테스트 .tres·설정·README와 기존 검증655개의 해시를 보관했습니다.
+25단계의 View/접근/Back/Runtime 정책과 보고는 보존했습니다.
+
+```text
+CaseData.research_entries: Array[ResearchEntryData]
+  → Main: 현재 Open의 로컬 유효 후보 배열 (null/ID/enum/중복 검증)
+  → 기존 Stage gate + Runtime 이력/확정 조건으로 Source Entry 생성
+  → source_kind + source_id 정확히 일치하는 작성 문구 선택
+  → 기존 category/source_id + 선택된 title/body_text 문자열 Snapshot
+  → 변경 없는 ResearchLogView.setup()
+```
+
+`ResearchEntryData`는 Resource이며 entry_id, SourceKind enum, source_id, title, multiline body_text만 가집니다.
+SourceKind 값은 PROFILE=0/CCTV=1/EXPERIMENT=2/CONTAINMENT=3/INCIDENT=4/BROADCAST=5/BROADCAST_OPTION=6/INCIDENT_RESULT=7입니다.
+source_id는 각각 profile_id/camera_id/experiment_id/room_id/incident_id/broadcast_id/option_id/result_id를 그대로 사용합니다.
+entry_id는 작성 콘텐츠의 안정적인 ID이며 지금은 Runtime/Save/Snapshot에 저장하지 않습니다.
+CaseData에 typed 배열 한 줄만 추가했고 기존 다른10개 콘텐츠 Script의 Schema에는 필드를 추가하지 않았습니다.
+
+Main의 `_get_valid_research_entries()`는 매 Snapshot마다 현재 Case 배열을 읽어 임시 후보를 만들고,
+`_find_research_entry()`는 후보에서 kind+ID로 검색합니다. `_append_source_research_entry()`는 기존 Entry의
+category/source_id를 유지하면서 title/body_text만 선택합니다. 콘텐츠를 갱신하거나 별도 Validator 객체를 만들지 않습니다.
+null, 공백 ID, 범위 밖 enum은 경고 후 제외합니다. 같은 kind+ID는 모든 충돌 항목을 제외하므로 첫 항목을 선택하지 않습니다.
+중복 entry_id도 모든 충돌 항목을 경고/제외하는 정책입니다. 유효한 빈 title/body_text는 작성 의도로 사용합니다.
+유효하지만 현재 Source에 연결되지 않는 orphan은 자동 Entry를 만들지 않고 조용히 무시합니다.
+원래 Source Resource가 누락되었으면 작성 문구가 있더라도 기존 unavailable 처리로 남습니다.
+
+Stage gate, 실행 순서, Confirm, 최종 결과와 Log Open/Back은 바꾸지 않았습니다.
+작성 데이터의 존재는 공개 시점을 결정하지 않습니다. Monitoring Stage는 기존 offset/observation_text 기반이며,
+Kind나 stage_id를 추가하지 않았습니다. Snapshot Entry 네 문자열과 ResearchLogView/모든 Scene은 이번 단계 변경이 없습니다.
+
+### 26단계 테스트 콘텐츠
+
+| SourceKind | source_id | entry_id |
+| --- | --- | --- |
+| PROFILE | TEST_PROFILE_01 | TEST_RESEARCH_PROFILE_01 |
+| CCTV | TEST_CAM_01 | TEST_RESEARCH_CCTV_01 |
+| EXPERIMENT | TEST_EXP_01 | TEST_RESEARCH_EXP_01 |
+| CONTAINMENT | TEST_ROOM_02 | TEST_RESEARCH_ROOM_02 |
+| INCIDENT | TEST_INCIDENT_01 | TEST_RESEARCH_INCIDENT_01 |
+| BROADCAST | TEST_BROADCAST_01 | TEST_RESEARCH_BROADCAST_01 |
+| BROADCAST_OPTION | TEST_OPTION_01_B | TEST_RESEARCH_OPTION_01_B |
+| INCIDENT_RESULT | TEST_INCIDENT_RESULT_01_B | TEST_RESEARCH_RESULT_01_B |
+
+제목은 `TEST RESEARCH: ...`, 본문은 `Research note override for ... Development validation content only.`로 구분합니다.
+EXP03/Room01·03/Incident03/Broadcast03/다른 응답·결과는 작성 문구를 두지 않아 fallback을 검증합니다.
+기존 화면용 문구와 기존 콘텐츠 Resource는 그대로이며 별도 .tres 파일을 만들지 않고 현재 테스트 Case에8개 내장 Resource만 추가했습니다.
+
+### 26단계 요청 55항목 보고
+
+| 번호 | 항목 | 처리 / 검증 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD345d93f, 25단계13수정 미커밋. 실제 저장소/소스66개/기존 검증655개 조사·해시 보관. |
+| 2 | ResearchEntryData | Resource, typed export5필드; 작성 콘텐츠만. |
+| 3 | SourceKind | 명시적 enum8종, Monitoring Stage 없음. |
+| 4 | entry_id | 작성 콘텐츠 고유 ID, Runtime/Save/Snapshot에 기록하지 않음. |
+| 5 | source_id | 기존 Source ID 그대로, index 연결 없음. |
+| 6 | CaseData | research_entries: Array[ResearchEntryData]=[] 한 줄 추가; 기존 Case는 빈 배열 fallback. |
+| 7 | 기존 Schema | 다른10개 기존 콘텐츠 Script와 Runtime 그대로, research_text/research_entry_id 일괄 추가 없음. |
+| 8 | 검색 helper | Main의 작은 검증·kind+ID 검색·문구 선택 helper3개. 별도 시스템 없음. |
+| 9 | 매핑 | kind+source_id 동시 정확 비교; 서로 다른 Kind가 같은 ID를 쓰는 충돌 예도 정상 분리. |
+| 10 | 작성 우선 | 유효하고 유일한 authored title/body_text만 우선. |
+| 11 | fallback | 없음/잘못됨/충돌이면 기존 derived Entry를 유지; Source 누락은 unavailable 유지. |
+| 12 | invalid | null/빈·공백 ID/enum -1·999 경고 및 fallback. |
+| 13 | 중복 Source | 관련 후보 전부 제외/경고; 배열 앞/뒤 모두 같은 fallback. invalid ID 후보와 충돌해도 임의 선택 없음. |
+| 14 | 중복 entry_id | 경고하며 충돌 후보 전부 제외; 아직 미공개 Source와 중복되어도 동일 정책. |
+| 15 | 배열 순서 | 모든 작성 항목을 역순으로 바꾼 정상 경로, 중복/제거 배열 역순도 결과 동일. |
+| 16 | 테스트 구성 | 현재 Case에8종 각1개, entry_id 고유. 미작성 Source도 유지. |
+| 17 | Profile 작성 | Log만 TEST RESEARCH 문구; Profile 화면 원본 텍스트 보존. |
+| 18 | CCTV 작성 | Log만 작성 문구; CCTV 화면 원본 텍스트 보존. |
+| 19 | Experiment 작성 | 실제 실행한 EXP01에서 작성 title/body 표시. |
+| 20 | 미실행 차단 | EXP01 데이터가 존재해도 실행 전/선택만 한 상태에서는 Entry 없음. |
+| 21 | Experiment fallback | 실행한 EXP03은 기존 display_name/description/result_text 그대로. |
+| 22 | 실행 순서 | 실제03→01 순서; 작성 배열 순서와 무관. |
+| 23 | Containment 작성 | 확정 Room02에서 작성 문구 사용. |
+| 24 | 미확정 Room | Room02 임시 선택만으로는 Entry 없음. |
+| 25 | Incident 작성 | FAILURE의 Incident01 진입 이후 사용, SUCCESS에는 없음. |
+| 26 | Broadcast 작성 | BROADCAST부터 Broadcast01 작성 문구 표시. |
+| 27 | Option 작성 | 정상 Confirm한01-B만 작성 문구 사용. |
+| 28 | 미확정 Option | 선택만 한 응답은 기록하지 않음. |
+| 29 | IncidentResult 작성 | INCIDENT_RESULT부터 확정01-B 결과 작성 문구 표시. |
+| 30 | 미래 Result | BROADCAST Confirm 이후에도 IncidentResult 문구 숨김. |
+| 31 | Monitoring 기록 | 기존 offset/관찰/배열 순서 그대로, 작성 override 없음. |
+| 32 | 최종 결과 | 기존 Runtime SUCCESS/FAILURE만 사용, 작성 콘텐츠는 결과에 영향 없음. |
+| 33 | category | PROFILE/OBSERVATION/EXPERIMENT/CONTAINMENT/INCIDENT 기존 정책 보존. Kind와 별개. |
+| 34 | View 변경 | ResearchLogView/typed Entry/모든 Scene 변경0. View는 작성 Resource를 알지 않음. |
+| 35 | Runtime | 소스/필드/getter/승인 정책 그대로, 해금 이력 추가 없음. |
+| 36 | 접근 정책 | 8개 허용 Stage/Monitoring·Log·unknown 차단/원래 Stage Back 그대로. |
+| 37 | 미래 차단 | 기존 Stage gate/실행 이력/확정 상태를 유지하고 문구만 선택. |
+| 38 | Snapshot 최신 | 매 Open 새 문자열 Snapshot, 독립 콘텐츠 갱신 후 새 Snapshot만 갱신. 이전 Snapshot 값 보존. |
+| 39 | 제거 fallback | 8종 각각 독립 복사에서 제거해 원래 derived 문구 복원. |
+| 40 | orphan | 없는 EXP/잘못된 Kind·ID의 유효 콘텐츠는 자동 노출 없음. |
+| 41 | 불변성 | 매 Open/Back의 기존·작성 Resource 값과 Runtime/승인 호출 수 비교, 파일 SHA-256 비교. |
+| 42 | SUCCESS | Room02 전체 경로와 작성/fallback 양쪽 검증, 실패 항목 없음. |
+| 43 | FAILURE | Room01·03의 A/B/C 전체 경로, 작성/미작성 항목과 확정 결과 ID 확인. |
+| 44 | Open/Back 회귀 | 8개 Source/반복/원래 Stage 복귀/임시 선택 초기화/확정 상태 복원 유지. |
+| 45 | 전체 시스템 | Profile/CCTV/Experiment/제한·이력/Containment/Monitoring/Incident/Broadcast·Confirm/IncidentResult/Summary/UNDEFINED/누락·예외/다른 Case 검사. |
+| 46 | stale | 25단계 detached/queued/replaced/wrong-stage/Open/Back/위조/nested 검증 재사용. |
+| 47 | signal | 반복 재생성 후 Open/Next/Confirm/Back 연결1개. |
+| 48 | 단일 View | 전환 직후 자식1개, 이전 객체 제거/해제 확인. |
+| 49 | 세 크기/Stretch | 1920×1080/1280×720/1024×768, 기존 keep/canvas_items/호스트/버튼/텍스트 유지. |
+| 50 | 파싱/실행 | 최종 기록은 아래 검증 결과 참조. |
+| 51 | 문제/해결 | 기존 Log 검사의 정확한 derived 문구 기대는 별도 fallback Case 복사로 보존; 새 authored 검사로 작성 문구도 검증. 제품 오류 수정 없음. |
+| 52 | 실제 파일 | 아래 기존4수정/신규2/삭제0, Scene 수정0. |
+| 53 | 기존 보존 | Step25의 UI/접근/복귀/선택/Runtime 정책, 기존 UID/설정/콘텐츠/검증/과거 보고 보존. 커밋·push 없음. |
+| 54 | 미구현 | 영구 해금/공유·다중·과거 Case/Save·Load/Monitoring ID·Open·Timer정책/검색·필터·편집·즐겨찾기/Validator시스템/Campaign/Manager·Singleton/Audio·Animation·Shader/최종 UI 없음. |
+| 55 | 다음 추천 | 각 Case의 research_entries에서 필요한 Source 문구를 작성·검증. 영구/다중 기록 요구는 별도 Runtime/저장 정책을 먼저 결정. |
+
+### 26단계 실제 변경 파일
+
+- 신규 `scripts/data/research_entry_data.gd`와 Godot 생성 UID.
+- 수정 `scripts/data/case_data.gd`: typed 배열 한 줄.
+- 수정 `scripts/main/main.gd`: Snapshot의8개 정상 Source에 문구 선택, 로컬 검증/검색/선택 helper3개.
+- 수정 `resources/cases/test_case_01.tres`: 새 Script 참조와8개 내장 작성 문구, root 배열/load_steps만 추가.
+- 수정 `README.md`: 현재 구조/사용법과 이번 보고.
+
+### 26단계 검증 기록
+
+Godot `4.7.1.stable.official.a13da4feb`에서 **105개 headless/Windows GPU 검사와 최종 editor import1개, 총106개**가 통과했습니다.
+현재25개 GDScript의 check-only, 기본 Main 실행, 기존 정상/예외/생명주기/다른 Case 검사와 새 작성/기존 fallback 검사를 포함합니다.
+작성 문구 있는 Case와 research_entries가 비어 있는 독립 Case 복사에서 각각7개 경로×3개 크기×headless/native를 실행했습니다.
+각 경우 Open/Back726회, 합계**1,452회** 실제 마우스 입력을 검증했습니다. 새 예외 검사는 null/공백/잘못된 enum,
+중복 kind+ID/entry_id, 역순,8종 작성 제거, 동일 source_id의 다른 Kind, 빈 작성 문자열, Snapshot 격리/최신성,
+orphan, 원래 Source 누락, Resource/Runtime 불변성을 확인했습니다.
+
+모든 실행 종료0, 파싱/GDScript/실행 오류0, 정상 경고0이며 예외의 의도한 경고 수만 정확히 일치했습니다.
+새 작성 예외는 모드별23개 경고가 예상대로 발생했습니다. F5 키 자체는 자동 누르지 않았으며 같은 Main 기본 실행을 양쪽 모드에서 확인했습니다.
+1920×1080/1280×720/1024×768 GPU PNG156개를 생성하고 작성 Log와 기존 게임 화면의 대표 캡처를 직접 확인했습니다.
+본문은 기존 ScrollContainer로 읽으며 1024×768 창의 기존 keep 콘텐츠 렌더 영역은1024×576입니다.
+해상도/Stretch/Scaling/모든 Scene/모든 View/Runtime/Monitoring Timer는 이번 단계 변경이 없습니다.
+
+시작 시점 대비 **기존4개 수정/신규2개/삭제0**, 기존 원본66개 중62개 및 UID24개는 SHA-256 동일합니다.
+CaseData의 새 배열과 .tres의8개 작성 항목/Script 참조/load_steps를 제외하면 이전 Schema/콘텐츠가 정확히 같습니다.
+Main의 기존26개 함수 중25개는 원문이 동일합니다. Snapshot의 문구 선택 추가를 제외한 Stage gate/순서/원래 fallback도 원문 보존을 확인했습니다.
+25단계 이하 보고와 이전 검증655개를 보존했고, 최종 코드의105개 실행 증명 signature/log SHA-256도 일치했습니다.
+누적 Git 상태는 25·26단계의15수정/2신규, HEAD345d93f 유지, staging 비어 있음, `git diff --check` 통과, 커밋/push 없음입니다.
+실행 증거는 `validation-results.json`/각 `.pass.json`/`final-import.log`, 보존 증거는 `final-audit.json`,
+이번 단계만의 변경은 `incremental-*.diff`에서 확인할 수 있습니다.
+새 검증/로그/캡처/시작 해시/단계별 diff는 `.godot/verification/step26/`에만 생성합니다.
+원래 검증 파일은 수정하지 않았고, 이전 검사와 helper를 재사용하며 작성 문구/예외/기존 fallback 검사를 추가했습니다.
+
+## 25단계 현재 Stage의 읽기 전용 Research Log 접근
+
+시작 HEAD는 `345d93fe3539edee39657b9ee76ccd52765f9fcc`, master→origin/main, 작업 트리는 clean이었습니다.
+첨부 요청의 Step24 미커밋 보존 조건과 달리 실제 Step24는 이미 커밋·push되어 있었습니다.
+전체 원본66개(24 GDScript/24 UID/11 Scene/콘텐츠 .tres1개), 실제 Main/각 View/공용 Flow/Runtime/11개 Data,
+Summary/ID helper/Route/설정과 이전 검증을 조사했습니다. 변경 전 원본과 기존 검증의 SHA-256을 보관했습니다.
+
+기존 9개 정규 Stage의 Route와 Log의 Stage=9/PackedScene 매핑은 그대로입니다.
+독립 View 재생성 정책을 유지하며 Log는 Main의 보조 이동으로만 열립니다.
+
+```text
+지원 View의 OpenResearchLogButton.pressed
+  → FlowView.research_log_requested
+  → Main: 허용 Stage + bind한 발신 Stage + 활성 View 검사
+  → Main._research_log_return_stage에 원래 Stage 저장
+  → 새 Snapshot 생성 → RESEARCH_LOG 하나 표시
+Log의 Back → Main: 활성 Log + 허용 복귀 Stage 검사
+  → 복귀 Stage를 -1로 초기화 → 원래 View 재생성/setup
+```
+
+FlowView에는 선택적 버튼 연결과 요청 signal만 추가했습니다. ResultView의 같은 코드를 공통 구현으로 옮겨
+중복 연결을 제거했습니다. Main에는 임시 정수 하나와 허용 목록만 두었으며 Runtime/Resource에 이동 상태를 저장하지 않습니다.
+Snapshot/Entry의 기존 문자열/enum/typed 배열 스키마는 바꾸지 않았습니다. 현재 Case 및 Runtime의 getter를 읽고,
+기존 Result Summary의 ID 검색 결과를 재사용하되 **원래 Stage gate를 통과한 문자열만** 새 Log Snapshot에 복사합니다.
+완료 Runtime이 남은 Restart PROFILE에서도 Profile만 표시합니다. 이전 Log Snapshot을 재사용하지 않습니다.
+
+미확정 Experiment/Room/Option의 임시 선택은 View 재생성으로 초기화됩니다. 실행 이력/사용 횟수/확정 Room/확정
+Broadcast 쌍은 Runtime에서 복원합니다. Log 이동은 실행/Confirm/결과 확정 메서드를 호출하지 않습니다.
+Result 복귀는 기존 `_build_result_summary()`로 동일 내용을 재생성합니다.
+
+### 25단계 요청 53항목 보고
+
+| 번호 | 항목 | 처리 / 검증 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD 345d93f, clean, Step24 이미 커밋·push. 실제66파일/Scene/Script/Resource/UID/설정/기존 검증 조사. |
+| 2 | 허용 Stage | PROFILE / CCTV / EXPERIMENT / CONTAINMENT / INCIDENT / BROADCAST / INCIDENT_RESULT / RESULT. |
+| 3 | 제외 Stage | MONITORING / RESEARCH_LOG / 알 수 없는 Stage. |
+| 4 | 공통 Open | 선택적 Open 버튼 → FlowView signal → Main, 다음 View 참조 없음. |
+| 5 | Flow 변경 이유 | 버튼 요청 공통화만 추가; Result 중복 구현 제거. 데이터/전환 결정은 없음. |
+| 6 | Main 검증 | 허용 목록, bind한 source Stage==현재 Stage, 기존 `_is_active_view`를 모두 검사. RESULT는 확정 Monitoring도 검사. |
+| 7 | return 저장 | Main의 `_research_log_return_stage: int` 하나, 정상 Back에서 -1로 초기화. |
+| 8 | Runtime 이동 필드 | 추가 없음. 기존 getter를 읽기만 하며 Open/Back에서 승인/기록/reset 호출 없음. |
+| 9 | Resource 이동 필드 | 추가/수정 없음. 콘텐츠 .tres와 Data/UID 그대로. |
+| 10 | Back | 원래 Stage 재생성, 유효성 검사 후 이동. Back 문구 일반화. |
+| 11 | 정규 Route | `_get_next_stage` 원문 보존; LOG=-1. 정규 Route와 Restart 그대로. |
+| 12 | 현재 Snapshot | 매 Open마다 현재 Case/Runtime/원래 Stage로 신규 객체 생성. |
+| 13 | 미래 정보 | Stage별 조기 반환, 실제 실행/확정 getter, 완료 결과 조건. 단순 ID 연결만으로 Entry 생성하지 않음. |
+| 14 | PROFILE | Profile만. 재시작의 이전 완료 Runtime이 있어도 후속 정보 숨김. |
+| 15 | CCTV | Profile+CCTV만. |
+| 16 | EXPERIMENT | Profile+CCTV+실행 이력 순서의 Experiment 설명·결과. |
+| 17 | 미실행 제외 | 선택만 한 항목과 미실행 결과 없음. |
+| 18 | 추가 실행 | 0→03→03,01 이력으로 각각 재생성/갱신 확인. |
+| 19 | CONTAINMENT 전 | 기존 공개 정보만; 임시 선택 Room Entry 없음. |
+| 20 | CONTAINMENT 후 | 확정 Room ID/이름/설명 추가, Monitoring 제외. |
+| 21 | INCIDENT | 완료 Monitoring 결과/관찰+Incident까지; Broadcast/Option/IncidentResult 제외. |
+| 22 | BROADCAST 전 | Broadcast 추가, 미확정 Option과 IncidentResult 제외. |
+| 23 | BROADCAST 후 | 확정 응답 추가; 연결된 IncidentResult는 아직 제외. |
+| 24 | INCIDENT_RESULT | 확정 응답의 IncidentResult까지 표시. |
+| 25 | RESULT | 기존 Step24 전체 확정 Log, Summary 표시/Restart 보존. |
+| 26 | SUCCESS | 실패 카테고리 Entry 없음. |
+| 27 | Monitoring 차단 | Open 버튼 없음; signal/직접 handler 요청도 거부. Timer 정책 변경 없음. |
+| 28 | 위조 Open | source Stage 불일치, 금지/미정의 Stage를 직접 전달해도 이동 없음. |
+| 29 | stale Open | 8개 허용 Stage 각각 detached/queued/replaced/wrong-stage 거부. |
+| 30 | stale Back | detached/queued/replaced/wrong-stage 및 교체 직후 이전 Log 요청 거부. |
+| 31 | 잘못된 return | -1/MONITORING/LOG/999는 경고 후 Log 유지, RESULT fallback 없음. |
+| 32 | 중첩 Log | 버튼 없음; 위조 nested signal/직접 요청 거부, return 값 유지. |
+| 33 | 임시 선택 | 재생성 시 초기화; 이동은 확정 동작이 아니며 실행/Confirm을 요구하지 않음. |
+| 34 | Experiment 복귀 | 실행/잔여 횟수/잠금 복원, 임시 선택 초기화와 Run disabled 확인. |
+| 35 | Containment 복귀 | 미확정 선택 초기화; 확정 ID/잠금/Next 가능 상태 복원. |
+| 36 | Broadcast 복귀 | 미확정 선택 초기화; 확정 쌍/잠금/Next 가능 상태 복원. |
+| 37 | Result 복귀 | 기존 Summary 재생성, 모든 공통/실패 필드 동일. |
+| 38 | 반복 | 세 크기×headless/native, 각121회 Open/Back 검증. |
+| 39 | 최신성 | 매 Open 신규 Snapshot, 실행 추가와 Confirm 직후 Entry 갱신, 이전 객체 재사용 없음. |
+| 40 | Runtime 불변 | 여섯 상태 필드/getter와 Broadcast 승인 호출 수를 매 이동 전후 비교. |
+| 41 | Resource 불변 | 원본/테스트 콘텐츠 값과 파일 SHA-256 전후 비교; 새 Entry는 문자열만 참조. |
+| 42 | SUCCESS Route | Log 없는 기존 Route와 새 Log를 섞은 Room02 Route 모두 검사. |
+| 43 | FAILURE Route | Room01/03 각각 A/B/C, 원래 Route와 확정 결과 ID 조회 회귀. |
+| 44 | 전체 회귀 | Profile/CCTV/Experiment/제한·이력/Containment/Monitoring/Incident/Broadcast·Confirm/IncidentResult/Result/Step24 Log/UNDEFINED/예외/다른 Case/생명주기 검사. |
+| 45 | signal | Open/Next/Back/Confirm의 연결1개, 반복 재진입 중복 없음. |
+| 46 | 단일 View | 전환 직후 ViewHost 자식1개, 이전 View 제거/queue_free/해제 확인. |
+| 47 | 화면/설정 | 1920×1080/1280×720/1024×768, 버튼·목록 영역/가독성 확인; project.godot/Main Scene/Stretch/Scaling 그대로. |
+| 48 | 파싱/실행 | 최종 검사 결과는 아래 검증 기록 참조. |
+| 49 | 문제/해결 | 이전 Broadcast 검사가 버튼 수를 +2로 고정. 원본 검사는 보존하고 새 wrapper에서 +3만 반영. 게임 회귀 수정 불필요. |
+| 50 | 변경 파일 | 아래13개 수정. 새 게임 파일0/삭제0; 새 검증은 Git 제외 `.godot/verification/step25/`에만 생성. |
+| 51 | 기존 보존 | Step24 커밋/UID/Runtime/Data/콘텐츠/기존 검증/과거 보고 보존. 변경 범위 SHA-256/diff 검사. 커밋·push 없음. |
+| 52 | 미구현 | Monitoring Open/pause/continuation, 영구·다중 Case·unlock·별도 Entry Resource·검색·필터·편집·즐겨찾기·stack·Manager·Singleton·Campaign·Save/Load·Audio·Animation·Shader·최종 UI 없음. |
+| 53 | 다음 지점 | Main Snapshot→ResearchLogView.setup 경계에서 필요한 표시 문구를 한 가지씩 검증. Monitoring/영구 기록은 별도 요구로 정책부터 결정. |
+
+### 25단계 실제 변경 파일
+
+- `scripts/main/main.gd`: 허용 검사, 임시 복귀 위치, Stage gate만 추가.
+- `scripts/views/flow_view.gd`: 선택적 Open 버튼 요청 공통화.
+- `scripts/views/result_view.gd`: 중복 Open 구현 제거, Summary 기능 보존.
+- `scripts/views/research_log_view.gd`: 미확정/초기 Stage의 최종 결과 Label 숨김.
+- `scenes/views/{profile,cctv,experiment,incident,incident_result}_view.tscn`: 기존 Next 옆에 Open을 추가한 Actions.
+- `scenes/views/{containment,broadcast}_view.tscn`: 기존 Actions에 Open 추가, 세 버튼이 기존 폭에 맞도록 최소 폭만 조정.
+- `scenes/views/research_log_view.tscn`: Back 문구만 일반화.
+- `README.md`: 현재 사용법/구조와 이번 검증 기록.
+
+### 25단계 검증 기록
+
+Godot `4.7.1.stable.official.a13da4feb`에서 **96개 headless/Windows GPU 검사와 최종 editor import 1개, 총97개**가 통과했습니다.
+GDScript24개 check-only, 기본 Main 실행, 기존 기능/예외/생명주기/다른 Case 검사 및 신규 navigation/security를 포함합니다.
+Open/Back은 7개 SUCCESS/FAILURE 경로×3개 창 크기×headless/native에서 **총726회** 실제 마우스 입력으로 검증했습니다.
+모든 실행 종료0, 파싱/GDScript/실행 오류0입니다. 누락·잘못된 데이터 검사에서 의도한 경고만 정확히 일치했고 정상 검사 경고0입니다.
+잘못된 return Stage 4종의 경고도 의도적으로 검증했습니다. F5 키 자체는 자동 누르지 않았으며 동일한 Main 기본 실행을 양쪽 모드에서 확인했습니다.
+
+1920×1080 / 1280×720 / 1024×768의 source/Log PNG78개를 생성하고 8개 source 화면과 Log의 대표 캡처를 직접 확인했습니다.
+기존 keep 비율로 1024×768 창의 콘텐츠 렌더 영역은 1024×576입니다. 기존 호스트/버튼/목록 영역 내 배치와 읽기 가능한 텍스트를 확인했습니다.
+`project.godot`/Main Scene/해상도/Stretch/Scaling/Monitoring Timer와 콘텐츠는 바꾸지 않았습니다.
+
+최종 diff: **원본66개 중13개 수정, 신규0/삭제0, 나머지53개와 UID24개 동일**.
+이전 검증 소스646개와 24단계 이하 보고를 보존했습니다. Main의 기존26개 함수 중22개는 원문이 동일하고,
+정규 Route/Result Summary/ID 조회/게임 승인/활성 View 방어 함수는 그대로입니다.
+`git diff --check` 통과, staging 비어 있음, HEAD345d93f 유지, 커밋/push 없음.
+실행 증거는 `validation-results.json`/각 `.pass.json`/`final-import.log`, 보존 증거는 `final-audit.json`에 있습니다.
+검증 코드/로그/캡처/시작 해시는 `.godot/verification/step25/`에만 있으며 게임에서 로드하지 않습니다.
+기존 검증을 상속·재사용하고 새 navigation/security 검사를 추가했습니다. Stage gate에 맞춘 Step24 snapshot
+wrapper와 추가 버튼 수를 반영한 Broadcast wrapper만 새로 두었으며 이전 테스트 파일을 수정하지 않았습니다.
 
 ## 24단계 현재 Case의 읽기 전용 Research Log
 
@@ -2097,7 +2364,7 @@ Resource와 표시 Script만 추가하는 지점이 적합합니다. 아직 사�
 Experiment 표시 확장은 `experiment_data.gd`와 `experiment_view.gd`에서 시작할 수 있습니다.
 현재 선택과 결과는 View 내부에만 있으며 실행 ID 이력은 Main이 소유하는 CaseRuntimeState에 있습니다.
 이력 조회를 다른 UI/로직에 연결하는 작업은 다음 단계의 요구사항이 정해졌을 때 추가합니다.
-현재 Research Log는 RESULT에서 열람하는 읽기 전용 파생 표시입니다. 진행률·영구 기록은 없으며 테스트 limit 2는 최종 게임 밸런스가 아닙니다.
+현재 Research Log는 MONITORING을 제외한 8개 Stage에서 열람하는 읽기 전용 파생 표시입니다. 현재 Stage와 Runtime 확정 여부로 후속 정보를 차단합니다. 진행률·영구 기록은 없으며 테스트 limit 2는 최종 게임 밸런스가 아닙니다.
 Containment 확장은 `containment_view.gd`의 선택 처리에서 시작할 수 있습니다.
 확정 ID 조회와 현재 Resource → Main → View.setup 경계에서 다음 요구사항을 확장할 수 있습니다.
 Monitoring 확장은 MonitoringStageData/MonitoringOutcomeData와 MonitoringView.setup 및 재생 완료 경계에서 시작할 수 있습니다.
@@ -2107,4 +2374,4 @@ Broadcast Option 선택은 View 내부의 임시 상태이며, 현재 단계에�
 
 Incident Result 표시는 BroadcastOptionData.result_id → Main의 ID 검색 → IncidentResultView.setup() 경계에서 확장할 수 있습니다. 별도의 Runtime Result 상태 없이 기존 확정 쌍에서 파생합니다.
 Case Result 표시는 기존 Runtime 조회 → Main._build_result_summary() → ResultView.setup(Summary) 경계에서 확장할 수 있습니다. 현재는 읽기 전용 표시이며, 저장 결과/다음 Case/피해·점수 요구사항은 구현하지 않았습니다.
-Research Log 표시는 Main._build_research_log_snapshot() → ResearchLogView.setup(Snapshot) 경계에서 확장할 수 있습니다. 정식 기록 문구가 기존 콘텐츠와 달라져야 할 요구가 생기면 별도 Resource를 검토하고, 진행 중 열람은 Timer 정책을 먼저 정합니다. 영구/다중 Case 기록은 별도 요구가 있을 때 설계합니다.
+Research Log 표시는 Main._build_research_log_snapshot() → ResearchLogView.setup(Snapshot) 경계에서 확장할 수 있습니다. 작성 문구는 현재 CaseData.research_entries의 ResearchEntryData를 kind+source_id로 연결해 추가할 수 있으며, MONITORING 중 열람이 필요해지면 Timer 정책을 먼저 정합니다. 영구/다중 Case 기록은 별도 요구가 있을 때 설계합니다.

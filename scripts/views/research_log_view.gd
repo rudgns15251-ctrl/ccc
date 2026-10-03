@@ -46,13 +46,16 @@ func _display_snapshot() -> void:
 		item.queue_free()
 	case_label.text = "Case: [Unavailable]"
 	result_label.text = "Monitoring Result: UNDEFINED"
+	result_label.visible = false
 	if _snapshot == null:
 		push_warning("ResearchLogView.setup(): snapshot is missing.")
 		return
 	case_label.text = "Case: %s (%s)" % [_snapshot.case_display_name, _snapshot.case_id]
 	if _snapshot.monitoring_result == MonitoringOutcomeData.Result.SUCCESS:
+		result_label.visible = true
 		result_label.text = "Monitoring Result: SUCCESS"
 	elif _snapshot.monitoring_result == MonitoringOutcomeData.Result.FAILURE:
+		result_label.visible = true
 		result_label.text = "Monitoring Result: FAILURE"
 	for entry: Entry in _snapshot.entries:
 		if entry == null:

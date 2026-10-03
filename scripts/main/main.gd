@@ -14,6 +14,8 @@ const ResearchLogView = preload("res://scripts/views/research_log_view.gd")
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG }
 
+const RESEARCH_LOG_STAGES: Array[int] = [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT, Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT, Stage.RESULT]
+
 const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/profile_view.tscn"),
 	preload("res://scenes/views/cctv_view.tscn"),
@@ -36,6 +38,7 @@ var case_runtime: CaseRuntimeState
 
 var _current_stage: int = Stage.PROFILE
 var _current_view: FlowView
+var _research_log_return_stage: int = -1
 
 
 func _ready() -> void:
@@ -58,6 +61,7 @@ func _show_view(stage: int) -> void:
 
 	_current_stage = stage
 	_current_view = VIEW_SCENES[stage].instantiate()
+	_current_view.research_log_requested.connect(_on_research_log_requested.bind(_current_view, stage))
 	if stage != Stage.RESEARCH_LOG:
 		_current_view.advance_requested.connect(_on_advance_requested.bind(_current_view))
 	if stage == Stage.PROFILE:
@@ -105,7 +109,6 @@ func _show_view(stage: int) -> void:
 		incident_result_view.setup(_get_current_incident_result())
 	elif stage == Stage.RESULT:
 		var result_view: ResultView = _current_view as ResultView
-		result_view.research_log_requested.connect(_on_research_log_requested.bind(result_view))
 		result_view.setup(_build_result_summary())
 	elif stage == Stage.RESEARCH_LOG:
 		var research_log_view: ResearchLogView = _current_view as ResearchLogView
@@ -114,46 +117,67 @@ func _show_view(stage: int) -> void:
 	view_host.add_child(_current_view)
 
 
-func _on_research_log_requested(result_view: ResultView) -> void:
-	if _current_stage != Stage.RESULT or not _is_active_view(result_view) or not case_runtime.has_monitoring_result():
+func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
+	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _is_active_view(view):
 		return
+	if _current_stage == Stage.RESULT and not case_runtime.has_monitoring_result():
+		return
+	_research_log_return_stage = _current_stage
 	_show_view(Stage.RESEARCH_LOG)
 
 
 func _on_research_log_back_requested(research_log_view: ResearchLogView) -> void:
 	if _current_stage != Stage.RESEARCH_LOG or not _is_active_view(research_log_view):
 		return
-	_show_view(Stage.RESULT)
+	if not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
+		push_warning("Main: Research Log return stage is invalid: %d." % _research_log_return_stage)
+		return
+	var return_stage: int = _research_log_return_stage
+	_research_log_return_stage = -1
+	_show_view(return_stage)
 
 
 func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 	var snapshot := ResearchLogView.Snapshot.new()
+	var source_stage: int = _research_log_return_stage if _current_stage == Stage.RESEARCH_LOG else _current_stage
+	if not RESEARCH_LOG_STAGES.has(source_stage):
+		push_warning("Main: Research Log snapshot source stage is invalid: %d." % source_stage)
+		return snapshot
 	var summary: ResultView.Summary = _build_result_summary()
+	var research_entries: Array[ResearchEntryData] = _get_valid_research_entries()
 	snapshot.case_id = summary.case_id
 	snapshot.case_display_name = summary.case_display_name
-	snapshot.monitoring_result = summary.monitoring_result
 	var profile: ProfileData = current_case.profile_data if current_case != null else null
 	if profile != null:
-		_append_research_entry(snapshot, "PROFILE", profile.profile_id, profile.subject_name, "Classification: %s\n%s" % [profile.classification, profile.basic_description])
+		_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.PROFILE, "PROFILE", profile.profile_id, profile.subject_name, "Classification: %s\n%s" % [profile.classification, profile.basic_description])
 	else:
 		_append_unavailable_research_entry(snapshot, "PROFILE", "", "Profile")
+	if source_stage == Stage.PROFILE:
+		return snapshot
 	var cctv: CCTVData = current_case.cctv_data if current_case != null else null
 	if cctv != null:
-		_append_research_entry(snapshot, "OBSERVATION", cctv.camera_id, "CCTV Observation", cctv.observation_text)
+		_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.CCTV, "OBSERVATION", cctv.camera_id, "CCTV Observation", cctv.observation_text)
 	else:
 		_append_unavailable_research_entry(snapshot, "OBSERVATION", "", "CCTV Observation")
+	if source_stage == Stage.CCTV:
+		return snapshot
 	for index in range(summary.experiment_ids.size()):
 		var id: String = summary.experiment_ids[index]
 		var experiment: ExperimentData = summary.experiments[index] if index < summary.experiments.size() else null
 		if experiment != null:
-			_append_research_entry(snapshot, "EXPERIMENT", id, experiment.display_name, "%s\nResult: %s" % [experiment.description, experiment.result_text])
+			_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.EXPERIMENT, "EXPERIMENT", id, experiment.display_name, "%s\nResult: %s" % [experiment.description, experiment.result_text])
 		else:
 			_append_unavailable_research_entry(snapshot, "EXPERIMENT", id, "Executed Experiment")
+	if source_stage == Stage.EXPERIMENT:
+		return snapshot
 	if not summary.room_id.strip_edges().is_empty():
 		if summary.room != null:
-			_append_research_entry(snapshot, "CONTAINMENT", summary.room_id, summary.room.display_name, summary.room.description)
+			_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.CONTAINMENT, "CONTAINMENT", summary.room_id, summary.room.display_name, summary.room.description)
 		else:
 			_append_unavailable_research_entry(snapshot, "CONTAINMENT", summary.room_id, "Confirmed Containment")
+	if source_stage == Stage.CONTAINMENT:
+		return snapshot
+	snapshot.monitoring_result = summary.monitoring_result
 	var outcome: MonitoringOutcomeData
 	if snapshot.monitoring_result == MonitoringOutcomeData.Result.SUCCESS or snapshot.monitoring_result == MonitoringOutcomeData.Result.FAILURE:
 		outcome = _get_monitoring_outcome()
@@ -168,23 +192,71 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 			_append_unavailable_research_entry(snapshot, "OBSERVATION", summary.room_id, "Monitoring Observations")
 	if snapshot.monitoring_result == MonitoringOutcomeData.Result.FAILURE:
 		if summary.incident != null:
-			_append_research_entry(snapshot, "INCIDENT", summary.incident.incident_id, summary.incident.display_name, summary.incident.description)
+			_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.INCIDENT, "INCIDENT", summary.incident.incident_id, summary.incident.display_name, summary.incident.description)
 		else:
 			_append_unavailable_research_entry(snapshot, "INCIDENT", outcome.incident_id if outcome != null else "", "Incident")
+		if source_stage == Stage.INCIDENT:
+			return snapshot
 		if summary.broadcast != null:
-			_append_research_entry(snapshot, "INCIDENT", summary.broadcast.broadcast_id, summary.broadcast.display_name, summary.broadcast.prompt_text)
+			_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.BROADCAST, "INCIDENT", summary.broadcast.broadcast_id, summary.broadcast.display_name, summary.broadcast.prompt_text)
 		else:
 			var broadcast_id: String = summary.incident.broadcast_id if summary.incident != null else case_runtime.get_confirmed_broadcast_id()
 			_append_unavailable_research_entry(snapshot, "INCIDENT", broadcast_id, "Emergency Broadcast")
-		if summary.option != null:
-			_append_research_entry(snapshot, "INCIDENT", summary.option.option_id, "Selected Response", summary.option.display_text)
-		else:
-			_append_unavailable_research_entry(snapshot, "INCIDENT", case_runtime.get_confirmed_broadcast_option_id(), "Selected Response")
-		if summary.incident_result != null:
-			_append_research_entry(snapshot, "INCIDENT", summary.incident_result.result_id, summary.incident_result.display_name, summary.incident_result.description)
-		else:
-			_append_unavailable_research_entry(snapshot, "INCIDENT", summary.option.result_id if summary.option != null else "", "Incident Result")
+		if case_runtime.has_confirmed_broadcast_option():
+			if summary.option != null:
+				_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.BROADCAST_OPTION, "INCIDENT", summary.option.option_id, "Selected Response", summary.option.display_text)
+			else:
+				_append_unavailable_research_entry(snapshot, "INCIDENT", case_runtime.get_confirmed_broadcast_option_id(), "Selected Response")
+			if source_stage != Stage.BROADCAST:
+				if summary.incident_result != null:
+					_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.INCIDENT_RESULT, "INCIDENT", summary.incident_result.result_id, summary.incident_result.display_name, summary.incident_result.description)
+				else:
+					_append_unavailable_research_entry(snapshot, "INCIDENT", summary.option.result_id if summary.option != null else "", "Incident Result")
 	return snapshot
+
+
+func _get_valid_research_entries() -> Array[ResearchEntryData]:
+	var valid_entries: Array[ResearchEntryData] = []
+	if current_case == null:
+		return valid_entries
+	var id_counts: Dictionary[String, int] = {}
+	var source_counts: Dictionary[String, int] = {}
+	for entry: ResearchEntryData in current_case.research_entries:
+		if entry == null:
+			continue
+		if not entry.entry_id.strip_edges().is_empty():
+			id_counts[entry.entry_id] = id_counts.get(entry.entry_id, 0) + 1
+		if ResearchEntryData.SourceKind.values().has(entry.source_kind) and not entry.source_id.strip_edges().is_empty():
+			var key: String = "%d:%s" % [entry.source_kind, entry.source_id]
+			source_counts[key] = source_counts.get(key, 0) + 1
+	for entry: ResearchEntryData in current_case.research_entries:
+		if entry == null:
+			push_warning("Main: ResearchEntryData is missing; using derived text.")
+			continue
+		var valid: bool = not entry.entry_id.strip_edges().is_empty() and not entry.source_id.strip_edges().is_empty() and ResearchEntryData.SourceKind.values().has(entry.source_kind)
+		if not valid:
+			push_warning("Main: ResearchEntryData has an invalid entry_id, source_id or source_kind; using derived text.")
+		if id_counts.get(entry.entry_id, 0) > 1:
+			push_warning("Main: duplicate ResearchEntryData.entry_id %s; using derived text." % entry.entry_id)
+			valid = false
+		if source_counts.get("%d:%s" % [entry.source_kind, entry.source_id], 0) > 1:
+			push_warning("Main: duplicate ResearchEntryData source mapping %d/%s; using derived text." % [entry.source_kind, entry.source_id])
+			valid = false
+		if valid:
+			valid_entries.append(entry)
+	return valid_entries
+
+
+func _find_research_entry(entries: Array[ResearchEntryData], source_kind: int, source_id: String) -> ResearchEntryData:
+	for entry: ResearchEntryData in entries:
+		if entry.source_kind == source_kind and entry.source_id == source_id:
+			return entry
+	return null
+
+
+func _append_source_research_entry(snapshot: ResearchLogView.Snapshot, entries: Array[ResearchEntryData], source_kind: int, category: String, source_id: String, title: String, body_text: String) -> void:
+	var authored: ResearchEntryData = _find_research_entry(entries, source_kind, source_id)
+	_append_research_entry(snapshot, category, source_id, authored.title if authored != null else title, authored.body_text if authored != null else body_text)
 
 
 func _append_research_entry(snapshot: ResearchLogView.Snapshot, category: String, source_id: String, title: String, body_text: String) -> void:
