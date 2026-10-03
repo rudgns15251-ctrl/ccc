@@ -7,7 +7,7 @@ const ExperimentView = preload("res://scripts/views/experiment_view.gd")
 const ContainmentView = preload("res://scripts/views/containment_view.gd")
 const MonitoringView = preload("res://scripts/views/monitoring_view.gd")
 
-enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT }
+enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT }
 
 const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/profile_view.tscn"),
@@ -16,6 +16,7 @@ const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/containment_view.tscn"),
 	preload("res://scenes/views/monitoring_view.tscn"),
 	preload("res://scenes/views/result_view.tscn"),
+	preload("res://scenes/views/incident_view.tscn"),
 ]
 
 @export var current_case: CaseData
@@ -49,7 +50,7 @@ func _show_view(stage: int) -> void:
 
 	_current_stage = stage
 	_current_view = VIEW_SCENES[stage].instantiate()
-	_current_view.advance_requested.connect(_on_advance_requested)
+	_current_view.advance_requested.connect(_on_advance_requested.bind(_current_view))
 	if stage == Stage.PROFILE:
 		var profile_view: ProfileView = _current_view as ProfileView
 		profile_view.setup(current_case.profile_data if current_case != null else null)
@@ -105,12 +106,37 @@ func _get_monitoring_outcome() -> MonitoringOutcomeData:
 	return null
 
 
-func _on_advance_requested() -> void:
+func _on_advance_requested(view: FlowView) -> void:
+	if view != _current_view or not view.is_inside_tree() or view.is_queued_for_deletion():
+		return
 	if _current_stage == Stage.CONTAINMENT and not case_runtime.has_confirmed_containment():
 		return
-	if _current_stage == Stage.MONITORING and (not case_runtime.has_monitoring_result() or _current_view.next_button.disabled):
-		return
-	_show_view((_current_stage + 1) % VIEW_SCENES.size())
+	var next_stage: int = _get_next_stage(_current_stage)
+	if next_stage != -1:
+		_show_view(next_stage)
+
+
+func _get_next_stage(stage: int) -> int:
+	match stage:
+		Stage.PROFILE:
+			return Stage.CCTV
+		Stage.CCTV:
+			return Stage.EXPERIMENT
+		Stage.EXPERIMENT:
+			return Stage.CONTAINMENT
+		Stage.CONTAINMENT:
+			return Stage.MONITORING
+		Stage.MONITORING:
+			match case_runtime.get_monitoring_result():
+				MonitoringOutcomeData.Result.SUCCESS:
+					return Stage.RESULT
+				MonitoringOutcomeData.Result.FAILURE:
+					return Stage.INCIDENT
+		Stage.INCIDENT:
+			return Stage.RESULT
+		Stage.RESULT:
+			return Stage.PROFILE
+	return -1
 
 
 func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:

@@ -1,21 +1,21 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-6개 임시 화면의 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT / CONTAINMENT 표시를 구현했습니다.
+7개 임시 화면의 명시적 이동 흐름과 테스트 Resource의 PROFILE / CCTV / EXPERIMENT / CONTAINMENT 표시를 구현했습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
 CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나를 임시 선택할 수 있습니다.
 선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다.
 확정 이후에만 MONITORING으로 진행합니다. Room 자체에 정답 필드를 두지 않습니다.
-MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 SUCCESS 또는 FAILURE를 확정해야 RESULT로 진행할 수 있습니다.
+MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 결과를 확정합니다. SUCCESS는 RESULT로, FAILURE는 INCIDENT 임시 화면을 거쳐 RESULT로 진행합니다.
 실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
 
 1. Godot 4.7.1에서 이 폴더의 `project.godot`를 가져오거나 엽니다.
 2. `scenes/main/main.tscn`을 연 뒤 **F6**으로 해당 Scene을 실행하거나, **F5**로 프로젝트를 실행합니다.
-3. **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT → MONITORING → RESULT** 순서로 이동합니다.
+3. **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT → MONITORING** 순서로 이동합니다. 이후 SUCCESS는 RESULT, FAILURE는 INCIDENT → RESULT입니다.
    PROFILE에는 테스트 Resource의 subject_name, classification, basic_description이 표시됩니다.
    CCTV에는 camera_id, observation_text가 표시됩니다.
    EXPERIMENT에는 available_experiments 배열의 이름과 설명이 동적 목록으로 표시됩니다.
@@ -36,6 +36,8 @@ MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 �
    Runtime에 결과를 한 번 기록한 뒤 **Monitoring Result: SUCCESS / FAILURE**를 표시하고 **Next: RESULT**를 활성화합니다.
    확정 결과가 있는 같은 Case 재진입에서는 전체 기록과 결과를 즉시 복원하며 Timer를 시작하지 않습니다.
    결과가 없는 재진입은 처음부터 재생합니다. 데이터 누락·미정의 결과·기록 실패는 경고와 함께 Next를 차단합니다.
+   Monitoring의 기존 **Next: RESULT** 버튼은 진행 요청만 보냅니다. Main이 Runtime 결과에 따라 다음 화면을 결정합니다.
+   FAILURE의 INCIDENT는 설명과 **Next: RESULT** 버튼만 있는 임시 화면입니다.
 4. RESULT의 **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
    이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력, 격리 확정, Monitoring 결과는 유지됩니다.
 5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
@@ -89,7 +91,8 @@ cap/
 │       ├── experiment_view.tscn
 │       ├── containment_view.tscn
 │       ├── monitoring_view.tscn
-│       └── result_view.tscn
+│       ├── result_view.tscn
+│       └── incident_view.tscn # FAILURE Route 검증용 placeholder, flow_view.gd 재사용
 └── scripts/
     ├── data/
     │   ├── case_data.gd
@@ -159,8 +162,8 @@ Main (Control, main.gd)
 ```
 
 화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / MONITORING 콘텐츠는 Resource에
-있고 RESULT는 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
-모든 View는 Control 기반 독립 Scene입니다. Result는 기존 `flow_view.gd`를
+있고 RESULT / INCIDENT는 임시 문구를 사용합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
+모든 View는 Control 기반 독립 Scene입니다. Result / Incident는 기존 `flow_view.gd`를
 그대로 사용하며, Profile / CCTV / Experiment / Containment / Monitoring 전용 Script는 이 Script를 한 단계 상속해 진행 기능을 재사용합니다.
 별도의 Scene 상속이나 추상 Base Class 계층은 없습니다.
 
@@ -168,9 +171,17 @@ Main (Control, main.gd)
 진행합니다. [Godot signal](https://docs.godotengine.org/en/4.7/getting_started/step_by_step/signals.html)을
 사용하며 개별 View는 Main이나 다른 View를 참조하지 않습니다.
 
-`main.gd`는 `Stage` enum, 이에 대응하는 6개 PackedScene 목록, 현재 단계와
+`main.gd`는 `Stage` enum, 이에 대응하는 7개 PackedScene 목록, 현재 단계와
 현재 View 참조, Inspector에서 지정한 `current_case`를 보유합니다. 전환 시 이전 View를 ViewHost에서 제거한 뒤
 `queue_free()`하고 다음 View 하나를 추가합니다. RESULT 다음은 PROFILE입니다.
+Stage enum은 PROFILE=0, CCTV=1, EXPERIMENT=2, CONTAINMENT=3, MONITORING=4,
+RESULT=5, INCIDENT=6입니다. INCIDENT를 배열 끝에 추가해 기존 인덱스를 보존했습니다.
+_get_next_stage(stage)의 match가 다음 Stage를 명시적으로 반환하고, -1이면 전환하지 않습니다.
+진행 signal에는 발신 View를 bind합니다. 현재 View와 다른 객체, Tree 밖 객체,
+queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident의 중복 전환을 차단합니다.
+Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
+INCIDENT는 기존 FlowView를 사용하는 Control → CenterContainer → VBoxContainer에
+제목, 두 줄 설명, NextButton만 둡니다. 새 Script·Runtime 필드·콘텐츠 Resource는 없습니다.
 기존 창 크기 표시 함수와 연결은 보존했습니다.
 Main._ready()에서 현재 Case ID로 CaseRuntimeState를 한 번 생성합니다.
 일반 View 전환, RESULT → PROFILE, ExperimentView.setup()은 런타임 상태를 초기화하지 않습니다.
@@ -301,14 +312,14 @@ UNDEFINED/지원하지 않는 enum, 다른 Outcome, 미완료/이전 View 요청
 try_set_monitoring_result() 성공 후 Runtime의 실제 결과를 apply_monitoring_result()로 전달합니다.
 View는 기존 Description Label에 `Monitoring Result: SUCCESS` 또는 `Monitoring Result: FAILURE`를 표시하고 Next를 활성화합니다.
 apply는 완료 전/유효하지 않은 값/이미 표시된 결과를 바꾸는 요청을 적용하지 않습니다.
-Main도 Monitoring 진행 요청에서 Runtime 결과와 disabled 상태를 확인하므로 잘못된 직접 signal로 RESULT에 넘어가지 않습니다.
+Main도 Monitoring 진행 요청에서 Runtime 결과를 확인하므로 UI의 disabled/문구/로컬 상태를 우회해도 UNDEFINED에서는 진행하지 않습니다.
 
 Runtime 결과가 있는 재진입/setup은 유효 Stage 전체와 결과를 즉시 복원합니다.
 Timer 시작이나 완료 signal 재전송, Runtime 결과 재기록은 없습니다. 결과가 없는 재진입은 처음부터 재생합니다.
 null Outcome/빈 배열/전부 null은 대체 UI, Timer 정지, Next disabled로 처리합니다.
 일부 null Stage는 경고하고 건너뛰며 빈 관찰 문구는 `[Missing observation_text]`를 표시합니다.
 final_result가 UNDEFINED여도 Stage 재생은 가능하지만 마지막에 Main이 경고하고 결과/Next를 미확정 상태로 유지합니다.
-성공과 실패 모두 기존 RESULT로 진행하며 결과별 화면 분기는 없습니다.
+Main._get_next_stage()는 Runtime SUCCESS → RESULT, FAILURE → INCIDENT, UNDEFINED → -1(진행 거부)를 반환합니다. INCIDENT → RESULT → PROFILE이며 순차 +1 계산을 사용하지 않습니다.
 
 MonitoringOutcomeData.Result는 UNDEFINED=0, SUCCESS=1, FAILURE=2입니다.
 검증용 Case의 Room01/03 Outcome은 FAILURE, Room02 Outcome은 SUCCESS이며 정식 콘텐츠 정답을 뜻하지 않습니다.
@@ -436,7 +447,7 @@ export template 설정은 배포 단계에서 추가합니다.
 
 검증용 스크립트, 격리 프로필, 로그, 캡처는 Git에서 제외되는
 `.godot/verification/`에만 있습니다. 게임에서 로드하지 않는 로컬 검증 자료입니다.
-UID 파일은 Git 보존 대상입니다. 14단계까지 48f35b2에 커밋·push되어 있으며 이번 15단계 변경은 미커밋 상태입니다.
+UID 파일은 Git 보존 대상입니다. 15단계까지 4d26d6f에 커밋·push되어 있으며 이번 16단계 변경은 미커밋 상태입니다.
 
 ## 2단계 UI 흐름 검증 결과
 
@@ -465,6 +476,57 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 16단계 Monitoring 결과별 Route와 Incident placeholder 검증 결과
+
+Main의 순차 이동을 명시적 Route로 바꾸고 FAILURE용 독립 Incident Scene만 추가했습니다.
+Runtime 결과 확정, 재생, 리소스 데이터와 기존 화면은 유지했습니다. 커밋/push는 하지 않았습니다.
+
+| 번호 | 항목 | 실제 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | HEAD 4d26d6f, master→origin/main, clean. Step15는 이미 커밋되어 미커밋 변경 없음. 소스44개, 모든 Scene/Script/Resource/UID/설정/기존 검증과 Main setup/완료/전환/해제 조사 |
+| 2 | 이전 Route | (_current_stage + 1) % VIEW_SCENES.size(), 6개 Scene 순환. Monitoring SUCCESS/FAILURE 모두 RESULT |
+| 3 | 새 Route | PROFILE→CCTV→EXPERIMENT→CONTAINMENT→MONITORING; SUCCESS→RESULT, FAILURE→INCIDENT→RESULT, RESULT→PROFILE |
+| 4 | 다음 Stage | Main._get_next_stage(stage)의 작은 match 함수. UNDEFINED/미지원 Stage는 -1, handler는 전환하지 않음. 순차 인덱스 계산 제거 |
+| 5 | enum/Scene | 기존0~5 보존, INCIDENT=6과 PackedScene 배열 끝 항목 추가. 7개 Scene의 실제 제목과 인덱스 단위 검증 통과 |
+| 6 | Incident Scene | full-rect Control→CenterContainer→VBoxContainer; INCIDENT Label, 임시 설명 두 줄, Next: RESULT Button |
+| 7 | Incident Script | 추가하지 않음. 기존 flow_view.gd가 버튼/진행 signal만 담당하므로 그대로 재사용 |
+| 8 | SUCCESS | TEST_ROOM_02 Confirm/재생/결과 확정/Next→RESULT. 방문 순서에 INCIDENT 없음 |
+| 9 | FAILURE | TEST_ROOM_01·03 Confirm/재생/결과 확정/Next→INCIDENT. 두 Room 모두 동일 경로 |
+| 10 | UNDEFINED | Next disabled/pressed/advance_requested 우회와 가짜 SUCCESS snapshot에서도 MONITORING 유지. Main이 Runtime 결과로 차단 |
+| 11 | Incident→Result | 공용 advance_requested→Main→RESULT. 이전 Incident의 추가 signal은 무시 |
+| 12 | Result→Profile | 기존 버튼 동작 유지. Experiment 이력/남은 횟수/확정 Room/Monitoring 결과 자동 reset 없음 |
+| 13 | Route 권위 | CaseRuntimeState.get_monitoring_result()의 SUCCESS/FAILURE만 분기 입력. Runtime 구조/API 변경 없음 |
+| 14 | UI 비의존 | 결과 반대 문구·로컬 completed=false·finalized=UNDEFINED·disabled=true로 변조해도 확정 Runtime대로 이동. UI 문구 파싱 없음 |
+| 15 | SUCCESS 재진입 | Step15 snapshot 복원, 전체 Stage 즉시 표시, Timer 정지, 완료 signal 재전송 없이 RESULT |
+| 16 | FAILURE 재진입 | 동일 snapshot 복원, Timer 정지 상태에서 INCIDENT→RESULT 경로 유지 |
+| 17 | stale 방어 | 발신 View를 bind. 현재 객체/inside_tree/queued_for_deletion 검사. 이전 Monitoring/Incident의 중복 signal과 현재 queue_free 예정 발신 무시, 이전 View 실제 해제 |
+| 18 | Containment gate | Runtime 확정 전에는 버튼 상태/직접 진행 signal을 우회해도 CONTAINMENT 유지. 후보 검증/Confirm 승인 보존 |
+| 19 | Monitoring gate | 결과 확정 전 Next 차단. 결과 UNDEFINED일 때 Main Route=-1. 미완료/다른 Outcome/기록 거부 회귀도 통과 |
+| 20 | Experiment Runtime | ID별1회, limit2, Experiment01/03 실행 이력/remaining0, 중복·소진 거부와 재진입 표시 유지 |
+| 21 | Containment Runtime | 한 번 확정한 Room 유지, 재확정 거부/후보 잠금/재진입 snapshot 유지 |
+| 22 | Monitoring Runtime | UNDEFINED 초기값, SUCCESS/FAILURE 1회 기록, 미지원/중복/반대값 거부, 기존 reset 정책 보존 |
+| 23 | 전체 SUCCESS | PROFILE→CCTV→실험2회→CONTAINMENT→Room02 Confirm→MONITORING 완료→RESULT→PROFILE 및 재진입 반복, Headless/GPU 모두 통과 |
+| 24 | 전체 FAILURE | 같은 전체 흐름에서 Room01·03→MONITORING 완료→INCIDENT→RESULT→PROFILE 및 재진입 반복, Headless/GPU 모두 통과 |
+| 25 | 반복 Incident | Room01·03 × 세 크기 × 초기+재진입2회, 각 모드18회 Incident 방문. 항상 ViewHost 자식1개, 이전 View/행 해제, 누적 없음 |
+| 26 | signal | advance_requested/버튼 pressed/PlaybackTimer.timeout/완료 signal의 상위 연결1회. 완료1회, 재진입 완료0회, 이전 객체 요청 중복 전환 없음 |
+| 27 | 해상도 | 1920×1080 / 1280×720 / 1024×768 실제 GPU, 논리1920×1080 유지. canvas_items/keep·창 변경·Scaling 보존. Incident 세 크기와 Result 캡처 직접 확인, 텍스트/버튼 잘림 없음 |
+| 28 | 파싱/실행 | Godot4.7.1 a13da4feb: Script15개 check-only + Headless/GPU 실행·회귀36개 + editor import1개 =52개 통과. 정상 검사 오류/경고0. 잘못된 데이터 검사는 예상 경고10/9/17/17개씩 정확히 일치 |
+| 29 | 문제/해결 | 프로젝트 오류 없음. 기존 테스트의 순차 Stage 기대값을 별도의 명시적 기대 Route로 변경하고 FAILURE 방문/중복 signal 검사를 추가. Monitoring의 기존 Next: RESULT 문구는 보존하며 실제 목적지는 Main이 선택 |
+| 30 | 실제 파일 | 수정2개: main.gd/README.md. 생성1개: incident_view.tscn. 새 Script/UID/Resource·삭제0. 소스44→45개. 테스트/로그/캡처/별도 diff는 Git 제외 .godot/verification/step16 안에만 저장 |
+| 31 | 이전 변경 보존 | 기존42개 소스와 이전 검증 gd/ps1 144개 SHA-256 동일. Step15~기존 보고 보존. Main의 변경 부분을 제외하면 setup/승인/매핑/완료 코드는 기준 사본과 동일. HEAD/staging 유지, git diff --check 통과 |
+| 32 | 미구현 | IncidentData/실제 콘텐츠/탈출·피해·대응/Runtime Incident 상태/Emergency Broadcast/CaseResult/Research Log/Campaign/Save·Load/Manager·Singleton·Framework/Audio·Animation·Shader/최종 UI |
+| 33 | 다음 확장 | Route는 Main._get_next_stage(), Incident 표시는 incident_view.tscn. 실제 데이터/전용 Script는 다음 요구사항이 있을 때 추가. 현재 Runtime/Resource 경계 유지 |
+
+통합검사에서는 Case/Outcome의 독립 사본으로 0/1/2초 재생을 사용해 세 Room×세 크기를 검사했습니다.
+원본 Resource의 0/10/20초는 변경하지 않았으며 Room02 실제20초 재생도 별도로 검증했습니다.
+Headless B=10.005s/C=20.017s, Windows GPU B=10.022s/C=20.017s로, 마지막 기록 이전에는 결과가 숨겨지고 Next가 차단됐습니다.
+GPU는 AMD Radeon RX6800 / OpenGL3.3 Compatibility입니다. 전체 PNG82개를 로컬 검증 폴더에 생성했습니다.
+명령행으로 프로젝트 설정의 Main Scene을 실행하고 GUI 마우스 입력으로 흐름을 검증했습니다. 에디터 F5 키 자체를 자동 입력하지는 않았습니다.
+
+로컬 검증 증거: `.godot/verification/step16/validation-results.json`, `audit-results.json`,
+`route_validation_*.log`, `result_integration_*.log`, `production_playback_validation_*.log`,
+`editor-import.log`, `step16-only.diff`, `git-step16.diff`, `incident_room*_*.png`.
 
 ## 15단계 Monitoring 최종 결과 확정 검증 결과
 
@@ -1131,15 +1193,15 @@ Resource, Autoload, 기존 콘텐츠는 없었습니다. Git은 `master` 브랜�
 
 ## 범위와 다음 단계
 
-현재 구현은 임시 Main UI, 창 크기 표시, 6개 View의 순차 이동과 테스트 Resource의
+현재 구현은 임시 Main UI, 창 크기 표시, 7개 View의 명시적 Route와 테스트 Resource의
 PROFILE / CCTV 텍스트, EXPERIMENT 목록·단일 선택·즉시 결과 텍스트 표시와
 현재 Case의 메모리 실행 ID 이력, ID별 1회와 Case 횟수 제한, 완료/남은 횟수 표시입니다.
 CONTAINMENT의 Resource 후보 목록, 임시 단일 선택, 명시적 확정과 메모리 Runtime 기록도 포함합니다.
 MONITORING은 확정 Room ID별 Outcome을 Timer로 순차 재생하고 시간/관찰 기록을 누적하며 완료 후 Main이 SUCCESS/FAILURE를 Runtime에 한 번 확정하고 결과 표시와 Next를 활성화합니다.
-테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
+SUCCESS는 RESULT로, FAILURE는 INCIDENT placeholder → RESULT로 진행합니다. UNDEFINED는 Main에서 차단합니다. 테스트 Case는 시스템 검증용이며 정식 세계관/크리쳐가 아닙니다.
 CCTV 이미지·영상·상태 변화·환경 수치, Experiment 결과 이미지/오디오, Containment 환경 조건·정답 판정,
-Monitoring 진행 위치·경과시간 저장, 결과별 Route/Result 화면, Campaign, 정식 Case 로직,
-Incident, Broadcast, Research Log,
+Monitoring 진행 위치·경과시간 저장, 실제 Result 콘텐츠, Campaign, 정식 Case 로직,
+IncidentData·실제 Incident 콘텐츠·탈출/피해/대응·Runtime Incident 상태, Broadcast, Research Log,
 Save/Load, Settings, Horror Event, 검열·이미지 시스템, CRT/Shader, Audio, Animation,
 GameState Singleton, CaseManager, CampaignManager, 최종 UI/폰트/에셋은 구현하지 않았습니다.
 
@@ -1154,4 +1216,4 @@ Experiment 표시 확장은 `experiment_data.gd`와 `experiment_view.gd`에서 �
 Containment 확장은 `containment_view.gd`의 선택 처리에서 시작할 수 있습니다.
 확정 ID 조회와 현재 Resource → Main → View.setup 경계에서 다음 요구사항을 확장할 수 있습니다.
 Monitoring 확장은 MonitoringStageData/MonitoringOutcomeData와 MonitoringView.setup 및 재생 완료 경계에서 시작할 수 있습니다.
-다음 단계 요구사항이 정해지면 이 경계에만 필요한 동작을 추가합니다. Stage 재생 완료와 Runtime 결과 확정은 별개이며 이후 Route는 아직 같은 RESULT입니다.
+다음 단계 요구사항이 정해지면 이 경계에만 필요한 동작을 추가합니다. Stage 재생 완료와 Runtime 결과 확정은 별개이며 이후 Route는 Main._get_next_stage()에서 결정합니다. Incident의 실제 표시가 필요해지면 독립 incident_view.tscn에서 시작할 수 있으며, 데이터 구조와 전용 Script는 해당 요구사항이 정해졌을 때 추가합니다.
