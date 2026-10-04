@@ -5,6 +5,7 @@ Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
+활성 환경에서 실제 실행한 Experiment는 Base 결과 뒤에 authored 조건 관찰을 추가할 수 있습니다. 실행 당시 관찰 ID만 기록하고 이후 환경 변화는 과거 결과에 소급하지 않습니다. 조건 관찰은 선택적 보조 증거이며 실험 횟수와 정답은 바꾸지 않습니다.
 CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나를 임시 선택할 수 있습니다.
 선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다. 같은 승인 경계에서 Main 소유 PendingContainmentState에 Case ID와 실제 확정 Room ID를 등록합니다. 선택만으로는 등록하지 않습니다.
 Confirm은 화면을 이동하지 않습니다. 확정 뒤 Next: CASE는 현재 Pending의 Case/Room ID로 Outcome을 검색하고 결과를 숨겨진 ContainmentResolutionState에 한 번 기록합니다. 성공한 판정만 Pending에서 제거하며 실패 결과에는 별도 FailureEventCandidateState를 등록합니다. Research를 Archive에 보존한 뒤 새 Runtime으로 다음 PROFILE을 엽니다. Room 자체에 정답 필드는 없습니다. 마지막 Case의 Next는 No next test case configured로 비활성화되며 현재 Pending을 유지합니다.
@@ -627,6 +628,176 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 35단계 실행 당시 환경에 따른 Experiment 추가 관찰
+
+기존 프로젝트를 확장했습니다. 작업 전 HEAD는 `a540260a40aad48fa749bdb28bf0c6b96fc208cf`,
+브랜치는 `master`(`origin/main` 추적), Git working tree는 깨끗했습니다.
+제품 파일 89개, 이전 검증 GDScript/PowerShell 소스 1,418개를 조사하고 SHA256 기준선을 남겼습니다.
+실제 Main, CaseRuntimeState, 모든 환경/관찰/실험/Research Resource, 두 Case, 실행 승인·횟수·이력,
+Log Snapshot/발견/Archive, Step33 환경 표시, Step34 Recheck, 기존 검증 코드와 설정을 확인했습니다.
+
+**condition observations are supporting/optional evidence**.
+환경 추가 관찰은 선택적 보조 증거입니다. 이미 사용한 실험을 환경 발생 후 다시 실행할 수 없으므로
+필수 정답 단서로 설계하지 않습니다. 기존 Base result, 실험 사용 수, 정답 Room/Outcome은 바꾸지 않습니다.
+이 원칙을 신규 테스트와 이번 회귀 테스트 사본에도 기록했습니다. 이전 검증 소스는 수정하지 않았습니다.
+
+새 `ExperimentConditionObservationData`는 다섯 필드만 가집니다.
+`observation_id`, `experiment_id`, `disturbance_id`, `display_name`, `observation_text`입니다.
+`CaseData.experiment_condition_observations: Array[ExperimentConditionObservationData]`에 배치했습니다.
+기존 CCTV 추가 관찰/Reaction/Research와 같은 Case별 authored 콘텐츠이고,
+ExperimentData의 기본 결과와 실행 의미를 보존하는 데 이 위치가 자연스럽습니다.
+`experiment_id + disturbance_id`를 ID로 연결하고, Main에는 Power/Vent 등 콘텐츠별 분기가 없습니다.
+이번 콘텐츠는 한 쌍에 관찰 하나입니다. 쌍 중복 또는 관찰 ID 중복/빈 필수 문구는 경고 후 생략합니다.
+
+```text
+현재 ExperimentView의 Run 요청
+  → Main: 현재 Stage/View/가시성/Case Runtime/실험 ID/중복/limit 확인
+  → 실행 시작 당시 active disturbance ID 순서로 matching authored 관찰 검색
+  → ConditionSnapshot: 관찰 문구와 실행 당시 환경 설명을 문자열로 복사
+  → Runtime: 기존 execution ID + 그 실행의 condition observation ID 배열 기록
+  → ExperimentView: BASE EXPERIMENT RESULT 먼저, CONDITION OBSERVATION 뒤에 표시
+  → 실제 표시된 ID: Base discovery → Condition A discovery → Condition B discovery
+  → 기존 successful-execution Gameplay Opportunity
+  → 필요하면 Disturbance Overlay (그 실험에는 소급 적용하지 않음)
+```
+
+실행 승인/표시는 동기적으로 처리하며 그 사이 `await`/환경 이벤트를 호출하지 않습니다.
+일반 UI의 선택된 Resource가 실제 Case Resource와 일치할 때만 추가 관찰 Snapshot을 만듭니다.
+기존 테스트/내부 ID-only 승인 호출의 Base 실행 정책은 호환성을 위해 유지합니다.
+선택되지 않은 내부 ID-only 승인에는 추가 관찰 이력/발견을 기록하지 않습니다.
+새 관찰 발견은 View가 반환한 실제 표시 ID에만 적용합니다. Resource 존재, 활성화, 선택으로는 발견하지 않습니다.
+
+Runtime의 기존 `get_experiment_execution_history(): Array[String]`는 그대로입니다.
+작은 `Dictionary[String, Array]`에 실험 ID별 실행 당시 관찰 ID만 저장합니다.
+`try_record_experiment_execution(id, limit, condition_observation_ids = [])`의 세 번째 인자는 선택적이며
+기존 두 인자 호출은 관찰 없는 정상 실행입니다. `get_experiment_condition_observation_ids(id)`는 복사본입니다.
+중복/빈 관찰 ID를 제거하며 거부된 실행은 metadata도 기록하지 않습니다.
+Resource/동적 상태/환경 수치/별도 실행 State를 저장하지 않고 reset으로 이 정보도 초기화합니다.
+
+새 SourceKind는 맨 뒤의 `EXPERIMENT_CONDITION_OBSERVATION = 10`이며 기존 0~9 값은 유지합니다.
+`source_id = observation_id`, 기존 authored `entry_id` 발견은 Base 실험과 독립적입니다.
+Log는 실행 이력에 저장된 ID와 실제 노출 Source 기록을 사용하며 현재 active environment로 재계산하지 않습니다.
+현재 환경이 제거되어도 과거 실행의 관찰은 유지됩니다. 유효 authored Research의 문구를 우선하고,
+없거나 무효이면 그 관찰 Resource의 문구를 fallback으로 표시합니다. 가짜 entry_id는 없습니다.
+카테고리는 기존 `EXPERIMENT`이며 제목에 `Condition Observation:`을 붙여 Base와 구분합니다.
+Step34의 실제 노출 순서 정렬을 새 Kind에도 적용하여 Base → A → B 순서를 보존합니다.
+Archive 구조/API는 바꾸지 않았고 기존 `(case_id, entry_id)` incremental merge에 포함됩니다.
+
+Case02에는 `TEST_CASE02_EXP_01 + TEST_DIST_POWER_FAILURE`에 TEMP 관찰 하나와 authored Research 하나를 추가했습니다.
+조명 중단 상태에서 자극 뒤 첫 움직임의 개시가 임시 정상 조명 reference보다 늦고 벽 접촉은 계속된다는 관찰입니다.
+실험/환경 중 무엇이 지연의 원인인지 확정하지 않습니다. 기존 일반 TEMP 결과와 충돌하는 Creature trait도 없습니다.
+어두움이 정답/안정 조건이라는 결론은 제시하지 않습니다. 정상 reference는 authored 테스트 문구이며
+게임이 정상/교란 실행을 두 번 수행하거나 비교/분석/시뮬레이션하는 기능은 없습니다.
+실제 ExperimentData, experiment_limit=2, 두 기존 실험, Room/Outcome, Case01 콘텐츠는 보존했습니다.
+
+결과는 기존 오른쪽 Execution 영역의 높이 152 ScrollContainer 안에 Base/추가 관찰 순서로 놓았습니다.
+문구는 wrap하고 여러 조건/긴 문구는 스크롤로 마지막 항목까지 볼 수 있습니다.
+Step33 Active Environment는 현재 상태로 계속 표시하며 각 결과에도 **Active condition at execution**을 붙입니다.
+두 개념을 분리하므로 이후 환경 refresh/Dismiss가 과거 결과를 교체하지 않습니다.
+스크롤 추가 후 발견된 View 높이 초과를 해결하기 위해 Experiment의 ViewHost만 일반 400/조건 활성 580으로 조정했습니다.
+기존 CCTV/Containment 높이 정책, 저장된 Main Scene, project.godot, Stretch 설정은 그대로입니다.
+
+### 요청한 67개 항목 보고
+
+| 번호 | 확인 항목 | 구현 및 검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | 위 HEAD/브랜치. 미커밋 변경 0, 이번 작업에서 commit/push 없음. |
+| 2 | Observation Resource | 다섯 문자열 필드만 추가. 별도 condition rule/판정/보상 필드 없음. |
+| 3 | 배치 위치 | CaseData authored 배열, CCTV/Reaction/Research와 일관성. Experiment 기본 결과에서 분리. |
+| 4 | Stable ID | experiment_id + disturbance_id 조합, observation_id로 기록/Research 연결. index/콘텐츠별 분기 없음. |
+| 5 | CaseData | typed experiment_condition_observations 배열 하나 추가. |
+| 6 | ExperimentData | 스키마/문구/Research 관계 모두 수정 없음. |
+| 7 | Base Result | 기존 ResultText를 먼저 표시. 조건 유무와 무관하게 원본 result_text 유지. |
+| 8 | Condition 구조 | 별도 typed 표시 Snapshot과 동적 Label 목록. 현재 환경 설명과 관찰 문구 구분. |
+| 9 | 실행 Snapshot | 실제 selected Resource + 승인 가능한 실행에 실행 시작 당시 active ID 목록을 순회해 값 복사. |
+| 10 | 소급 변경 방지 | 실행 ID별 확정 관찰 ID만 저장. 환경 refresh/Overlay/Dismiss/Log에서 재계산 없음. |
+| 11 | 무료 재실험 | once-per-case 거부 유지. 교란 후 사용한 실험 재요청은 이력/발견 불변. |
+| 12 | Limit 유지 | Case01/02 모두 기존 2. refund/+1/-1 없음. 사용 수는 기존 실행 ID 이력으로 계산. |
+| 13 | 보조 증거 | condition observations are supporting/optional evidence. README/테스트에 기록. 필수 단서/정답 요건 없음. |
+| 14 | 정답 노출 | 움직임 개시/벽 접촉 사실만 제시. 정답 Room/LIGHT OFF 결론 없음. |
+| 15 | 거짓 단서 | generic TEMP Base/Case02 벽 접촉 관찰과 모순되는 trait 없음. 테스트 reference는 authored 문구로 명시. |
+| 16 | 여러 조건 | 같은 실험의 Power/Vent 독립 관찰을 모두 표시/기록. overwrite/조합 엔진 없음. |
+| 17 | 표시 순서 | Runtime disturbance 최초 적용 순서. Resource 역순 배열과 동일 disturbance의 여러 쌍도 검증. |
+| 18 | Missing mapping | Base만 표시, 환경 요약 유지. 다른 실험/조건의 관찰을 빌리지 않음. |
+| 19 | Duplicate mapping | 한 쌍 1:1. 중복 쌍/중복 ID/빈 필수값은 warning 후 생략, first fallback 없음. |
+| 20 | History 호환 | Array[String] execution history 그대로. 별도 작은 실험 ID → 관찰 ID 배열. |
+| 21 | ID 기록 | 승인 시 복사/빈 ID 제거/중복 제거. Resource 저장 없음. Getter 수정으로 원본 변하지 않음. |
+| 22 | 소급 계산 금지 | Log는 기록 ID 조회. 환경 제거/나중 발생/재진입으로 과거 목록 수정 없음. |
+| 23 | SourceKind | EXPERIMENT_CONDITION_OBSERVATION=10 추가, 기존 0~9 보존. |
+| 24 | Source ID | observation_id. authored entry_id는 별도 기존 ResearchEntry 정책. |
+| 25 | Base 독립 | Base EXPERIMENT discovery와 Condition discovery를 순서대로 별도 호출. |
+| 26 | 발견 시점 | 성공 승인 후 Base/Condition 실제 UI 표시 ID 확인. Resource/active/선택만으로 발견하지 않음. |
+| 27 | 거부된 실행 | unknown/empty/used/limit/stale/hidden/modal/mismatch 요청의 metadata/Research 불변. |
+| 28 | Authored Research | 기존 유효 entry_id/source pair 검증과 발견 정책. duplicate authored Research는 안전하게 거부. |
+| 29 | Fallback | observation_text 사용, entry_id를 만들어 기록/Archive하지 않음. |
+| 30 | Log category | 기존 EXPERIMENT, 제목 Condition Observation 접두사로 Base와 구분. 새 대형 category 없음. |
+| 31 | 발견 순서 | 실제 source 노출 순서: Base → A → B. Log도 동일, 정렬은 Kind/ID 쌍 기준. |
+| 32 | 환경 제거 후 이력 | active 배열 제거 fixture에서도 실행 ID/발견/Log 문구 유지. 현재 환경 UI만 사라짐. |
+| 33 | Archive | 기존 case_id + 유효 discovered entry_id merge. API/Archive UI 추가 없음. |
+| 34 | Case02 | EXP01 + 기존 Power 교란의 TEMP 관찰/Research 한 쌍 추가. |
+| 35 | 정보 강도 | 자극 이후 첫 움직임 지연/벽 접촉 지속. 원인과 정답/성공 결과 해석 없음. |
+| 36 | 교란 전 실행 | Base 표시/발견, condition IDs empty, Condition 미발견. |
+| 37 | 교란 후 실행 | Base + 추가 관찰 표시, execution ID/condition ID/Research 정확히 기록. |
+| 38 | 실행 후 교란 | 기존 Base UI/이력 유지, Condition Research 소급 발견 없음. |
+| 39 | 재실행 거부 | 사용한 EXP 재요청/최대 사용 후 재요청 모두 불변. 무료 재실험 없음. |
+| 40 | 여러 조건 테스트 | Power/Vent 관찰 모두 표시, 긴 문구/순서/중복 적용 ID 검증. |
+| 41 | 일부 mapping | A/B active, A만 mapping → Base+A. 다른 EXP는 Base만. |
+| 42 | Stale View | detached/queued/교체/Case handoff 이후 요청 차단. 현재 Runtime/Research/metadata 보존. |
+| 43 | Overlay selection | 선택 유지한 동일 View Dismiss 후 Run → 현재 활성 환경 관찰. Overlay 중 Run은 차단. |
+| 44 | 실행/Opportunity 순서 | 실행 당시 snapshot → 기록 → 실제 표시 → 발견 → 기존 opportunity. |
+| 45 | 같은 action 교란 | CCTV 기회 1 + EXP 기회 2로 Power 발생 fixture: 해당 EXP 결과는 Base만. |
+| 46 | 다음 실험 | 그 뒤 unused EXP02에 독립 matching fixture 관찰 추가 → 새 환경 관찰. 기존 EXP01 ID는 empty. |
+| 47 | Result 호환 | Summary는 기존 ID history 그대로 사용. 기존 debug 결과 요약/정상 실행 회귀. 새 결과 항목 강제 추가 없음. |
+| 48 | CCTV 독립 | 기존 Resource/Script/Scene 그대로. Recheck 발견은 Experiment metadata/사용 수를 변경하지 않음. |
+| 49 | Resource 불변성 | 원본 Case01/02 전체 script 변수와 검증 전후 해시 확인. 테스트 변경은 deep duplicate fixture에만 적용. |
+| 50 | Runtime 안전성 | 기록/Getter 복사, 거부 불변, reset, 다른 Runtime/Archive 독립성 검증. |
+| 51 | Hidden Resolution | 정상 handoff의 Pending/Outcome ID/한 번 판정 정책 회귀. 구현 수정 없음. |
+| 52 | Failure Candidate | threshold/FIFO/한 기회 한 이벤트/독립 session 기록 회귀. 구현 수정 없음. |
+| 53 | Disturbance | overlay/modal/dismiss/반응/기회 중복 방지 회귀. 기존 이벤트 처리 함수 그대로. |
+| 54 | Active Environment | 0/1/3/10 조건, 순서/wrap/scroll/복사/복귀/reset 회귀. Experiment 최소 높이만 조정. |
+| 55 | CCTV Recheck | EXP/확정 Containment Back/Log 공개 조건/기회 증가 없음/실행 잠금 유지 회귀. |
+| 56 | Research Log | authored/fallback/mixed/보안/Stage 공개/재진입/실제 순서 회귀. 화면 Script/Scene 수정 없음. |
+| 57 | ResearchArchive | merge/dedup/Case ID 식별/fallback 가짜 ID 없음/reset 분리 회귀. 구현 수정 없음. |
+| 58 | Case handoff | 실제 두 Case handoff에서 조건 Research merge, 새 Runtime metadata/active 초기화, stale 거부. |
+| 59 | Monitoring debug | 기존 test-only debug Main으로 playback/time_offset/SUCCESS/FAILURE/UNDEFINED 회귀. 정상 Timer 경로 추가 없음. |
+| 60 | Failure downstream | Incident/Broadcast 선택·확정/IncidentResult/Result/무효 ID/미확정 진행 차단 회귀. |
+| 61 | 세 해상도/Stretch | 1920×1080, 1280×720, 1024×768; 기준 논리 UI 1920×1080와 canvas_items/keep/resizable 보존. |
+| 62 | 파싱/실행 | Godot 4.7.1 공식 실행 파일: 167개 검사 통과(headless 100, Windows GPU 67), 35개 제품 GDScript check-only, 기본 Main 실행 및 최종 editor import 오류/경고 0. 잘못된 fixture 경고는 기대 수와 일치. 실제 F5 키는 누르지 않았으며 설정된 Main을 CLI로 실행함. |
+| 63 | 문제 및 해결 | sandbox Windows 인증서 접근 오류는 정상 실행 환경 검사로 해결. 결과 Scroll로 인한 View 초과는 EXP 높이 400/580으로 해결. Fixture handoff 준비 때 이미 resolve된 Case01을 초기화해 독립 테스트를 올바르게 구성. 기존 GPU 회귀 캡처의 빈 출력 폴더 누락은 폴더 생성으로 해결하고 실패한 검사부터 재실행. |
+| 64 | 실제 파일 | 아래 변경 목록. 무관 파일 변경/삭제 없음, git diff --check 통과. |
+| 65 | 기존 미커밋 보존 | 시작 시 변경 0. 이전 제품 81개와 이전 검증 소스 1,418개 byte-identical. 커밋/push 하지 않음. |
+| 66 | 제외 기능 | 무료 재실행/limit 변경/Base 교체/정답·Outcome 변경/compound rules/시뮬레이션/Severity/MAJOR/자동 Broadcast/시설 상태 Case 간 지속/Case03/Campaign/SaveLoad/Hypothesis/Archive UI/Manager/Singleton/RuleEngine 없음. |
+| 67 | 다음 지점 | CaseData의 두 condition observation authored 목록과 ResearchEntry에서 근거 문구를 검토·확장할 수 있음. 조건별 관찰은 계속 선택적 보조 증거로 유지하고, 새 로직은 별도 요구사항 확정 후 추가. |
+
+### 변경 파일과 최종 구조
+
+새 파일:
+- `scripts/data/experiment_condition_observation_data.gd`
+- `scripts/data/experiment_condition_observation_data.gd.uid` (Godot 생성 stable UID)
+
+수정 파일:
+- `scripts/data/case_data.gd`: authored 배열.
+- `scripts/data/research_entry_data.gd`: Kind 10 추가.
+- `scripts/runtime/case_runtime_state.gd`: 실행별 관찰 ID metadata/조회/reset.
+- `scripts/main/main.gd`: 실행 당시 matching/snapshot, 추가 관찰 발견/Log, EXP 높이.
+- `scripts/views/experiment_view.gd`: Base 뒤 조건 관찰 표시, 실제 표시 ID 반환/선택 확인/reset.
+- `scenes/views/experiment_view.tscn`: 기존 Result 영역의 Scroll/wrap/관찰 목록.
+- `resources/cases/test_case_02.tres`: TEMP 관찰/Research 한 쌍. 기존 subresource 내용 보존.
+- `README.md`: 현재 설명 및 이 67개 항목 보고.
+
+삭제 파일은 없습니다. Main/Case01 Scene/Resource, ExperimentData, CCTV/Containment/Research Log View,
+EnvironmentalDisturbanceData/ReactionData/CCTVConditionObservationData, ResearchArchive/Pending/Resolution/Candidate,
+project.godot, .gitignore/.gitattributes는 byte-identical입니다.
+기존 Scene 계층은 유지하며 Experiment의 오른쪽 Execution 안의 Result 영역만 Scroll → VBox → Base/Condition으로 감쌌습니다.
+Result/Log 열람 자체가 실행이나 새로운 발견/기회를 만들지 않습니다.
+
+검증 자료는 `.godot/verification/step35/`에 있습니다. 실행용 게임에 참조하지 않고 `.godot/` Git 제외 정책을 유지합니다.
+새 `experiment_condition_validation.gd`와 `experiment_condition_edge_validation.gd`, 기존 검사 사본,
+`run_validation.ps1`, per-run log/pass certificate, editor import, source/test baseline 및 scope audit를 남겼습니다.
+기존 enum 크기와 Case02 연구 배열 추가에 따라 사본의 기대값만 확장하고 원본 테스트는 보존했습니다.
+기존 회귀 흐름의 expected source/text에는 실제 새 조건 관찰을 반영했습니다. 기존 판정 검사를 제거하지 않았습니다.
+
 
 ## 34단계 환경 조건에 따른 CCTV 추가 관찰과 실제 확인 기록
 

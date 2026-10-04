@@ -15,3 +15,4 @@ extends Resource
 @export var research_entries: Array[ResearchEntryData] = []
 @export var disturbance_reactions: Array[CaseDisturbanceReactionData] = []
 @export var cctv_condition_observations: Array[CCTVConditionObservationData] = []
+@export var experiment_condition_observations: Array[ExperimentConditionObservationData] = []

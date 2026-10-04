@@ -231,6 +231,7 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 			_append_source_research_entry(snapshot, research_entries, ResearchEntryData.SourceKind.EXPERIMENT, "EXPERIMENT", id, experiment.display_name, "%s\nResult: %s" % [experiment.description, experiment.result_text])
 		else:
 			_append_unavailable_research_entry(snapshot, "EXPERIMENT", id, "Executed Experiment")
+		_append_experiment_condition_observations(snapshot, research_entries, id)
 	if source_stage == Stage.EXPERIMENT:
 		return _order_research_log_snapshot(snapshot)
 	if not summary.room_id.strip_edges().is_empty():
@@ -716,7 +717,10 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 func _refresh_current_environment_conditions() -> void:
 	if _current_view is CCTVView or _current_view is ExperimentView or _current_view is ContainmentView:
 		var summary: EnvironmentConditions.Summary = _build_environment_summary()
-		view_host.custom_minimum_size.y = (500 if _current_view is CCTVView else 550) if not summary.entries.is_empty() else 360
+		if _current_view is ExperimentView:
+			view_host.custom_minimum_size.y = 580 if not summary.entries.is_empty() else 400
+		else:
+			view_host.custom_minimum_size.y = (500 if _current_view is CCTVView else 550) if not summary.entries.is_empty() else 360
 		_current_view.set_environment_conditions(summary)
 
 
@@ -806,7 +810,7 @@ func _order_research_log_snapshot(snapshot: ResearchLogView.Snapshot) -> Researc
 	var history: Array[Dictionary] = case_runtime.get_observed_research_sources()
 	var has_condition_observation: bool = false
 	for record: Dictionary in history:
-		if record.source_kind == ResearchEntryData.SourceKind.CCTV_CONDITION_OBSERVATION:
+		if record.source_kind in [ResearchEntryData.SourceKind.CCTV_CONDITION_OBSERVATION, ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION]:
 			has_condition_observation = true
 	if not has_condition_observation:
 		return snapshot
@@ -968,18 +972,30 @@ func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
 
 
 func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
-	if _current_stage != Stage.EXPERIMENT or not _is_active_view(experiment_view) or not _has_current_case_runtime():
+	if _current_stage != Stage.EXPERIMENT or not _is_active_view(experiment_view) or not experiment_view.is_visible_in_tree() or not _has_current_case_runtime():
 		return
-	var valid_source: bool = false
+	var source: ExperimentData
 	for experiment: ExperimentData in current_case.available_experiments:
 		if experiment != null and not experiment_id.strip_edges().is_empty() and experiment.experiment_id == experiment_id:
-			valid_source = true
+			source = experiment
 			break
 	var limit: int = current_case.experiment_limit
-	var approved: bool = valid_source and case_runtime.try_record_experiment_execution(experiment_id, limit)
+	# Freeze the display values before recording, discovery and this action's opportunity.
+	# The existing ID-only approval API remains compatible; additional observations
+	# require the actual selected Resource to be displayed in this active View.
+	var snapshot := ExperimentView.ConditionSnapshot.new()
+	var condition_ids: Array[String] = []
+	if source != null and case_runtime.can_execute_experiment(experiment_id, limit) and experiment_view.is_displaying_selected_experiment(source):
+		for data: ExperimentConditionObservationData in _get_active_experiment_condition_observations(experiment_id):
+			var condition: EnvironmentalDisturbanceData = _find_environment_condition_data(data.disturbance_id)
+			snapshot.entries.append(ExperimentView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text, condition.display_name if condition != null else "[Unavailable]", condition.condition_change_text if condition != null else "[Unavailable]"))
+			condition_ids.append(data.observation_id)
+	var approved: bool = source != null and case_runtime.try_record_experiment_execution(experiment_id, limit, condition_ids)
+	var displayed_ids: Array[String] = experiment_view.show_execution_result(experiment_id, approved, snapshot)
 	if approved:
 		_try_discover_research_entry(ResearchEntryData.SourceKind.EXPERIMENT, experiment_id)
-	experiment_view.show_execution_result(experiment_id, approved)
+		for id: String in displayed_ids:
+			_try_discover_research_entry(ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION, id)
 	experiment_view.update_execution_state(
 		case_runtime.get_experiment_execution_history(),
 		case_runtime.get_remaining_experiment_count(limit),
@@ -987,6 +1003,64 @@ func _on_experiment_execution_requested(experiment_id: String, experiment_view: 
 	)
 	if approved:
 		_try_process_failure_event_opportunity(experiment_view, "experiment:" + experiment_id)
+
+
+func _get_active_experiment_condition_observations(experiment_id: String) -> Array[ExperimentConditionObservationData]:
+	var result: Array[ExperimentConditionObservationData] = []
+	if not _has_current_case_runtime():
+		return result
+	var experiment_count: int = 0
+	for experiment: ExperimentData in current_case.available_experiments:
+		if experiment != null and experiment.experiment_id == experiment_id:
+			experiment_count += 1
+	if experiment_count != 1:
+		push_warning("Main: Experiment condition observation requires a unique Experiment ID; omitting observations.")
+		return result
+	var observations: Array[ExperimentConditionObservationData] = current_case.experiment_condition_observations
+	var id_counts: Dictionary[String, int] = {}
+	for data: ExperimentConditionObservationData in observations:
+		if data != null:
+			id_counts[data.observation_id] = id_counts.get(data.observation_id, 0) + 1
+	var applied_ids: Array[String] = []
+	for record: Dictionary in case_runtime.get_applied_disturbances():
+		if applied_ids.has(record.disturbance_id):
+			continue
+		applied_ids.append(record.disturbance_id)
+		var matches: Array[ExperimentConditionObservationData] = []
+		for data: ExperimentConditionObservationData in observations:
+			if data != null and data.experiment_id == experiment_id and data.disturbance_id == record.disturbance_id:
+				matches.append(data)
+		if matches.size() > 1:
+			push_warning("Main: duplicate Experiment condition mapping %s/%s; omitting observations." % [experiment_id, record.disturbance_id])
+			continue
+		if matches.is_empty():
+			continue
+		var data: ExperimentConditionObservationData = matches[0]
+		if data.observation_id.strip_edges().is_empty() or data.disturbance_id.strip_edges().is_empty() or id_counts.get(data.observation_id, 0) != 1 or data.display_name.strip_edges().is_empty() or data.observation_text.strip_edges().is_empty():
+			push_warning("Main: invalid Experiment condition observation ID/content; omitting observation.")
+			continue
+		result.append(data)
+	return result
+
+
+func _append_experiment_condition_observations(snapshot: ResearchLogView.Snapshot, entries: Array[ResearchEntryData], experiment_id: String) -> void:
+	if not _has_current_case_runtime():
+		return
+	# Read execution IDs, never the currently active environment.
+	for id: String in case_runtime.get_experiment_condition_observation_ids(experiment_id):
+		if not case_runtime.has_observed_research_source(ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION, id):
+			continue
+		var matches: Array[ExperimentConditionObservationData] = []
+		for data: ExperimentConditionObservationData in current_case.experiment_condition_observations:
+			if data != null and data.observation_id == id:
+				matches.append(data)
+		if matches.size() != 1 or matches[0].experiment_id != experiment_id:
+			push_warning("Main: recorded Experiment condition observation is missing or ambiguous; omitting observation.")
+			continue
+		var data: ExperimentConditionObservationData = matches[0]
+		_append_source_research_entry(snapshot, entries, ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION, "EXPERIMENT", id, "Condition Observation: " + data.display_name, data.observation_text)
+		if not snapshot.entries[-1].title.begins_with("Condition Observation:"):
+			snapshot.entries[-1].title = "Condition Observation: " + snapshot.entries[-1].title
 
 
 func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:

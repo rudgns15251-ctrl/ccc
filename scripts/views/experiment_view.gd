@@ -5,6 +5,25 @@ const EnvironmentConditions = preload("res://scripts/views/environment_condition
 signal experiment_execution_requested(experiment_id: String)
 signal cctv_review_requested
 
+class ConditionObservation extends RefCounted:
+	var observation_id: String
+	var display_name: String
+	var observation_text: String
+	var condition_name: String
+	var condition_change_text: String
+
+	func _init(id: String, title: String, text: String, environment_name: String, environment_text: String) -> void:
+		observation_id = id
+		display_name = title
+		observation_text = text
+		condition_name = environment_name
+		condition_change_text = environment_text
+
+
+class ConditionSnapshot extends RefCounted:
+	var entries: Array[ConditionObservation] = []
+
+
 @onready var description_label: Label = %Description
 @onready var experiment_list: VBoxContainer = %ExperimentList
 @onready var experiment_scroll: ScrollContainer = %ExperimentScroll
@@ -117,10 +136,27 @@ func _on_run_experiment_pressed() -> void:
 	experiment_execution_requested.emit(experiment.experiment_id)
 
 
-func show_execution_result(experiment_id: String, approved: bool) -> void:
+func show_execution_result(experiment_id: String, approved: bool, conditions: ConditionSnapshot = null) -> Array[String]:
+	var displayed_ids: Array[String] = []
 	var experiment: ExperimentData = _get_selected_experiment()
 	if approved and experiment != null and experiment.experiment_id == experiment_id:
 		result_label.text = _text_or_placeholder(experiment.result_text, "result_text", _selected_experiment_index)
+		_clear_condition_observations()
+		if conditions != null:
+			for entry: ConditionObservation in conditions.entries:
+				var label := Label.new()
+				label.text = "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s" % [entry.condition_name, entry.condition_change_text, entry.display_name, entry.observation_text]
+				label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				label.add_theme_font_size_override("font_size", 18)
+				label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				%ConditionObservationList.add_child(label)
+				displayed_ids.append(entry.observation_id)
+		%ResultScroll.scroll_vertical = 0
+	return displayed_ids
+
+
+func is_displaying_selected_experiment(experiment: ExperimentData) -> bool:
+	return is_node_ready() and is_visible_in_tree() and experiment != null and _get_selected_experiment() == experiment and _can_select_experiment(_selected_experiment_index)
 
 
 func update_execution_state(executed_ids: Array[String], remaining_count: int, experiment_limit: int) -> void:
@@ -160,6 +196,14 @@ func _update_execution_ui() -> void:
 
 func _reset_result() -> void:
 	result_label.text = "No experiment has been executed."
+	_clear_condition_observations()
+	%ResultScroll.scroll_vertical = 0
+
+
+func _clear_condition_observations() -> void:
+	for item: Node in %ConditionObservationList.get_children():
+		%ConditionObservationList.remove_child(item)
+		item.queue_free()
 
 
 func _text_or_placeholder(value: String, field_name: String, index: int) -> String:

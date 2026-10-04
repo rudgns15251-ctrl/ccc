@@ -76,16 +76,33 @@ theme_override_font_sizes/font_size = 22
 disabled = true
 text = "Run Experiment"
 
-[node name="ResultTitle" type="Label" parent="Center/Content/Workspace/Execution"]
+[node name="ResultScroll" type="ScrollContainer" parent="Center/Content/Workspace/Execution"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 152)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ResultContent" type="VBoxContainer" parent="Center/Content/Workspace/Execution/ResultScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ResultTitle" type="Label" parent="Center/Content/Workspace/Execution/ResultScroll/ResultContent"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-text = "RESULT"
+text = "EXPERIMENT RESULT"
 
-[node name="ResultText" type="Label" parent="Center/Content/Workspace/Execution"]
+[node name="ResultText" type="Label" parent="Center/Content/Workspace/Execution/ResultScroll/ResultContent"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
+
+[node name="ConditionObservationList" type="VBoxContainer" parent="Center/Content/Workspace/Execution/ResultScroll/ResultContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
 [node name="EnvironmentConditions" parent="Center/Content" instance=ExtResource("2_conditions")]
 unique_name_in_owner = true

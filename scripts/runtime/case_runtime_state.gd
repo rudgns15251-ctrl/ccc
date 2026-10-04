@@ -3,6 +3,8 @@ extends RefCounted
 
 var case_id: String = ""
 var _experiment_execution_history: Array[String] = []
+# IDs exposed at execution time; never derived from later active conditions.
+var _experiment_condition_observations: Dictionary[String, Array] = {}
 var _confirmed_containment_room_id: String = ""
 var _monitoring_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Result.UNDEFINED
 var _confirmed_broadcast_id: String = ""
@@ -20,6 +22,7 @@ func _init(case_identifier: String = "") -> void:
 func reset(case_identifier: String = "") -> void:
 	case_id = case_identifier
 	_experiment_execution_history.clear()
+	_experiment_condition_observations.clear()
 	_confirmed_containment_room_id = ""
 	_monitoring_result = MonitoringOutcomeData.Result.UNDEFINED
 	_confirmed_broadcast_id = ""
@@ -29,7 +32,7 @@ func reset(case_identifier: String = "") -> void:
 	_observed_research_sources.clear()
 
 
-func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
+func try_record_experiment_execution(experiment_id: String, limit: int, condition_observation_ids: Array[String] = []) -> bool:
 	if experiment_id.strip_edges().is_empty():
 		push_warning("CaseRuntimeState: cannot record an empty experiment_id.")
 		return false
@@ -39,6 +42,11 @@ func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
 	if not can_execute_experiment(experiment_id, limit):
 		return false
 	_experiment_execution_history.append(experiment_id)
+	var observed_ids: Array[String] = []
+	for id: String in condition_observation_ids:
+		if not id.strip_edges().is_empty() and not observed_ids.has(id):
+			observed_ids.append(id)
+	_experiment_condition_observations[experiment_id] = observed_ids
 	return true
 
 
@@ -60,6 +68,12 @@ func get_experiment_execution_history() -> Array[String]:
 
 func get_experiment_execution_count() -> int:
 	return _experiment_execution_history.size()
+
+
+func get_experiment_condition_observation_ids(experiment_id: String) -> Array[String]:
+	if not _experiment_condition_observations.has(experiment_id):
+		return []
+	return _experiment_condition_observations[experiment_id].duplicate()
 
 
 func try_confirm_containment_room(room_id: String) -> bool:
