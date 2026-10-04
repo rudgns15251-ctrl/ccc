@@ -44,17 +44,88 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="EntryScroll" type="ScrollContainer" parent="Center/Content"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(900, 160)
+[node name="Workspace" type="HBoxContainer" parent="Center/Content"]
 layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="EntryScroll" type="ScrollContainer" parent="Center/Content/Workspace"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 420)
+layout_mode = 2
+size_flags_horizontal = 3
 horizontal_scroll_mode = 0
 
-[node name="EntryList" type="VBoxContainer" parent="Center/Content/EntryScroll"]
+[node name="EntryList" type="VBoxContainer" parent="Center/Content/Workspace/EntryScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
+
+[node name="Notebook" type="VBoxContainer" parent="Center/Content/Workspace"]
+custom_minimum_size = Vector2(440, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Heading" type="Label" parent="Center/Content/Workspace/Notebook"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "WORKING HYPOTHESES"
+
+[node name="Hint" type="Label" parent="Center/Content/Workspace/Notebook"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player notes. No evaluation."
+autowrap_mode = 3
+
+[node name="HypothesisInput" type="TextEdit" parent="Center/Content/Workspace/Notebook"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+wrap_mode = 1
+placeholder_text = "Write your own working hypothesis."
+
+[node name="Actions" type="HBoxContainer" parent="Center/Content/Workspace/Notebook"]
+layout_mode = 2
+
+[node name="SaveHypothesisButton" type="Button" parent="Center/Content/Workspace/Notebook/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 36)
+layout_mode = 2
+text = "Add Hypothesis"
+
+[node name="CancelHypothesisButton" type="Button" parent="Center/Content/Workspace/Notebook/Actions"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(100, 36)
+layout_mode = 2
+text = "Cancel Edit"
+
+[node name="HypothesisStatus" type="Label" parent="Center/Content/Workspace/Notebook"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="HypothesisEmpty" type="Label" parent="Center/Content/Workspace/Notebook"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "No working hypotheses recorded."
+autowrap_mode = 3
+
+[node name="HypothesisScroll" type="ScrollContainer" parent="Center/Content/Workspace/Notebook"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="HypothesisList" type="VBoxContainer" parent="Center/Content/Workspace/Notebook/HypothesisScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
 [node name="NextButton" type="Button" parent="Center/Content"]
 unique_name_in_owner = true

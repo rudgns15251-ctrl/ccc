@@ -17,6 +17,7 @@ ResearchArchiveState는 결과 확정 여부와 관계없이 획득한 Case별 R
 환경 교란이 실제 발생하면 현재 Case의 해당 reaction_id를 OBSERVATION으로 추가합니다. 발생 전에는 표시/발견하지 않습니다. Notice는 시설 조건 변화와 현재 관찰 사실만 보여주며 원인 Case나 숨겨진 성공/실패를 공개하지 않습니다. Dismiss 후 동일 View를 이어갑니다.
 적용된 교란은 현재 Case Runtime의 활성 환경 조건입니다. CCTV / EXPERIMENT / CONTAINMENT의 **ACTIVE FACILITY CONDITION**에서 계속 확인할 수 있으며, Dismiss와 Research Log Open/Back으로 사라지지 않습니다. Runtime 교체/reset 시 초기화하며 다른 Case로 자동 승계하지 않습니다.
 CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응하는 **CONDITION OBSERVATION**을 별도로 표시합니다. 활성 조건이 있으면 Experiment / Containment의 **Recheck CCTV**로 다시 확인하고 원래 화면으로 돌아올 수 있습니다. 추가 관찰 Research는 CCTV에 실제 표시된 뒤에만 발견하며, Overlay를 본 것만으로는 발견하지 않습니다.
+Research Log의 WORKING HYPOTHESES에서 현재 Case의 자유 메모를 Add/Edit/Delete할 수 있습니다. Main 소유 WorkingHypothesisState가 Case별로 세션 동안 유지하며, Runtime 교체와 ResearchArchive 초기화로 삭제되지 않습니다. 가설을 추천하거나 평가하지 않고 연구 발견/게임 판정에도 연결하지 않습니다.
 최종 게임 시스템과 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
@@ -628,6 +629,175 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 36단계 플레이어 작성 Working Hypothesis Notebook
+
+기존 프로젝트를 확장했습니다. 작업 전 HEAD는 `7e4dfe4542fb3bfe439098260b66804733115f01`,
+브랜치는 `master`(`origin/main` 추적), Git working tree는 깨끗했습니다.
+제품 파일 91개와 기존 검증 GDScript/PowerShell 소스 1,604개를 조사하고 SHA256 기준선을 남겼습니다.
+Main/Runtime/Archive/ResearchLog Snapshot·Script·Scene/ResearchEntry와 발견 경계,
+실제 Case01→02 sequence와 Runtime 교체, 네 정상 화면의 Log 진입, CCTV Recheck,
+stale/modal 방어, 기존 테스트·README·프로젝트 설정을 확인했습니다.
+
+가설은 **플레이어가 작성한 개인 메모**입니다. 공식 ResearchEntry, 게임 판정, 정답 후보가 아닙니다.
+추천/자동 생성/평가/확률/정답 일치/환경 또는 Evidence 자동 연결은 없습니다.
+서로 모순되는 생각, 임의 단어·기호·욕설·BBCode 같은 문자열도 내용 그대로 기록합니다.
+Label/TextEdit의 plain text로 표시하며 문자열의 의미를 해석하지 않습니다.
+Step34~35의 condition observations are supporting/optional evidence 원칙도 유지합니다.
+
+`WorkingHypothesisState`는 Main이 생성/소유하는 세션 `RefCounted`입니다.
+CaseRuntimeState/ResearchArchiveState에 넣지 않았습니다. Runtime 종료/reset/교체 후에도
+메모가 남아야 하고 Research 발견 ID와는 다른 데이터이기 때문입니다.
+`Dictionary[String, Array]`에 Case ID별 작성 순서의 `{hypothesis_id, text}`만 저장합니다.
+각 Case의 단조 증가 counter로 `HYP_001`, `HYP_002` 등을 발급합니다. Array index는 identity가 아닙니다.
+Delete, clear_case, clear_all은 record만 지우고 counter는 유지하므로 같은 세션에서 ID를 재사용하지 않습니다.
+새 Main/State 생성으로 새 세션이 시작됩니다. 다른 Case의 같은 ID는 Case ID와 함께 구분합니다.
+
+API는 `add_hypothesis(case_id, text) → String`(실패 시 빈 ID),
+`update_hypothesis(...) → bool`, `remove_hypothesis(...) → bool`,
+`get_hypotheses(case_id) → Array[Dictionary]`, `clear_case(case_id)`, `clear_all()` 여섯 개입니다.
+Getter는 각 record를 deep copy합니다. 없는 Case는 empty Array이며 존재하지 않는 ID 수정/삭제는 false입니다.
+Add/Update는 앞뒤 whitespace만 제거하고 빈/whitespace-only/500자 초과 입력은 거부합니다.
+내부 newline/기호/내용은 보존하고 자동 수정/조용한 truncation은 없습니다.
+`WorkingHypothesisState.MAX_TEXT_LENGTH = 500` 한 곳에서 조절합니다. **prototype UI safety limit**이며 밸런스가 아닙니다.
+Godot String.length 기준으로 Unicode 문자 길이를 검사하고 500개 emoji도 테스트했습니다.
+
+```text
+WorkingHypothesisState (세션/Case ID별 실제 메모)
+  → Main._build_research_log_snapshot()
+  → 기존 ResearchLogView.Snapshot + 복사된 hypotheses / UI max length
+  → View: 기존 Research 목록 옆 WORKING HYPOTHESES
+      TextEdit → Add / Edit → Update / Cancel Edit / Delete
+  → Case ID + text / stable hypothesis ID를 담은 request signal
+  → Main: RESEARCH_LOG Stage + active/visible View + current Case/Runtime + View Case ID 검증
+  → State API 승인
+  → 복사된 갱신 목록만 View에 전달, Research 영역과 gameplay는 건드리지 않음
+```
+
+ResearchLogView는 State instance를 찾거나 읽지 않습니다. Snapshot과 Main의 승인 응답만 받습니다.
+Add/Update 성공 시 입력과 edit ID를 비우고 목록을 즉시 갱신합니다.
+Edit는 현재 ID의 text를 같은 multiline TextEdit로 불러오고 focus합니다. Update는 ID와 위치를 유지합니다.
+Cancel Edit는 임시 입력만 버립니다. Delete는 confirmation modal 없이 즉시 요청하며 다른 메모의 draft는 보존합니다.
+실패한 요청은 입력을 유지하고 저장되지 않았다는 중립 메시지를 표시합니다. 입력의 정답성 평가가 아닙니다.
+빈 목록에는 `No working hypotheses recorded.`를 표시합니다.
+Back 시 저장하지 않은 draft는 View와 함께 사라지며, 승인된 메모는 세션 State에 유지됩니다.
+
+Scene은 기존 Content 안에 HBox Workspace를 두어 왼쪽 기존 EntryScroll/EntryList와 오른쪽 Notebook을 함께 표시합니다.
+기존 Research 행 생성·카테고리·문구·발견·정렬 코드는 유지합니다. 기존 900 폭을 440+20+440으로 나누고
+Research Scroll 높이는 160→420으로 늘렸습니다. Notebook 목록은 높이 160 Scroll이며 모든 메모 Label은 wrap합니다.
+TextEdit는 높이 96, soft wrap/multiline입니다. 길이 표시와 초과 안내를 제공하고 유효 입력만 Add/Update를 활성화합니다.
+Research Log ViewHost만 660으로 확보했습니다. 다른 화면의 높이/게임 흐름/저장된 Main Scene/Stretch는 그대로입니다.
+Enter는 TextEdit newline 입력, Escape는 기존 navigation shortcut이 없으므로 화면을 이동하지 않습니다.
+새 키 바인딩, 자동 저장, 이벤트 처리기를 만들지 않았습니다. Log 입력·CRUD는 Gameplay Opportunity가 아닙니다.
+
+### 요청한 82개 항목 보고
+
+| 번호 | 확인 항목 | 구현 및 검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | 위 HEAD/브랜치, 미커밋 변경 0. 이번 작업에서 commit/push 없음. |
+| 2 | State 구조 | Main 소유 RefCounted. Case별 Array/ID counter만, Manager/Resource/Autoload 아님. |
+| 3 | 세션 범위 | 플레이어 메모를 Runtime 사실/Research 발견에서 분리하여 handoff 후에도 유지. |
+| 4 | Case 분리 | Dictionary의 case_id 키, 다른 Case 목록을 현재 UI에 넘기지 않음. |
+| 5 | ID 생성 | Case별 단조 counter → HYP_001 등. index identity 없음. |
+| 6 | ID 재사용 | 삭제/clear_case/clear_all 후에도 counter 유지. 새 State만 새 세션. |
+| 7 | Record | hypothesis_id/text 두 필드, 작성 순서는 Array 위치로 유지. gameplay 필드 없음. |
+| 8 | API | add/update/remove/get/clear_case/clear_all 여섯 메서드, bool/빈 ID로 실패 반환. |
+| 9 | Getter | Array 및 각 Dictionary deep copy, 외부 수정으로 원본 불변. |
+| 10 | Whitespace | 앞뒤 strip_edges. 내부 newline/공백/내용 보존. empty/whitespace-only 거부. |
+| 11 | 최대 길이 | MAX_TEXT_LENGTH=500 한 곳. UI/State 동일 reject 정책, truncate 없음, UI safety 명시. |
+| 12 | Resource | 메모는 RefCounted만. .tres/CaseData/ResearchEntry 변경 없음. |
+| 13 | Main 소유 | _ready에서 한 번 생성, handoff/Runtime reset/Log 재생성으로 교체하지 않음. |
+| 14 | Log 통합 | 기존 Stage/Snapshot에 hypotheses 복사 데이터, 별도 WORKING HYPOTHESES Section. |
+| 15 | 기존 Research | EntryList 생성/내용 그대로, 옆 영역에서 계속 wrap/scroll 열람 가능. |
+| 16 | 입력 UI | 여러 문장·newline을 담기 위한 multiline/soft-wrap TextEdit. |
+| 17 | Add | 승인된 현재 Case에 추가 → 목록 즉시 refresh → 입력/편집 ID 초기화. |
+| 18 | Edit | 같은 ID의 text 로드/focus → Update로 text만 수정. Cancel은 State 변경 없음. |
+| 19 | Delete | 현재 Case/ID 삭제, 즉시 refresh. confirmation modal 없음, 다른 연구/gameplay 불변. |
+| 20 | Empty | No working hypotheses recorded. 메모 없는 Case도 입력 가능. |
+| 21 | 순서 | 작성 순서, 자동 알파벳 정렬 없음. |
+| 22 | Edit 순서 | 기존 Dictionary text만 갱신, ID/상대 위치 유지. |
+| 23 | Delete 순서 | 해당 record만 제거, 남은 상대 순서 유지. |
+| 24 | View 재생성 | queue_free/recreate해도 State 기록 유지. 임시 미저장 draft만 사라짐. |
+| 25 | Open/Back | Add → Back → Open에서 같은 ID/text 확인. |
+| 26 | 승인 경계 | Main의 _can_edit_hypotheses에서 Stage/active/visible/Case Runtime/Case ID/View ID 검증. |
+| 27 | Active View | 기존 _is_active_view를 사용, detached/queued/modal 상태 거부. |
+| 28 | Stale 방어 | Back/교체/handoff 이전 View의 Add/Update/Delete 늦은 signal 무효. |
+| 29 | 현재 Case UI | Snapshot/current_case의 notes만 표시/편집, 다른 Case 조회 UI 없음. |
+| 30 | Case01/02 | handoff 후 Case01 State는 유지, Case02 UI empty로 시작, Case02 작성 후 독립 목록. |
+| 31 | Runtime reset | reset 및 new instance 후 기존 Case02 notes 유지. Runtime 코드 변경 없음. |
+| 32 | Archive | Archive reset은 notes 유지, notes clear는 Archive 유지. |
+| 33 | Pending | CRUD 전후 Pending instance/Case/Room 기록 불변. |
+| 34 | Resolution | CRUD 전후 hidden resolution 기록 불변. |
+| 35 | Candidate | CRUD 전후 candidate/threshold/기회 수 불변. |
+| 36 | Gameplay | Room/Outcome/limit/Incident/Disturbance/Research/RNG/기회 상태 전후 비교. 변경 없음. |
+| 37 | 평가 없음 | 맞음/틀림/정답 접근성/Containment 일치 feedback 없음. |
+| 38 | 자동 가설 없음 | Research 발견을 notes add/update와 연결하지 않음. |
+| 39 | Preset 없음 | 자유 TextEdit만, LIGHT/SOUND 같은 후보 선택 UI/Resource 필드 없음. |
+| 40 | 환경 연결 없음 | 교란/조건 관찰이 notes를 생성/수정/삭제하지 않음. |
+| 41 | Confidence | 확률/slider/score/status/AI 평가 없음. |
+| 42 | Evidence | entry_id/source_id 연결/pin/reference 필드/코드 없음. |
+| 43 | 모순 허용 | 빛이 원인/무관하다는 메모 동시 저장 허용. 임의 기호·BBCode·욕설 문자열도 plain text 유지. |
+| 44 | Research 발견 | hypothesis_id를 discovery/observed source에 넣지 않음. 새 SourceKind 없음. |
+| 45 | Archive merge | notes를 ResearchArchive에 merge하지 않음. 기존 discovered entry ID 정책 그대로. |
+| 46 | 0개 UI | empty label, 기존 연구 목록/입력/버튼 정상. |
+| 47 | 1개 UI | stable ID/text/Edit/Delete 표시와 Back/Open 유지. |
+| 48 | 5개 UI | 순서/wrap/목록 scroll/마지막 메모 Edit/Delete. |
+| 49 | 20개 UI | 독립 fixture 최대 길이 20행; 마지막 행 액션까지 scroll 접근. 실제 콘텐츠 추가 없음. |
+| 50 | 긴 텍스트 | 500자 Unicode 및 multiline, wrap/scroll/edit/delete 안전. 501자는 거부. |
+| 51 | Keyboard | TextEdit focus 후 실제 Enter/Escape key event. Enter newline, navigation/save 미발생. |
+| 52 | Opportunity 없음 | 입력/CRUD/Log Open/Back 중 processed opportunity/Candidate/RNG 불변. |
+| 53 | Save/Load | 세션 메모리만, 디스크 저장/게임 재시작 복원 없음. |
+| 54 | 미래 Archive | get_hypotheses(case_id)로 과거 Case notes 조회 가능, Archive 화면 미구현. |
+| 55 | Identity | case_id + hypothesis_id 쌍. 다른 Case의 HYP_001 허용/분리 검증. |
+| 56 | Invalid Case | empty/공백/현재 Case 아닌 UI 요청 거부, 기존 다른 Case notes 보존. |
+| 57 | Invalid ID | nonexistent/empty/공백 Update/Delete false, 다른 record 불변. |
+| 58 | Invalid text | empty/공백/newline-only add/update 거부, text 자동 truncation 없음. |
+| 59 | Duplicate ID | 200개 독립 생성 fixture에서 uniqueness 확인, 삭제/clear 후 재사용 없음. |
+| 60 | Max length | 500개 emoji/500자 일반 텍스트 허용, 501자 거부. trim 후 검사 일관성. |
+| 61 | Add 테스트 | 요청 A 문구 저장/앞뒤 정리/입력 clear/현재 Case 즉시 표시. |
+| 62 | Edit 테스트 | 요청 B 문구로 same ID/order 수정, Cancel draft 불저장. |
+| 63 | Delete 테스트 | 중간 메모 삭제 후 상대 순서 보존, 연구/Archive/gameplay 불변. |
+| 64 | Handoff 테스트 | 실제 Case01→02 정상 handoff, Case01 note State 유지, 새 Case UI 미표시. |
+| 65 | Case02 테스트 | 새 note를 Case02에만 기록, Case01 목록 그대로. |
+| 66 | Runtime 재생성 | Case02 Runtime reset/new + Archive reset 후 notes 유지. |
+| 67 | Stale 테스트 | queued old Log의 이전 Case/새 Case request 모두 차단. hidden/detached/mismatch도 거부. |
+| 68 | Research Log 회귀 | Profile/CCTV/Experiment/Containment/Reaction/CCTV 조건/EXP 조건/authored/fallback/discovery order/Open Back 유지. |
+| 69 | Hidden Resolution | 기존 handoff/Pending/Outcome/한 번 판정/Failure Candidate 회귀, 코드 변경 없음. |
+| 70 | Disturbance | 기존 opportunity/modal/input-block/Dismiss/Active Environment/Case 반응 회귀. |
+| 71 | CCTV 조건 | Recheck/Back/조건 관찰 실제 확인/순서/제한/Research 회귀. 구현 파일 변경 없음. |
+| 72 | EXP 조건 | 실행 당시 ID snapshot/Base 유지/무료 재실행 없음/no retroactive/다음 실험 영향 회귀. |
+| 73 | ResearchArchive | 기존 Case ID+entry ID merge/dedup/유효 발견/reset 분리 회귀. |
+| 74 | Monitoring | 독립 debug Main의 playback/SUCCESS/FAILURE/UNDEFINED 회귀, 정상 Timer 추가 없음. |
+| 75 | Failure debug | Incident/Broadcast 선택·확정/IncidentResult/Result/잘못된 매핑/미확정 진행 차단 유지. |
+| 76 | 해상도/Stretch | 1920×1080, 1280×720, 1024×768 창; canvas_items/keep/resizable 및 1920×1080 논리 UI 보존. GPU 캡처 27개 중 empty/1/5/20 및 마지막 액션 대표 7개 육안 확인. 1024×768의 viewport texture는 비율 유지로 1024×576. |
+| 77 | 파싱/실행 | Godot 4.7.1 official.a13da4feb: 176개 검사(Headless 105 / GPU 71) 통과. 제품 GDScript 36개 check-only, 최종 editor import와 실제 Main/Notebook 실행은 오류·경고 0. 의도적 invalid fixture의 기존 예상 경고 수도 일치. null Snapshot 오류 수정 후 전체 재실행 완료. |
+| 78 | 문제/해결 | 자동 UI 입력 테스트에서 TextEdit.text setter와 사용자 text_changed를 구분해 수정. Scroll 밖 Delete를 클릭하던 fixture는 실제 scroll 후 클릭으로 수정. 동적 Main Archive fixture는 typed String ID 배열로 수정. 기존 독립 Research Log fixture의 높이 360을 현재 Main과 같은 660으로 조정했고 기존 레이아웃 assertions는 유지. null Snapshot 회귀에서 typed Array에 untyped 빈 Array를 대입하는 런타임 오류를 발견해 clear 후 유효 Snapshot만 복사하도록 수정. |
+| 79 | 변경 파일 | 아래 기존 4개 수정/새 2개/삭제 0, git diff --check 통과. |
+| 80 | 미커밋 보존 | 시작 시 변경 0. 기존 제품 87개와 이전 검증 소스 1,604개 byte-identical. commit/push 없음. |
+| 81 | 제외 기능 | 추천/preset/정답평가/confidence/AI/evidence/pin/Archive UI/SaveLoad/Severity/MAJOR/Campaign/Case03/자동 Broadcast/Manager/Singleton/EventBus/최종 UI 없음. |
+| 82 | 다음 단계 | 자유 메모 작성 흐름과 가독성을 먼저 사용 검토. 향후 Evidence 연결이 필요하면 authored/fallback을 모두 식별하는 정책부터 설계하고, 가설 평가·정답 시스템에는 자동 연결하지 않음. |
+
+### 변경 파일과 최종 구조
+
+생성:
+- `scripts/runtime/working_hypothesis_state.gd`: Case별 session records와 여섯 API.
+- `scripts/runtime/working_hypothesis_state.gd.uid`: Godot 생성 stable UID.
+
+수정:
+- `scripts/main/main.gd`: State 소유/Snapshot 복사/세 request 승인/Log 영역 높이.
+- `scripts/views/research_log_view.gd`: 기존 Snapshot에 표시 데이터 추가, TextEdit/목록/CRUD request/승인 응답.
+- `scenes/views/research_log_view.tscn`: 기존 EntryScroll 옆 Notebook, multiline input/버튼/상태/empty/목록 Scroll.
+- `README.md`: 현재 설명과 82개 항목 보고.
+
+삭제 없음. project.godot/Main Scene/두 Case .tres/모든 Data Resource/기존 다섯 State와 다른 View는 보존했습니다.
+기존 Research 행 생성과 공개/정렬/발견/Archive 함수는 유지하며 Main의 승인 request 세 개와 공통 guard만 추가했습니다.
+기존 Research Snapshot과 View API는 기본 empty notes 값을 가지므로 기존 standalone/debug 검사와 호환됩니다.
+
+검증 소스/로그/캡처/baseline/pass certificate/scope audit는 `.godot/verification/step36/`에 남겼습니다.
+게임은 이 자료를 참조하지 않고 `.godot/` Git 제외 설정도 그대로입니다.
+신규 `hypothesis_state_validation.gd`, `hypothesis_validation.gd`와 기존 검증 사본을 사용했습니다.
+기존 검증 소스에는 수정이 없으며, 새 정상 Stage나 콘텐츠 Resource도 추가하지 않았습니다.
+
 
 ## 35단계 실행 당시 환경에 따른 Experiment 추가 관찰
 

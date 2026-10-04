@@ -39,6 +39,7 @@ const VIEW_SCENES: Array[PackedScene] = [
 
 var case_runtime: CaseRuntimeState
 var research_archive: ResearchArchiveState
+var working_hypotheses: WorkingHypothesisState
 var pending_containment: PendingContainmentState
 var containment_resolutions: ContainmentResolutionState
 var failure_candidates: FailureEventCandidateState
@@ -67,6 +68,7 @@ func _ready() -> void:
 	_validate_case()
 	case_runtime = CaseRuntimeState.new(current_case.case_id if current_case != null else "")
 	research_archive = ResearchArchiveState.new()
+	working_hypotheses = WorkingHypothesisState.new()
 	pending_containment = PendingContainmentState.new()
 	containment_resolutions = ContainmentResolutionState.new()
 	failure_candidates = FailureEventCandidateState.new()
@@ -154,7 +156,11 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		result_view.setup(_build_result_summary())
 	elif stage == Stage.RESEARCH_LOG:
 		var research_log_view: ResearchLogView = _current_view as ResearchLogView
+		view_host.custom_minimum_size.y = 660
 		research_log_view.advance_requested.connect(_on_research_log_back_requested.bind(research_log_view))
+		research_log_view.hypothesis_add_requested.connect(_on_hypothesis_add_requested.bind(research_log_view))
+		research_log_view.hypothesis_update_requested.connect(_on_hypothesis_update_requested.bind(research_log_view))
+		research_log_view.hypothesis_remove_requested.connect(_on_hypothesis_remove_requested.bind(research_log_view))
 		research_log_view.setup(_build_research_log_snapshot())
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
@@ -208,6 +214,9 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 	var research_entries: Array[ResearchEntryData] = _get_valid_research_entries()
 	snapshot.case_id = summary.case_id
 	snapshot.case_display_name = summary.case_display_name
+	if _has_current_case_runtime() and working_hypotheses != null:
+		snapshot.hypotheses = working_hypotheses.get_hypotheses(snapshot.case_id)
+		snapshot.hypothesis_max_length = WorkingHypothesisState.MAX_TEXT_LENGTH
 	_append_disturbance_observations(snapshot, research_entries)
 	_append_cctv_condition_observations(snapshot, research_entries)
 	var profile: ProfileData = current_case.profile_data if current_case != null else null
@@ -277,6 +286,31 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 				else:
 					_append_unavailable_research_entry(snapshot, "INCIDENT", summary.option.result_id if summary.option != null else "", "Incident Result")
 	return _order_research_log_snapshot(snapshot)
+
+
+func _can_edit_hypotheses(case_id: String, view: ResearchLogView) -> bool:
+	return _current_stage == Stage.RESEARCH_LOG and _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
+
+
+func _on_hypothesis_add_requested(case_id: String, text: String, view: ResearchLogView) -> void:
+	if not _can_edit_hypotheses(case_id, view):
+		return
+	var approved: bool = not working_hypotheses.add_hypothesis(case_id, text).is_empty()
+	view.show_hypothesis_request_result(approved, working_hypotheses.get_hypotheses(case_id))
+
+
+func _on_hypothesis_update_requested(case_id: String, id: String, text: String, view: ResearchLogView) -> void:
+	if not _can_edit_hypotheses(case_id, view):
+		return
+	var approved: bool = working_hypotheses.update_hypothesis(case_id, id, text)
+	view.show_hypothesis_request_result(approved, working_hypotheses.get_hypotheses(case_id))
+
+
+func _on_hypothesis_remove_requested(case_id: String, id: String, view: ResearchLogView) -> void:
+	if not _can_edit_hypotheses(case_id, view):
+		return
+	var approved: bool = working_hypotheses.remove_hypothesis(case_id, id)
+	view.show_hypothesis_request_result(approved, working_hypotheses.get_hypotheses(case_id), id)
 
 
 func _get_valid_research_entries() -> Array[ResearchEntryData]:
