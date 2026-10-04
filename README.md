@@ -637,6 +637,16 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
 
+## 38단계 Core Loop UX / 구조 감사
+
+새 Gameplay 기능 없이 현재 동선·클릭 수·정보 밀도·추리 효용·State/표시 경계를 감사했습니다.
+정상 Case의 격리 확정은 최소 5클릭, 다음 Case 인계는 6클릭이며,
+환경 변화·CCTV 재확인·조건 실험·가설 생성/편집을 포함한 검증 동선은 19클릭입니다.
+현재 테스트 콘텐츠의 단서→Room 판단 연결과 조건 관찰의 시점별 접근성은 후속 검증 과제로 보고했습니다.
+Main 상단과 Experiment 재진입의 잘못된 안내 문구만 수정했습니다.
+요청한 85개 종료 항목, UX Audit/Journey 표, 구조 수치와 검증 결과는
+[Step38 감사 보고서](docs/step38_core_loop_audit.md)에 있습니다. 커밋·push는 하지 않았습니다.
+
 ## 37단계 읽기 전용 Research Archive
 
 기존 프로젝트를 확장했습니다. 작업 전 HEAD는 `4295dd1103d162edc37ca180ccab7ec085f3d483`,

@@ -55,7 +55,7 @@ horizontal_alignment = 1
 [node name="Notice" type="Label" parent="Margin/Center/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Temporary navigation only — no gameplay"
+text = "Temporary Case gameplay prototype — test content"
 horizontal_alignment = 1
 
 [node name="ViewHost" type="Control" parent="Margin/Center/Content"]

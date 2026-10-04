@@ -165,6 +165,8 @@ func update_execution_state(executed_ids: Array[String], remaining_count: int, e
 	_experiment_limit = maxi(experiment_limit, 0)
 	if is_node_ready():
 		_update_execution_ui()
+		if not _executed_ids.is_empty() and result_label.text == "No experiment has been executed.":
+			result_label.text = "No result selected. Review executed experiments in Research Log."
 
 
 func _can_select_experiment(index: int) -> bool:
@@ -195,7 +197,7 @@ func _update_execution_ui() -> void:
 
 
 func _reset_result() -> void:
-	result_label.text = "No experiment has been executed."
+	result_label.text = "No experiment has been executed." if _executed_ids.is_empty() else "No result selected. Review executed experiments in Research Log."
 	_clear_condition_observations()
 	%ResultScroll.scroll_vertical = 0
 
