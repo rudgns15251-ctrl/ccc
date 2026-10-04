@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/views/containment_view.gd" id="1_containment"]
+
+[ext_resource type="PackedScene" path="res://scenes/views/environment_conditions_view.tscn" id="2_conditions"]
 
 [node name="ContainmentView" type="Control"]
 layout_mode = 3
@@ -50,6 +52,19 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
+[node name="EnvironmentConditions" parent="Center/Content" instance=ExtResource("2_conditions")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RecheckCCTVButton" type="Button" parent="Center/Content"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(240, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 18
+text = "Recheck CCTV"
+
 [node name="Actions" type="HBoxContainer" parent="Center/Content"]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -70,7 +85,7 @@ layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 28
 disabled = true
-text = "Next: MONITORING"
+text = "Next: CASE"
 
 [node name="OpenResearchLogButton" type="Button" parent="Center/Content/Actions"]
 unique_name_in_owner = true

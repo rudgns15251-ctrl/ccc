@@ -1,0 +1,123 @@
+[gd_resource type="Resource" script_class="CaseData" load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
+[ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
+[ext_resource type="Script" path="res://scripts/data/cctv_data.gd" id="3_cctv"]
+[ext_resource type="Script" path="res://scripts/data/experiment_data.gd" id="4_experiment"]
+[ext_resource type="Script" path="res://scripts/data/containment_data.gd" id="5_containment"]
+[ext_resource type="Script" path="res://scripts/data/research_entry_data.gd" id="6_research"]
+[ext_resource type="Script" path="res://scripts/data/case_disturbance_reaction_data.gd" id="7_reaction"]
+[ext_resource type="Script" path="res://scripts/data/cctv_condition_observation_data.gd" id="8_cctv_condition"]
+
+[sub_resource type="Resource" id="Resource_profile"]
+script = ExtResource("2_profile")
+profile_id = "TEST_CASE02_PROFILE_01"
+subject_name = "TEST SUBJECT CASE 02"
+classification = "TEST CLASSIFICATION CASE 02"
+basic_description = "Temporary Case 02 profile for sequential case handoff verification."
+
+[sub_resource type="Resource" id="Resource_cctv"]
+script = ExtResource("3_cctv")
+camera_id = "TEST_CASE02_CAM_01"
+observation_text = "Temporary Case 02 CCTV observation for prototype verification."
+
+[sub_resource type="Resource" id="Resource_experiment_01"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_CASE02_EXP_01"
+display_name = "TEST CASE 02 EXPERIMENT 01"
+description = "Temporary Case 02 experiment 01 for sequential flow verification."
+result_text = "Temporary result for TEST CASE 02 EXPERIMENT 01."
+
+[sub_resource type="Resource" id="Resource_experiment_02"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_CASE02_EXP_02"
+display_name = "TEST CASE 02 EXPERIMENT 02"
+description = "Temporary Case 02 experiment 02 for sequential flow verification."
+result_text = "Temporary result for TEST CASE 02 EXPERIMENT 02."
+
+[sub_resource type="Resource" id="Resource_room_01"]
+script = ExtResource("5_containment")
+room_id = "TEST_CASE02_ROOM_01"
+display_name = "TEST CASE 02 ROOM 01"
+description = "Temporary Case 02 containment candidate; no resolution is defined."
+
+[sub_resource type="Resource" id="Resource_room_02"]
+script = ExtResource("5_containment")
+room_id = "TEST_CASE02_ROOM_02"
+display_name = "TEST CASE 02 ROOM 02"
+description = "Temporary Case 02 containment candidate; no resolution is defined."
+
+[sub_resource type="Resource" id="Resource_research_profile"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_PROFILE_01"
+source_kind = 0
+source_id = "TEST_CASE02_PROFILE_01"
+title = "Test Case 02 subject record"
+body_text = "Temporary research record for TEST SUBJECT CASE 02 under TEST CLASSIFICATION CASE 02."
+
+[sub_resource type="Resource" id="Resource_research_experiment_01"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_EXP_01"
+source_kind = 2
+source_id = "TEST_CASE02_EXP_01"
+title = "Test Case 02 experiment 01 record"
+body_text = "The temporary result of Case 02 experiment 01 was displayed after execution."
+
+[sub_resource type="Resource" id="Resource_research_room_01"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_ROOM_01"
+source_kind = 3
+source_id = "TEST_CASE02_ROOM_01"
+title = "Test Case 02 room 01 submission"
+body_text = "The player confirmed temporary room 01 for Case 02. Its containment result remains pending."
+
+[sub_resource type="Resource" id="Resource_reaction_power"]
+script = ExtResource("7_reaction")
+reaction_id = "TEST_CASE02_REACTION_POWER_OFF"
+disturbance_id = "TEST_DIST_POWER_FAILURE"
+display_name = "Unplanned Observation: TEST LIGHTING INTERRUPTION"
+observation_text = "After the lighting interruption, subject movement became less frequent. Repeated wall contact continued."
+
+[sub_resource type="Resource" id="Resource_reaction_ventilation"]
+script = ExtResource("7_reaction")
+reaction_id = "TEST_CASE02_REACTION_VENTILATION"
+disturbance_id = "TEST_DIST_VENTILATION_INSTABILITY"
+display_name = "Unplanned Observation: TEST AIRFLOW INTERRUPTION"
+observation_text = "During intermittent airflow, repeated wall contact continued. Subject movement remained intermittent."
+
+[sub_resource type="Resource" id="Resource_research_reaction_power"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_REACTION_POWER_OFF"
+source_kind = 8
+source_id = "TEST_CASE02_REACTION_POWER_OFF"
+title = "Unplanned Observation: test lighting interruption"
+body_text = "With LIGHT changed from NORMAL to OFF, subject movement became less frequent while repeated wall contact continued."
+
+[sub_resource type="Resource" id="Resource_cctv_condition_power"]
+script = ExtResource("8_cctv_condition")
+observation_id = "TEST_CASE02_POWER_CCTV_OBS"
+cctv_id = "TEST_CASE02_CAM_01"
+disturbance_id = "TEST_DIST_POWER_FAILURE"
+display_name = "TEST CCTV OBSERVATION - LIGHTING INTERRUPTION"
+observation_text = "TEST observation: After the lighting interruption, movement across the room became less frequent. Repeated wall contact continued without a clear change."
+
+[sub_resource type="Resource" id="Resource_research_cctv_condition_power"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_POWER_CCTV_OBS"
+source_kind = 9
+source_id = "TEST_CASE02_POWER_CCTV_OBS"
+title = "Test CCTV follow-up: lighting interruption"
+body_text = "During CCTV recheck after LIGHT changed from NORMAL to OFF, movement across the room was less frequent. Repeated wall contact continued without a clear change. This is a temporary observation record."
+
+[resource]
+script = ExtResource("1_case")
+case_id = "TEST_CASE_02"
+display_name = "TEST CASE 02"
+experiment_limit = 2
+profile_data = SubResource("Resource_profile")
+cctv_data = SubResource("Resource_cctv")
+available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02")])
+available_containment_rooms = Array[ExtResource("5_containment")]([SubResource("Resource_room_01"), SubResource("Resource_room_02")])
+research_entries = Array[ExtResource("6_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_experiment_01"), SubResource("Resource_research_room_01"), SubResource("Resource_research_reaction_power"), SubResource("Resource_research_cctv_condition_power")])
+disturbance_reactions = Array[ExtResource("7_reaction")]([SubResource("Resource_reaction_power"), SubResource("Resource_reaction_ventilation")])
+cctv_condition_observations = Array[ExtResource("8_cctv_condition")]([SubResource("Resource_cctv_condition_power")])

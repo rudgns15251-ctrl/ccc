@@ -5,12 +5,14 @@ class Entry extends RefCounted:
 	var source_id: String
 	var title: String
 	var body_text: String
+	var source_kind: int = -1
 
-	func _init(entry_category: String, entry_source_id: String, entry_title: String, entry_body_text: String) -> void:
+	func _init(entry_category: String, entry_source_id: String, entry_title: String, entry_body_text: String, entry_source_kind: int = -1) -> void:
 		category = entry_category
 		source_id = entry_source_id
 		title = entry_title
 		body_text = entry_body_text
+		source_kind = entry_source_kind
 
 
 class Snapshot extends RefCounted:

@@ -1,5 +1,7 @@
 extends "res://scripts/views/flow_view.gd"
 
+# Prototype/debug resolution playback only. Final gameplay uses progression units,
+# not this real-time Timer; delayed resolution timing has not been decided.
 signal monitoring_playback_completed
 
 @onready var room_id_label: Label = %RoomId

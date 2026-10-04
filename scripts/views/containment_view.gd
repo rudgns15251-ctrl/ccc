@@ -1,6 +1,9 @@
 extends "res://scripts/views/flow_view.gd"
 
+const EnvironmentConditions = preload("res://scripts/views/environment_conditions_view.gd")
+
 signal containment_confirmation_requested(room_id: String)
+signal cctv_review_requested
 
 @onready var description_label: Label = %Description
 @onready var room_list: VBoxContainer = %RoomList
@@ -11,6 +14,8 @@ var _rooms: Array[ContainmentData] = []
 var _selected_room_index: int = -1
 var _selection_group: ButtonGroup
 var _confirmed_room_id: String = ""
+var _next_action_text: String = "Next: CASE"
+var _can_advance: bool = true
 
 
 func setup(rooms: Array[ContainmentData], confirmed_room_id: String = "") -> void:
@@ -23,8 +28,16 @@ func setup(rooms: Array[ContainmentData], confirmed_room_id: String = "") -> voi
 
 func _ready() -> void:
 	super._ready()
+	%RecheckCCTVButton.pressed.connect(cctv_review_requested.emit)
 	confirm_button.pressed.connect(_on_confirm_containment_pressed)
 	_display_rooms()
+
+
+func configure_next_action(text: String, can_advance: bool) -> void:
+	_next_action_text = text
+	_can_advance = can_advance
+	if is_node_ready():
+		_update_confirmation_ui()
 
 
 func _display_rooms() -> void:
@@ -132,7 +145,8 @@ func _update_confirmation_ui() -> void:
 				button.set_pressed_no_signal(true)
 	var selected_room: ContainmentData = _get_selected_room()
 	confirm_button.disabled = confirmed or selected_room == null or selected_room.room_id.strip_edges().is_empty()
-	next_button.disabled = not confirmed
+	next_button.text = _next_action_text
+	next_button.disabled = not confirmed or not _can_advance
 
 
 func _text_or_placeholder(value: String, field_name: String, index: int) -> String:
@@ -140,3 +154,9 @@ func _text_or_placeholder(value: String, field_name: String, index: int) -> Stri
 		push_warning("ContainmentView: %s at index %d is empty." % [field_name, index])
 		return "[Missing %s]" % field_name
 	return value
+
+
+func set_environment_conditions(summary: EnvironmentConditions.Summary) -> void:
+	var conditions: EnvironmentConditions = get_node("%EnvironmentConditions")
+	conditions.set_summary(summary)
+	%RecheckCCTVButton.visible = summary != null and not summary.entries.is_empty()

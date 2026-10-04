@@ -8,6 +8,9 @@ var _monitoring_result: MonitoringOutcomeData.Result = MonitoringOutcomeData.Res
 var _confirmed_broadcast_id: String = ""
 var _confirmed_broadcast_option_id: String = ""
 var _discovered_research_entry_ids: Array[String] = []
+var _applied_disturbances: Array[Dictionary] = []
+# Actual source exposure order, including fallback sources without authored entry IDs.
+var _observed_research_sources: Array[Dictionary] = []
 
 
 func _init(case_identifier: String = "") -> void:
@@ -22,6 +25,8 @@ func reset(case_identifier: String = "") -> void:
 	_confirmed_broadcast_id = ""
 	_confirmed_broadcast_option_id = ""
 	_discovered_research_entry_ids.clear()
+	_applied_disturbances.clear()
+	_observed_research_sources.clear()
 
 
 func try_record_experiment_execution(experiment_id: String, limit: int) -> bool:
@@ -122,3 +127,35 @@ func has_discovered_research_entry(entry_id: String) -> bool:
 
 func get_discovered_research_entry_ids() -> Array[String]:
 	return _discovered_research_entry_ids.duplicate()
+
+
+func try_apply_disturbance(disturbance_id: String, reaction_id: String = "") -> bool:
+	if disturbance_id.strip_edges().is_empty():
+		return false
+	for record: Dictionary in _applied_disturbances:
+		if record.disturbance_id == disturbance_id and record.reaction_id == reaction_id:
+			return false
+	_applied_disturbances.append({"disturbance_id": disturbance_id, "reaction_id": reaction_id})
+	return true
+
+
+func get_applied_disturbances() -> Array[Dictionary]:
+	return _applied_disturbances.duplicate(true)
+
+
+func try_observe_research_source(source_kind: int, source_id: String) -> bool:
+	if not ResearchEntryData.SourceKind.values().has(source_kind) or source_id.strip_edges().is_empty() or has_observed_research_source(source_kind, source_id):
+		return false
+	_observed_research_sources.append({"source_kind": source_kind, "source_id": source_id})
+	return true
+
+
+func has_observed_research_source(source_kind: int, source_id: String) -> bool:
+	for record: Dictionary in _observed_research_sources:
+		if record.source_kind == source_kind and record.source_id == source_id:
+			return true
+	return false
+
+
+func get_observed_research_sources() -> Array[Dictionary]:
+	return _observed_research_sources.duplicate(true)

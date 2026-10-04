@@ -13,3 +13,5 @@ extends Resource
 @export var emergency_broadcasts: Array[EmergencyBroadcastData] = []
 @export var incident_results: Array[IncidentResultData] = []
 @export var research_entries: Array[ResearchEntryData] = []
+@export var disturbance_reactions: Array[CaseDisturbanceReactionData] = []
+@export var cctv_condition_observations: Array[CCTVConditionObservationData] = []

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/views/cctv_view.gd" id="1_cctv"]
+
+[ext_resource type="PackedScene" path="res://scenes/views/environment_conditions_view.tscn" id="2_conditions"]
 
 [node name="CCTVView" type="Control"]
 layout_mode = 3
@@ -22,7 +24,7 @@ grow_vertical = 2
 [node name="Content" type="VBoxContainer" parent="Center"]
 custom_minimum_size = Vector2(900, 0)
 layout_mode = 2
-theme_override_constants/separation = 24
+theme_override_constants/separation = 8
 
 [node name="ScreenTitle" type="Label" parent="Center/Content"]
 unique_name_in_owner = true
@@ -37,12 +39,44 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 
+[node name="BaseObservationHeading" type="Label" parent="Center/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "BASE OBSERVATION"
+
 [node name="Description" type="Label" parent="Center/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 26
 horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="EnvironmentConditions" parent="Center/Content" instance=ExtResource("2_conditions")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ConditionObservationSection" type="VBoxContainer" parent="Center/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Heading" type="Label" parent="Center/Content/ConditionObservationSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "CONDITION OBSERVATION"
+
+[node name="ConditionObservationScroll" type="ScrollContainer" parent="Center/Content/ConditionObservationSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 144)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ConditionObservationList" type="VBoxContainer" parent="Center/Content/ConditionObservationSection/ConditionObservationScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
 
 [node name="Actions" type="HBoxContainer" parent="Center/Content"]
 layout_mode = 2

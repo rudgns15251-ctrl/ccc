@@ -1,6 +1,9 @@
 extends "res://scripts/views/flow_view.gd"
 
+const EnvironmentConditions = preload("res://scripts/views/environment_conditions_view.gd")
+
 signal experiment_execution_requested(experiment_id: String)
+signal cctv_review_requested
 
 @onready var description_label: Label = %Description
 @onready var experiment_list: VBoxContainer = %ExperimentList
@@ -29,6 +32,7 @@ func setup(experiments: Array[ExperimentData], executed_ids: Array[String] = [],
 
 func _ready() -> void:
 	super._ready()
+	%RecheckCCTVButton.pressed.connect(cctv_review_requested.emit)
 	run_button.pressed.connect(_on_run_experiment_pressed)
 	_display_experiments()
 
@@ -163,3 +167,9 @@ func _text_or_placeholder(value: String, field_name: String, index: int) -> Stri
 		push_warning("ExperimentView: %s at index %d is empty." % [field_name, index])
 		return "[Missing %s]" % field_name
 	return value
+
+
+func set_environment_conditions(summary: EnvironmentConditions.Summary) -> void:
+	var conditions: EnvironmentConditions = get_node("%EnvironmentConditions")
+	conditions.set_summary(summary)
+	%RecheckCCTVButton.visible = summary != null and not summary.entries.is_empty()

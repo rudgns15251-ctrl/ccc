@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=73 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=76 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="11_incident_result"]
 
 [ext_resource type="Script" path="res://scripts/data/research_entry_data.gd" id="12_research"]
+[ext_resource type="Script" path="res://scripts/data/environmental_disturbance_data.gd" id="13_disturbance"]
 
 [sub_resource type="Resource" id="Resource_profile"]
 script = ExtResource("2_profile")
@@ -131,12 +132,27 @@ final_result = 2
 incident_id = "TEST_INCIDENT_03"
 stages = Array[ExtResource("6_stage")]([SubResource("Resource_stage_03_A"), SubResource("Resource_stage_03_B"), SubResource("Resource_stage_03_C")])
 
+[sub_resource type="Resource" id="Resource_disturbance_power"]
+script = ExtResource("13_disturbance")
+disturbance_id = "TEST_DIST_POWER_FAILURE"
+display_name = "TEST POWER INTERRUPTION"
+notice_text = "Temporary facility lighting interruption detected."
+condition_change_text = "LIGHT: NORMAL → OFF"
+
+[sub_resource type="Resource" id="Resource_disturbance_ventilation"]
+script = ExtResource("13_disturbance")
+disturbance_id = "TEST_DIST_VENTILATION_INSTABILITY"
+display_name = "TEST VENTILATION INSTABILITY"
+notice_text = "Temporary facility airflow instability detected."
+condition_change_text = "AIRFLOW: STEADY → INTERMITTENT"
+
 [sub_resource type="Resource" id="Resource_incident_01"]
 script = ExtResource("8_incident")
 incident_id = "TEST_INCIDENT_01"
 display_name = "TEST INCIDENT 01"
 description = "Temporary incident data for TEST_ROOM_01 failure."
 broadcast_id = "TEST_BROADCAST_01"
+environmental_disturbance = SubResource("Resource_disturbance_power")
 
 [sub_resource type="Resource" id="Resource_incident_03"]
 script = ExtResource("8_incident")
@@ -144,6 +160,7 @@ incident_id = "TEST_INCIDENT_03"
 display_name = "TEST INCIDENT 03"
 description = "Temporary incident data for TEST_ROOM_03 failure."
 broadcast_id = "TEST_BROADCAST_03"
+environmental_disturbance = SubResource("Resource_disturbance_ventilation")
 
 [sub_resource type="Resource" id="Resource_option_01_A"]
 script = ExtResource("9_option")

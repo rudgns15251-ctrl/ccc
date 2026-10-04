@@ -1,23 +1,28 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-9개 정규 화면의 명시적 이동 흐름과 8개 화면에서 여는 Research Log 보조 화면을 구현했습니다. MONITORING에서는 Log를 열 수 없습니다.
+정상 플레이는 Main Scene에 설정한 Case01 → Case02 순서로 각 Case의 PROFILE → CCTV → EXPERIMENT → CONTAINMENT를 진행합니다. 기존 Monitoring/결과/실패 후속 화면은 독립 prototype/debug 검사용으로 보존했습니다. Research Log는 정상 흐름의 네 화면과 기존 debug 경로의 네 화면에서 열 수 있으며 MONITORING에서는 열 수 없습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
 CONTAINMENT는 후보 Resource 배열의 이름·설명을 표시하고 하나를 임시 선택할 수 있습니다.
-선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다.
-확정 이후에만 MONITORING으로 진행합니다. Room 자체에 정답 필드를 두지 않습니다.
+선택은 View 안에만 유지하며 Confirm Containment로 확정한 Room ID는 CaseRuntimeState에 기록합니다. 같은 승인 경계에서 Main 소유 PendingContainmentState에 Case ID와 실제 확정 Room ID를 등록합니다. 선택만으로는 등록하지 않습니다.
+Confirm은 화면을 이동하지 않습니다. 확정 뒤 Next: CASE는 현재 Pending의 Case/Room ID로 Outcome을 검색하고 결과를 숨겨진 ContainmentResolutionState에 한 번 기록합니다. 성공한 판정만 Pending에서 제거하며 실패 결과에는 별도 FailureEventCandidateState를 등록합니다. Research를 Archive에 보존한 뒤 새 Runtime으로 다음 PROFILE을 엽니다. Room 자체에 정답 필드는 없습니다. 마지막 Case의 Next는 No next test case configured로 비활성화되며 현재 Pending을 유지합니다.
 MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 재생하고 관찰 기록을 누적합니다. 모든 유효 Stage가 공개된 뒤 Main/Runtime이 결과를 확정합니다. SUCCESS는 RESULT로, FAILURE는 ID로 찾은 IncidentData를 INCIDENT에, 연결된 EmergencyBroadcastData와 단일 선택 Option 목록을 BROADCAST에 표시합니다. Confirm Broadcast가 승인되어 두 ID를 Runtime에 기록한 뒤 INCIDENT_RESULT에서 해당 결과 콘텐츠를 표시하고 RESULT로 진행합니다.
+이 MONITORING 경로는 **prototype/debug resolution playback**입니다. 0/10/20초는 prototype verification timing이며 정상 판정은 Timer를 사용하지 않습니다. 이번 Vertical Slice의 내부 판정 경계는 handoff이며 실제 시설 영향은 이후 의미 있는 행동 opportunity와 숨겨진 threshold로 분리합니다. 최종 게임의 판정·사건 시점과 밸런스는 아직 확정하지 않았습니다. debug Timer는 Pending을 resolve하거나 제거하지 않습니다.
 RESULT는 Main이 전달한 표시용 snapshot으로 Case, 확정 결과/Room, 실제 실행 순서의 Experiment와 사용 수를 읽기 전용으로 요약합니다. FAILURE에는 현재 Incident/Broadcast/확정 Option/IncidentResult도 표시하며 SUCCESS에는 없음/해당 없음으로 표시합니다.
 RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설명·결과, 확정 Room, 완료된 Monitoring 관찰, FAILURE의 확정 응답·결과를 카테고리별로 읽기만 합니다. 기존 Stage/Runtime 공개 조건을 만족하고 해당 유효 ResearchEntryData.entry_id를 현재 Case Runtime에서 실제로 발견한 경우에만 Log 전용 title/body_text를 사용합니다. 작성 콘텐츠가 없거나 잘못된 매핑, 발견 기록이 없는 공개 Source는 기존 문구를 사용합니다. 게임 화면 문구와 영구 기록은 변경하지 않습니다.
-실제 게임 시스템과 최종 디자인은 아직 구현하지 않았습니다.
+ResearchArchiveState는 결과 확정 여부와 관계없이 획득한 Case별 Research ID를 세션 메모리에 보관합니다. 정상 handoff 직전에 유효 발견 ID를 incremental merge하며 기존 debug RESULT 경계의 merge도 유지합니다. 현재 Research Log는 계속 현재 Runtime만 사용합니다. 마지막 Case의 발견 기록은 handoff가 없으므로 현재 Runtime에 유지됩니다. Archive 화면과 디스크 저장은 없습니다.
+환경 교란이 실제 발생하면 현재 Case의 해당 reaction_id를 OBSERVATION으로 추가합니다. 발생 전에는 표시/발견하지 않습니다. Notice는 시설 조건 변화와 현재 관찰 사실만 보여주며 원인 Case나 숨겨진 성공/실패를 공개하지 않습니다. Dismiss 후 동일 View를 이어갑니다.
+적용된 교란은 현재 Case Runtime의 활성 환경 조건입니다. CCTV / EXPERIMENT / CONTAINMENT의 **ACTIVE FACILITY CONDITION**에서 계속 확인할 수 있으며, Dismiss와 Research Log Open/Back으로 사라지지 않습니다. Runtime 교체/reset 시 초기화하며 다른 Case로 자동 승계하지 않습니다.
+CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응하는 **CONDITION OBSERVATION**을 별도로 표시합니다. 활성 조건이 있으면 Experiment / Containment의 **Recheck CCTV**로 다시 확인하고 원래 화면으로 돌아올 수 있습니다. 추가 관찰 Research는 CCTV에 실제 표시된 뒤에만 발견하며, Overlay를 본 것만으로는 발견하지 않습니다.
+최종 게임 시스템과 디자인은 아직 구현하지 않았습니다.
 
 ## 실행
 
 1. Godot 4.7.1에서 이 폴더의 `project.godot`를 가져오거나 엽니다.
 2. `scenes/main/main.tscn`을 연 뒤 **F6**으로 해당 Scene을 실행하거나, **F5**로 프로젝트를 실행합니다.
-3. **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT → MONITORING** 순서로 이동합니다. 이후 SUCCESS는 RESULT, FAILURE는 INCIDENT → BROADCAST → INCIDENT_RESULT → RESULT입니다.
+3. Case01의 **PROFILE**에서 시작합니다. 버튼으로 **CCTV → EXPERIMENT → CONTAINMENT** 순서로 이동합니다.
    PROFILE에는 테스트 Resource의 subject_name, classification, basic_description이 표시됩니다.
    CCTV에는 camera_id, observation_text가 표시됩니다.
    EXPERIMENT에는 available_experiments 배열의 이름과 설명이 동적 목록으로 표시됩니다.
@@ -29,10 +34,16 @@ RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설�
    선택만 하면 기록하지 않으며, 정상 실행할 때마다 이력에 ID 하나를 추가합니다.
    CONTAINMENT에는 available_containment_rooms 배열의 후보 이름과 설명이 표시됩니다.
    이름 옆 선택 Control을 클릭하면 하나만 선택되며 재클릭해도 유지됩니다.
-   초기 상태에는 선택이 없고 Confirm과 **Next: MONITORING**이 비활성화됩니다.
+   초기 상태에는 선택이 없고 Confirm과 **Next: CASE**가 비활성화됩니다.
    Room을 선택한 뒤 **Confirm Containment**를 누르면 현재 Case 후보를 검증하고 한 번만 확정합니다.
    확정된 후보는 **[Confirmed]**로 표시되며 후보 변경과 재확정은 불가능합니다.
-   확정 후 **Next: MONITORING**으로 진행합니다. 재진입하면 Runtime의 확정 상태를 복원합니다.
+   Confirm 후 화면에 머무르며 **Next: CASE**로 Case02의 PROFILE에 진입합니다. Case01 Pending은 내부 판정 성공 후 제거되고 숨겨진 Resolution과 Archive가 유지됩니다. 새 Case Runtime은 실행 이력·확정 Room·결과·발견 목록과 적용 교란 기록을 새로 시작합니다. 새 PROFILE의 유효 작성 Research는 실제 표시 시 발견됩니다. 판정 데이터가 잘못되면 Pending을 유지하고 handoff를 차단합니다.
+4. Case02도 같은 네 화면을 진행합니다. CCTV, 두 번째 Experiment, 두 번째 Room에는 authored Research가 없어 기존 fallback 문구로 Research Log를 표시합니다. Case01 Room01 또는 Room03을 확정했다면 Case02의 의미 있는 행동 도중 임시 환경 교란이 한 번 발생할 수 있습니다. **FACILITY DISTURBANCE**에서 조건 변화와 **UNPLANNED OBSERVATION**을 읽고 **Dismiss**로 이어갑니다. Room02 경로는 후보/교란이 없습니다. 이 설명은 개발 검증 안내이며 실제 UI는 과거 Case 판정과 원인을 공개하지 않습니다.
+   마지막 Case는 **No next test case configured**로 진행을 차단하며 Case02 Pending을 유지합니다. 정상 Route에서 결과 화면이나 Campaign 완료는 없습니다.
+5. 네 화면의 **Open Research Log → Back**은 현재 Case와 원래 Stage로 돌아갑니다. 이전 Case Archive를 섞지 않습니다. 이 탐색은 opportunity를 소비하지 않습니다. Log 왕복의 미확정 임시 선택은 초기화하고 실행·확정 상태는 복원합니다. 교란 Notice의 Dismiss는 View를 재생성하지 않아 현재 UI context를 유지합니다. 창 크기를 바꾸면 기존 비율과 UI scaling을 유지합니다.
+
+아래 Monitoring 이후 설명은 정상 F5 진행에 포함되지 않는 기존 debug 기능입니다. 검사용 Main 확장은 `.godot/verification/step32/debug_main.gd`에만 있으며 제품 코드에는 debug 전환 버튼이나 설정을 추가하지 않았습니다. debug 검사는 단일 Case01에서 확정 후 MONITORING으로 진행합니다. SUCCESS는 RESULT, FAILURE는 INCIDENT → BROADCAST → INCIDENT_RESULT → RESULT입니다.
+
    MONITORING에는 확정 Room ID와 전체 Stage 개수가 표시됩니다. 테스트 기록은 진입 직후, 10초 후, 20초 후 하나씩 누적됩니다.
    미래 Stage 내용과 최종 결과는 미리 공개하지 않습니다. 마지막 Stage 후 Main이 해당 Case/Room Outcome의 결과를 검증합니다.
    Runtime에 결과를 한 번 기록한 뒤 **Monitoring Result: SUCCESS / FAILURE**를 표시하고 **Next: RESULT**를 활성화합니다.
@@ -42,11 +53,10 @@ RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설�
    FAILURE의 INCIDENT는 현재 Case에서 ID로 검색한 incident_id / display_name / description을 표시합니다. Room01은 TEST_INCIDENT_01, Room03은 TEST_INCIDENT_03입니다. 유효 Incident와 연결된 Broadcast/Option이 있어야 Next: BROADCAST를 활성화합니다. 누락 시 경고와 대체 문구 또는 진행 차단을 적용합니다.
    BROADCAST는 broadcast_id / display_name / prompt_text와 options의 ID·문구를 Label로 표시합니다. 각 문구 옆 CheckBox로 하나를 임시 선택할 수 있고 재클릭해도 선택을 유지합니다. 처음에는 Confirm과 Next가 비활성화됩니다. 유효 Option을 선택하면 **Confirm Broadcast**만 활성화됩니다. Confirm 시 Main이 현재 Case/FAILURE/Incident/Broadcast와 Option ID, Option.result_id에 대응하는 실제 IncidentResultData까지 다시 확인하고 최초 ID 쌍만 Runtime에 기록합니다. 확정 항목은 **[Confirmed]**, 모든 Option과 Confirm은 disabled, **Next: INCIDENT RESULT**는 활성화됩니다. 같은 Broadcast 재진입은 이 상태를 복원합니다. 다른 Broadcast 또는 잘못된 snapshot은 경고와 함께 진행을 차단합니다. 연결된 결과가 없으면 Confirm을 거부하고 미확정 Next를 비활성 상태로 유지합니다. 피해/점수 판정은 없습니다.
    INCIDENT_RESULT에는 확정 Option의 result_id로 검색한 결과 ID/이름/설명을 표시합니다. 정상 데이터에서 Next: RESULT가 활성화됩니다. 누락 데이터는 경고/대체 문구와 진행 차단을 적용합니다. 다른 결과를 대신 표시하지 않습니다.
-4. RESULT에서 Case ID/이름, **SUCCESS / FAILURE**, 확정 Room ID/이름, 실행 순서의 Experiment ID/이름, **Experiment Usage**를 확인합니다. FAILURE에는 연결된 Incident/Broadcast/확정 Option/IncidentResult의 ID와 이름·문구를 표시합니다. SUCCESS에는 Incident 없음, 나머지 실패 항목 해당 없음으로 표시합니다. 이력이 길어지면 요약 영역을 스크롤합니다.
+   Debug RESULT에서 Case ID/이름, **SUCCESS / FAILURE**, 확정 Room ID/이름, 실행 순서의 Experiment ID/이름, **Experiment Usage**를 확인합니다. FAILURE에는 연결된 Incident/Broadcast/확정 Option/IncidentResult의 ID와 이름·문구를 표시합니다. SUCCESS에는 Incident 없음, 나머지 실패 항목 해당 없음으로 표시합니다. 이력이 길어지면 요약 영역을 스크롤합니다.
    **Open Research Log**로 현재 Case의 확인된 정보를 열람하고 **Back**으로 동일 요약에 돌아옵니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / INCIDENT / BROADCAST / INCIDENT_RESULT에서도 열 수 있고, Back은 원래 화면으로 복귀합니다. 현재 Stage까지 공개 가능한 정보만 표시하며 MONITORING에는 Open 버튼이 없습니다. 이 이동은 Runtime과 Resource를 변경하지 않습니다. View를 재생성하므로 미확정 Experiment/Room/Option 임시 선택은 초기화되고 실행·확정 상태는 복원됩니다.
    **Restart: PROFILE** 버튼으로 흐름을 반복합니다.
    이 버튼은 화면 흐름만 다시 시작합니다. 같은 Case의 실행 이력, 격리 확정, Monitoring 결과, Broadcast 확정 ID 쌍과 Research 발견 ID 목록은 유지됩니다. Runtime.reset()은 이 상태를 모두 초기화합니다.
-5. 창 크기를 변경하면 UI 비율을 유지하면서 확대/축소되고 창 크기 문구가 갱신됩니다.
 
 각 View Scene을 따로 F6 실행하면 해당 임시 화면만 표시됩니다. 다음 화면의
 선택은 Main이 담당하므로 전체 흐름 검증에는 Main의 F6 또는 프로젝트 F5를 사용합니다.
@@ -92,7 +102,8 @@ cap/
 ├── resources/
 │   ├── .gitkeep
 │   └── cases/
-│       └── test_case_01.tres # 기존 콘텐츠, Outcome3개/Stage9개/Incident2개/Broadcast2개/Option6개/IncidentResult6개/ResearchEntry24개
+│       ├── test_case_01.tres # 기존 콘텐츠, Outcome3개/Stage9개/Incident2개/Broadcast2개/Option6개/IncidentResult6개/ResearchEntry24개/Disturbance2개
+│       └── test_case_02.tres # Profile1/CCTV1/Experiment2/Room2/Research5/Reaction2/CCTVConditionObservation1, downstream 배열은 비어 있음
 ├── scenes/
 │   ├── main/
 │   │   └── main.tscn       # 기존 기반 UI와 ViewHost
@@ -106,9 +117,14 @@ cap/
 │       ├── incident_view.tscn # IncidentData 표시, incident_view.gd 사용
 │       ├── broadcast_view.tscn # Option 목록, Confirm Broadcast / Next: INCIDENT RESULT
 │       ├── incident_result_view.tscn # 결과 ID/이름/설명과 Next: RESULT
-│       └── research_log_view.tscn # 8개 Stage에서 여는 보조 화면, 동적 Entry 목록과 Back
+│       ├── research_log_view.tscn # 8개 Stage에서 여는 보조 화면, 동적 Entry 목록과 Back
+│       ├── environment_conditions_view.tscn # CCTV/Experiment/Containment 내부 표시 영역
+│       └── environmental_disturbance_notice.tscn # Main의 modal overlay, 정규 Stage 아님
 └── scripts/
     ├── data/
+    │   ├── environmental_disturbance_data.gd / .gd.uid
+    │   ├── case_disturbance_reaction_data.gd / .gd.uid
+    │   ├── cctv_condition_observation_data.gd / .gd.uid # CCTV ID + Disturbance ID의 작성 관찰
     │   ├── broadcast_option_data.gd
     │   ├── broadcast_option_data.gd.uid
     │   ├── incident_result_data.gd
@@ -137,9 +153,17 @@ cap/
     │   ├── main.gd         # 창 크기 표시, View 전환, Runtime 연결, 격리 후보 검증/진행 보호
     │   └── main.gd.uid
     ├── runtime/
+    │   ├── containment_resolution_state.gd / .gd.uid # 숨겨진 Case별 판정
+    │   ├── failure_event_candidate_state.gd / .gd.uid # threshold/발생 여부, 세션 후보
     │   ├── case_runtime_state.gd # 메모리 Case ID, 실행 이력, 격리 ID, Monitoring 결과, Broadcast 확정 ID 쌍, Research 발견 ID 목록
-    │   └── case_runtime_state.gd.uid
+    │   ├── case_runtime_state.gd.uid
+    │   ├── pending_containment_state.gd # Case별 결과 대기 격리 결정, Case/Room ID만 저장
+    │   ├── pending_containment_state.gd.uid
+    │   ├── research_archive_state.gd # 획득한 Case별 발견 ID, 결과 판정과 독립적인 세션 메모리 상태
+    │   └── research_archive_state.gd.uid
     └── views/
+        ├── environment_conditions_view.gd / .gd.uid # 표시용 Summary/Condition과 동적 상태 목록
+        ├── environmental_disturbance_notice.gd / .gd.uid # 환경/관찰 표시와 Dismiss
         ├── broadcast_view.gd # 동적 Option/임시 선택/확정 요청, 확정 snapshot 복원과 UI 잠금
         ├── broadcast_view.gd.uid
         ├── flow_view.gd    # 진행/Open 버튼 입력을 요청 signal로 전달
@@ -207,6 +231,7 @@ Main (Control, main.gd)
 화면 이름과 버튼 이름은 해당 `.tscn`에 있습니다. PROFILE / CCTV / EXPERIMENT / CONTAINMENT / MONITORING 콘텐츠는 Resource에
 있습니다. INCIDENT, BROADCAST, INCIDENT_RESULT도 Case Resource의 데이터를 표시하고 RESULT는 확정된 Runtime과 현재 Case에서 파생한 snapshot을 표시합니다. Main에는 콘텐츠 문자열을 하드코딩하지 않았습니다.
 모든 View는 Control 기반 독립 Scene입니다. Profile / CCTV / Experiment / Containment / Monitoring / Incident / Broadcast / IncidentResult / Result / ResearchLog 전용 Script는 기존 `flow_view.gd`를 한 단계 상속해 버튼 요청 기능을 재사용합니다.
+EnvironmentalDisturbanceNotice는 Main 아래 Margin과 나란히 생성하는 별도 Control입니다. ViewHost와 정규 Route 밖에서 표시하며 FlowView를 상속하지 않습니다.
 별도의 Scene 상속이나 추상 Base Class 계층은 없습니다.
 
 `NextButton.pressed → advance_requested → Main._on_advance_requested() → 다음 View`로
@@ -214,8 +239,8 @@ Main (Control, main.gd)
 사용하며 개별 View는 Main이나 다른 View를 참조하지 않습니다.
 
 `main.gd`는 `Stage` enum, 이에 대응하는 10개 PackedScene 목록, 현재 단계와
-현재 View 참조, Inspector에서 지정한 `current_case`를 보유합니다. 전환 시 이전 View를 ViewHost에서 제거한 뒤
-`queue_free()`하고 다음 View 하나를 추가합니다. RESULT 다음은 PROFILE입니다.
+현재 View 참조, Inspector에서 지정한 `case_sequence: Array[CaseData]`, 현재 배열 index와 `current_case`를 보유합니다. 기본 Scene의 순서는 Case01, Case02입니다. 단일 Case 독립 검사 호환성을 위해 기존 current_case export도 유지하며 배열이 있으면 배열을 우선합니다. 전환 시 이전 View를 ViewHost에서 제거한 뒤
+`queue_free()`하고 다음 View 하나를 추가합니다. 정상 Containment Next는 다음 Case의 PROFILE로 handoff하며, 기존 debug RESULT 다음은 같은 Case의 PROFILE입니다.
 Stage enum은 PROFILE=0, CCTV=1, EXPERIMENT=2, CONTAINMENT=3, MONITORING=4,
 RESULT=5, INCIDENT=6, BROADCAST=7, INCIDENT_RESULT=8, RESEARCH_LOG=9입니다. 새 Stage를 배열 끝에 추가해 기존 인덱스를 보존했습니다.
 _get_next_stage(stage)의 match가 다음 Stage를 명시적으로 반환하고, -1이면 전환하지 않습니다.
@@ -224,13 +249,15 @@ RESEARCH_LOG는 이 정규 Route에 포함되지 않아 -1을 반환합니다. �
 queue_free 예정 객체의 요청은 무시해 이전 Monitoring / Incident / Broadcast / IncidentResult의 중복 전환을 차단합니다.
 Main._is_active_view()가 이 생명주기 검사를 공통으로 수행하며 화면 진행, Experiment 실행,
 Containment/Broadcast 확정, Monitoring 완료, Research Log Open/Back 요청 모두 같은 검사를 통과해야 합니다.
-Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
+기존 debug 결과 Route는 Runtime.get_monitoring_result()만 사용하며 표시 문구나 View 내부 bool을 읽지 않습니다.
 INCIDENT는 기존 FlowView를 사용하는 Control → CenterContainer → VBoxContainer에
 제목, 이름, ID, 설명, NextButton을 둡니다. Incident Scene의 기존 콘텐츠를 보존하고 진행 버튼 옆에 Open을 추가했습니다. Broadcast Scene의 기존 Actions/ConfirmButton/NextButton에 Open 버튼을 추가했습니다. Runtime의 기존 Broadcast/Option 확정 ID 문자열 두 개를 유지하며 별도 Result 필드는 추가하지 않았습니다.
 기존 창 크기 표시 함수와 연결은 보존했습니다.
-Main._ready()에서 현재 Case ID로 CaseRuntimeState를 한 번 생성합니다.
+Main._ready()에서 첫 Case ID로 CaseRuntimeState를 생성하며, 정상 handoff마다 다음 Case ID로 새 객체를 생성합니다. 이전 Runtime 객체를 reset하거나 수정하지 않습니다.
+PendingContainmentState도 한 번 생성하며, 정상 Containment Confirm 승인 뒤에만 결정 ID를 등록합니다. 정상 handoff의 숨겨진 판정 기록이 성공한 Case만 remove_pending으로 제거합니다. debug 재생과 Log 왕복은 소비하지 않습니다.
+같은 초기화 경계에서 ResearchArchiveState를 한 번 생성합니다. 검증된 정상 handoff 직전에 유효 authored 발견 ID를 merge하고 기존 debug RESULT의 merge 경계도 유지합니다. 단순 View 생성과 Research Log Open/Back은 Archive를 변경하지 않습니다.
 일반 View 전환, RESULT → PROFILE, ExperimentView.setup()은 런타임 상태를 초기화하지 않습니다.
-Containment → Monitoring은 Runtime에 확정된 Room이 있어야 진행됩니다.
+Containment handoff는 활성 View, 현재 Case/Runtime ID, 확정 Room, Pending Case/Room 일치, 현재 Case 후보 Room, 유효한 다음 배열 항목과 중복 Pending 여부를 검사합니다. Archive merge 뒤 index/current_case/Runtime을 교체하고 Log 복귀 Stage를 -1로 초기화합니다. Monitoring은 정상 Route에서 제외하며 Scene/Timer/Schema/debug 결과 처리 코드는 보존합니다.
 View 버튼 disabled 상태뿐 아니라 Main의 진행 요청 처리에서도 확정 여부를 검사합니다.
 
 `flow_view.gd`는 버튼 signal 연결, 버튼의 초기 키보드 포커스, 진행/Open 요청
@@ -239,35 +266,42 @@ signal 전송만 담당합니다. Open 버튼이 없는 Scene은 연결하지 �
 ## 테스트 Resource와 데이터 전달
 
 [Godot Resource](https://docs.godotengine.org/en/4.7/tutorials/scripting/resources.html)를
-데이터 컨테이너로 사용합니다. 열두 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
+데이터 컨테이너로 사용합니다. 열네 콘텐츠 클래스는 `class_name`과 typed export 필드로 콘텐츠를 정의합니다. MonitoringOutcomeData에는 최종 결과 enum도 있습니다.
 
 | 파일 | 책임 / 필드 |
 | --- | --- |
-| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData], incident_results: Array[IncidentResultData], research_entries: Array[ResearchEntryData] |
-| `scripts/data/research_entry_data.gd` | ResearchEntryData: entry_id, SourceKind, source_id, title, body_text만; 해금/발견/저장 상태 없음 |
+| `scripts/data/case_data.gd` | CaseData: 기존 필드, containment_outcomes: Array[MonitoringOutcomeData], incidents: Array[IncidentData], emergency_broadcasts: Array[EmergencyBroadcastData], incident_results: Array[IncidentResultData], research_entries: Array[ResearchEntryData], disturbance_reactions: Array[CaseDisturbanceReactionData] |
+| `scripts/data/research_entry_data.gd` | ResearchEntryData: 기존 0~7 SourceKind 유지, DISTURBANCE_REACTION=8 추가; entry_id/source_id/title/body_text, 발견/저장 상태 없음 |
 | `scripts/data/profile_data.gd` | ProfileData: profile_id, subject_name, classification, basic_description |
 | `scripts/data/cctv_data.gd` | CCTVData: camera_id, observation_text만 정의 |
 | `scripts/data/experiment_data.gd` | ExperimentData: experiment_id, display_name, description, result_text만 정의 |
 | `scripts/data/containment_data.gd` | ContainmentData: room_id, display_name, description만 정의 |
-| `scripts/data/monitoring_stage_data.gd` | MonitoringStageData: time_offset: int(초), observation_text: String |
-| `scripts/data/monitoring_outcome_data.gd` | MonitoringOutcomeData: Result enum(UNDEFINED/SUCCESS/FAILURE), room_id, stages, final_result, incident_id |
-| `scripts/data/incident_data.gd` | IncidentData: incident_id, display_name, description, broadcast_id |
+| `scripts/data/monitoring_stage_data.gd` | MonitoringStageData: time_offset: int(프로토타입 검증용 초), observation_text: String; 최종 progression offset은 미정 |
+| `scripts/data/monitoring_outcome_data.gd` | 현재 prototype resolution 콘텐츠: Result enum(UNDEFINED/SUCCESS/FAILURE), room_id, stages, final_result, incident_id |
+| `scripts/data/incident_data.gd` | IncidentData: incident_id, display_name, description, broadcast_id, environmental_disturbance: EnvironmentalDisturbanceData |
 | `scripts/data/broadcast_option_data.gd` | BroadcastOptionData: option_id: String, display_text: String, result_id: String |
 | `scripts/data/incident_result_data.gd` | IncidentResultData: result_id: String, display_name: String, description: String |
 | `scripts/data/emergency_broadcast_data.gd` | EmergencyBroadcastData: broadcast_id: String, display_name: String, prompt_text: String, options: Array[BroadcastOptionData] |
 | `resources/cases/test_case_01.tres` | 기존 테스트 콘텐츠, Room별 Outcome 3개와 각 Stage 3개(0/10/20초), 검증용 문구, Room01/03 FAILURE·Room02 SUCCESS, Incident01/03 → Broadcast01/03 ID 연결, 각각 Option3개와 result_id로 연결한 개발용 IncidentResult6개 |
-| `scenes/main/main.tscn` | 테스트 Case Resource를 Main.current_case에 연결 |
-| `scripts/main/main.gd` | 데이터 전달/전환, CaseRuntimeState 소유, 실행 후보 ID 검증/승인, 격리 후보 검증/진행 차단, Monitoring 완료 시 Outcome 재검증과 결과 기록, Incident/Broadcast ID 검색과 현재 데이터/유효 Option/Result 연결 재검증, 실제 표시/승인 후 authored Research 발견 및 Log 공개 조건 검사 |
+| `resources/cases/test_case_02.tres` | 독립 TEST_CASE_02, Profile1/CCTV1/Experiment2/Room2, 작성 Research4/Reaction2, 실행 제한2; Outcome/Incident/Broadcast/IncidentResult 없음 |
+| `scenes/main/main.tscn` | Main.case_sequence에 Case01/Case02 Resource를 배열 순서대로 연결 |
+| `scripts/main/main.gd` | 데이터 전달/전환, 현재 Runtime 및 네 독립 세션 상태 소유, 기존 실행/확정/Research 검증, 정상 handoff의 숨겨진 판정·Pending 소비·Archive 보존·새 Runtime·다음 PROFILE, opportunity와 overlay orchestration, 기존 debug 결과/후속 Route 유지 |
 | `scripts/runtime/case_runtime_state.gd` | RefCounted 메모리 객체, Case ID/실행 이력, 중복·제한 검증, 격리 ID/Monitoring 결과/Broadcast ID 쌍 한 번 확정·조회/reset, 첫 발견 순서의 Research entry_id 목록과 중복 거부/getter 복사 |
+| `scripts/runtime/pending_containment_state.gd` | RefCounted 세션 상태, case_id→확정 room_id, 중복·빈 ID 거부, 등록 순서 getter 복사, 독립 reset/remove_pending; 결과/시간/Resource 없음 |
+| `scripts/runtime/containment_resolution_state.gd` | RefCounted, 숨겨진 최초 판정의 Case/Room/result/Incident ID, 복사 getter와 독립 reset |
+| `scripts/runtime/failure_event_candidate_state.gd` | RefCounted, Case별 후보 ID/threshold/기회 수/triggered, ready 등록 순서와 복사 getter |
+| `scripts/data/environmental_disturbance_data.gd` | ID/제목/시설 알림/명시적 조건 변화 문구 |
+| `scripts/data/case_disturbance_reaction_data.gd` | Reaction ID/Disturbance ID/제목/관찰 사실 문구 |
+| `scripts/views/environmental_disturbance_notice.gd` | 전달한 문구 표시, keyboard input 처리와 Dismiss 요청만 담당 |
 | `scripts/views/profile_view.gd` | setup(ProfileData), 3개 표시 필드 반영, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/profile_view.tscn` | 제목·데이터 Label·기존 진행 버튼 레이아웃 |
 | `scripts/views/cctv_view.gd` | setup(CCTVData), 두 필드 표시, 누락/빈 필드 경고와 대체 문구 |
 | `scenes/views/cctv_view.tscn` | 제목·CameraId·Description·기존 진행 버튼 레이아웃 |
 | `scripts/views/experiment_view.gd` | 목록/선택, experiment_execution_requested(ID), 승인 후 결과와 전달된 실행 상태 표시 |
 | `scenes/views/experiment_view.tscn` | 제목·목록·RemainingCount·RunButton·결과 영역·기존 진행 버튼 |
-| `scripts/views/containment_view.gd` | setup(rooms, confirmed_room_id), 후보/선택/확정 요청, snapshot 표시, 누락 처리 |
-| `scenes/views/containment_view.tscn` | 기존 제목·개수·목록, Actions의 Confirm Containment / Next: MONITORING |
-| `scripts/views/monitoring_view.gd` | setup(outcome, finalized_result), Timer 순차 공개/완료 signal, 결과 적용/재진입 복원/Next 보호 |
+| `scripts/views/containment_view.gd` | setup(rooms, confirmed_room_id), 후보/선택/확정 요청, snapshot 표시, 누락 처리; configure_next_action(text, can_advance)로 상위에서 전달한 다음 버튼 상태 표시 |
+| `scenes/views/containment_view.tscn` | 기존 제목·개수·목록, Actions의 Confirm Containment / Next: CASE |
+| `scripts/views/monitoring_view.gd` | prototype/debug playback: setup(outcome, finalized_result), Timer 순차 공개/완료 signal, 결과 적용/재진입 복원/Next 보호 |
 | `scenes/views/monitoring_view.tscn` | 기존 제목/진행 버튼, RoomId/Description/StageScroll/StageList, one-shot PlaybackTimer |
 | `scripts/views/incident_view.gd` | setup(IncidentData, can_advance=false), ID/이름/설명 표시, 누락 처리, Main이 전달한 Broadcast 가용성으로 Next 보호 |
 | `scenes/views/incident_view.tscn` | 기존 제목/Next와 DisplayName/IncidentId/Description Label |
@@ -391,6 +425,11 @@ View는 Runtime을 직접 탐색하지 않고 snapshot만 표시합니다.
 격리 확정은 최종 결정으로 취급하며 같은 ID 요청도 두 번째 확정은 거부합니다.
 Main에는 격리 상태 사본이나 격리실 자체의 정답 판정이 없습니다. Monitoring의 final_result만 현재 Case에서 확인해 Runtime에 전달합니다.
 
+아래 Monitoring 설명은 유지 중인 prototype/debug resolution playback에만 해당합니다.
+최종 normal gameplay에서는 실시간 Timer를 사용하지 않고 게임 진행 단위를 사용할 예정입니다.
+최종 게임의 단위/간격은 미정이며, 이번 prototype에서는 handoff를 숨겨진 판정 경계로 사용합니다.
+기존 time_offset/Timer/Outcome Schema와 debug Route를 보존하며, 정상 Pending 소비는 숨겨진 Resolution 기록 성공 뒤에만 수행합니다.
+
 Main은 MONITORING 생성 시 확정된 Room ID로 현재 Case의 containment_outcomes를 검색합니다.
 배열 인덱스나 첫 Outcome으로 대신 연결하지 않으며, ID가 일치하는 첫 유효 Outcome을 전달합니다.
 확정 Room/Case/목록/일치 Outcome이 없으면 경고와 null을 전달합니다. null Outcome과 빈 ID 항목은 경고하고 건너뜁니다.
@@ -478,6 +517,10 @@ CaseData.experiment_limit의 기본값은 0입니다. 테스트 Case는 검증�
 0은 실행 불가, 음수는 경고와 실행 불가로 처리하며 Resource의 원래 값은 수정하지 않습니다.
 State는 .tres나 디스크에 저장하지 않으며 Main이 해제되거나 프로그램을 종료하면 사라집니다.
 Broadcast API는 `try_confirm_broadcast_option(broadcast_id, option_id) -> bool`, `has_confirmed_broadcast_option() -> bool`, `get_confirmed_broadcast_id() -> String`, `get_confirmed_broadcast_option_id() -> String`입니다. 초기 ID 쌍은 빈 문자열입니다. 빈·공백 ID 및 두 번째 같은/다른 쌍은 false로 거부하고 기존 쌍을 보존합니다. 최초 정상 쌍은 한 동기 호출에서 두 ID를 함께 기록합니다. 현재 Case 콘텐츠 검증은 Main의 책임이며 Runtime은 Resource를 참조하지 않습니다.
+
+Runtime의 `try_apply_disturbance(disturbance_id, reaction_id = "")`는 같은 쌍의 중복을 거부합니다.
+`get_applied_disturbances()`는 Dictionary 배열의 deep copy를 반환하며 `reset()`은 적용 기록도 초기화합니다.
+현재 Runtime의 debug Monitoring 결과와 숨겨진 session Resolution은 서로 다른 상태입니다.
 
 테스트 Resource 교체는 `main.tscn`의 **Main**을 선택하고 Inspector의
 **Current Case (`current_case`)**에 다른 CaseData Resource를 지정한 뒤 Scene을 저장합니다.
@@ -584,6 +627,825 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 34단계 환경 조건에 따른 CCTV 추가 관찰과 실제 확인 기록
+
+기존 프로젝트를 확장했습니다. 작업 전 HEAD는 `1c4eea4c195fd1ba7447bdca447a7f533b92e756`,
+브랜치는 `master`(`origin/main` 추적)이었습니다. 미커밋 경로 35개(수정 16, 미추적 19),
+제품 파일 87개와 이전 검증 소스 1,235개를 조사하고 작업 전 사본/해시를 남겼습니다.
+Main, 두 Case Resource, 모든 State/Data/View 및 기존 검증 흐름을 실제 파일 기준으로 확인했습니다.
+
+새 `CCTVConditionObservationData`는 `observation_id`, `cctv_id`, `disturbance_id`,
+`display_name`, `observation_text`의 다섯 필드만 가집니다.
+`CaseData.cctv_condition_observations: Array[CCTVConditionObservationData]`에 둡니다.
+기존 Case의 authored Reaction/Research 배열과 역할이 같고, 여러 CCTV의 관찰도 ID로
+연결할 수 있으므로 이 위치를 선택했습니다. 기존 `CCTVData` 스키마/기본 문구는 변경하지 않았습니다.
+이번 콘텐츠는 CCTV/Disturbance 조합당 합쳐진 관찰 하나입니다. 동일 조합 중복은 warning 후
+모두 생략하며, 여러 활성 조건에는 각각의 관찰을 동적 목록으로 표시합니다.
+
+```text
+기존 Runtime 적용 기록 + 현재 Case authored CCTV 관찰
+  → Main: Case/Runtime/CCTV ID/적용 ID/관찰 ID 유효성 검증
+  → CCTVView.ConditionSnapshot (표시 문자열 복사)
+      BASE OBSERVATION (기존 문구)
+      ACTIVE FACILITY CONDITION (Step33 상태)
+      CONDITION OBSERVATION (조건별 추가 관찰, 높이 144의 Scroll)
+  → 현재/실제 표시 CCTV 확인 → Main 승인
+      Runtime observed source 순서 기록 + 유효 authored entry_id 발견
+  → Research Log: OBSERVATION, authored 또는 실제 확인한 관찰의 fallback
+```
+
+Runtime에는 작은 `_observed_research_sources` 순서 배열을 추가했습니다.
+`{source_kind, source_id}`만 저장하며 별도 상태 객체/게임 판정/시설 상태를 만들지 않습니다.
+기존 authored `entry_id` 목록만으로는 fallback 관찰의 확인 여부와 전체 확인 순서를
+구분할 수 없어서 필요한 기록입니다. Getter는 deep copy, 중복은 Kind/ID 쌍으로 거부하고
+reset으로 초기화합니다. 가짜 Research ID를 만들지 않으며 Archive API도 그대로입니다.
+새 관찰을 확인한 Log는 공개 가능한 기존 항목을 실제 source 확인 순서로 배열합니다.
+새 관찰이 없는 기존 경로는 기존 Log 배열/Stage 공개 정책을 유지합니다.
+추가 SourceKind는 맨 뒤의 `CCTV_CONDITION_OBSERVATION = 9`이며 기존 0~8은 그대로입니다.
+표시 Entry에 Kind를 함께 전달해 다른 Kind의 같은 source_id와도 순서 연결이 충돌하지 않습니다.
+
+활성 조건이 생긴 Experiment / Containment에는 **Recheck CCTV**가 나타납니다.
+Main은 원래 Stage만 기억하고 CCTV로 이동하며, 재확인은 새 Failure opportunity를 소비하지 않습니다.
+CCTV의 **Back: EXPERIMENT / CONTAINMENT**로 돌아옵니다. 실행/확정 상태는 Runtime에서 복원하며,
+미확정 임시 선택은 기존 Log Back과 같은 View 재생성 정책에 따라 초기화됩니다.
+재확인 중 Log에는 원래 화면까지 이미 공개된 정보가 유지됩니다. 미래 결과는 공개하지 않습니다.
+Recheck 버튼이 표시된 Experiment/Containment에는 ViewHost 높이 550, 추가 관찰 CCTV에는 660을
+실행 중 확보합니다. CCTV 안의 간격만 8로 조정했고 저장된 Main Scene/프로젝트 Stretch는 그대로입니다.
+
+교란이 CCTV 위에서 발생하면 조건 관찰은 Overlay 중에는 갱신/발견하지 않습니다.
+Dismiss 후 동일 CCTV instance의 추가 관찰 영역만 갱신하고 실제 표시를 확인해 발견합니다.
+Experiment / Containment에서 발생하면 그 화면의 환경 상태만 유지하며 CCTV 확인 전에는 미발견입니다.
+조건 추가 관찰의 표시 refresh는 State/Resource를 쓰거나 opportunity를 호출하지 않습니다.
+발견은 별도 승인 함수에서 current View/Stage/표시 여부/실제 CCTV 데이터와 mapping을 재검증합니다.
+
+### 요청한 65개 항목 보고
+
+| 번호 | 확인 항목 | 구현 및 검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | 위 HEAD/브랜치/미커밋 35개 경로. 커밋/push 없음. |
+| 2 | 관찰 데이터 | Resource 다섯 문자열 필드, 불필요한 조건/판정 필드 없음. |
+| 3 | Resource 위치 | CaseData의 authored 배열. 기존 Reaction/Research 콘텐츠 구조와 일관성, 여러 CCTV ID 연결 가능. |
+| 4 | Stable ID | 현재 CCTV camera_id = cctv_id, 적용 disturbance_id = 관찰 disturbance_id. 콘텐츠별 Main 분기 없음. |
+| 5 | CaseData | typed `cctv_condition_observations` 배열 하나 추가. |
+| 6 | CCTVData | 수정 없음. camera_id/observation_text 스키마 그대로. |
+| 7 | Base 보존 | 기존 Description Node/문구/표시 함수를 유지. BASE OBSERVATION 표제만 추가. |
+| 8 | 추가 관찰 | 별도 조건 관찰 영역에 typed Snapshot의 동적 Label 목록. |
+| 9 | 여러 조건 | Power와 Vent가 동시에 적용되면 각 관찰 표시. |
+| 10 | 표시 순서 | 적용 ID 최초 순서, 같은 disturbance의 여러 Reaction 쌍은 한 번만 표시. 정렬 없음. |
+| 11 | 중복 mapping | 이번 조합당 한 관찰 정책. 동일 CCTV/Disturbance 중복은 경고 후 생략. |
+| 12 | 없는 mapping | Base/Active를 유지하고 추가 영역만 숨김. 다른 관찰 대체 없음. |
+| 13 | Invalid ID | 빈/중복 observation_id 및 빈 표시 문구를 거부. 다른 CCTV/불일치 Runtime는 매칭되지 않음. |
+| 14 | CCTV UI | Base → Active → Condition → 기존 Open/Next 또는 Back. |
+| 15 | 구분 | BASE OBSERVATION / ACTIVE FACILITY CONDITION / CONDITION OBSERVATION 표제. |
+| 16 | 긴 문구 | WORD_SMART 줄바꿈, 144 높이 Scroll, 긴 두 번째 관찰 끝 접근 검사. |
+| 17 | Main → View | Main이 ID를 해석해 `set_condition_observations(snapshot)` 전달. |
+| 18 | Snapshot | CCTVView의 작은 RefCounted ConditionSnapshot/ConditionObservation. 표시 문자열만 복사. |
+| 19 | Runtime 접근 | CCTVView가 Main/Runtime/Session 객체를 찾지 않음. |
+| 20 | 직접 load | 새 관찰 Resource/TRES를 View가 load하지 않음. 기존 CCTVData 입력만 유지. |
+| 21 | Same View | 상태 표시 setter로 추가 영역만 갱신, setup 재실행 없음. |
+| 22 | CCTV 유지 | Notice/Dismiss 전후 동일 instance와 기존 Base 내용 확인. |
+| 23 | SourceKind | 맨 뒤에 CCTV_CONDITION_OBSERVATION 추가. 총 10, 기존 값 보존. |
+| 24 | source_id | observation_id. 기존 CCTV camera_id 매핑과 독립. |
+| 25 | Authored | 실제 확인 뒤 유효 authored entry_id만 기존 API로 발견. Log 전용 title/body 사용. |
+| 26 | Fallback | 실제 확인한 authored 없는 관찰의 이름/observation_text 사용. 가짜 entry_id 없음. |
+| 27 | Category | 기존 OBSERVATION으로 표시. 새 대분류 없음. |
+| 28 | Timing | 적용 여부 + 유효 mapping + 현재 실제 표시 CCTV를 Main 승인 경계에서 확인. |
+| 29 | 적용 전 | Resource가 있어도 추가 영역/확인 기록/authored discovery 없음. |
+| 30 | 적용 직후 | Experiment Overlay/Dismiss 직후에도 CCTV 추가 관찰은 미발견. |
+| 31 | 확인 후 | Recheck 실제 클릭 후 확인 source와 authored ID 발견, fallback도 확인 기록 생성. |
+| 32 | CCTV 위 교란 | Overlay 중 미발견, Dismiss 뒤 표시/발견. 별도 재진입 불필요. |
+| 33 | 중복 발견 | Kind/ID 확인 기록과 entry_id 발견 기록 모두 기존/추가 중복 guard로 한 번만 기록. |
+| 34 | Log farming | Open/Back 반복으로 확인/발견/실행/조건/Candidate 값 증가 없음. |
+| 35 | Opportunity farming | Recheck/Back/추가 영역 refresh는 opportunity 호출 없음. 기존 key와 실제 승인 행동 유지. |
+| 36 | 상태/발견 독립 | 환경 적용만으로는 CCTV 발견하지 않음. 표시와 discovery를 별도 함수로 구분. |
+| 37 | Resource 불변 | 표시/발견 중 모든 authored Resource deep 비교 및 디스크 해시 검사. |
+| 38 | Runtime 불변 | refresh만 반복하면 불변. 실제 새 관찰 승인 때만 확인/authored 발견 목록 변화. |
+| 39 | Case02 콘텐츠 | Power용 TEST_CASE02_POWER_CCTV_OBS 및 authored TEST_CASE02_RESEARCH_POWER_CCTV_OBS 하나 추가. |
+| 40 | 정답 비노출 | 기존 Power Reaction과 일치하는 이동 감소/벽면 접촉 유지라는 임시 관찰 사실만 작성. 격리 정답/안정 trait 판정 없음. |
+| 41 | SUCCESS | Case01 Room02→Case02에서 조건/추가 관찰/Recheck 표시 없음. |
+| 42 | FAILURE 전 | threshold 전 CCTV에는 Base만, 추가 관찰 미발견. |
+| 43 | FAILURE 후 | 실제 Experiment 승인 → Power 교란 → CCTV 확인 → 추가 관찰/Log 발견. |
+| 44 | 조건 독립 | 메모리 Vent 관찰을 추가하고 Resource 순서를 뒤집어도 Power→Vent 적용 순서로 둘 다 표시. |
+| 45 | Unknown 조건 | 현재 활성 조건에 매핑이 없으면 Base/Active 유지, 추가 관찰 없음. |
+| 46 | Reset | 확인 source/authored ID/applied 조건 초기화, 새 Runtime 독립. |
+| 47 | Archive | Main의 기존 merge로 새 authored ID 보존. fallback에는 가짜 Archive ID 없음. |
+| 48 | Stale View | 이전/분리/Modal 상태의 CCTV discovery 요청 무시. current CCTV 데이터 일치도 확인. |
+| 49 | Hidden Resolution | 기존 Outcome/Pending/handoff 검증 유지. |
+| 50 | Candidate | threshold/FIFO/하나씩 발생/잘못된 콘텐츠 보존 정책 유지. |
+| 51 | Overlay | 입력 차단/focus/same View/stale Dismiss/중복 방지 회귀. |
+| 52 | Active Environment | 기존 공통 표시/0·1·3·10개/순서/누락 처리/지속/reset 회귀. |
+| 53 | Experiment | 결과/실행 이력/횟수/중복 제한 그대로. Recheck 요청만 추가. |
+| 54 | Containment | Room 임시 선택/Confirm/확정 잠금/Pending/Next 유지. Recheck 후 확정 잠금 복원. |
+| 55 | Research Log | 기존 Stage 공개와 authored/fallback 보존. 실제 추가 관찰 확인 뒤에는 실제 source 확인 순서로 배열. |
+| 56 | ResearchArchive | API/Session 수명 그대로. 기존 보존/중복 merge 회귀. |
+| 57 | Debug Monitoring | 기존 검증용 Main으로 Timer/관찰/결과 검사. 정상 Route에 Monitoring 추가 없음. |
+| 58 | 실패 Debug | Incident/Broadcast/Option/IncidentResult/Result 기존 회귀 검사. |
+| 59 | 해상도 | 1920×1080 / 1280×720 / 1024×768, canvas_items/keep/resizable/Compatibility 그대로. |
+| 60 | 파싱/실행 | Godot 4.7.1 import, 모든 GDScript check-only 및 정상/이전 회귀 결과는 아래 기록. |
+| 61 | 문제/해결 | 재확인 경로 부재→작은 요청 버튼/복귀 Stage 추가. fallback 확인 여부·순서 부재→source 확인 기록 추가. UI 공간→작은 간격/고정 Scroll/필요한 높이 확보. 현재 CCTV 데이터 일치 guard 보강 후 최종 전체 검사 재실행. |
+| 62 | 실제 변경 | 기존 파일 13개 수정, 새 Data Script/UID 2개 추가. 아래 책임 목록. 삭제 없음. |
+| 63 | 이전 변경 | 이전 미커밋 전부 보존. 이전 보고/검증 소스 1,235개 보존 검사. |
+| 64 | 미구현 | Experiment Variant, 정답 변경, trait/시설 simulation, Severity/MAJOR/Broadcast 자동, Case03/Campaign/SaveLoad/Archive UI/영상·음향·최종 디자인/Manager/Rule Engine. |
+| 65 | 다음 단계 | CCTV 추가 단서와 기존 Experiment의 추리 관계를 콘텐츠 검토하는 지점. 조건별 Experiment Variant는 이번 단계에서 구현하지 않음. |
+
+### 파일 변경과 책임
+
+- 추가: `scripts/data/cctv_condition_observation_data.gd`, 해당 `.gd.uid` — authored 관찰 스키마.
+- 수정: `scripts/data/case_data.gd`, `research_entry_data.gd` — 콘텐츠 배열/SourceKind 추가.
+- 수정: `resources/cases/test_case_02.tres` — 관찰과 authored Research 하나씩 추가. 기존 모든 sub_resource 값 보존.
+- 수정: `scripts/runtime/case_runtime_state.gd` — source 확인 순서/중복/복사 조회, reset 한 줄. 기존 실행/확정/조건 API 그대로.
+- 수정: `scripts/main/main.gd` — 재확인 요청/복귀, mapping 검증, Snapshot/실제 표시 발견, Log 순서와 알려진 화면 공개 범위.
+- 수정: `scripts/views/cctv_view.gd`, `scenes/views/cctv_view.tscn` — 추가 관찰 영역과 표시 전용 API, 기존 CCTV 그대로.
+- 수정: `scripts/views/experiment_view.gd`, `containment_view.gd`, 두 `.tscn` — 활성 환경일 때 Recheck 버튼/요청 signal만 추가.
+- 수정: `scripts/views/research_log_view.gd` — Entry에 source_kind/기본값 매개변수 추가. 기존 Log 표시 UI/함수 그대로.
+- 수정: `README.md` — 현재 흐름/구조와 이 보고. 33단계 이하 과거 보고 보존.
+
+검증 코드/로그/캡처/변경 전 사본은 Git 제외 `.godot/verification/step34/`에만 있습니다.
+이전 검사 원본은 그대로 두고 복사본에 새 SourceKind 총수, 정확한 Reaction fallback 제거,
+새 관찰이 없는 기존 CCTV modal fixture만 반영했습니다. 새 CCTV 발견 timing은 별도 검사합니다.
+제품에는 debug Main/Scene/검증 fixture를 추가하지 않았습니다.
+
+최종 **158개 검사 모두 통과**했습니다(headless 95, Windows GPU 63).
+제품 GDScript 34개 `--check-only`, 프로젝트 기본 Main 실행, Step32/33와 이전 debug 회귀를 포함합니다.
+추가 관찰은 세 해상도 각각 양쪽 실행 방식에서 A/B/C 발견 시점, Recheck/Back,
+same CCTV Dismiss, authored/fallback, 실제 확인 순서, 복수 조건과 장문 스크롤을 검사했습니다.
+이전 정상 Flow의 360회 Open/Back과 새 재확인 경로의 60회 Open/Back을 포함해 farming을 확인했습니다.
+일반 실행과 최종 editor import의 오류/경고는 0이며, 부적합 fixture의 warning은
+검사별 예상 수와 전부 일치했습니다. 제품 Script/Resource는 검증 실행 중 변경되지 않았습니다.
+GPU 캡처 186개를 생성하고 세 해상도의 Base/Active/Condition 및 장문/Log를 시각적으로 확인했습니다.
+151→158개로 늘어난 검사 로그/증명 파일은 모두 실제 파일 경로와 로그 해시로 재확인했습니다.
+F5 키 자체를 UI 자동 조작하지는 않았으며 같은 `run/main_scene`의 기본 실행을 확인했습니다.
+1024×768 창의 콘텐츠 렌더 영역은 기존 비율 유지에 따라 1024×576입니다.
+작업 전 사본 비교와 `git diff --check` 결과는 제품 13개 수정/2개 추가/삭제 0,
+변경 없는 기존 파일 74개, 이전 검증 소스 1,235개 보존입니다.
+Main 기존 함수 37개, Runtime 기존 함수 22개는 그대로이며, 기존 Case02 sub_resource와
+Scene 노드도 추가 영역/허용한 CCTV 간격 외에는 보존했습니다. 커밋/push 없음.
+상세 증거는 `validation-results.json`, 검사별 `.pass.json`/로그, `audit-results.json`에 있습니다.
+
+## 33단계 현재 Case의 활성 환경 조건 표시
+
+기존 프로젝트를 확장했습니다. 작업 시작 당시 `master`는 `origin/main`을 추적했고,
+HEAD는 `1c4eea4c195fd1ba7447bdca447a7f533b92e756`이었습니다.
+Step29~32의 변경 28개 경로(수정 12, 미추적 16)가 남아 있었습니다.
+실제 제품 파일 84개, 기존 검증 GDScript/PowerShell 소스 1,053개를 먼저 조사·보존했습니다.
+`project.godot`, Main Scene, Case01/Case02 Resource, 다섯 State, Data 스키마,
+Notice/Profile/Log 및 debug 화면은 이번 단계에서 수정하지 않았습니다.
+
+```text
+CaseRuntimeState.get_applied_disturbances() → Main._build_environment_summary()
+  → EnvironmentConditions.Summary (RefCounted)
+      entries: Array[Condition]
+      Condition: disturbance_id / display_name / condition_change_text
+  → CCTV / Experiment / Containment.set_environment_conditions(summary)
+      → EnvironmentConditions (VBoxContainer)
+          Heading: ACTIVE FACILITY CONDITION
+          ConditionScroll: 높이 96, 가로 스크롤 없음
+              ConditionList: 발생 순서의 동적 Label 목록, 자동 줄바꿈
+```
+
+상태의 저장소는 기존 Runtime 기록 하나입니다. Summary는 매번 생성하는 표시용 값이며
+새 Runtime/Session 상태가 아닙니다. Main이 `case_sequence`와 현재 Case의 Incident에
+연결된 Disturbance를 ID로 찾습니다. 동일 ID의 이름/조건이 일치하는 재사용 정의는 허용하고,
+표시 내용이 충돌하거나 누락·빈 값이면 warning과 ID/`[Unavailable]`을 표시합니다.
+현재 Case에 Reaction이 없거나 authored Research를 사용할 수 없어도 시설 조건은 유지합니다.
+원인 Case, Room 정답, 숨겨진 결과, creature 관찰 전체 문장을 Summary에 넣지 않습니다.
+
+View 생성 직전과 실제 교란 적용 직후에 표시 전용 API만 호출합니다. 전체 `setup()`이나
+화면 전환을 다시 호출하지 않습니다. 공통 표시 영역은 Summary 문자열을 복사하므로
+외부에서 표시 객체를 수정해도 UI/Runtime에 영향을 주지 않습니다.
+조건이 있으면 Main의 ViewHost 최소 높이를 실행 중 360→500으로 조정해 기존 버튼의
+공간을 확보합니다. 조건이 없거나 다른 화면으로 이동하면 360으로 복원합니다.
+Main Scene의 저장된 레이아웃과 프로젝트 해상도/Stretch 설정은 그대로입니다.
+
+### 요청한 61개 항목 보고
+
+| 번호 | 확인 항목 | 구현 및 검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | 위 HEAD/브랜치, 기존 미커밋 28개 경로. 커밋/push 없음. |
+| 2 | Active Environment | 현재 Runtime의 적용 기록을 활성 조건 목록으로 표시. |
+| 3 | 기록 재사용 | 기존 `_applied_disturbances`와 복사본 getter를 그대로 사용. |
+| 4 | 새 Runtime 상태 | 없음. Summary는 일시적인 표시 데이터. |
+| 5 | Summary 구조 | typed RefCounted Summary와 Condition, 세 문자열 필드. |
+| 6 | Main → View | Main이 ID를 해석해 `set_environment_conditions(summary)` 전달. |
+| 7 | CCTV 표시 | Camera/기존 observation_text 아래, Actions 위에 상태 표시. |
+| 8 | Experiment 표시 | 기존 Workspace와 결과 아래, Actions 위에 상태 표시. |
+| 9 | Containment 표시 | Room 목록 아래, Confirm/Next/Open 위에 상태 표시. |
+| 10 | 조건 없음 | 공통 영역 전체 숨김. 빈 패널 없음. |
+| 11 | 조건 1개 | 정상 Failure의 Power 또는 Airflow 표시. |
+| 12 | 다중 조건 | 동적 목록, 복수 후보 및 3/10개 fixture 확인. |
+| 13 | 순서 | Runtime 최초 적용 순서 유지. 자동 정렬 없음. |
+| 14 | 중복 | Runtime의 기존 쌍 중복 거부 유지, Summary는 disturbance_id 기준 한 줄. |
+| 15 | Overlay 이후 | Dismiss는 Notice만 닫으며 조건을 지우지 않음. |
+| 16 | same View | CCTV/Experiment/Containment에서 Notice 전후 동일 instance 확인. |
+| 17 | Experiment 선택 | 기존 Step32 선택 보존 회귀와 반복 refresh 검사 통과. |
+| 18 | Containment 선택 | 미확정 Room 선택 상태에서 실제 opportunity/Notice/Dismiss 후 유지. |
+| 19 | Confirm 잠금 | refresh 후 확정 후보/Confirm 및 마지막 Case Next 잠금 유지. |
+| 20 | Log 복귀 | View를 재생성해도 조건 목록 복원. 기존 미확정 선택 초기화 정책 유지. |
+| 21 | CCTV 재진입 | Main이 Runtime에서 새 Summary를 전달해 복원. |
+| 22 | Runtime 직접 접근 | 대상 View와 공통 상태 영역에서 없음. |
+| 23 | Resource 직접 load | 새 상태 표시에서 없음. 기존 타입 Script preload만 사용. |
+| 24 | Disturbance 누락 | warning, 해당 ID와 `[Unavailable]`; 다른 정의로 대체하지 않음. |
+| 25 | Reaction 누락 | 시설 조건 표시 유지, 관찰 생성 정책은 기존 그대로. |
+| 26 | authored/fallback | 조건은 Reaction/Research 텍스트 선택과 독립. 기존 양쪽 경로 검증. |
+| 27 | handoff 초기화 | 활성 조건이 있던 Case01→Case02 실제 handoff 및 Runtime 교체/reset 검사. |
+| 28 | Session 독립 | Pending/Resolution/Candidate/Archive 객체와 값이 표시/교체/reset으로 변하지 않음. |
+| 29 | Source Failure 숨김 | Summary에 source_case_id/result/Room 정보를 넣지 않음. |
+| 30 | 정답/해석 | 조건 변화 사실만 표시. 기존 답/Outcome/result_text 변경 없음. |
+| 31 | UI 구조 | 세 View 내부에 작은 공통 VBox/Scroll/동적 Label Scene. 새 주요 Stage 없음. |
+| 32 | 긴 문구 | WORD_SMART 줄바꿈, 고정 높이 스크롤, 10개 장문 마지막 항목 접근 검사. |
+| 33 | 반복 refresh | 상태 영역만 갱신. 세 번 반복해도 선택/결과/잠금/State 유지. |
+| 34 | 0/1/3/10 | 각 개수를 세 View × 세 해상도 × headless/GPU에서 검사. |
+| 35 | Resource 불변 | 디스크 해시 및 deep 콘텐츠 비교. 실제 TRES 수정 없음. |
+| 36 | Runtime 불변 | Summary 생성/표시/재진입 전후 Runtime와 네 Session 값 비교. |
+| 37 | Overlay 회귀 | 기존 입력 차단, focus 복원, same View Dismiss 회귀 검사. |
+| 38 | Opportunity 회귀 | 실제 승인 행동, 유효 Stage, 처리 key, 숨겨진 threshold 정책 유지. |
+| 39 | Research farming | Open/Back 반복으로 추가 opportunity/교란/발견 없음. |
+| 40 | Hidden Resolution | 기존 handoff 판정/부적합 데이터 Pending 보존 검사 유지. |
+| 41 | SUCCESS | Case01 Room02→Case02 정상 흐름에서 교란 후보/조건 없음. |
+| 42 | FAILURE | Power authored와 Vent fallback, 반응 작성 데이터 누락 경로 확인. |
+| 43 | Experiment 교란 | 실제 승인 실행 이후 Notice와 상태 영역, 선택 유지 회귀. |
+| 44 | Containment 교란 | 정상 threshold4 진입 및 미확정 선택 중 적용 fixture 확인. |
+| 45 | CCTV 교란 | 실제 CCTV entry opportunity 검사. threshold1은 검증용 메모리 후보에만 적용. |
+| 46 | Reentry | 세 View Log Back 및 Profile를 거친 재진입 시 조건 복원. |
+| 47 | Research Observation | 기존 reaction_id OBSERVATION과 authored/fallback 보존, 상태 영역에 관찰 전체 반복 없음. |
+| 48 | ResearchArchive | handoff merge/Reaction ID 보존과 debug Archive 회귀. |
+| 49 | Case handoff | 승인/불가 Next, 기존 Runtime 보존 및 새 Runtime 독립 검사. Case03 없음. |
+| 50 | debug Monitoring | 기존 test 전용 Main으로 Timer/누적 관찰/결과 회귀 검사. |
+| 51 | Failure downstream | Incident/Broadcast/확정 Option/IncidentResult/Result debug 회귀 검사. |
+| 52 | stale/signal | 오래된/분리된 View 요청 무시, 현재 signal 단일 연결 검사. |
+| 53 | 단일 View | ViewHost에 주요 View 하나. 상태 영역은 내부 자식 Scene. |
+| 54 | Overlay 중복 | 기존 중복 key/triggered/modal guard 및 stale Dismiss 검사. |
+| 55 | 해상도/Stretch | 1920×1080, 1280×720, 1024×768, canvas_items/keep/resizable 그대로. |
+| 56 | 파싱/실행 | Godot 4.7.1 import 및 전체 GDScript 검사, 기본 Main 실행과 headless/GPU 회귀 결과는 아래 기록. |
+| 57 | 문제/해결 | 기존 ViewHost 360에는 추가 영역이 넘칠 수 있어 조건이 있을 때만 500 확보. 검증 fixture의 반복 ID 정의 충돌/해제된 View 참조를 수정한 뒤 재검사. |
+| 58 | 실제 변경 | 아래 목록: 기존 파일 8개 수정, 공통 Scene/Script/UID 3개 추가, 삭제 없음. |
+| 59 | 이전 변경 보존 | 이전 변경을 취소하지 않음. 수정 없는 기존 제품 76개/이전 검증 소스 1,053개 해시 및 기존 함수/Scene 내용 비교. |
+| 60 | 미구현 | 환경별 CCTV/Experiment Variant, 정답 변경, penalty, severity, 시설 simulation, Manager/Singleton, Campaign/Case03, Save/Load, 연출/최종 디자인. |
+| 61 | 다음 단계 | 실제 기획에 맞는 환경별 authored 관찰/실험 콘텐츠 계약을 먼저 정리하는 지점. 이번에는 Variant 구현 없음. |
+
+### 실제 변경 파일과 책임
+
+- 추가: `scenes/views/environment_conditions_view.tscn`, `scripts/views/environment_conditions_view.gd`, 해당 `.gd.uid`.
+- 수정: `scripts/main/main.gd` — Summary 생성/ID 해석, 상태 영역 갱신, 조건이 있는 화면의 높이 확보.
+- 수정: `scripts/views/cctv_view.gd`, `experiment_view.gd`, `containment_view.gd` — 각각 작은 표시 전용 setter 추가. 기존 함수는 그대로.
+- 수정: `scenes/views/cctv_view.tscn`, `experiment_view.tscn`, `containment_view.tscn` — 기존 Actions 앞에 공통 Scene instance 하나 추가.
+- 수정: `README.md` — 현재 정책/폴더 구조 및 이 보고 추가. 32단계 이하 과거 보고 본문 보존.
+
+검증 자료는 Git 제외 `.godot/verification/step33/`에만 있습니다.
+기존 검증 소스를 덮어쓰지 않고, 현재 Main을 사용하는 정상 테스트와 이전 debug Route를
+사용하는 검증용 복사본을 분리했습니다. F5 키를 UI로 자동 조작하지는 않았으며 동일한
+`run/main_scene` 프로젝트 기본 실행을 headless와 Windows GPU에서 검사했습니다.
+1024×768 창의 실제 콘텐츠 렌더 영역은 비율 유지로 1024×576입니다.
+
+최종 검증은 **151개 모두 통과**했습니다(headless 91, Windows GPU 60).
+GDScript 33개 `--check-only`, 프로젝트 기본 실행, 기존 정상/실패 debug Route를 포함합니다.
+일반 실행과 최종 editor import는 오류/경고 0이며, 부적합 데이터 fixture의 경고는
+검사별 예상 수와 일치했습니다. Power authored / Vent fallback / Reaction 작성 누락 / SUCCESS의
+정상 흐름에서 총 360회 Open/Back을 확인했고, 별도 상태 표시 검사에서 0/1/3/10개와 장문,
+선택/잠금, 재진입, CCTV/Containment 교란, Runtime 교체/reset을 확인했습니다.
+GPU 캡처 165개를 생성하고 세 해상도의 실제 상태 표시와 장문 스크롤을 시각적으로 점검했습니다.
+`validation-results.json`, 각 검사 `.pass.json`/로그, `audit-results.json`에 결과를 보관했습니다.
+검증 결과 확인용 명령의 잘못된 경로 조합도 수정했으며 실제 151개 로그 해시/Script 경로를 재확인했습니다.
+Git diff 검사 및 작업 전 사본 비교 결과 삭제/의도하지 않은 변경이 없고,
+기존 Main/View 함수와 기존 Scene 노드 구성, 32단계 이하 보고는 보존됐습니다.
+
+## 32단계 숨겨진 판정과 환경 교란 관찰 Vertical Slice
+
+현재 정상 Route는 그대로 네 화면씩 Case01 → Case02를 진행합니다. 현재 저장소에는
+과거 실패를 다음 제출에서 즉시 Incident 화면으로 연결하는 정상 Route가 없었으며,
+31단계의 Pending 보존/handoff 기반에 아래 구조를 추가했습니다.
+
+```text
+Containment Confirm → Pending (화면 유지)
+Next/handoff → Case ID + Room ID로 유일한 Outcome 검색
+  → 숨겨진 Resolution 한 번 기록 → FAILURE이면 후보 등록 → Pending 제거
+  → 기존 Research Archive merge → 새 Runtime → 다음 PROFILE
+
+후속 Case의 실제 CCTV 진입 / 승인된 Experiment 실행 / Containment 진입
+  → 중복 없는 opportunity → 후보별 카운트
+  → threshold에 도달한 가장 오래된 유효 후보 하나
+  → IncidentData.environmental_disturbance
+  → 현재 Case의 disturbance_id 일치 Reaction 검색
+  → Runtime applied record → modal Notice → authored discovery
+  → Dismiss 후 동일 View 계속 → Research Log OBSERVATION
+```
+
+내부 결과는 기존 `MonitoringOutcomeData.final_result`가 Source of Truth입니다.
+정상 경로에서는 Monitoring Timer, 현재 Runtime의 monitoring_result, Incident/Broadcast
+Route를 사용하지 않습니다. 실패 원인 Case와 SUCCESS/FAILURE는 플레이 UI에 전달하지 않습니다.
+판정이 잘못됐거나 중복이면 handoff를 차단하고 Pending과 현재 상태를 유지합니다.
+마지막 Case는 다음 항목이 없으므로 판정하지 않고 현재 Pending/Runtime에 머무릅니다.
+
+Main은 현재 Runtime과 네 독립 세션 상태를 소유합니다. Resolution은 Case별 최초 판정을
+보존하고 Candidate는 source_case_id/incident_id/threshold/count/disturbance_triggered를
+보존합니다. 각 getter는 복사본을 반환합니다. Candidate의 환경 영향이 발생해도 후보를
+삭제하지 않습니다. 이 상태들은 Resource나 Manager가 아니며 서로를 참조하지 않습니다.
+
+`PROTOTYPE_DISTURBANCE_THRESHOLD = Vector2i(2, 4)`는 **TEMPORARY / PROTOTYPE** 값입니다.
+후보 생성 때 Main의 RNG로 한 번 선택하며 초 단위 Timer/random polling이 없습니다.
+실제 행동이 없으면 기다린 시간만으로 발생하지 않습니다. 두 번의 Experiment를 모두
+건너뛰면 이번 두 Case sequence 안에서 threshold에 도달하지 않을 수도 있습니다.
+모든 대기 후보는 같은 유효 opportunity에서 카운트를 진행하고 ready 후보를 등록 순서로
+검사합니다. 잘못된 콘텐츠의 후보는 유지하고 건너뛰며, 가장 오래된 유효 후보 하나만
+적용합니다. 중복 disturbance+reaction은 현재 Runtime에 다시 적용하지 않습니다.
+
+Incident01은 TEST POWER INTERRUPTION, Incident03은 TEST VENTILATION INSTABILITY입니다.
+조건은 각각 `LIGHT: NORMAL → OFF`, `AIRFLOW: STEADY → INTERMITTENT`로 명시합니다.
+Case02에는 두 반응을 작성했습니다. 전원 반응에는 Research Entry를 추가하고 환기 반응은
+fallback을 사용합니다. 문구는 이동 빈도/반복 벽 접촉 같은 임시 관찰 사실이며 정답·해석·
+고의적인 거짓 단서를 넣지 않습니다. 후보/실험 제한/CCTV/Room/Research를 삭제하거나
+숫자형 불이익을 주지 않습니다. 환경 전체를 시뮬레이션하지 않습니다.
+
+Notice는 Main의 자식 Control이며 Stage 목록과 ViewHost에 포함되지 않습니다.
+뒤 화면의 처리를 잠시 비활성화하고 전체 화면의 mouse input을 막으며 keyboard input은
+Notice가 처리합니다. Dismiss 또는 ui_accept으로 닫습니다. Main의 활성 View 검증도
+Notice 동안 진행/Open/실행/확정 요청을 차단합니다. 같은 View 객체와 임시 선택을 보존하고
+기존 process mode/focus를 복원합니다. 긴 문구는 Notice 안에서 스크롤할 수 있습니다.
+
+Research Log는 실제 applied record가 있는 현재 Case Reaction만 표시합니다.
+SourceKind DISTURBANCE_REACTION=8을 배열 끝에 추가했으며 기존 0~7은 그대로입니다.
+Source ID는 reaction_id, 표시 category는 OBSERVATION입니다. 유효 authored 항목을 실제
+발견했으면 작성 문구, 그렇지 않으면 Reaction 문구를 사용합니다. Source Case의 Incident/
+Broadcast/IncidentResult Research는 발견하지 않습니다. 기존 merge helper가 Reaction 발견
+ID도 보존하며 마지막 Case에서는 기존 정책대로 현재 Runtime에 남습니다.
+
+### 요청한 76개 항목의 작업 보고
+
+| 번호 | 항목 | 구현 및 검증 내용 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | master → origin/main, HEAD 1c4eea4. 기존 수정7개/미추적5개, 제품73파일과 기존 검사 원본872개를 먼저 스냅샷/해시로 보관. |
+| 2 | Hidden Resolution | 정상 handoff에서 Pending Case/Room ID로 유일한 기존 Outcome을 검색, Timer 없이 final_result 사용. |
+| 3 | ResolutionState | Main 소유 RefCounted. Case ID/Room ID/result/FAILURE incident_id, 최초 기록/복사 조회/순서/reset. |
+| 4 | Pending 전환 | 판정·후보 조건을 먼저 검사하고 기록 성공 뒤 remove_pending. 실패하면 현재 상태와 Pending 유지. |
+| 5 | SUCCESS | Resolution만 저장. Runtime 결과/알림/후보/교란 없음. |
+| 6 | FAILURE | Resolution에 Incident ID와 결과 기록 후 ID 중심 후보 등록. 즉시 UI 사건 없음. |
+| 7 | CandidateState | source_case_id/incident_id/threshold/opportunities_seen/disturbance_triggered, 여러 Case 등록/복사 getter/명시적 reset. |
+| 8 | 판정/사건 분리 | handoff 판정과 이후 gameplay opportunity 발생을 분리. PROFILE 직후 사건 없음. |
+| 9 | 후보 수명 | Runtime 교체/reset과 독립이며 triggered 이후도 유지. |
+| 10 | DisturbanceData | disturbance_id/display_name/notice_text/condition_change_text만 typed Resource. |
+| 11 | Incident 연결 | environmental_disturbance: EnvironmentalDisturbanceData 필드 하나 추가. Main에 특정 Incident ID 분기 없음. |
+| 12 | ReactionData | reaction_id/disturbance_id/display_name/observation_text만 typed Resource. |
+| 13 | CaseData | disturbance_reactions: Array[CaseDisturbanceReactionData] 추가. 기존 필드 보존. |
+| 14 | SourceKind | DISTURBANCE_REACTION=8 추가. 기존 0~7/Monitoring 제외 정책 유지. |
+| 15 | Runtime 기록 | disturbance_id/reaction_id 쌍, 없는 반응은 빈 reaction_id. 중복 쌍 거부, deep-copy getter, reset 초기화. |
+| 16 | discovery | 유효 현재 반응을 Notice로 실제 보여준 경계에서 기존 helper로 발견. |
+| 17 | 작성/fallback | 유효 발견 ID가 있는 authored 사용, 없거나 충돌이면 실제 Reaction 문구. 가짜 ID 생성 없음. |
+| 18 | Opportunities | 실제 CCTV 진입, 승인된 개별 Experiment 실행, 실제 Containment 진입만. |
+| 19 | 중복 방지 | 현재 Case의 Main key 집합. handoff에서 초기화, 동일 key 한 번만. |
+| 20 | Log farming | Open/Back은 opportunity 아님. Back 생성은 기존 false 경계, key 중복 방어도 유지. |
+| 21 | Experiment | 승인 완료된 ID별 key. 선택/거부/중복 실행은 소비하지 않음. |
+| 22 | threshold | 한 곳의 임시 2~4 범위, 후보 생성 시 한 번 RNG 선택. 첫 opportunity 자동 발생 없음. |
+| 23 | RNG 검사 | ignored 검사에서 private RNG seed를 지정해 2/3/4 threshold를 재현. 제품 Debug API 추가 없음. |
+| 24 | 여러 후보 | 모든 대기 후보 진행, ready 중 가장 오래된 유효 후보 하나 처리. 잘못된 후보 보존. |
+| 25 | FIFO | 등록 순서의 ready 목록. Severity/Priority engine 없음. |
+| 26 | 한 번 한 Event | Main loop는 성공한 하나의 Notice 이후 break. 독립 두 후보 검사. |
+| 27 | Overlay | 독립 Control Scene/Script, 시설 제목/조건 변화/선택적 관찰/Dismiss, 스크롤 영역. |
+| 28 | Stage 아님 | 기존 enum/PackedScene Route 배열 변경 없음. Main 자식 overlay. |
+| 29 | View 유지 | Notice와 Dismiss에서 현재 View 생성/해제 없음. 같은 객체 유지. |
+| 30 | 입력 차단 | 전체 화면 mouse 차단, keyboard 처리, ViewHost process 중단, Main 활성 View guard. |
+| 31 | 환경 명시 | LIGHT/AIRFLOW 변화 문구를 Notice에 표시. |
+| 32 | 관찰 | 해당 현재 Case Reaction의 observation_text만 UNPLANNED OBSERVATION 표시. |
+| 33 | 정답 비노출 | 정답 Room이나 안정화 해석을 쓰지 않음. |
+| 34 | 거짓 단서 없음 | 실제 작성한 현재 Case 반응만 표시, 다른 반응 대체 없음. |
+| 35 | 필수 정보 보존 | Experiment/CCTV/Room/Research/limit를 교란으로 제거·수정하지 않음. |
+| 36 | Case01 콘텐츠 | Incident01 전원/Incident03 환기 교란 연결. 기존 Outcome/Stage/후속 콘텐츠 보존. |
+| 37 | Case02 반응 | 전원·환기 각 하나. disturbance_id 검색. |
+| 38 | Research | 전원 반응 authored1 추가, 환기 fallback. 기존 Research3 보존. |
+| 39 | 숨겨진 실패 | 새 Runtime monitoring_result는 UNDEFINED. Case02 UI/Log에 source FAILURE 없음. |
+| 40 | 원인 Case | Notice에 source_case_id/incident_id/판정 전달 없음. |
+| 41 | 후보 보존 | triggered=true로 남김. 삭제/resolve/MAJOR 전환 없음. |
+| 42 | MAJOR | Incident/Broadcast/IncidentResult 자동 interrupt 미구현. |
+| 43 | SUCCESS 후보 | SUCCESS 흐름 후보0, applied record0, Notice0 확인. |
+| 44 | debug 보존 | Monitoring Scene/Timer/Schema와 기존 debug Route 유지. 정상 판정에서 사용하지 않음. |
+| 45 | 원인 Research | Source Case의 Incident/Broadcast/결과 발견 없음. 실제 기존 discovery 목록만 Archive merge. |
+| 46 | Runtime reset | 적용 기록/현재 발견은 지우고 독립 Resolution/Candidate/Archive는 유지. |
+| 47 | 상태 독립 | 현재 Runtime + Pending/Resolution/Candidate/Archive의 수명·API 분리. Resource 저장 없음. |
+| 48 | 정상 SUCCESS | Room02 확정 → 숨겨진 SUCCESS → 새 Case02 정상 진행, 알림 없음. |
+| 49 | 정상 FAILURE | Room01/03 → 숨겨진 FAILURE → 후보 → 후속 행동 → 교란 한 번/현재 반응. |
+| 50 | 발생 전 | Case02 PROFILE과 첫 CCTV 행동에는 반응 기록/발견/Notice 없음. |
+| 51 | 발생 후 | applied record와 해당 authored discovery, 후보 triggered만 변경. 현재 Stage 유지. |
+| 52 | Dismiss | 같은 View/Stage와 미실행 임시 Experiment 선택 유지, 처리/focus 복원. |
+| 53 | Log 전/후 | 발생 전 미공개, 발생 후 현재 Case OBSERVATION의 authored/fallback 정확한 문구 확인. |
+| 54 | 누락 반응 | 시설 조건 Notice만 표시, 빈 reaction_id 기록, 관찰/가짜 발견 없음. |
+| 55 | 중복 반응 | 같은 disturbance 복수/같은 reaction ID 충돌은 경고 후 관찰 생략. 첫 항목 fallback 없음. |
+| 56 | 잘못된 교란 | null/빈 ID/누락 문구/없는 또는 중복 Incident는 이벤트 없이 후보 유지. |
+| 57 | 배열 순서 | Outcome/Incident/Reaction 배열을 뒤집어도 ID 매칭. |
+| 58 | stale 차단 | 활성/Tree/queue-free 검증 유지, 이전 Case/View와 분리 객체 요청은 opportunity 소비 없음. |
+| 59 | reentry | CCTV Log 왕복과 같은 key 재요청 반복에도 카운트 증가 없음. |
+| 60 | 두 후보 | 한 행동에서 첫 후보만 triggered, 다음 실제 행동에 다른 후보 처리, 두 후보 모두 보존. 독립 fixture 검사만 사용. |
+| 61 | Resource 불변 | 원본 Case/Incident/Disturbance/Reaction/Research deep snapshot과 디스크 해시 검사. |
+| 62 | Archive 회귀 | 기존 API/경계/ID/충돌/증분 merge와 반응 발견 보존 검사. |
+| 63 | Log 회귀 | authored/fallback/mixed/Open/Back/공개 조건/lifecycle/security 검사 유지. |
+| 64 | handoff 회귀 | 기존 Case01→Case02/Archive/새 Runtime/stale/단일 View, Pending 정책만 새 판정 소비로 변경. |
+| 65 | Monitoring 회귀 | 기존 0/10/20 prototype playback, 완료/복원/보호 검사. |
+| 66 | debug 실패 | Room01/03 Incident→Broadcast Confirm→IncidentResult→Result 검사. |
+| 67 | 주요 View | ViewHost 자식 하나, Notice는 별도 Main 자식. |
+| 68 | Overlay 중복 | 열려 있을 때 opportunity/전환 요청 차단, 한 행동 한 Notice. |
+| 69 | signal | 진행/Open/Dismiss 연결 하나, 오래된 Dismiss/현재 View 요청으로 중복 진행 없음. |
+| 70 | 해상도 | 기존 1920×1080/1280×720/1024×768, canvas_items/keep 유지, overlay 레이아웃/입력/캡처 검사. |
+| 71 | 파싱/실행 | 완료된 최종 검증 결과는 아래 기록에 기재. |
+| 72 | 문제/해결 | 기존 coverage 검사의 enum 개수8은 복사본에서9로만 갱신. 제품 파싱/실행 오류는 초기 import·새 흐름/상태/경계 검사에서 발견되지 않음. |
+| 73 | 실제 파일 | 신규5 GD+각 UID5+Notice Scene1. 수정 Main/Runtime/Pending/Data3/Case2개/README9개. 아래 범위 표 참조. |
+| 74 | 이전 변경 | 기존 미커밋 구현·UID·Scene 설정·검사 원본은 보존하며, 변경한 파일은 필요한 경계만 확장. 커밋/push 금지 준수. |
+| 75 | 미구현 | Severity/MAJOR/자동 Broadcast/연쇄 사건/시간 trigger/환경 Simulation/숫자 penalty/Case03/Campaign/Save/Load/Archive UI/Manager/최종 UI·Audio·Animation·Shader 없음. |
+| 76 | 다음 단계 | 유지된 후보가 언제 MAJOR 영향으로 발전할지와 플레이 중단/복귀 정책을 먼저 설계. 다음 제출 즉시 사건이라는 규칙을 자동으로 넣지 않음. |
+
+### 32단계 실제 변경 범위
+
+| 구분 | 파일 / 이유 |
+| --- | --- |
+| 신규 Resource Schema | scripts/data/environmental_disturbance_data.gd, case_disturbance_reaction_data.gd 및 UID |
+| 신규 세션 State | scripts/runtime/containment_resolution_state.gd, failure_event_candidate_state.gd 및 UID |
+| 신규 UI | scenes/views/environmental_disturbance_notice.tscn, scripts/views/environmental_disturbance_notice.gd 및 UID |
+| 수정 orchestration | scripts/main/main.gd: 숨겨진 판정, 의미 있는 행동 경계, Notice, 현재 반응 Log 연결 |
+| 수정 현재/대기 상태 | case_runtime_state.gd: 적용 쌍/복사 getter/reset; pending_containment_state.gd: remove_pending만 추가 |
+| 수정 기존 Schema | case_data.gd/incident_data.gd: typed 필드 각1; research_entry_data.gd: enum 끝에1종 추가 |
+| 수정 테스트 콘텐츠 | test_case_01.tres: 교란2와 Incident typed 연결; test_case_02.tres: 반응2/Research1 추가 |
+| 수정 문서 | README: 현재 실행 안내/구조/32단계 보고, 아래 Step31 이하 역사 보고 보존 |
+
+검사 자료는 Git 제외 `.godot/verification/step32/`에 저장합니다. 기존 검사 원본을 수정하지
+않고 독립 debug Main과72개 복사본에서 이전 단일 Case 기능을 검사합니다. 새 normal flow는
+제품 Main Scene을 그대로 실행합니다. RNG seed와 비정상 콘텐츠 조작은 ignored 검사 fixture에만 있습니다.
+### 32단계 최종 검증 기록
+
+- Windows Standard Godot `4.7.1.stable.official.a13da4feb`, AMD Radeon RX 6800/OpenGL 3.3 Compatibility에서 검사했습니다.
+- 최종 에디터 import: exit=0, errors=0, warnings=0. 전체 **144검사(headless87/native57)** 통과. 제품 GDScript32개의 check-only를 포함합니다.
+- 정상 slice 흐름은 SUCCESS/전원 FAILURE/환기 FAILURE/전원 authored 누락 fallback 네 시나리오를 세 창 크기 × headless/native에서 검사했습니다. 실행마다 실제 Open/Back60회, 합계360회입니다. threshold2/3/4를 seed로 재현했습니다. 정상 Main 실행과 정상 흐름은 경고 없이 통과했습니다.
+- 비정상 상태 edge 검사의 의도한 경고20개와 기존 debug edge 검사의 지정한 경고 개수가 각각 일치했습니다. 없는/중복 Outcome, 기존 Resolution/Candidate, invalid Disturbance/Incident/source, 누락/중복/invalid Reaction과 충돌 authored mapping을 포함합니다.
+- 새 흐름 캡처129장(overlay9장 포함), 기존 debug authored/fallback/mixed navigation 캡처234장. 전원/환기 overlay의 조건·관찰·Dismiss와 Research Log, 기존 SUCCESS/FAILURE Result를 직접 열어 확인했습니다. 1024×768 keep 렌더링 영역은 1024×576입니다.
+- 검사 중 제품 Script/Resource 디스크 해시와 원본 콘텐츠 deep snapshot이 유지됐습니다. 결과는 `.godot/verification/step32/validation-results.json`, 각 *.log, `final_editor_import.log`에 있습니다.
+- 최종 audit: 작업 전73파일 중64개 바이트 동일, 필요한9개 수정, 신규11개, 삭제0개. 기존 검사 원본872개 해시 동일, 기존 Case 두 Resource의 모든 subresource 필드는 새 typed Incident 연결 외에 보존됐습니다.
+- Main은 기존36함수 중 필요한7개만 변경하고7개 추가(총43). Runtime 기존21함수는 reset의 적용 기록 초기화만 변경하고2개 추가. Pending 기존5함수는 그대로이며 remove_pending1개만 추가했습니다.
+- project.godot/Main Scene/기존 Containment UI/Monitoring Scene·Script·Schema/Archive Script/기존 UID 및 Step31 이하 README 보고는 보존했습니다. git diff --check 통과, HEAD 동일, staged0개, 커밋/push 없음.
+
+보류 사항: 마지막 Case의 Pending은 다음 Case handoff가 없으므로 유지됩니다. 기다린 시간이나 Log 탐색으로 threshold를 소비하지 않으며, 최소 행동만 하고 끝내면 후보가 이번 sequence에서 아직 드러나지 않을 수 있습니다. 이는 임시 opportunity 기반 정책이며 최종 밸런스·Severity·MAJOR 발생 규칙은 미정입니다.
+
+## 31단계 두 Case의 순차 업무 진행
+
+정상 Main Scene은 `case_sequence = [test_case_01, test_case_02]`를 설정합니다.
+두 Case 모두 PROFILE → CCTV → EXPERIMENT → CONTAINMENT를 진행합니다.
+Confirm은 현재 Room 확정과 Pending 등록만 수행하고 화면에 머무릅니다.
+Next는 검증된 다음 Case가 있을 때 현재 Research를 Archive에 합친 뒤
+새 Runtime을 생성하고 다음 PROFILE을 표시합니다. 이전 Runtime은 수정하지 않습니다.
+Archive와 Pending은 Main이 처음 생성한 동일한 객체를 계속 사용합니다.
+
+```text
+Case01 PROFILE → CCTV → EXPERIMENT → CONTAINMENT
+    Confirm: Runtime Room + Pending[Case01] 기록, 화면 유지
+    Next: 유효 발견 ID merge → index 증가 → 새 Runtime → Case02 PROFILE
+Case02 PROFILE → CCTV → EXPERIMENT → CONTAINMENT
+    Confirm: Pending[Case01] + Pending[Case02] 유지
+    Next: No next test case configured (disabled), 현재 상태 유지
+```
+
+Archive는 이제 “결과가 확정된 Case”만을 뜻하지 않습니다. 결과 판정 없이도
+실제로 획득한 Research ID를 Case별로 보존합니다. 같은 ID의 중복 merge는 멱등이며
+추가 발견은 기존 순서를 유지하면서 뒤에 합칩니다. 기존 유효 entry 검사와 충돌
+제외 로직을 재사용하고 별도 Validator를 만들지 않았습니다. 정상 마지막 Case는
+handoff하지 않으므로 발견 ID가 현재 Runtime에 유지되며 Archive에 새로 합치지 않습니다.
+현재 Case Log는 Archive를 조회하지 않습니다.
+
+Case02는 Case01과 구분되는 Case/Profile/CCTV/Experiment/Room/Research ID를 사용합니다.
+Profile1, CCTV1, Experiment2, Room2, Research3과 실행 제한2만 있습니다.
+Profile·Experiment01·Room01에는 작성 Research가 있고 CCTV·Experiment02·Room02에는
+작성 Research가 없어 기존 fallback을 검증합니다. Outcome/Incident/Broadcast/IncidentResult는
+빈 배열이며 정상 업무 진행은 이를 요구하지 않습니다.
+
+### 요청한 49개 항목의 작업 보고
+
+| 번호 | 항목 | 구현 및 검증 내용 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | master → origin/main, HEAD 1c4eea4. README/Main/Monitoring 관련 4파일 수정과 Pending/Archive GD·UID 4파일 미추적. 먼저 72파일과 기존 검사 원본 693개의 해시를 보관함. |
+| 2 | Case sequence | Main Scene의 typed Array[CaseData] export. Resource 순서만 설정. |
+| 3 | Case02 구조 | 새 test_case_02.tres, TEST_CASE_02 및 독립 Source/Research ID. |
+| 4 | 콘텐츠 범위 | Profile1/CCTV1/Experiment2/Room2/Research3, 임시 문구와 limit2. downstream 없음. |
+| 5 | Manager 미사용 | Campaign/Manager/Singleton/범용 상태 프레임워크 없음. |
+| 6 | index/state | Main의 _case_index 정수, current_case, 현재 Case Runtime. 배열이 있으면 첫 항목에서 시작. |
+| 7 | Confirm | 기존 승인 경계에서 Room 확정과 Pending 등록. 화면 유지. |
+| 8 | Next | Research 보존 후 다음 index/Case/새 Runtime/PROFILE으로 handoff. |
+| 9 | Guard | 활성 View·현재 Stage·Case/Runtime 일치·확정 Room·동일 Pending Room·실제 Room 후보·배열/index/다음 Case 유효성·중복 Pending 검사. |
+| 10 | 미확정 차단 | 버튼 disabled와 Main의 독립 검증. 강제 활성화와 직접 signal도 거부. |
+| 11 | 정상 Monitoring 제외 | Containment 진행 handler는 handoff만 호출하며 _get_next_stage의 해당 Monitoring 분기를 제거함. |
+| 12 | debug 보존 | 기존 Scene/Timer/Schema/결과 처리 보존. ignored 검사용 Main 확장에서만 Containment → Monitoring 연결. 제품 debug UI 추가 없음. |
+| 13 | merge 시점 | Guard 통과 후 이전 Runtime/Case 교체 전에 유효 발견 ID merge. |
+| 14 | Archive 의미 | 결과 확정과 독립적인 획득 Research의 Case별 세션 기록. |
+| 15 | incremental merge | 기존 API의 멱등·추가 발견·순서·getter 복사·독립 reset 검사 유지. |
+| 16 | Runtime 교체 | 새 CaseRuntimeState.new(next_case.case_id). 이전 객체 reset 없이 새 업무 상태 시작. |
+| 17 | 누출 방지 | 이전 실행/Room/결과/Broadcast/발견 목록 누출 없음. 이전 객체도 불변. |
+| 18 | 이전 Pending | Case01 실제 확정 Room 유지. |
+| 19 | 이전 Archive | Case01 첫 발견 순서의 유효 ID 유지, Case02 Log에 섞지 않음. |
+| 20 | Case02 PROFILE | handoff 즉시 새 subject/classification/description 표시. |
+| 21 | Case02 discovery | 실제 Profile 표시, Experiment 승인 실행, Room 확정에 해당 작성 ID만 발견. fallback Source는 authored ID를 만들지 않음. |
+| 22 | Case02 Log | 현재 Stage/현재 Runtime 공개 조건, 작성·fallback 정확한 문구와 Back 복원 확인. |
+| 23 | Experiment | Case02 ID 실행 이력·순서·중복/limit 유지. 선택만으로 소비/발견하지 않음. |
+| 24 | Containment | Case02 후보 표시/선택/한 번 확정/Log 복원. 판정 없음. |
+| 25 | 두 Pending | Case01+Case02의 실제 Room과 등록 순서 동시 유지. |
+| 26 | Research 식별 | Archive는 Case ID별 ID 목록. 독립 세 번째 fixture에 동일 Research ID를 넣어도 Case 구분 유지. |
+| 27 | 배열 순서 | Case02→Case01 역순과 Case01→Case02→세 번째 fixture도 코드 변경 없이 검사. |
+| 28 | 마지막 Next | No next test case configured, disabled. 직접 요청도 경고 후 현재 상태 유지. |
+| 29 | 종료 개발 상태 | Containment에서 머무르는 테스트 데이터 끝. 완료 시스템/Result 없음. |
+| 30 | Pending 미판정 | resolve/remove/지연 시간/진행 단위 없음. |
+| 31 | 정상 결과 없음 | 두 Case Runtime 결과 UNDEFINED, Incident/Broadcast 확정 없음. |
+| 32 | Incident Queue | 미구현. 기존 debug Incident 표시와 구분. |
+| 33 | stale signal | 이전 Case01 View 및 Log의 늦은 진행/확정/Open/Back 차단. Tree 밖/queue-free 발신자도 차단. |
+| 34 | Resource 불변 | 원본 Case01/Case02 deep snapshot과 디스크 해시 검사. Runtime 상태를 Resource에 쓰지 않음. |
+| 35 | Archive 회귀 | 기존 상태/경계/불일치/잘못된 ID/충돌 검사 유지. |
+| 36 | Log 회귀 | 기존 authored/fallback/mixed, Stage gate, lifecycle/security/Back 검사 유지. |
+| 37 | Monitoring 회귀 | 독립 prototype 0/10/20 재생·완료·복원·보호 검사. Pending은 미판정. |
+| 38 | FAILURE 회귀 | Room01/03의 Incident→Broadcast Confirm→IncidentResult→Result 검사. |
+| 39 | SUCCESS 회귀 | Room02의 Monitoring→Result, 실패 콘텐츠 없음 검사. |
+| 40 | 정상 전체 경로 | 다섯 순차 시나리오, 창 크기별 실제 버튼 Open/Back 77회, headless/native 검사. |
+| 41 | 단일 View | 모든 전환과 Log 왕복에서 ViewHost 자식 하나 유지. |
+| 42 | signal 중복 | 활성 View 진행/Open 연결 한 개, stale 중복 요청으로 재진행하지 않음. |
+| 43 | 해상도/Stretch | 1920×1080, 1280×720, 1024×768. 기준 1920×1080/canvas_items/keep 유지, 긴 마지막 버튼 포함 레이아웃 검사. |
+| 44 | 파싱/실행 | Godot 4.7.1 에디터 import와 137검사 통과. 오류 없음. F5가 사용하는 설정 Main Scene을 headless/native 명령행으로 실행. |
+| 45 | 문제/해결 | 테스트가 해제된 이전 View에 신호를 보내던 시점을 같은 프레임으로 수정. 기존 테스트 두 곳의 직접 Main Scene 참조는 복사본에서만 debug Scene으로 조정. 누락된 debug 캡처 폴더도 생성. 제품 실행 오류 수정이나 기존 검사 원본 변경은 없음. |
+| 46 | 실제 변경 | 신규 Case02 TRES 하나. 기존 Main GD/Scene, Containment GD/Scene, README 다섯 파일만 Step31 수정. |
+| 47 | 이전 변경 보존 | 기존 Step29/30 구현·설명과 693 검사 원본 보존. 커밋/push 없음. |
+| 48 | 미구현 | delayed resolution 규칙·SUCCESS/FAILURE 판정·IncidentQueue·Shift/Campaign·영구 결과·Archive UI·Save/Load·Validator·Manager·최종 디자인/에셋/Audio/Animation/Shader 없음. |
+| 49 | 다음 단계 | 결과 대기 Case의 콘텐츠를 어떤 경계에서 다시 조회할지 정하고 명시적인 resolve 경계를 별도 설계. 몇 Case 뒤 또는 몇 초 뒤라는 규칙은 아직 만들지 않음. |
+
+### 31단계 변경 이유와 검증 기록
+
+- Main Scene은 기존 UI 노드를 유지하면서 두 Resource의 배열 연결만 변경했습니다.
+- Main Script는 정상 Containment 진행을 handoff로 바꾸고 Archive filtering을 기존 debug RESULT와 공유하도록 추출했습니다. 기존 결과 경계 보호는 유지합니다.
+- Containment Script/Scene은 상위에서 전달하는 Next 문구와 가용성을 반영합니다. 선택·확정 코드는 유지합니다.
+- README 현재 실행 안내는 새 정상 경로를 반영하며 아래의 Step30 이하 기록은 당시 동작의 역사 기록으로 보존합니다.
+- 검증 자료는 Git 제외 `.godot/verification/step31/`에 보관합니다. 기존 검사 원본을 수정하지 않고 72개 복사본과 test-only debug Main으로 기존 단일 Case 경로를 검사합니다.
+- 검증 엔진은 Windows Standard `4.7.1.stable.official.a13da4feb`, native 렌더러는 AMD Radeon RX 6800/OpenGL 3.3 Compatibility입니다.
+- 최종 에디터 import는 exit=0, error=0, warning=0입니다. 전체 137검사(headless81/native56)가 통과했으며 27개 제품 GDScript의 check-only를 포함합니다. 정상 경로와 Main 실행은 경고 없이 통과했고 잘못된 상태를 주입한 검사는 지정한 경고 개수까지 일치했습니다.
+- 정상 순차 진행은 세 창 크기 × headless/native × 다섯 시나리오로 검사했습니다. 실행별 실제 Open/Back 77회, 합계462회입니다. Case01 Room01/02/03, Case02 작성/미작성 Room, 역순 배열, 독립 세 번째 fixture를 포함합니다.
+- 정상 경로 캡처60장, 기존 debug authored/fallback/mixed navigation 캡처234장을 생성했습니다. Case02의 Profile/CCTV/Experiment/최종 Containment/Log와 기존 debug SUCCESS/FAILURE Result를 직접 열어 확인했습니다. 1024×768 창의 keep 렌더링 영역 캡처는 1024×576이며 창 크기 문구는 1024×768입니다.
+- 입력 서명과 로그 해시가 일치한 성공 검사만 재사용하여 누락 캡처 폴더 수정 후 남은 검사를 재개했습니다. 검사 결과/로그는 validation-results.json과 각 *.log, 파싱 기록은 final_editor_import.log에 있습니다.
+- 최종 audit-results.json: 작업 전72파일 중67개 바이트 동일, 허용한5개만 수정, 신규 Case02 Resource1개, 삭제0개, 기존 검사 원본693개 해시 동일. Main 기존33함수 중 필요한5개만 변경하고3개 추가(총36개), 다른 함수와 Containment 선택/확정 함수는 보존했습니다.
+- Step30 이하 README 보고는 보존했습니다. project.godot, 기존 Case01, 세 Runtime 상태 클래스, Monitoring Scene/Script/Schema와 기존 UID도 작업 시작 시점과 동일합니다. git diff --check 통과, HEAD 동일, staged 파일0개, 커밋/push 없음.
+
+## 30단계 Delayed Containment Resolution 기반 준비
+
+작업 전 HEAD는 `1c4eea4`, master→origin/main입니다. 29단계의 Main/README 수정과
+ResearchArchiveState GD/UID 추가가 미커밋 상태였으며 이를 보존했습니다.
+실제 작업 파일 70개와 기존 로컬 GD/PS1 검증 자료 687개의 SHA-256 및 기존 diff를 보관했습니다.
+현재 프로젝트는 Case 1개, Main과 10개 View Scene, 26개 GDScript, authored ResearchEntry 24개를 사용합니다.
+Main의 Containment Confirm→Runtime 기록, Monitoring Timer/완료 검사, SUCCESS/FAILURE Route,
+Incident/Broadcast/IncidentResult/Result/Log/discovery 및 RESULT Archive 승격 경계를 조사했습니다.
+
+`PendingContainmentState`는 Main이 한 번 생성하는 작은 RefCounted 세션 상태입니다.
+별도 Record 객체를 만들지 않고 `_rooms_by_case: Dictionary[String, String]`에
+Case ID→실제 확정 Room ID만 저장합니다. `_case_order: Array[String]`은 최초 등록 순서를 보존합니다.
+초/Timer/resolve_after_cases/결과/Incident/Resource/배열 인덱스를 저장하지 않습니다.
+CaseRuntimeState, PendingContainmentState, ResearchArchiveState는 서로 참조하지 않는 독립 객체입니다.
+세션은 Main 수명 동안 유지되며 앱 종료 후에는 저장되지 않습니다.
+
+| 구조 판정 | 현재 책임 |
+| --- | --- |
+| CaseRuntimeState | 현재 Case의 플레이 사실 |
+| PendingContainmentState | 나중에 결과를 처리할 Case별 격리 결정 |
+| ResearchArchiveState | Runtime보다 오래 유지할 확보한 Research ID |
+| MonitoringOutcomeData | 현재 prototype resolution 콘텐츠 |
+
+이 책임 분리는 다음 Case로 Runtime을 교체해도 이전 제출과 Research를 유지할 기반입니다.
+실제 handoff와 delayed resolver는 아직 없습니다.
+
+| API | 정책 |
+| --- | --- |
+| `try_add_pending(case_id, room_id) -> bool` | 빈/공백 ID와 동일 Case 재등록을 false로 거부; 최초 결정만 저장 |
+| `has_pending(case_id) -> bool` | 정확한 Case ID로 대기 결정 존재 여부 조회 |
+| `get_pending_room_id(case_id) -> String` | Room 문자열 반환; 없는 Case는 빈 문자열, 가변 Record 노출 없음 |
+| `get_pending_case_ids() -> Array[String]` | 최초 등록 순서의 배열 복사본 |
+| `reset()` | Pending만 비움; Runtime/Archive 비변경 |
+
+Main은 기존 Containment 요청의 Stage/활성 View/현재 Case와 Runtime ID 일치 조건을 유지합니다.
+현재 Case 후보에서 요청 Room ID를 찾고 `try_confirm_containment_room()`이 성공한 직후에만,
+current_case.case_id와 Runtime getter의 실제 확정 Room ID를 Pending에 전달합니다.
+기존 Research 발견 승인도 같은 경계에서 유지합니다. 단순 선택/setup/Open/Back/실패한 Confirm은 등록하지 않습니다.
+같은 Case의 기존 Pending 결정은 같은/다른 Room 재등록으로 덮어쓰지 않습니다.
+Pending API가 false를 반환하며, 현재 debug Confirm 경로는 기존 기록을 보존하고 계속 기존 Runtime 정책을 따릅니다.
+Runtime을 따로 reset한 뒤 같은 Case를 다시 Confirm해도 Pending의 최초 결정은 유지됩니다.
+
+격리 제출과 결과 판정은 분리된 의미입니다. 이번 단계는 제출 상태만 마련합니다.
+**자동 delayed resolution, progression counter, scheduler, resolve 메서드는 없습니다.**
+현재 debug Monitoring은 기존처럼 Runtime의 SUCCESS/FAILURE를 기록하고 downstream 연결을 검증합니다.
+이 결과는 최종 delayed gameplay resolution이 아니므로 Pending을 소비하거나 제거하지 않습니다.
+따라서 debug RESULT 이후에도 해당 제출 ID가 남습니다. 최종 정상 경로에서 Timer를 제거하는 변경은
+다음 Case handoff와 실제 delayed resolution이 동작할 때 진행할 대상입니다.
+
+MonitoringView에는 debug 재생임을 밝히는 주석 두 줄,
+MonitoringStageData.time_offset에는 prototype verification timing임을 밝히는 주석 한 줄만 추가했습니다.
+MonitoringOutcomeData와 두 Schema의 필드/이름, Timer의 실행 코드, 모든 Scene, 원본 0/10/20초 콘텐츠는 보존했습니다.
+어떤 Case/Shift 단위 또는 몇 Case 뒤에 결과가 나오는지는 정하지 않았습니다.
+
+Archive도 기존 RESULT merge 경계를 유지합니다. 기존 API는 동일 Case에 발견 ID를 추가 merge하고
+중복을 제거하므로 향후 별도 단계에서 `Containment 제출→현재 발견 merge`,
+`Incident 완료→추가 발견 merge`를 구성할 수 있습니다. 지금 그 호출 시점을 이동하거나 Archive UI를 추가하지 않았습니다.
+
+### 요청한 35개 항목의 작업 보고
+
+| 번호 | 항목 | 구현·검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | `1c4eea4`, master→origin/main. 29단계 Main/README 수정과 Archive GD/UID 미추적 파일 유지. |
+| 2 | Pending 구조 | 새 PendingContainmentState, RefCounted 세션 상태 하나. |
+| 3 | 내부 저장 | typed Case→Room Dictionary와 Case 등록 순서 배열; ID 문자열만. |
+| 4 | API | try_add_pending/has_pending/get_pending_room_id/get_pending_case_ids/reset. |
+| 5 | Case 식별 | case_id 원문 문자열; Case당 최초 결정 한 개. |
+| 6 | Room 저장 | Runtime 승인 성공 후 getter의 실제 확정 Room ID; index/Resource 미저장. |
+| 7 | Confirm 경계 | 기존 Main Stage/활성/Case/후보 검증과 Runtime 승인 뒤에만 등록. |
+| 8 | 선택 미등록 | 실제 Room 선택과 선택 없는 disabled Confirm 클릭에서 Pending 공백 확인. |
+| 9 | Confirm 실패 | 이미 확정한 Runtime과 빈/공백/unknown/foreign Room 요청에서 미등록. |
+| 10 | stale 요청 | 이전/분리/Tree 밖/queue-free Containment View 요청 미등록. |
+| 11 | 중복 Case | 같은 Room/다른 Room 재등록 모두 false; 최초 Room과 순서 유지. |
+| 12 | invalid 입력 | 빈/공백 Case·Room 거부, 기존 상태 비변경. |
+| 13 | Case A/B | 독립 상태 검증으로 CASE_A→ROOM_A, CASE_B→ROOM_B 동시 유지. 실제 Case 추가 없음. |
+| 14 | getter 보호 | ID 배열 duplicate, Room은 문자열 값; 외부 배열 reverse/append로 내부 상태 변경 불가. |
+| 15 | Runtime reset | Pending/Archive 유지; Runtime 객체 교체 후에도 동일 세션 Pending 유지. |
+| 16 | Pending reset | Runtime 이력·Room·결과·발견 및 Archive 동일; 반복 reset 가능. |
+| 17 | Archive 독립성 | Archive reset은 Pending/Runtime을 지우지 않음; 세 상태 간 참조 없음. |
+| 18 | Main 검증 | Case/Runtime ID 불일치, null Case/Runtime, 빈 Case 정보는 등록 거부. |
+| 19 | Resource | 원본 Case/Containment/Outcome/Research 콘텐츠 snapshot과 파일 hash 보존. |
+| 20 | Outcome 유지 | 파일·Result enum·필드·ID 연결·원본 콘텐츠 그대로. |
+| 21 | Stage 유지 | time_offset 이름/타입/값 그대로; 검증용 시간임을 주석으로 명시. |
+| 22 | Timer 의미 | prototype/debug playback. 최종 real-time 게임 규칙 아님; progression 단위/간격 미정. |
+| 23 | Vertical Slice | 기존 Containment→Monitoring→SUCCESS/FAILURE→Incident/Result debug 경로 보존. |
+| 24 | Archive incremental | 기존 추가 merge/중복 제거/최초 순서 지원 확인; API와 승격 시점 변경 없음. |
+| 25 | SUCCESS 회귀 | Room02 정상 경로와 결과/요약/Archive 유지, Pending은 debug 완료 후에도 남음. |
+| 26 | FAILURE 회귀 | Room01/03 × Option A/B/C 6경로의 Incident/Broadcast/IncidentResult/Result 유지. |
+| 27 | Log 회귀 | authored/fallback/혼합, Stage gate/현재 발견/Open/Back/Monitoring 차단 유지. |
+| 28 | Archive 회귀 | 실제 발견/순서 일치, 독립 reset, invalid ID/Case 방어, RESULT 재생성 비변경. |
+| 29 | 전체 시스템 | 기존 이력/제한/확정/재생/결과/후속 콘텐츠/발견/세션 상태/stale/단일 View 검사. |
+| 30 | 해상도/Stretch | 1920×1080, 1280×720, 1024×768 창 및 canvas_items/keep 보존. |
+| 31 | 파싱/실행 | 아래 검증 기록 참조. |
+| 32 | 실제 파일 | Pending GD/UID 추가; Main/README 수정, MonitoringView/StageData는 주석만. 삭제 없음. |
+| 33 | 기존 변경 보존 | Archive GD/UID 및 29단계 승격 helper/API, 기존 README 보고 내용 보존. |
+| 34 | 미구현 | 두 번째 Case/다음 Case 버튼/Campaign/scheduler/resolve 간격·실제 delayed 결과/Incident Queue/Archive UI/저장/Timer pause/Manager/최종 UI 없음. |
+| 35 | 다음 단계 | 별도 요청에서 Case handoff와 과거 Case 콘텐츠 조회·Pending 소비 경계를 설계한 뒤 delayed resolution을 구현; 진행 단위/간격은 그때 결정. |
+
+### 30단계 검증 기록
+
+새 검증 자료는 Git에서 제외한 `.godot/verification/step30/`에만 있습니다.
+Pending 단위/등록 경계 검사와 기존 22~29단계 전체 회귀를 headless 및 Windows GPU에서 실행합니다.
+authored/fallback/혼합 UI 검사는 세 창 크기마다 정상 SUCCESS 1개와 FAILURE 6개 경로를
+실제 입력으로 진행하며, 선택 전/후 Pending 공백, Confirm 직후 실제 Room 일치,
+debug 완료/RESULT/Log 왕복/재시작에서 Pending/Archive/Runtime의 불변성을 함께 검사합니다.
+원본 0/10/20초 debug 재생도 유지하고, 빠른 흐름 테스트만 독립 Resource 복사본의 offset을 0으로 변경합니다.
+원본 콘텐츠는 변경하지 않습니다. 기대 경고 수를 검사하고, Resume은 입력/로그 hash와 성공 인증서가 일치할 때만 허용합니다.
+
+Godot **4.7.1.stable.official.a13da4feb**에서 **129개 검사**가 모두 통과했습니다.
+27개 제품 GDScript의 check-only를 포함한 headless 77개와 Windows GPU 52개 검사입니다.
+GPU는 AMD Radeon RX 6800, OpenGL 3.3 Compatibility입니다. 새 Pending 단위/경계 검사는 두 모드에서
+모두 오류/경고 0으로 완료했고, 기존 비정상 fixture의 경고 개수도 예상과 일치했습니다.
+정상 SUCCESS 및 FAILURE 6경로, Research Log/discovery/Archive와 기존 전체 회귀도 통과했습니다.
+최종 에디터 `--headless --editor --import --quit`는 exit 0이며 파싱/GDScript 오류와 경고가 없습니다.
+프로젝트 Main 실행은 명령행으로 검증했으며 에디터 F5 키를 직접 누른 검증은 아닙니다.
+이번 변경에서 별도 제품 코드 오류나 기존 기능의 회귀는 재현되지 않았습니다.
+
+세 창 크기에서 authored/fallback/혼합 흐름을 검사하고 새 UI 캡처 **234개**를 생성했습니다.
+주요 화면을 직접 확인했으며 전체 PNG의 크기/16:9 비율과 UI bounds 검사도 통과했습니다.
+1024×768 창은 keep 설정에 따라 UI Viewport 캡처가 1024×576이며 레터박스 여백은 캡처에 포함하지 않습니다.
+1920×1080 기준 UI, 초기 창 1280×720, canvas_items/keep, Main/모든 View Scene은 그대로입니다.
+
+최종 `git status`, `git diff`, `git diff --check` 및 SHA-256 감사 결과:
+작업 전 존재한 파일 70개 중 66개는 바이트 그대로이며,
+Main/README 수정과 MonitoringView/MonitoringStageData의 주석 추가만 있습니다.
+이번에 추가한 제품 파일은 Pending GD/엔진 생성 UID 두 개이고 삭제는 없습니다.
+Main 함수 개수는 33개 그대로이며 `_ready()`와 Containment Confirm 처리만 변경했습니다.
+Archive 승격을 포함한 기존 함수 31개와 29단계 Archive GD/UID는 그대로입니다.
+Monitoring의 주석을 제외한 실행 코드/Stage Schema, 모든 원본 .tres와 기존 검증 자료 687개,
+29단계부터 이전 README 보고도 보존했습니다.
+검증 자료는 `validation-results.json`, `change-audit.json`, `immutability-evidence.json`과 개별 로그에 있습니다.
+커밋/푸시는 하지 않았고 HEAD는 계속 `1c4eea4`입니다.
+
+## 29단계 완료한 Case의 세션 Research Archive
+
+작업 전 Git은 HEAD `1c4eea4`, `master` / `origin/main`이며 변경 파일이 없었습니다.
+실제 저장소의 추적 파일 68개, 기존 로컬 GD/PS1 검증 자료 681개를 조사하고 SHA-256 기준을 보관했습니다.
+프로젝트에는 Main과 10개 View Scene, 25개 GDScript, 테스트 Case 1개 및 authored ResearchEntry 24개가 있습니다.
+Step25~28은 이미 커밋된 상태이므로 이번 작업에서는 기존 HEAD의 콘텐츠와 동작을 보존합니다.
+
+Main이 두 메모리 상태를 소유합니다. `CaseRuntimeState`는 현재 플레이에서 확정한 사실을,
+새 `ResearchArchiveState`는 완료한 Case의 발견 ID를 보관합니다. 둘 다 RefCounted이며
+서로 참조하지 않습니다. Main이 해제되거나 앱을 종료하면 세션 기록도 사라집니다.
+Runtime.reset()과 Archive.reset()은 서로 영향을 주지 않습니다.
+
+Archive 내부는 `_entries_by_case: Dictionary[String, Array]`와 `_case_order: Array[String]`입니다.
+Dictionary의 각 값은 merge 내부에서 만든 `Array[String]`이며 Case/Entry ID 문자열만 저장합니다.
+동일 Case 안의 동일 Entry는 한 번만 보관하고, 다른 Case의 같은 Entry ID는 독립적으로 허용합니다.
+Case는 최초 유효 Entry가 들어온 순서, Entry는 해당 Case의 최초 발견 순서를 유지합니다.
+ID는 원문 문자열을 식별자로 사용하며 빈/공백뿐인 문자열을 거부합니다. 자동 정렬이나 ID 정규화는 없습니다.
+빈 배열 또는 유효 Entry가 없는 merge는 빈 Case 항목을 만들지 않습니다. 기존 항목도 지우지 않습니다.
+
+| API | 역할 |
+| --- | --- |
+| `merge_case_discoveries(case_id, entry_ids)` | 유효 문자열만 최초 발견 순서대로 추가; 중복 merge는 상태 동일 |
+| `has_discovered_entry(case_id, entry_id)` | Case와 Entry 두 ID로 정확한 발견 여부 조회 |
+| `get_discovered_entry_ids(case_id)` | 해당 Case Entry 배열의 복사본; 없는 Case는 빈 배열 |
+| `get_archived_case_ids()` | 최초 등록 순서의 Case 배열 복사본 |
+| `reset()` | Archive만 비움; 반복 호출 가능 |
+
+정상 `MONITORING → RESULT` 또는 `INCIDENT_RESULT → RESULT` 진행 요청을 처리한 뒤,
+Main의 `_archive_case_discoveries()`가 현재 Case/Runtime ID 일치와 RESULT/확정 결과를 확인합니다.
+기존 `_get_valid_research_entries()`로 null, 빈 ID, 잘못된 enum, 중복 entry_id/Source 매핑을 제외하고,
+Runtime 발견 순서를 그대로 순회하여 유효 ID만 전달합니다. 알 수 없는 ID는 경고 후 제외하며 나머지를 보존합니다.
+RESULT 진입으로 Runtime에 새 발견을 추가하지 않습니다. `_show_view(RESULT)` 자체는 승격 경계가 아니므로
+RESULT 재표시와 Log Open/Back은 merge조차 수행하지 않습니다. 정상 완료를 반복해도 merge 중복 정책이 적용됩니다.
+
+현재 Log의 정보 공개 조건, authored/fallback 문구, Source of Truth는 기존과 같습니다.
+Archive에서 발견한 ID만으로 현재 Case Log의 authored 문구가 열리지 않습니다.
+fallback에는 가짜 연구 ID를 만들지 않으며 title/body_text와 콘텐츠 Resource 객체는 Archive에 저장하지 않습니다.
+Main에는 소유 필드, 초기화 한 줄, 완료 경계 호출과 승격 helper 한 개만 추가했습니다.
+기존 Runtime/Data/View/Scene/해상도 설정과 테스트 콘텐츠는 변경하지 않았습니다.
+
+### 요청한 52개 항목의 작업 보고
+
+| 번호 | 항목 | 구현·검증 결과 |
+| --- | --- | --- |
+| 1 | 작업 전 Git | `1c4eea4`, master→origin/main, 깨끗한 작업 트리. |
+| 2 | Archive 구조 | `scripts/runtime/research_archive_state.gd`, RefCounted 상태 클래스 하나. |
+| 3 | 내부 저장 | Case→문자열 Entry 배열 Dictionary와 Case 등록 순서 배열. |
+| 4 | 식별 정책 | case_id + entry_id; 다른 Case의 동일 Entry ID는 별도 기록. |
+| 5 | API | merge, has, Entry getter, Case getter, reset의 5개 API. |
+| 6 | 입력 검증 | 빈/공백 Case 및 Entry를 저장하지 않음. |
+| 7 | 중복 | 같은 Case/Entry는 최초 한 번만 저장; 반복 merge는 동일 상태. |
+| 8 | Case별 순서 | Runtime discovery 순서 유지; 추가 merge는 새 ID만 뒤에 추가. |
+| 9 | Case 등록 순서 | 최초 유효 Entry가 등록된 순서 유지; 재merge로 이동하지 않음. |
+| 10 | getter 보호 | 두 Array getter 모두 복사본; 반환값 reverse/append/clear 검증. |
+| 11 | Main 소유 | `_ready()`에서 research_archive를 한 번 생성. |
+| 12 | 수명 분리 | Runtime과 Archive가 서로 참조하지 않는 별도 객체. |
+| 13 | 승격 시점 | 활성 View의 정상 진행이 RESULT에 도달한 뒤. |
+| 14 | RESULT 발견 아님 | Runtime discovery를 추가하거나 repair하지 않고 기존 ID만 승격. |
+| 15 | SUCCESS | 실제 발견 5개(Profile/CCTV/EXP03/EXP01/Room02), 실패 관련 ID 없음. |
+| 16 | FAILURE | Room01/03 × Option A/B/C의 6경로마다 실제 발견 9개와 Archive 순서 일치. |
+| 17 | Case 불일치 | warning 후 merge 거부; OTHER_CASE로 잘못 등록하지 않음. |
+| 18 | invalid discovery | UNKNOWN_RESEARCH 제외, 같은 배열의 유효 Profile ID는 보존. |
+| 19 | fallback | 전체 fallback에서는 Archive가 비어 있음; CCTV/EXP03 혼합 fallback에도 가짜 ID 없음. |
+| 20 | 중복 ResearchEntry | 기존 validator 재사용; ID/매핑 충돌의 모든 후보 제외, 무관한 유효 ID 보존. |
+| 21 | 저장 대상 | ID 문자열만 저장; title/body/이름/Resource 저장 없음. |
+| 22 | Log와 Archive | 현재 Log는 Runtime discovery와 Stage gate만 사용; Archive 조회 코드 없음. |
+| 23 | Open/Back | 각 Stage의 왕복 전후 Runtime·Archive·콘텐츠 동일. |
+| 24 | RESULT 재진입 | RESULT↔Log에서 Archive 비변경; 재생성 자체로 merge하지 않음. |
+| 25 | RESULT 반복 | 3회 직접 RESULT 생성/왕복에도 새로운 정상 discovery를 Archive에 추가하지 않음. |
+| 26 | Runtime reset | 발견 배열은 비워지고 이미 승격한 Archive ID는 유지. |
+| 27 | Archive reset | Dictionary와 Case 등록 순서 모두 비움; 새 등록 순서도 검증. |
+| 28 | reset 독립성 | Archive reset 전후 Runtime의 이력·Room·결과·확정 쌍·발견 ID 동일. |
+| 29 | Case A/B | A=[ENTRY_01,ENTRY_02], B=[ENTRY_01,ENTRY_03] 독립 저장 확인. |
+| 30 | 추가 merge | A에 ENTRY_02/ENTRY_03 재merge → [ENTRY_01,ENTRY_02,ENTRY_03]. |
+| 31 | 빈 discovery | 신규 Case를 등록하지 않음; 기존 Case도 변경하지 않음. |
+| 32 | 잘못된 Case ID | 빈/공백 Case merge는 기존 상태 비변경. |
+| 33 | 발견 순서 | Profile→CCTV→EXP03→EXP01→Room 및 실패 후속 ID 순서 정확히 유지. |
+| 34 | 콘텐츠 변경 | 독립 ResearchEntry의 title/body 변경에도 Archive ID 배열 동일. |
+| 35 | Runtime 독립성 | merge/get/reset에서 Runtime 필드와 승인 호출 횟수를 변경하지 않음. |
+| 36 | Resource 불변성 | 원본 및 독립 Case 콘텐츠 snapshot, 파일 SHA-256 동일. |
+| 37 | Main 구조 | 소유/전달/전환 경계 유지; 별도 Manager나 추상화 분리 불필요. |
+| 38 | 다중 Case | 실제 두 번째 Case, 선택/진행/로딩 시스템 없음; A/B는 상태 테스트만. |
+| 39 | Save/Load | 없음; 세션 종료 후 기록 유지 없음. |
+| 40 | Research Log 회귀 | authored/fallback/혼합, 발견 조건, Stage gate, 복귀, Monitoring 차단 유지. |
+| 41 | 전체 회귀 | 기존 실험 제한/이력, 격리 확정, Monitoring 재생/결과, 사고/응답/후속 결과/요약 검사. |
+| 42 | SUCCESS Route | PROFILE→CCTV→EXPERIMENT→CONTAINMENT→MONITORING→RESULT→PROFILE. |
+| 43 | FAILURE Route | MONITORING→INCIDENT→BROADCAST→INCIDENT_RESULT→RESULT, 6경로. |
+| 44 | stale/signal | 이전/Tree 밖/queue-free View와 중복·중첩 요청 차단; signal 연결 한 번. |
+| 45 | 단일 View | 정상/왕복/재시작 단계 모두 ViewHost 자식 하나. |
+| 46 | 세 해상도 | 1920×1080, 1280×720, 1024×768 창; canvas_items/keep와 UI bounds 유지. |
+| 47 | 파싱/실행 | 아래 검증 기록 참조. |
+| 48 | 발견한 문제 | 테스트의 정적 타입 검사 표현을 Variant로 수정. 미완료 RESULT 경고 2개도 기대 경고로 명시. 제품 코드 오류는 재현하지 않음. |
+| 49 | 실제 파일 | Main/README 수정, Archive GD/엔진 생성 UID 추가. 삭제 없음. |
+| 50 | 기존 변경 보존 | 작업 전 미커밋 파일 없음; 기존 28단계까지 커밋 내용 보존. |
+| 51 | 미구현 | Archive UI/과거 Log/다중 Case/Campaign/Save/Load/점수/보상/수집률/Manager/최종 디자인 없음. |
+| 52 | 다음 단계 | 별도 요청에서 읽기 전용 Archive 조회용 snapshot을 설계하는 지점부터 시작 가능. |
+
+### 29단계 검증 기록
+
+검증 스크립트와 로그는 Git에서 제외한 `.godot/verification/step29/`에 보관합니다.
+`run_validation.ps1`은 기존 22~28단계 회귀 검사와 새 Archive 단위/경계 검사,
+Archive 상태 비교를 추가한 authored/fallback/혼합 실제 UI 입력 테스트를 실행합니다.
+headless와 Windows Compatibility GPU 모드를 모두 사용하고, 기존 20초 Monitoring 재생도 검증합니다.
+비정상 입력 테스트는 알려진 경고 수를 정확히 검사하며 정상 흐름은 경고 없이 실행되어야 합니다.
+실패 기록을 통과로 취급하지 않습니다. Resume은 동일 입력/로그 SHA-256과 성공 인증서가 있을 때만 재사용합니다.
+
+Godot **4.7.1.stable.official.a13da4feb**에서 최종 **124개 검사**가 모두 통과했습니다.
+26개 제품 GDScript check-only를 포함한 headless 74개와 Windows GPU 50개 검사입니다.
+GPU는 AMD Radeon RX 6800, OpenGL 3.3 Compatibility를 사용했습니다. 정상 경로는 오류/경고 0이며,
+비정상 fixture의 경고는 기대 개수와 일치했습니다. 새 경계 검사는 의도한 14개 경고를 각각 확인했습니다.
+최종 에디터 `--headless --editor --import --quit`도 exit 0, 파싱/스크립트 오류 없이 완료했습니다.
+프로젝트 Main 실행은 명령행으로 확인했으며 에디터 F5 키를 직접 누른 검증은 아닙니다.
+
+SUCCESS 1개와 Room01/03 × Option A/B/C의 FAILURE 6개 경로를 authored/fallback/혼합 데이터로,
+headless와 native에서 세 창 크기마다 실제 UI 입력으로 실행했습니다. Archive의 완료 이전 공백,
+완료 직후 실제 발견 순서와의 일치, Open/Back/재시작에서의 불변성을 확인했습니다.
+전체 authored는 SUCCESS 5개/FAILURE 9개 ID, CCTV·EXP03 authored를 뺀 혼합은 3개/7개 ID,
+전체 fallback은 0개 ID와 빈 Case 목록입니다. 정상 Case에 미선택 Option/Result나 미래 Entry가 들어가지 않았습니다.
+기존 0/10/20초 생산 데이터 재생도 수정 없이 실행했고 완료 후에만 RESULT에 도달했습니다.
+
+새 로컬 UI 캡처 234개를 생성했습니다. 세 창 크기의 주요 화면과 Log를 직접 확인했고,
+전체 캡처 PNG 헤더의 크기/16:9 비율과 UI bounds 검사도 통과했습니다.
+1024×768 창의 Viewport 캡처는 keep 정책에 따라 1024×576이며 창의 레터박스 여백은 포함하지 않습니다.
+기준 1920×1080, 초기 창 1280×720, canvas_items/keep 및 모든 Scene 파일은 보존했습니다.
+
+최종 `git status`, `git diff`, `git diff --check`, SHA-256 감사 결과:
+기존 추적 파일 68개 중 Main/README만 수정했고 나머지 66개는 바이트 그대로입니다.
+Archive GD와 엔진 생성 UID 두 파일만 추가했으며 삭제는 없습니다.
+이전 GD/PS1 검증 자료 681개와 28단계부터 이전 README 보고 내용도 보존했습니다.
+Main의 기존 32개 함수 중 `_ready()`/`_on_advance_requested()`만 변경했고 승격 helper 하나를 추가했습니다.
+나머지 기존 30개 함수는 동일합니다. 커밋/푸시는 하지 않았으며 HEAD는 `1c4eea4`입니다.
+검증 결과는 `validation-results.json`, 보존 감사는 `change-audit.json`과 `immutability-evidence.json`에 있습니다.
 
 ## 28단계 test_case_01의 주요 Research 작성 콘텐츠 확장
 

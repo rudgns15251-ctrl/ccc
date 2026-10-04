@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/views/environment_conditions_view.gd" id="1_conditions"]
+
+[node name="EnvironmentConditions" type="VBoxContainer"]
+visible = false
+theme_override_constants/separation = 4
+script = ExtResource("1_conditions")
+
+[node name="Heading" type="Label" parent="."]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "ACTIVE FACILITY CONDITION"
+
+[node name="ConditionScroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ConditionList" type="VBoxContainer" parent="ConditionScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
