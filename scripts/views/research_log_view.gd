@@ -3,6 +3,7 @@ extends "res://scripts/views/flow_view.gd"
 signal hypothesis_add_requested(case_id: String, text: String)
 signal hypothesis_update_requested(case_id: String, hypothesis_id: String, text: String)
 signal hypothesis_remove_requested(case_id: String, hypothesis_id: String)
+signal archive_requested
 
 class Entry extends RefCounted:
 	var category: String
@@ -48,6 +49,7 @@ func setup(snapshot: Snapshot) -> void:
 
 func _ready() -> void:
 	super._ready()
+	%OpenArchiveButton.pressed.connect(func() -> void: archive_requested.emit())
 	%HypothesisInput.text_changed.connect(_update_hypothesis_input)
 	%SaveHypothesisButton.pressed.connect(_on_save_hypothesis_pressed)
 	%CancelHypothesisButton.pressed.connect(_cancel_hypothesis_edit)

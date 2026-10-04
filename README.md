@@ -13,7 +13,7 @@ MONITORING은 확정 Room ID에 맞는 Outcome을 time_offset에 따라 순차 �
 이 MONITORING 경로는 **prototype/debug resolution playback**입니다. 0/10/20초는 prototype verification timing이며 정상 판정은 Timer를 사용하지 않습니다. 이번 Vertical Slice의 내부 판정 경계는 handoff이며 실제 시설 영향은 이후 의미 있는 행동 opportunity와 숨겨진 threshold로 분리합니다. 최종 게임의 판정·사건 시점과 밸런스는 아직 확정하지 않았습니다. debug Timer는 Pending을 resolve하거나 제거하지 않습니다.
 RESULT는 Main이 전달한 표시용 snapshot으로 Case, 확정 결과/Room, 실제 실행 순서의 Experiment와 사용 수를 읽기 전용으로 요약합니다. FAILURE에는 현재 Incident/Broadcast/확정 Option/IncidentResult도 표시하며 SUCCESS에는 없음/해당 없음으로 표시합니다.
 RESEARCH LOG는 현재 Case의 Profile/CCTV, 실제 실행한 Experiment의 설명·결과, 확정 Room, 완료된 Monitoring 관찰, FAILURE의 확정 응답·결과를 카테고리별로 읽기만 합니다. 기존 Stage/Runtime 공개 조건을 만족하고 해당 유효 ResearchEntryData.entry_id를 현재 Case Runtime에서 실제로 발견한 경우에만 Log 전용 title/body_text를 사용합니다. 작성 콘텐츠가 없거나 잘못된 매핑, 발견 기록이 없는 공개 Source는 기존 문구를 사용합니다. 게임 화면 문구와 영구 기록은 변경하지 않습니다.
-ResearchArchiveState는 결과 확정 여부와 관계없이 획득한 Case별 Research ID를 세션 메모리에 보관합니다. 정상 handoff 직전에 유효 발견 ID를 incremental merge하며 기존 debug RESULT 경계의 merge도 유지합니다. 현재 Research Log는 계속 현재 Runtime만 사용합니다. 마지막 Case의 발견 기록은 handoff가 없으므로 현재 Runtime에 유지됩니다. Archive 화면과 디스크 저장은 없습니다.
+ResearchArchiveState는 결과 확정 여부와 관계없이 획득한 Case별 Research ID를 세션 메모리에 보관합니다. 정상 handoff 직전에 유효 발견 ID를 incremental merge하며 기존 debug RESULT 경계의 merge도 유지합니다. 현재 Research Log는 계속 현재 Runtime만 사용합니다. 마지막 Case의 발견 기록은 handoff가 없으므로 현재 Runtime에 유지됩니다. 읽기 전용 Research Archive는 Research Log에서 열 수 있으며, 이미 archived된 Case의 authored Research와 개인 메모만 표시합니다. 디스크 저장은 없습니다.
 환경 교란이 실제 발생하면 현재 Case의 해당 reaction_id를 OBSERVATION으로 추가합니다. 발생 전에는 표시/발견하지 않습니다. Notice는 시설 조건 변화와 현재 관찰 사실만 보여주며 원인 Case나 숨겨진 성공/실패를 공개하지 않습니다. Dismiss 후 동일 View를 이어갑니다.
 적용된 교란은 현재 Case Runtime의 활성 환경 조건입니다. CCTV / EXPERIMENT / CONTAINMENT의 **ACTIVE FACILITY CONDITION**에서 계속 확인할 수 있으며, Dismiss와 Research Log Open/Back으로 사라지지 않습니다. Runtime 교체/reset 시 초기화하며 다른 Case로 자동 승계하지 않습니다.
 CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응하는 **CONDITION OBSERVATION**을 별도로 표시합니다. 활성 조건이 있으면 Experiment / Containment의 **Recheck CCTV**로 다시 확인하고 원래 화면으로 돌아올 수 있습니다. 추가 관찰 Research는 CCTV에 실제 표시된 뒤에만 발견하며, Overlay를 본 것만으로는 발견하지 않습니다.
@@ -43,6 +43,8 @@ Research Log의 WORKING HYPOTHESES에서 현재 Case의 자유 메모를 Add/Edi
 4. Case02도 같은 네 화면을 진행합니다. CCTV, 두 번째 Experiment, 두 번째 Room에는 authored Research가 없어 기존 fallback 문구로 Research Log를 표시합니다. Case01 Room01 또는 Room03을 확정했다면 Case02의 의미 있는 행동 도중 임시 환경 교란이 한 번 발생할 수 있습니다. **FACILITY DISTURBANCE**에서 조건 변화와 **UNPLANNED OBSERVATION**을 읽고 **Dismiss**로 이어갑니다. Room02 경로는 후보/교란이 없습니다. 이 설명은 개발 검증 안내이며 실제 UI는 과거 Case 판정과 원인을 공개하지 않습니다.
    마지막 Case는 **No next test case configured**로 진행을 차단하며 Case02 Pending을 유지합니다. 정상 Route에서 결과 화면이나 Campaign 완료는 없습니다.
 5. 네 화면의 **Open Research Log → Back**은 현재 Case와 원래 Stage로 돌아갑니다. 이전 Case Archive를 섞지 않습니다. 이 탐색은 opportunity를 소비하지 않습니다. Log 왕복의 미확정 임시 선택은 초기화하고 실행·확정 상태는 복원합니다. 교란 Notice의 Dismiss는 View를 재생성하지 않아 현재 UI context를 유지합니다. 창 크기를 바꾸면 기존 비율과 UI scaling을 유지합니다.
+
+6. Research Log의 **Open Research Archive**로 보존된 Case 목록을 열고 **Open**으로 연구·메모를 읽기 전용 조회합니다. **Back**은 Detail → List → Research Log → 원래 View 순서입니다. 아직 handoff되지 않은 현재 Case는 Archive에 넣지 않습니다. 가설 편집은 현재 Research Log에서만 가능합니다.
 
 아래 Monitoring 이후 설명은 정상 F5 진행에 포함되지 않는 기존 debug 기능입니다. 검사용 Main 확장은 `.godot/verification/step32/debug_main.gd`에만 있으며 제품 코드에는 debug 전환 버튼이나 설정을 추가하지 않았습니다. debug 검사는 단일 Case01에서 확정 후 MONITORING으로 진행합니다. SUCCESS는 RESULT, FAILURE는 INCIDENT → BROADCAST → INCIDENT_RESULT → RESULT입니다.
 
@@ -119,7 +121,9 @@ cap/
 │       ├── incident_view.tscn # IncidentData 표시, incident_view.gd 사용
 │       ├── broadcast_view.tscn # Option 목록, Confirm Broadcast / Next: INCIDENT RESULT
 │       ├── incident_result_view.tscn # 결과 ID/이름/설명과 Next: RESULT
-│       ├── research_log_view.tscn # 8개 Stage에서 여는 보조 화면, 동적 Entry 목록과 Back
+│       ├── research_log_view.tscn # 현재 연구·편집 가능한 메모·Archive Open·Back
+│       ├── research_archive_list_view.tscn # archived Case 목록/Open/Back
+│       ├── research_archive_detail_view.tscn # 연구·메모 읽기 전용/Back
 │       ├── environment_conditions_view.tscn # CCTV/Experiment/Containment 내부 표시 영역
 │       └── environmental_disturbance_notice.tscn # Main의 modal overlay, 정규 Stage 아님
 └── scripts/
@@ -161,6 +165,7 @@ cap/
     │   ├── case_runtime_state.gd.uid
     │   ├── pending_containment_state.gd # Case별 결과 대기 격리 결정, Case/Room ID만 저장
     │   ├── pending_containment_state.gd.uid
+    │   ├── working_hypothesis_state.gd / .gd.uid # Main 소유 Case별 세션 개인 메모
     │   ├── research_archive_state.gd # 획득한 Case별 발견 ID, 결과 판정과 독립적인 세션 메모리 상태
     │   └── research_archive_state.gd.uid
     └── views/
@@ -184,7 +189,9 @@ cap/
         ├── monitoring_view.gd.uid
         ├── result_view.gd # 표시용 Summary snapshot, 읽기 전용 요약/동적 실행 이력/누락 처리
         ├── result_view.gd.uid
-        ├── research_log_view.gd # 표시용 Snapshot/Entry, 동적 읽기 전용 목록
+        ├── research_log_view.gd # 현재 연구 Snapshot/Entry, 개인 메모 request, Archive Open
+        ├── research_archive_list_view.gd / .gd.uid # CaseSummary/Snapshot와 Case ID request
+        ├── research_archive_detail_view.gd / .gd.uid # 읽기 전용 Research/메모 Snapshot renderer
         ├── research_log_view.gd.uid
         ├── profile_view.gd # 전달받은 ProfileData 표시
         └── profile_view.gd.uid
@@ -629,6 +636,191 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 `.godot/verification/step2/`에만 있습니다. 이전 검증 코드는 수정하지 않았습니다.
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
+
+## 37단계 읽기 전용 Research Archive
+
+기존 프로젝트를 확장했습니다. 작업 전 HEAD는 `4295dd1103d162edc37ca180ccab7ec085f3d483`,
+브랜치는 `master`(`origin/main` 추적), working tree는 깨끗했습니다.
+실제 제품 파일 93개와 이전 검증 GDScript/PowerShell 소스 1,793개를 조사하고 SHA256 기준선을 남겼습니다.
+Main/Stage/두 session State/Runtime/CaseData/ResearchEntry/현재 Log Snapshot·Scene·Script,
+case_sequence와 handoff, authored validation/discovery/fallback, Log return-stage,
+Recheck CCTV와 active/stale guard, Hypothesis request와 기존 검증·README·설정을 확인했습니다.
+
+Archive는 **이미 ArchiveState에 보존된 authored Research ID와 해당 Case의 플레이어 메모**만 조회합니다.
+과거 Runtime, hidden resolution, 후보/threshold/정답 Room/최종 결과/원인 Incident를 조회하지 않습니다.
+현재 환경과 공개된 authored Research를 자동 연결하지 않으며, 읽기는 discovery/merge/opportunity가 아닙니다.
+
+### UI와 탐색
+
+```text
+Main
+  정상 View → ResearchLogView → ResearchArchiveListView → ResearchArchiveDetailView
+                    ↑                 ↑                         │
+                    └── Back ─────────┘──────── Back ────────────┘
+  ResearchLogView Back → 기존 _research_log_return_stage의 View (discover=false)
+```
+
+기존 Stage 값 뒤에 `RESEARCH_ARCHIVE_LIST`, `RESEARCH_ARCHIVE_DETAIL`을 추가했습니다.
+두 Scene의 list/detail 책임과 Main 승인 경계를 분리하는 편이 기존 _show_view/active View 패턴과 자연스럽습니다.
+기존 Stage 숫자/정규 next-stage/RESEARCH_LOG_STAGES는 바꾸지 않았습니다. Manager/State Framework는 없습니다.
+Research Log 안에만 Open Research Archive 버튼을 추가했습니다. 기존 Research/Notebook/Back을 보존했습니다.
+Main이 모든 Open/Case 선택/Back을 승인하고 View는 ID signal과 표시 Snapshot만 사용합니다.
+List→Log는 return-stage를 소비하지 않고, 마지막 Log→원래 View에서만 기존 정책대로 clear합니다.
+Recheck CCTV의 복귀 문맥도 기존 변수에 그대로 남습니다. 저장하지 않은 Notebook draft와 미확정 선택은
+기존 View 재생성 정책대로 사라집니다. 새로운 draft/selection 보존 시스템은 없습니다.
+
+List Scene은 900 폭/440 높이 ScrollContainer 안에 동적 Case 행을 표시합니다.
+Detail Scene은 440+20+440 두 열에 ARCHIVED RESEARCH / WORKING HYPOTHESES와 각각 360 높이 Scroll을 표시합니다.
+Main의 두 보조 ViewHost는 660이며, 긴 Case 이름/Research/500자 메모에 wrap과 scroll을 사용합니다.
+Archive Detail에는 입력창/Edit/Delete가 없고 Back만 있습니다. 최종 디자인은 하지 않았습니다.
+
+### 데이터와 승인
+
+- `ArchiveListView.CaseSummary extends RefCounted`: case_id, display_name, research_count, hypothesis_count, available.
+- `ArchiveListView.Snapshot extends RefCounted`: 작성된 CaseSummary 배열.
+- `ArchiveDetailView.ResearchEntry extends RefCounted`: archived entry_id와 표시 category/source_id/title/body_text.
+- `ArchiveDetailView.Snapshot extends RefCounted`: case_id, display_name, research_entries, 복사된 hypotheses.
+
+각 Open에서 Snapshot을 재생성합니다. 영구 캐시/Resource/새 session 저장소가 아닙니다.
+Case 목록은 ResearchArchiveState.get_archived_case_ids의 최초 Archive 순서이고,
+Research는 get_discovered_entry_ids의 실제 merge/발견 순서입니다. Resource 배열 순서로 정렬하지 않습니다.
+WorkingHypothesisState getter의 deep copy를 받아 작성 순서와 stable ID를 그대로 표시합니다.
+
+Main은 case_sequence에서 case_id가 정확히 한 번 존재할 때만 CaseData를 반환합니다.
+sequence가 빈 단일 Case debug Main에서만 일치하는 current_case를 사용합니다.
+누락/중복이면 warning, 목록에 해당 Case ID와 [Unavailable] 및 수를 표시하고 Open을 비활성화합니다.
+직접 Case signal을 보내도 같은 lookup으로 거부합니다. 다른 Case를 대신 사용하지 않습니다.
+
+기존 _get_valid_research_entries에 선택적 CaseData 인자만 추가해 같은 ID/SourceKind/source mapping
+중복/누락 검증을 Archive에도 적용했습니다. 기존 무인자 호출은 current_case로 동작합니다.
+Main의 작은 _research_category가 기존 SourceKind 의미를 사용하며 Log의 authored 행과 Archive가 함께 씁니다.
+PROFILE / OBSERVATION(CCTV·교란·CCTV 조건 관찰) / EXPERIMENT(기본·조건 관찰) / CONTAINMENT / INCIDENT입니다.
+Research entry_id를 해당 Case의 유효 authored 목록에서 정확히 찾아 문자열만 복사합니다.
+없거나 duplicate/invalid mapping이면 warning과 [Unavailable Research Entry] + 원래 archived entry_id를 표시합니다.
+비슷한 항목으로 대체하거나 첫 duplicate를 고르지 않습니다.
+
+Archive Open은 RESEARCH_LOG Stage/active·visible View/current Case·Runtime/Log Case ID/정상 return-stage를 검증합니다.
+Case Open은 Archive List Stage/active·visible View/실제 archived case_id/유일 CaseData mapping을 검증합니다.
+Back도 Stage/active·visible View를 검증합니다. stale/detached/hidden View와 forged ID는 UI·State를 바꾸지 못합니다.
+Archive에는 gameplay 신호 처리/Timer/merge/discovery/가설 CRUD 경로가 없습니다.
+
+### fallback 보존의 현재 한계
+
+ResearchArchiveState는 **유효 authored entry_id만** 저장합니다. handoff와 기존 debug RESULT merge 정책을 유지했습니다.
+현재 Log에서 보이는 derived Profile/CCTV/Experiment/Containment/Monitoring/실패 후속 fallback body는
+그 문구 자체가 ArchiveState에 저장되지 않습니다. 특히 현재 Case02의 CCTV/Experiment02/Room02 fallback과
+debug Monitoring stage 기록은 ID/body snapshot 없이 과거 Archive에서 재구성할 수 없습니다.
+현재 authored condition observation/교란 reaction은 실제 발견 후 merge된 ID가 있을 때 조회할 수 있습니다.
+이번 단계에서는 synthetic ID, 가짜 ResearchEntry, runtime body snapshot을 추가하지 않았습니다.
+State에 없는 현재 Case와 메모만 존재하는 Case도 목록에 넣지 않습니다.
+
+### 요청한 84개 항목 보고
+
+| 번호 | 항목 | 구현 및 검증 |
+| --- | --- | --- |
+| 1 | Git 상태 | HEAD 4295dd1, master→origin/main, 작업 전 변경 0. |
+| 2 | 전체 UI | Log→Case List→Case Detail, 연구/메모 읽기 전용. |
+| 3 | Stage | enum 뒤에 보조 Stage 두 개 추가, 기존 값/정규 route 보존. |
+| 4 | Main 탐색 | _show_view와 request guard로 생성/전환/Back 관리. |
+| 5 | Log Open | 기존 Log에만 Open Research Archive 추가. |
+| 6 | Back | Detail→List→Log→원래 View, 마지막 단계에서만 return-stage 소비. |
+| 7 | Return-stage | Archive 진입·상세 선택 동안 기존 _research_log_return_stage 보존. |
+| 8 | List Source | get_archived_case_ids만 사용. CaseData 목록을 그대로 노출하지 않음. |
+| 9 | Case 순서 | State의 최초 Archive 순서 유지, 현재/미획득 Case 추가 없음. |
+| 10 | Identity | Case signal은 case_id, 배열 index를 식별자로 사용하지 않음. |
+| 11 | 이름 | 해당 CaseData.display_name과 case_id, 다른 Case 이름 fallback 없음. |
+| 12 | Missing Case | warning/[Unavailable]/해당 ID·개수/disabled Open, 직접 요청 거부. |
+| 13 | Duplicate Case | 정확히 하나만 허용, first-match 미사용. |
+| 14 | List Snapshot | typed CaseSummary와 Snapshot RefCounted. 개수/조회 가능 여부만 표시. |
+| 15 | Detail Snapshot | Case ID/이름, 새 표시 ResearchEntry 배열, 복사된 hypotheses. |
+| 16 | 표시 데이터 | Resource/Runtime/Archive replacement 아님. Snapshot mutation 격리 검증. |
+| 17 | Archive ID | 각 Case get_discovered_entry_ids를 읽기만 함. |
+| 18 | 재구성 | 같은 Case의 valid authored entry_id로만 문자열 복사. |
+| 19 | ID 검증 | 기존 ID/source_kind/source_id/duplicate 검증 재사용. |
+| 20 | Missing Entry | warning + Unavailable Research Entry + 원래 archived entry_id. |
+| 21 | Duplicate Entry | ID/source mapping 중복 모두 제외, 첫 항목 대신 사용하지 않음. |
+| 22 | Research 순서 | archived IDs 순서 그대로, Resource 배열 sort 없음. |
+| 23 | Category | PROFILE/OBSERVATION/EXPERIMENT/CONTAINMENT/INCIDENT 기존 의미. |
+| 24 | SourceKind | 작은 Main 변환 함수를 authored Log/Archive가 함께 사용. enum/schema 변경 없음. |
+| 25 | Authored | State에 실제 보존된 ID만 표시. 독립 fixture에서 모든 authored SourceKind 재구성 확인. |
+| 26 | Fallback 한계 | ID 없는 derived body와 debug Monitoring 기록은 Archive에 없음. 위 설명 참조. |
+| 27 | Synthetic 없음 | fake ID/ResearchEntry/body snapshot 추가 없음. |
+| 28 | Hypothesis | WorkingHypothesisState.get_hypotheses(case_id) copy 사용. |
+| 29 | 메모 순서 | 작성 순서/기존 stable ID 그대로. |
+| 30 | Read-only | Detail에 TextEdit/Edit/Delete/request API 없음. |
+| 31 | 메모 Empty | No working hypotheses recorded. |
+| 32 | Hidden Resolution | Snapshot/renderer/builder가 Resolution를 조회하지 않음. |
+| 33 | 결과 비노출 | Snapshot에 Monitoring/final_result 없음. 실제 실패 handoff 후 UI 누출 검사. |
+| 34 | Room 평가 | 획득 authored Containment만 표시, correct/wrong 평가 덧붙이지 않음. |
+| 35 | Candidate | 존재 여부/threshold/기회 수 표시 없음. 읽기 전후 상태·RNG 비교. |
+| 36 | 원인 Incident | hidden Incident/source Case/failure 연결 문구 생성 없음. |
+| 37 | 환경 Research | archived reaction/CCTV condition/Experiment condition entry_id 재구성 지원·검증. |
+| 38 | 환경 격리 | 과거 CaseData와 archived ID만 사용, 현재 Runtime 환경을 조회하지 않음. 실제 활성 교란/Recheck 중 Archive의 Case01 IDs/State 격리 검증. |
+| 39 | List UI | 이름/ID/Research 수/Hypotheses 수/Open/Back 동적 행. |
+| 40 | Detail UI | Case header + 두 읽기 전용 Scroll 열 + Back. |
+| 41 | Dynamic | Container에 배열 길이만큼 생성, 고정 콘텐츠 슬롯 없음. |
+| 42 | 0/1/5/20 Case | 긴 이름 독립 fixture, 마지막 행 Open까지 scroll 접근·forged ID 거부. |
+| 43 | 0/1/10/30 Research | 독립 Detail fixture, repeated/null setup 및 Scroll. |
+| 44 | 긴 Research | 긴 title/body와 multiline wrap, 최소 높이/폭/enclosure 검사. |
+| 45 | 긴 메모 | 20개 500자 multiline 메모 읽기 전용 wrap/scroll. |
+| 46 | Open 경계 | Stage/active/visible/current Case+Runtime/Log Case ID/return-stage. |
+| 47 | Detail 경계 | List Stage/active/visible/archived ID/unique mapping. |
+| 48 | Forged ID | unarchived/current/fixture/임의 ID 요청 거부. |
+| 49 | Stale | 이전 Log/List/Detail의 Open/Back/Select signal 차단, hidden/detached도 거부. |
+| 50 | Read-only State | Runtime/Archive/Hypotheses/Pending/Resolution/Candidate/RNG 전후 비교. |
+| 51 | 발견 없음 | observed/discovered arrays와 ResearchArchive 내용 불변. |
+| 52 | Opportunity | processed opportunity/후보/threshold/RNG 불변. |
+| 53 | 교란 없음 | 새 Timer/trigger 없음, 기존 후보가 있는 Archive 탐색 중 상태 불변. |
+| 54 | Experiment 왕복 | Log→Archive→Log→Back 후 Experiment 복귀, 미확정 선택 초기화 정책 유지. 활성 환경 Recheck CCTV→Log→Archive 왕복도 Experiment 복귀 확인. |
+| 55 | Monitoring | 기존 Log 접근 불허 정책 유지, 직접 Archive 버튼 없음. |
+| 56 | 실제 handoff | Case01 Room 확정과 Next:CASE 후 Case02 Log에서 Case01 Archive 노출. |
+| 57 | Case01 메모 | handoff 이전 메모 수정, 이후 Detail에서 최신 text 확인. |
+| 58 | 현재 Case 제외 | Case02 메모가 있어도 미archived Case02는 List/Case01 Detail에 없음. |
+| 59 | Incremental | 기존 IDs 뒤 추가 merge 후 Snapshot 재생성에 최신 목록/순서 반영. |
+| 60 | 최신 text | 메모 Source of Truth는 WorkingHypothesisState, cache 없음. |
+| 61 | 편집 없음 | Archive Snapshot/Scene/Script에 Hypothesis mutation signal 없음. |
+| 62 | 재생성 | List/Detail 진입 및 Back마다 현재 session State에서 생성. |
+| 63 | CaseData | 변경 없음, runtime 필드/Archive flag 추가 없음. |
+| 64 | ResearchEntry | 변경 없음, 현재 ID/SourceKind/title/body만 사용. |
+| 65 | Resource | 원본 Case01/02 deep content와 모든 Resource 해시 불변. |
+| 66 | Session | 모든 기존 State 코드/identity/records 불변. |
+| 67 | Archive Empty | No archived research available., null Snapshot 안전. |
+| 68 | Log 회귀 | 기존 current authored/fallback/discovery 순서/Back/Recheck 검사 유지. |
+| 69 | Hypothesis 회귀 | Step36 Add/Edit/Delete/취소/500자/Case 분리/stale/reset 검사를 그대로 실행. |
+| 70 | Resolution 회귀 | Step32 이후 숨겨진 판정 경계 유지. |
+| 71 | Candidate 회귀 | 숨겨진 후보/threshold/opportunity 정책 유지. |
+| 72 | Disturbance 회귀 | overlay/dismiss/context/환경 요약/late signal 검사 유지. |
+| 73 | CCTV 조건 | 실제 표시/발견/Recheck/OpenBack/환경 reset 회귀 유지. |
+| 74 | Experiment 조건 | 실제 실행 시 snapshot/후발 환경 소급 없음/limit/history 회귀 유지. |
+| 75 | Archive State | merge/dedup/Case 순서/getter/reset/Runtime 독립성 기존 검사 유지. |
+| 76 | Debug Monitoring | 독립 debug Main playback/SUCCESS/FAILURE/UNDEFINED 검사 유지. |
+| 77 | Failure Debug | Incident/Broadcast/확정 Option/IncidentResult/Result와 invalid fixtures 유지. |
+| 78 | 해상도 | 1920×1080/1280×720/1024×768 창에서 List/Detail/Log wrap·scroll. 기존 canvas_items/keep/resizable 보존. GPU Archive 캡처 57개 중 대표 8개 육안 확인. 4:3 창의 viewport capture는 기존 keep으로 1024×576. |
+| 79 | 파싱/실행 | Godot 4.7.1 official.a13da4feb: 186개 검사(Headless 111 / GPU 75) 통과. 제품 GDScript 38개 check-only, 최종 editor import와 실제 Main/Archive 정상 실행 오류·경고 0. 의도적 invalid fixture의 기존/신규 예상 경고 수 일치. 카테고리 및 Stage 테스트 사본 수정 후 전체 재실행 완료. |
+| 80 | 문제/해결 | 긴 Case 이름 독립 Detail fixture에서 높이 초과 발견. 새 Detail Scroll 높이 400→360으로 조정 후 enclosure/wrap 검사 통과. 기존 Experiment Condition Observation category가 EXPERIMENT임을 회귀 검사로 확인하여 공유 변환을 수정. 기존 Stage 수를 고정 가정한 회귀 사본의 제목 매핑에 Archive 두 항목을 추가했고 기존 assertions와 원본 테스트는 유지. 문서 변경 범위 검사에서 과거 보고 한 문장에 새 설명이 붙은 것을 찾아 원래대로 복구. 재검사로 역사 보고 보존 확인. 기존 파일 전면 재작성 없음. |
+| 81 | 변경 파일 | 기존 4개 수정/새 6개/삭제 0. 아래 파일별 책임 참조. |
+| 82 | 미커밋 보존 | 시작 변경 0. 기존 제품 89개·이전 검증 소스 1,793개/이전 README 보고 보존. commit/push 없음. |
+| 83 | 제외 기능 | Archive 편집/search/filter/sorting/tagging/evidence/fallback snapshot/SaveLoad/Campaign/Case03/Severity/MAJOR/자동 Broadcast/Manager/Singleton/EventBus/최종 UI 없음. |
+| 84 | 다음 단계 | 실제 handoff 후 과거 연구 조회의 가독성 검토. fallback 보존이 필요하면 synthetic ID 대신 안정된 provenance/저장 정책을 별도 설계. 결과 공개·정답 평가와 자동 연결하지 않음. |
+
+### 실제 변경 파일과 책임
+
+생성:
+- `scripts/views/research_archive_list_view.gd` + `.uid`: 표시 Snapshot/동적 Case 행/ID 선택 request.
+- `scripts/views/research_archive_detail_view.gd` + `.uid`: 독립 표시 Snapshot/읽기 전용 연구·메모 renderer.
+- `scenes/views/research_archive_list_view.tscn`: List Scroll/Open/Back.
+- `scenes/views/research_archive_detail_view.tscn`: Research/메모 두 Scroll 열/Back.
+
+수정:
+- `scripts/main/main.gd`: 보조 Stage/Scene 연결, Main request 승인, Case lookup/Snapshot 생성, 기존 authored validation/category 재사용.
+- `scripts/views/research_log_view.gd`: Archive request signal과 버튼 연결만 추가, 기존 Research/Notebook 함수 유지.
+- `scenes/views/research_log_view.tscn`: Open Research Archive 버튼만 추가.
+- `README.md`: 현재 사용 설명과 84개 항목 보고.
+
+project.godot/Main Scene/Case .tres/모든 Data/기존 여섯 State/다른 View는 변경하지 않았습니다.
+검증 자료는 Git 제외된 `.godot/verification/step37/`의 신규 Archive tests와 이전 tests의 사본,
+소스 기준선, log/pass certificate, 캡처, scope audit에 남깁니다. 제품은 이를 참조하지 않습니다.
+기존 테스트 소스는 수정하지 않았습니다. 커밋과 push는 하지 않았습니다.
 
 ## 36단계 플레이어 작성 Working Hypothesis Notebook
 

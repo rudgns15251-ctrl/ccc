@@ -127,6 +127,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
+[node name="OpenArchiveButton" type="Button" parent="Center/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Open Research Archive"
+
 [node name="NextButton" type="Button" parent="Center/Content"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(360, 64)

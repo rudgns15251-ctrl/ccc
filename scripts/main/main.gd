@@ -11,13 +11,15 @@ const BroadcastView = preload("res://scripts/views/broadcast_view.gd")
 const IncidentResultView = preload("res://scripts/views/incident_result_view.gd")
 const ResultView = preload("res://scripts/views/result_view.gd")
 const ResearchLogView = preload("res://scripts/views/research_log_view.gd")
+const ArchiveListView = preload("res://scripts/views/research_archive_list_view.gd")
+const ArchiveDetailView = preload("res://scripts/views/research_archive_detail_view.gd")
 const DisturbanceNotice = preload("res://scripts/views/environmental_disturbance_notice.gd")
 const EnvironmentConditions = preload("res://scripts/views/environment_conditions_view.gd")
 const DISTURBANCE_NOTICE_SCENE = preload("res://scenes/views/environmental_disturbance_notice.tscn")
 # Temporary opportunity count range for this vertical slice, not final balance.
 const PROTOTYPE_DISTURBANCE_THRESHOLD := Vector2i(2, 4)
 
-enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG }
+enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG, RESEARCH_ARCHIVE_LIST, RESEARCH_ARCHIVE_DETAIL }
 
 const RESEARCH_LOG_STAGES: Array[int] = [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT, Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT, Stage.RESULT]
 
@@ -32,6 +34,8 @@ const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/broadcast_view.tscn"),
 	preload("res://scenes/views/incident_result_view.tscn"),
 	preload("res://scenes/views/research_log_view.tscn"),
+	preload("res://scenes/views/research_archive_list_view.tscn"),
+	preload("res://scenes/views/research_archive_detail_view.tscn"),
 ]
 
 @export var current_case: CaseData
@@ -50,6 +54,7 @@ var failure_candidates: FailureEventCandidateState
 var _current_stage: int = Stage.PROFILE
 var _current_view: FlowView
 var _research_log_return_stage: int = -1
+var _archive_detail_case_id: String = ""
 var _cctv_review_return_stage: int = -1
 var _case_index: int = -1
 var _processed_opportunities: Dictionary[String, bool] = {}
@@ -93,7 +98,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	view_host.custom_minimum_size.y = 360
 	var displayed_source: Resource
 	_current_view.research_log_requested.connect(_on_research_log_requested.bind(_current_view, stage))
-	if stage != Stage.RESEARCH_LOG:
+	if stage not in [Stage.RESEARCH_LOG, Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		_current_view.advance_requested.connect(_on_advance_requested.bind(_current_view))
 	if stage == Stage.PROFILE:
 		var profile_view: ProfileView = _current_view as ProfileView
@@ -158,10 +163,22 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		var research_log_view: ResearchLogView = _current_view as ResearchLogView
 		view_host.custom_minimum_size.y = 660
 		research_log_view.advance_requested.connect(_on_research_log_back_requested.bind(research_log_view))
+		research_log_view.archive_requested.connect(_on_research_archive_requested.bind(research_log_view))
 		research_log_view.hypothesis_add_requested.connect(_on_hypothesis_add_requested.bind(research_log_view))
 		research_log_view.hypothesis_update_requested.connect(_on_hypothesis_update_requested.bind(research_log_view))
 		research_log_view.hypothesis_remove_requested.connect(_on_hypothesis_remove_requested.bind(research_log_view))
 		research_log_view.setup(_build_research_log_snapshot())
+	elif stage == Stage.RESEARCH_ARCHIVE_LIST:
+		var archive_list: ArchiveListView = _current_view as ArchiveListView
+		view_host.custom_minimum_size.y = 660
+		archive_list.case_requested.connect(_on_archive_case_requested.bind(archive_list))
+		archive_list.advance_requested.connect(_on_archive_list_back_requested.bind(archive_list))
+		archive_list.setup(_build_archive_list_snapshot())
+	elif stage == Stage.RESEARCH_ARCHIVE_DETAIL:
+		var archive_detail: ArchiveDetailView = _current_view as ArchiveDetailView
+		view_host.custom_minimum_size.y = 660
+		archive_detail.advance_requested.connect(_on_archive_detail_back_requested.bind(archive_detail))
+		archive_detail.setup(_build_archive_detail_snapshot(_archive_detail_case_id))
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
 	view_host.add_child(_current_view)
@@ -313,13 +330,117 @@ func _on_hypothesis_remove_requested(case_id: String, id: String, view: Research
 	view.show_hypothesis_request_result(approved, working_hypotheses.get_hypotheses(case_id), id)
 
 
-func _get_valid_research_entries() -> Array[ResearchEntryData]:
+func _on_research_archive_requested(view: ResearchLogView) -> void:
+	if _current_stage != Stage.RESEARCH_LOG or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage) or view.get_hypothesis_case_id() != current_case.case_id:
+		return
+	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
+
+
+func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
+	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
+		return
+	if _find_archive_case(case_id) == null:
+		return
+	_archive_detail_case_id = case_id
+	_show_view(Stage.RESEARCH_ARCHIVE_DETAIL, false)
+
+
+func _on_archive_list_back_requested(view: ArchiveListView) -> void:
+	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
+		return
+	_archive_detail_case_id = ""
+	_show_view(Stage.RESEARCH_LOG, false)
+
+
+func _on_archive_detail_back_requested(view: ArchiveDetailView) -> void:
+	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _is_active_view(view) or not view.is_visible_in_tree():
+		return
+	_archive_detail_case_id = ""
+	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
+
+
+func _find_archive_case(case_id: String) -> CaseData:
+	var matches: Array[CaseData] = []
+	for data: CaseData in case_sequence:
+		if data != null and data.case_id == case_id:
+			matches.append(data)
+	# Single-Case debug/standalone Main has no configured sequence.
+	if case_sequence.is_empty() and current_case != null and current_case.case_id == case_id:
+		matches.append(current_case)
+	if case_id.strip_edges().is_empty() or matches.size() != 1:
+		push_warning("Main: Archive CaseData mapping unavailable or duplicate for case_id %s." % case_id)
+		return null
+	return matches[0]
+
+
+func _build_archive_list_snapshot() -> ArchiveListView.Snapshot:
+	var snapshot := ArchiveListView.Snapshot.new()
+	if research_archive == null:
+		return snapshot
+	for case_id: String in research_archive.get_archived_case_ids():
+		var item := ArchiveListView.CaseSummary.new()
+		item.case_id = case_id
+		var data: CaseData = _find_archive_case(case_id)
+		item.available = data != null
+		item.display_name = data.display_name if data != null else "[Unavailable]"
+		item.research_count = research_archive.get_discovered_entry_ids(case_id).size()
+		item.hypothesis_count = working_hypotheses.get_hypotheses(case_id).size() if working_hypotheses != null else 0
+		snapshot.cases.append(item)
+	return snapshot
+
+
+func _build_archive_detail_snapshot(case_id: String) -> ArchiveDetailView.Snapshot:
+	var snapshot := ArchiveDetailView.Snapshot.new()
+	snapshot.case_id = case_id
+	if research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
+		return snapshot
+	var data: CaseData = _find_archive_case(case_id)
+	snapshot.display_name = data.display_name if data != null else "[Unavailable]"
 	var valid_entries: Array[ResearchEntryData] = []
-	if current_case == null:
+	if data != null:
+		valid_entries = _get_valid_research_entries(data)
+	for entry_id: String in research_archive.get_discovered_entry_ids(case_id):
+		var row := ArchiveDetailView.ResearchEntry.new()
+		row.entry_id = entry_id
+		row.title = "[Unavailable Research Entry]"
+		for entry: ResearchEntryData in valid_entries:
+			if entry.entry_id == entry_id:
+				row.category = _research_category(entry.source_kind)
+				row.source_id = entry.source_id
+				row.title = entry.title
+				row.body_text = entry.body_text
+				break
+		if row.category.is_empty():
+			push_warning("Main: Archive ResearchEntry unavailable for %s/%s." % [case_id, entry_id])
+		snapshot.research_entries.append(row)
+	if working_hypotheses != null:
+		snapshot.hypotheses = working_hypotheses.get_hypotheses(case_id)
+	return snapshot
+
+
+func _research_category(source_kind: int) -> String:
+	match source_kind:
+		ResearchEntryData.SourceKind.PROFILE:
+			return "PROFILE"
+		ResearchEntryData.SourceKind.CCTV, ResearchEntryData.SourceKind.DISTURBANCE_REACTION, ResearchEntryData.SourceKind.CCTV_CONDITION_OBSERVATION:
+			return "OBSERVATION"
+		ResearchEntryData.SourceKind.EXPERIMENT, ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION:
+			return "EXPERIMENT"
+		ResearchEntryData.SourceKind.CONTAINMENT:
+			return "CONTAINMENT"
+		ResearchEntryData.SourceKind.INCIDENT, ResearchEntryData.SourceKind.BROADCAST, ResearchEntryData.SourceKind.BROADCAST_OPTION, ResearchEntryData.SourceKind.INCIDENT_RESULT:
+			return "INCIDENT"
+	return ""
+
+
+func _get_valid_research_entries(case_data: CaseData = null) -> Array[ResearchEntryData]:
+	var valid_entries: Array[ResearchEntryData] = []
+	var source_case: CaseData = case_data if case_data != null else current_case
+	if source_case == null:
 		return valid_entries
 	var id_counts: Dictionary[String, int] = {}
 	var source_counts: Dictionary[String, int] = {}
-	for entry: ResearchEntryData in current_case.research_entries:
+	for entry: ResearchEntryData in source_case.research_entries:
 		if entry == null:
 			continue
 		if not entry.entry_id.strip_edges().is_empty():
@@ -327,7 +448,7 @@ func _get_valid_research_entries() -> Array[ResearchEntryData]:
 		if ResearchEntryData.SourceKind.values().has(entry.source_kind) and not entry.source_id.strip_edges().is_empty():
 			var key: String = "%d:%s" % [entry.source_kind, entry.source_id]
 			source_counts[key] = source_counts.get(key, 0) + 1
-	for entry: ResearchEntryData in current_case.research_entries:
+	for entry: ResearchEntryData in source_case.research_entries:
 		if entry == null:
 			push_warning("Main: ResearchEntryData is missing; using derived text.")
 			continue
@@ -356,7 +477,7 @@ func _append_source_research_entry(snapshot: ResearchLogView.Snapshot, entries: 
 	var authored: ResearchEntryData = _find_research_entry(entries, source_kind, source_id)
 	if authored != null and (not _has_current_case_runtime() or not case_runtime.has_discovered_research_entry(authored.entry_id)):
 		authored = null
-	_append_research_entry(snapshot, category, source_id, authored.title if authored != null else title, authored.body_text if authored != null else body_text, source_kind)
+	_append_research_entry(snapshot, _research_category(source_kind) if authored != null else category, source_id, authored.title if authored != null else title, authored.body_text if authored != null else body_text, source_kind)
 
 
 func _has_current_case_runtime() -> bool:
