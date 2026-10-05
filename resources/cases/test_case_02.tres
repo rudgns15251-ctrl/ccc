@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CaseData" load_steps=26 format=3]
+[gd_resource type="Resource" script_class="CaseData" load_steps=61 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
 [ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
@@ -9,6 +9,13 @@
 [ext_resource type="Script" path="res://scripts/data/case_disturbance_reaction_data.gd" id="7_reaction"]
 [ext_resource type="Script" path="res://scripts/data/cctv_condition_observation_data.gd" id="8_cctv_condition"]
 [ext_resource type="Script" path="res://scripts/data/experiment_condition_observation_data.gd" id="9_experiment_condition"]
+[ext_resource type="Script" path="res://scripts/data/monitoring_stage_data.gd" id="10_stage"]
+[ext_resource type="Script" path="res://scripts/data/monitoring_outcome_data.gd" id="11_outcome"]
+[ext_resource type="Script" path="res://scripts/data/environmental_disturbance_data.gd" id="12_disturbance"]
+[ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="13_incident"]
+[ext_resource type="Script" path="res://scripts/data/broadcast_option_data.gd" id="14_option"]
+[ext_resource type="Script" path="res://scripts/data/emergency_broadcast_data.gd" id="15_broadcast"]
+[ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="16_result"]
 
 [sub_resource type="Resource" id="Resource_profile"]
 script = ExtResource("2_profile")
@@ -20,7 +27,7 @@ basic_description = "TEST: wall-contact loss precedes searching; no damage recor
 [sub_resource type="Resource" id="Resource_cctv"]
 script = ExtResource("3_cctv")
 camera_id = "TEST_CASE02_CAM_01"
-observation_text = "TEST: vent cycles prompt turns to the outlet. A paw follows shallow wall ribs; on smooth patches it sweeps sideways. No new damage appears."
+observation_text = "TEST: ribbed-wall tracing resumes after vent turns. Smooth patches prompt repeated sideways searches toward the service grille; vent cycling restarts those searches. No new damage appears."
 
 [sub_resource type="Resource" id="Resource_experiment_01"]
 script = ExtResource("4_experiment")
@@ -34,7 +41,7 @@ script = ExtResource("4_experiment")
 experiment_id = "TEST_CASE02_EXP_02"
 display_name = "TEST CASE 02 EXPERIMENT 02"
 description = "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure."
-result_text = "Paw tracks follow the shallow ribs; on the smooth panel, sideways searches recur. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+result_text = "Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
 
 [sub_resource type="Resource" id="Resource_room_01"]
 script = ExtResource("5_containment")
@@ -126,6 +133,195 @@ source_id = "TEST_CASE02_POWER_EXP01_OBS"
 title = "Condition Observation: test experiment 01 under lighting interruption"
 body_text = "Without lighting, an air pulse still caused a nozzle-directed pivot with a later first step than the lit reference. Wall tracing resumed; onset delay alone did not explain wall searching."
 
+[sub_resource type="Resource" id="Resource_stage_success_01"]
+script = ExtResource("10_stage")
+time_offset = 0
+observation_text = "TEST playback: wall tracing follows the available ribs under steady airflow."
+
+[sub_resource type="Resource" id="Resource_stage_success_02"]
+script = ExtResource("10_stage")
+time_offset = 10
+observation_text = "TEST playback: repeated passes return to the same wall path; grille-directed searching is infrequent."
+
+[sub_resource type="Resource" id="Resource_stage_success_03"]
+script = ExtResource("10_stage")
+time_offset = 20
+observation_text = "TEST playback: contact pressure remains unchanged; the service air-line stays steady during this sample."
+
+[sub_resource type="Resource" id="Resource_outcome_success"]
+script = ExtResource("11_outcome")
+room_id = "TEST_CASE02_ROOM_01"
+stages = Array[ExtResource("10_stage")]([SubResource("Resource_stage_success_01"), SubResource("Resource_stage_success_02"), SubResource("Resource_stage_success_03")])
+final_result = 1
+
+[sub_resource type="Resource" id="Resource_stage_failure_01"]
+script = ExtResource("10_stage")
+time_offset = 0
+observation_text = "TEST playback: sideways searching repeatedly reaches the service grille."
+
+[sub_resource type="Resource" id="Resource_stage_failure_02"]
+script = ExtResource("10_stage")
+time_offset = 10
+observation_text = "TEST playback: vent transitions repeatedly redirect the search toward the grille; wall tracing does not settle."
+
+[sub_resource type="Resource" id="Resource_stage_failure_03"]
+script = ExtResource("10_stage")
+time_offset = 20
+observation_text = "TEST playback: grille contact coincides with short discharges from the service air-line; no damage is recorded."
+
+[sub_resource type="Resource" id="Resource_outcome_failure"]
+script = ExtResource("11_outcome")
+room_id = "TEST_CASE02_ROOM_02"
+stages = Array[ExtResource("10_stage")]([SubResource("Resource_stage_failure_01"), SubResource("Resource_stage_failure_02"), SubResource("Resource_stage_failure_03")])
+final_result = 2
+incident_id = "TEST_CASE02_INCIDENT_01"
+
+[sub_resource type="Resource" id="Resource_disturbance_service_air"]
+script = ExtResource("12_disturbance")
+disturbance_id = "TEST_DIST_SERVICE_AIR_PULSES"
+display_name = "TEST SERVICE AIR-LINE PULSES"
+notice_text = "Short air jets are discharging from the facility service line. Main ventilation continues at its previous setting."
+condition_change_text = "SERVICE AIR-LINE: STEADY -> INTERMITTENT LOCAL JETS"
+
+[sub_resource type="Resource" id="Resource_incident"]
+script = ExtResource("13_incident")
+incident_id = "TEST_CASE02_INCIDENT_01"
+display_name = "TEST SERVICE-GRILLE SEARCH INCIDENT"
+description = "TEST observation: repeated sideways searches reach the service grille. Contact there coincides with short service air-line discharges, which redirect the next search toward the outlet. Contact pressure remains unchanged; wall tracing has not settled into a repeated path."
+broadcast_id = "TEST_CASE02_BROADCAST_01"
+environmental_disturbance = SubResource("Resource_disturbance_service_air")
+
+[sub_resource type="Resource" id="Resource_result_A"]
+script = ExtResource("16_result")
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_A"
+display_name = "TEST CONTINUOUS-GUIDE OBSERVATION"
+description = "A temporary shallow-ribbed guide restores a repeated tracing path. Grille-directed searches become less frequent, but each remaining service air jet still prompts an outlet-directed turn. The air-line cue remains unresolved."
+
+[sub_resource type="Resource" id="Resource_result_B"]
+script = ExtResource("16_result")
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_B"
+display_name = "TEST SERVICE-LINE ISOLATION OBSERVATION"
+description = "Local service air jets stop after isolating that line; the associated outlet turns cease. Sideways wall searches continue to reach the grille. Airflow redirection was removed, but a repeatable contact guide is still absent."
+
+[sub_resource type="Resource" id="Resource_result_C"]
+script = ExtResource("16_result")
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_C"
+display_name = "TEST SOUND-REDUCTION OBSERVATION"
+description = "Fan sound is reduced while the wall surface and service line remain unchanged. Sideways searches and turns following local air jets continue. Quieter machinery does not restore a repeated wall path or remove the air cue."
+
+[sub_resource type="Resource" id="Resource_option_A"]
+script = ExtResource("14_option")
+option_id = "TEST_CASE02_OPTION_01_A"
+display_text = "Add a temporary continuous shallow-ribbed contact guide. Prioritizes the repeated tracing path seen in the surface trial, but leaves service air jets active."
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_A"
+
+[sub_resource type="Resource" id="Resource_option_B"]
+script = ExtResource("14_option")
+option_id = "TEST_CASE02_OPTION_01_B"
+display_text = "Isolate the pulsing service air-line while keeping main ventilation and wall surface unchanged. Removes the directional air cue, but leaves sideways contact searching unresolved."
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_B"
+
+[sub_resource type="Resource" id="Resource_option_C"]
+script = ExtResource("14_option")
+option_id = "TEST_CASE02_OPTION_01_C"
+display_text = "Reduce airborne fan sound while retaining the wall surface and service air-line. Limits sound exposure, although the sound-only trial showed no consistent pivot and actual air jets remain."
+result_id = "TEST_CASE02_INCIDENT_RESULT_01_C"
+
+[sub_resource type="Resource" id="Resource_broadcast"]
+script = ExtResource("15_broadcast")
+broadcast_id = "TEST_CASE02_BROADCAST_01"
+display_name = "TEST RESPONSE: WALL SEARCH AND SERVICE AIR"
+prompt_text = "The surface trial linked ribs with a repeated wall path and smooth panels with grille-directed searches. Air pulses prompted pivots; fan sound alone did not. Choose a temporary response to the current search and air-line cues. These observations do not establish a long-term containment solution."
+options = Array[ExtResource("14_option")]([SubResource("Resource_option_A"), SubResource("Resource_option_B"), SubResource("Resource_option_C")])
+
+[sub_resource type="Resource" id="Resource_research_cctv"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_CCTV_01"
+source_kind = 1
+source_id = "TEST_CASE02_CAM_01"
+title = "Test Case 02: tracing paths and service-grille searches"
+body_text = "Rib tracing resumed after vent turns. Smooth patches prompted repeated sideways searches toward the service grille; vent cycling restarted those searches. No new damage was observed."
+
+[sub_resource type="Resource" id="Resource_research_experiment_02"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_EXP_02"
+source_kind = 2
+source_id = "TEST_CASE02_EXP_02"
+title = "Test Case 02 experiment 02: repeated surface passes"
+body_text = "Under matched airflow and lighting, rib tracks returned to the same path while smooth-panel searches repeatedly reached the service grille. Pressure did not increase. Continuous versus cycling airflow was not compared."
+
+[sub_resource type="Resource" id="Resource_research_room_02"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_ROOM_02"
+source_kind = 3
+source_id = "TEST_CASE02_ROOM_02"
+title = "Test Case 02 room 02 submission"
+body_text = "Submitted configuration: start/stop airflow, smooth panels without purchase points and reduced task lighting. This record describes the submission and does not report its outcome."
+
+[sub_resource type="Resource" id="Resource_research_incident"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_INCIDENT_01"
+source_kind = 4
+source_id = "TEST_CASE02_INCIDENT_01"
+title = "Test service-grille search incident"
+body_text = "Sideways searches repeatedly reached the service grille. Contact coincided with short service air-line discharges and outlet-directed turns. Pressure stayed unchanged; tracing had not settled."
+
+[sub_resource type="Resource" id="Resource_research_broadcast"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_BROADCAST_01"
+source_kind = 5
+source_id = "TEST_CASE02_BROADCAST_01"
+title = "Test emergency response: contact guide or air cue"
+body_text = "Temporary responses compare a repeated contact path, isolation of local service air jets and airborne fan-sound reduction. Surface and air-versus-sound trials provide the relevant observations; no long-term solution is established."
+
+[sub_resource type="Resource" id="Resource_research_option_A"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_OPTION_01_A"
+source_kind = 6
+source_id = "TEST_CASE02_OPTION_01_A"
+title = "Test response recorded: temporary contact guide"
+body_text = "Added a continuous shallow-ribbed guide to support a repeated tracing path. Service air jets were left active, so the airflow cue remained to be observed."
+
+[sub_resource type="Resource" id="Resource_research_option_B"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_OPTION_01_B"
+source_kind = 6
+source_id = "TEST_CASE02_OPTION_01_B"
+title = "Test response recorded: service-line isolation"
+body_text = "Isolated the pulsing service air-line without changing main ventilation or wall surface. This targeted air-directed turns rather than the repeated contact search."
+
+[sub_resource type="Resource" id="Resource_research_option_C"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_OPTION_01_C"
+source_kind = 6
+source_id = "TEST_CASE02_OPTION_01_C"
+title = "Test response recorded: fan-sound reduction"
+body_text = "Reduced airborne fan sound while retaining surface and service air cues. The earlier sound-only trial had not produced a consistent pivot."
+
+[sub_resource type="Resource" id="Resource_research_result_A"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_RESULT_01_A"
+source_kind = 7
+source_id = "TEST_CASE02_INCIDENT_RESULT_01_A"
+title = "Test guide response: repeated tracing with remaining air turns"
+body_text = "Tracing followed the temporary guide and grille searches decreased. Remaining air jets still prompted outlet turns; the air-line cue remained unresolved."
+
+[sub_resource type="Resource" id="Resource_research_result_B"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_RESULT_01_B"
+source_kind = 7
+source_id = "TEST_CASE02_INCIDENT_RESULT_01_B"
+title = "Test isolation response: air turns stop, wall searching remains"
+body_text = "Service jets and their associated outlet turns ceased. Sideways wall searches still reached the grille, leaving the absent repeated contact guide unresolved."
+
+[sub_resource type="Resource" id="Resource_research_result_C"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE02_RESEARCH_RESULT_01_C"
+source_kind = 7
+source_id = "TEST_CASE02_INCIDENT_RESULT_01_C"
+title = "Test sound response: searching and air turns persist"
+body_text = "Lower fan sound did not stop sideways searches or air-jet turns. Neither the repeated wall path nor the air cue was changed."
+
 [resource]
 script = ExtResource("1_case")
 case_id = "TEST_CASE_02"
@@ -135,7 +331,11 @@ profile_data = SubResource("Resource_profile")
 cctv_data = SubResource("Resource_cctv")
 available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02")])
 available_containment_rooms = Array[ExtResource("5_containment")]([SubResource("Resource_room_01"), SubResource("Resource_room_02")])
-research_entries = Array[ExtResource("6_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_experiment_01"), SubResource("Resource_research_room_01"), SubResource("Resource_research_reaction_power"), SubResource("Resource_research_cctv_condition_power"), SubResource("Resource_research_experiment_condition_power")])
+containment_outcomes = Array[ExtResource("11_outcome")]([SubResource("Resource_outcome_success"), SubResource("Resource_outcome_failure")])
+incidents = Array[ExtResource("13_incident")]([SubResource("Resource_incident")])
+emergency_broadcasts = Array[ExtResource("15_broadcast")]([SubResource("Resource_broadcast")])
+incident_results = Array[ExtResource("16_result")]([SubResource("Resource_result_A"), SubResource("Resource_result_B"), SubResource("Resource_result_C")])
+research_entries = Array[ExtResource("6_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_experiment_01"), SubResource("Resource_research_room_01"), SubResource("Resource_research_reaction_power"), SubResource("Resource_research_cctv_condition_power"), SubResource("Resource_research_experiment_condition_power"), SubResource("Resource_research_cctv"), SubResource("Resource_research_experiment_02"), SubResource("Resource_research_room_02"), SubResource("Resource_research_incident"), SubResource("Resource_research_broadcast"), SubResource("Resource_research_option_A"), SubResource("Resource_research_option_B"), SubResource("Resource_research_option_C"), SubResource("Resource_research_result_A"), SubResource("Resource_research_result_B"), SubResource("Resource_research_result_C")])
 disturbance_reactions = Array[ExtResource("7_reaction")]([SubResource("Resource_reaction_power"), SubResource("Resource_reaction_ventilation")])
 cctv_condition_observations = Array[ExtResource("8_cctv_condition")]([SubResource("Resource_cctv_condition_power")])
 experiment_condition_observations = Array[ExtResource("9_experiment_condition")]([SubResource("Resource_experiment_condition_power")])

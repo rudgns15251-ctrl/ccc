@@ -1,7 +1,7 @@
 # CAP — 개발 기반과 Case 흐름 UI 프로토타입
 
 Godot **4.7.1 Standard**, GDScript, Windows PC용 2D UI 프로젝트입니다.
-정상 플레이는 Main Scene에 설정한 Case01 → Case02 순서로 각 Case의 PROFILE → CCTV → EXPERIMENT → CONTAINMENT를 진행합니다. 기존 Monitoring/결과/실패 후속 화면은 독립 prototype/debug 검사용으로 보존했습니다. Research Log는 정상 흐름의 네 화면과 기존 debug 경로의 네 화면에서 열 수 있으며 MONITORING에서는 열 수 없습니다.
+정상 플레이는 Main Scene에 설정한 Case01 → Case02 → Case03 순서로 각 Case의 PROFILE → CCTV → EXPERIMENT → CONTAINMENT를 진행합니다. 기존 Monitoring/결과/실패 후속 화면은 독립 prototype/debug 검사용으로 보존했습니다. Research Log는 정상 흐름의 네 화면과 기존 debug 경로의 네 화면에서 열 수 있으며 MONITORING에서는 열 수 없습니다.
 EXPERIMENT 목록에서 하나를 선택하고 즉시 테스트 결과 텍스트를 표시할 수 있습니다.
 각 Experiment ID는 Case당 한 번만 실행할 수 있고 CaseData.experiment_limit을 소비합니다.
 Main이 소유하는 메모리 CaseRuntimeState가 중복과 제한을 검증한 뒤 승인한 실행만 기록합니다.
@@ -19,6 +19,41 @@ ResearchArchiveState는 결과 확정 여부와 관계없이 획득한 Case별 R
 CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응하는 **CONDITION OBSERVATION**을 별도로 표시합니다. 활성 조건이 있으면 Experiment / Containment의 **Recheck CCTV**로 다시 확인하고 원래 화면으로 돌아올 수 있습니다. 추가 관찰 Research는 CCTV에 실제 표시된 뒤에만 발견하며, Overlay를 본 것만으로는 발견하지 않습니다.
 Research Log의 WORKING HYPOTHESES에서 현재 Case의 자유 메모를 Add/Edit/Delete할 수 있습니다. Main 소유 WorkingHypothesisState가 Case별로 세션 동안 유지하며, Runtime 교체와 ResearchArchive 초기화로 삭제되지 않습니다. 가설을 추천하거나 평가하지 않고 연구 발견/게임 판정에도 연결하지 않습니다.
 최종 게임 시스템과 디자인은 아직 구현하지 않았습니다.
+
+## Step45: Final Sequence Event Policy / Pacing Design Decision
+
+설계 문서만 작성했으며 현재 Gameplay 규칙은 유지합니다. 추천 기본안은 Case/같은 Run의 Shift에서는 후보 이월, 최종 Run에서는 미처리 의무 기록으로 전환하는 방식입니다. 자발 종료는 현재 active 응답만 마무리하고, 강제 종료는 자동 선택 없이 중단 사실을 보존합니다.
+
+진행 중에는 모든 interruption 사이 새 의미 있는 연구 진행1개와 읽기 경계를 지킨 뒤 가장 오래된 actionable event를 선택하는 안을 권장합니다. 성공 플레이에는 별도 시설 source의 authored 핵심 경험을 최소1회 제공하는 방향입니다. 종료·gate·ordering·독립 사건은 아직 구현하지 않았습니다.
+
+102개 항목, 정책 비교표와 다음 Step46의 좁은 범위: [Step45 정책 문서](docs/step45_final_sequence_event_policy.md).
+
+## Step44: 3-Case Event Pacing / Cross-Case UX Audit
+
+Step43의 미커밋 기반을 보존한 Audit이다. 제품 코드·Scene·Resource는 변경하지 않았다. 실제 버튼으로 144개 threshold/실험량 조합과 세 해상도의 dense/all-Success 흐름을 측정했다.
+
+- Major readiness=1과 실제 CCTV/Containment presentation을 구분한다. 122회 중 Containment86/CCTV36이며 완료된 연구 행동 간격0도 있다.
+- 교란 우선의 실제 순서/마지막 경계 지연과 무한 유입의 이론상 starvation을 분리했다. invalid oldest는 유효 후보 전체를 막지 않는다.
+- F01은 OPEN, F07은 continuation 해결(A)과 마지막 미처리 정책(B OPEN)으로 분해한다. threshold/RNG/pacing/Case 수는 그대로다.
+- 291개 최종 suite와 별도 import/Main3개, source/current Archive·같은 Runtime 복귀·기존 debug 회귀를 검증했다. 사람의 공포/재미/피로를 검증한 것은 아니다.
+
+132개 보고 항목과 timeline/density/threshold/ordering/starvation/UX 표: [Step44 보고서](docs/step44_three_case_event_pacing_audit.md).
+
+## Step43 — Case02 Resolution + Case03 + Cross-Case Deferred Incident
+
+정상 sequence를 Case01 → Case02 → Case03으로 확장했습니다.
+Case02의 기본 CCTV/표면 실험을 최소 보완한 뒤 모든 Room에 Prototype Test Outcome과 최소 실패 후속 chain을 작성했습니다.
+이 매핑은 시스템 검증용이며 정식 Creature 설정이나 장기 격리 정답을 확정하지 않습니다.
+늦어진 Case01 Candidate가 Case02 handoff를 넘어 Case03에서 사건을 시작하고 같은 Case03 Runtime으로 복귀합니다.
+두 Failure 후보, Case02만 Failure, 모두 Success, sequence 끝 Deferred 보존을 검증했습니다.
+threshold/RNG/교란 우선·FIFO/Step42 읽기 경계·Context·Archive draft는 유지했습니다.
+Case03은 Test 콘텐츠와 최소 reaction만 제공하며 Outcome 없이 마지막 Pending을 보존합니다.
+
+145개 종료 항목과 Case02 Evidence/Mapping, 실제 3-Case reachability,
+변경 범위와 검증 결과는 [Step43 보고서](docs/step43_cross_case_deferred_incident.md)에 정리했습니다.
+기존 235개 + 신규 32개 suite, 별도 import/기본 Main 실행 3개를 통과했습니다.
+F07은 부분 해결, Major1의 F01 pacing과 마지막 Case의 후속 기회 부족은 남았습니다.
+커밋·push하지 않았습니다.
 
 ## Step42 — Major Incident Response Content + Context + Read Boundary
 

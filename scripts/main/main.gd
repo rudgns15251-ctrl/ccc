@@ -75,8 +75,12 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_update_window_size)
 	_update_window_size()
 	if not case_sequence.is_empty():
-		_case_index = 0
-		current_case = case_sequence[_case_index]
+		if _has_unique_case_sequence():
+			_case_index = 0
+			current_case = case_sequence[_case_index]
+		else:
+			push_warning("Main: case_sequence requires nonempty unique Case IDs; no Case selected.")
+			current_case = null
 	_validate_case()
 	case_runtime = CaseRuntimeState.new(current_case.case_id if current_case != null else "")
 	research_archive = ResearchArchiveState.new()
@@ -87,6 +91,9 @@ func _ready() -> void:
 	incident_responses = IncidentResponseState.new()
 	_event_rng.randomize()
 	_show_view(Stage.PROFILE)
+	if current_case == null:
+		_current_view.next_button.disabled = true
+		_current_view.research_log_button.disabled = true
 
 
 func _update_window_size() -> void:
@@ -790,6 +797,8 @@ func _is_active_view(view: FlowView) -> bool:
 func _on_advance_requested(view: FlowView) -> void:
 	if not _is_active_view(view):
 		return
+	if not _has_unique_case_sequence():
+		return
 	if _is_normal_interrupt() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		_advance_response(view)
 		return
@@ -834,8 +843,17 @@ func _merge_current_case_discoveries() -> void:
 	research_archive.merge_case_discoveries(current_case.case_id, discoveries)
 
 
+func _has_unique_case_sequence() -> bool:
+	var ids: Array[String] = []
+	for data: CaseData in case_sequence:
+		if data == null or data.case_id.strip_edges().is_empty() or ids.has(data.case_id):
+			return false
+		ids.append(data.case_id)
+	return true
+
+
 func _has_next_test_case() -> bool:
-	if _case_index < 0 or _case_index + 1 >= case_sequence.size() or case_sequence[_case_index] != current_case:
+	if not _has_unique_case_sequence() or _case_index < 0 or _case_index + 1 >= case_sequence.size() or case_sequence[_case_index] != current_case:
 		return false
 	var next_case: CaseData = case_sequence[_case_index + 1]
 	return next_case != null and not next_case.case_id.strip_edges().is_empty() and not next_case.display_name.strip_edges().is_empty() and next_case.case_id != current_case.case_id and not pending_containment.has_pending(next_case.case_id) and not containment_resolutions.has_resolution(next_case.case_id)
@@ -888,6 +906,9 @@ func _try_resolve_current_pending() -> bool:
 	var incident_id: String = outcome.incident_id if result == MonitoringOutcomeData.Result.FAILURE else ""
 	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE or (result == MonitoringOutcomeData.Result.FAILURE and (incident_id.strip_edges().is_empty() or failure_candidates.has_candidate(case_id))):
 		push_warning("Main: invalid hidden resolution or existing failure candidate; retaining Pending.")
+		return false
+	if result == MonitoringOutcomeData.Result.FAILURE and _unique_response_content(current_case.incidents, "incident_id", incident_id) == null:
+		push_warning("Main: hidden FAILURE requires a unique Incident; retaining Pending.")
 		return false
 	if not containment_resolutions.try_record_resolution(case_id, room_id, result, incident_id):
 		return false

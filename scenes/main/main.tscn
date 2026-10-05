@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/main/main.gd" id="1_main"]
 [ext_resource type="Resource" path="res://resources/cases/test_case_01.tres" id="2_case"]
 [ext_resource type="Resource" path="res://resources/cases/test_case_02.tres" id="3_case"]
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="4_case_data"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="5_case"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -13,7 +14,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
-case_sequence = Array[ExtResource("4_case_data")]([ExtResource("2_case"), ExtResource("3_case")])
+case_sequence = Array[ExtResource("4_case_data")]([ExtResource("2_case"), ExtResource("3_case"), ExtResource("5_case")])
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1

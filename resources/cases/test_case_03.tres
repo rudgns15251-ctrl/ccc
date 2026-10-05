@@ -1,0 +1,122 @@
+[gd_resource type="Resource" script_class="CaseData" load_steps=22 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/case_data.gd" id="1_case"]
+[ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="2_profile"]
+[ext_resource type="Script" path="res://scripts/data/cctv_data.gd" id="3_cctv"]
+[ext_resource type="Script" path="res://scripts/data/experiment_data.gd" id="4_experiment"]
+[ext_resource type="Script" path="res://scripts/data/containment_data.gd" id="5_room"]
+[ext_resource type="Script" path="res://scripts/data/research_entry_data.gd" id="6_research"]
+[ext_resource type="Script" path="res://scripts/data/case_disturbance_reaction_data.gd" id="7_reaction"]
+
+[sub_resource type="Resource" id="Resource_profile"]
+script = ExtResource("2_profile")
+profile_id = "TEST_CASE03_PROFILE_01"
+subject_name = "TEST SUBJECT CASE 03"
+classification = "TEST CLASSIFICATION CASE 03"
+basic_description = "TEST: follows contrasting floor strips; short pauses occur at gaps."
+
+[sub_resource type="Resource" id="Resource_cctv"]
+script = ExtResource("3_cctv")
+camera_id = "TEST_CASE03_CAM_01"
+observation_text = "TEST: travel follows a contrasting floor strip. At a gap the subject pauses and turns, then returns to the visible strip. Lighting and airflow are steady in this sample."
+
+[sub_resource type="Resource" id="Resource_experiment_01"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_CASE03_EXP_01"
+display_name = "TEST CASE 03 CONTRAST COMPARISON"
+description = "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged."
+result_text = "Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+
+[sub_resource type="Resource" id="Resource_experiment_02"]
+script = ExtResource("4_experiment")
+experiment_id = "TEST_CASE03_EXP_02"
+display_name = "TEST CASE 03 GAP COMPARISON"
+description = "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged."
+result_text = "Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+
+[sub_resource type="Resource" id="Resource_room_01"]
+script = ExtResource("5_room")
+room_id = "TEST_CASE03_ROOM_01"
+display_name = "TEST CASE 03 ROOM 01"
+description = "TEST configuration: continuous contrasting floor strip, ordinary task lighting and steady airflow."
+
+[sub_resource type="Resource" id="Resource_room_02"]
+script = ExtResource("5_room")
+room_id = "TEST_CASE03_ROOM_02"
+display_name = "TEST CASE 03 ROOM 02"
+description = "TEST configuration: interrupted floor strips, reduced task lighting and steady airflow."
+
+[sub_resource type="Resource" id="Resource_reaction_service_air"]
+script = ExtResource("7_reaction")
+reaction_id = "TEST_CASE03_REACTION_SERVICE_AIR"
+disturbance_id = "TEST_DIST_SERVICE_AIR_PULSES"
+display_name = "TEST CASE 03 OBSERVATION - LOCAL AIR JETS"
+observation_text = "TEST: a short service air jet prompts a turn away from the floor strip. The subject then returns to the visible strip; pauses at existing gaps continue."
+
+[sub_resource type="Resource" id="Resource_research_profile"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_PROFILE_01"
+source_kind = 0
+source_id = "TEST_CASE03_PROFILE_01"
+title = "Test Case 03 intake: contrasting floor strips"
+body_text = "Intake records strip following and pauses at gaps. Responses to lighting changes have not been compared."
+
+[sub_resource type="Resource" id="Resource_research_cctv"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_CCTV_01"
+source_kind = 1
+source_id = "TEST_CASE03_CAM_01"
+title = "Test Case 03 camera: following and returning to a strip"
+body_text = "Under steady lighting and airflow, travel followed the contrasting strip. Gaps prompted pauses and turns before returning to a visible strip."
+
+[sub_resource type="Resource" id="Resource_research_experiment_01"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_EXP_01"
+source_kind = 2
+source_id = "TEST_CASE03_EXP_01"
+title = "Test Case 03 experiment: floor-strip contrast"
+body_text = "With texture, lighting and airflow held unchanged, contrasting strips were followed for more of each pass. Low-contrast strips prompted recurring pauses and turns. Long-term containment was not tested."
+
+[sub_resource type="Resource" id="Resource_research_experiment_02"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_EXP_02"
+source_kind = 2
+source_id = "TEST_CASE03_EXP_02"
+title = "Test Case 03 experiment: floor-strip gaps"
+body_text = "Continuous strips supported longer uninterrupted passes. Gaps prompted pauses and turns before another visible strip was found. Responses to lighting changes were not compared."
+
+[sub_resource type="Resource" id="Resource_research_room_01"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_ROOM_01"
+source_kind = 3
+source_id = "TEST_CASE03_ROOM_01"
+title = "Test Case 03 room 01 submission"
+body_text = "Recorded a continuous contrasting floor strip with ordinary lighting and steady airflow. This record reports no outcome."
+
+[sub_resource type="Resource" id="Resource_research_room_02"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_ROOM_02"
+source_kind = 3
+source_id = "TEST_CASE03_ROOM_02"
+title = "Test Case 03 room 02 submission"
+body_text = "Recorded interrupted floor strips with reduced lighting and steady airflow. This record reports no outcome."
+
+[sub_resource type="Resource" id="Resource_research_reaction_service_air"]
+script = ExtResource("6_research")
+entry_id = "TEST_CASE03_RESEARCH_SERVICE_AIR_OBS"
+source_kind = 8
+source_id = "TEST_CASE03_REACTION_SERVICE_AIR"
+title = "Test Case 03 observation: local service air jet"
+body_text = "A short local jet prompted a turn away from the floor strip, followed by a return to it. Pauses at existing gaps continued. This is a current-subject observation, separate from the source incident."
+
+[resource]
+script = ExtResource("1_case")
+case_id = "TEST_CASE_03"
+display_name = "TEST CASE 03"
+experiment_limit = 2
+profile_data = SubResource("Resource_profile")
+cctv_data = SubResource("Resource_cctv")
+available_experiments = Array[ExtResource("4_experiment")]([SubResource("Resource_experiment_01"), SubResource("Resource_experiment_02")])
+available_containment_rooms = Array[ExtResource("5_room")]([SubResource("Resource_room_01"), SubResource("Resource_room_02")])
+research_entries = Array[ExtResource("6_research")]([SubResource("Resource_research_profile"), SubResource("Resource_research_cctv"), SubResource("Resource_research_experiment_01"), SubResource("Resource_research_experiment_02"), SubResource("Resource_research_room_01"), SubResource("Resource_research_room_02"), SubResource("Resource_research_reaction_service_air")])
+disturbance_reactions = Array[ExtResource("7_reaction")]([SubResource("Resource_reaction_service_air")])
