@@ -18,6 +18,9 @@ const EnvironmentConditions = preload("res://scripts/views/environment_condition
 const DISTURBANCE_NOTICE_SCENE = preload("res://scenes/views/environmental_disturbance_notice.tscn")
 # Temporary opportunity count range for this vertical slice, not final balance.
 const PROTOTYPE_DISTURBANCE_THRESHOLD := Vector2i(2, 4)
+# TEMPORARY/PROTOTYPE: one later eligible action, not final balance.
+const PROTOTYPE_MAJOR_THRESHOLD: int = 1
+enum IncidentRoute { DEBUG_RUNTIME, NORMAL_INTERRUPT }
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG, RESEARCH_ARCHIVE_LIST, RESEARCH_ARCHIVE_DETAIL }
 
@@ -47,6 +50,10 @@ var working_hypotheses: WorkingHypothesisState
 var pending_containment: PendingContainmentState
 var containment_resolutions: ContainmentResolutionState
 var failure_candidates: FailureEventCandidateState
+var incident_responses: IncidentResponseState
+var _incident_route: IncidentRoute = IncidentRoute.DEBUG_RUNTIME
+var _interrupt_context: Dictionary = {}
+var _source_archive_return_stage: int = -1
 
 @onready var window_size_label: Label = %WindowSize
 @onready var view_host: Control = %ViewHost
@@ -77,6 +84,7 @@ func _ready() -> void:
 	pending_containment = PendingContainmentState.new()
 	containment_resolutions = ContainmentResolutionState.new()
 	failure_candidates = FailureEventCandidateState.new()
+	incident_responses = IncidentResponseState.new()
 	_event_rng.randomize()
 	_show_view(Stage.PROFILE)
 
@@ -145,10 +153,16 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
+		var confirmed_broadcast_id: String = case_runtime.get_confirmed_broadcast_id()
+		var confirmed_option_id: String = case_runtime.get_confirmed_broadcast_option_id()
+		if _is_normal_interrupt():
+			var response: Dictionary = incident_responses.get_active_response()
+			confirmed_option_id = response.get("confirmed_option_id", "")
+			confirmed_broadcast_id = response.get("broadcast_id", "") if not confirmed_option_id.is_empty() else ""
 		broadcast_view.setup(
 			broadcast,
-			case_runtime.get_confirmed_broadcast_id(),
-			case_runtime.get_confirmed_broadcast_option_id()
+			confirmed_broadcast_id,
+			confirmed_option_id
 		)
 		displayed_source = broadcast
 	elif stage == Stage.INCIDENT_RESULT:
@@ -182,14 +196,21 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
 	view_host.add_child(_current_view)
+	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+		_current_view.research_log_button.text = "Open Source Archive"
+		if stage == Stage.INCIDENT:
+			_current_view.get_node("%ScreenTitle").text = "MAJOR CONTAINMENT INCIDENT"
+		elif stage == Stage.INCIDENT_RESULT:
+			_current_view.next_button.text = "Resume: " + Stage.keys()[_interrupt_context.return_stage]
+		_discover_response_research(stage, displayed_source)
 	if discover_displayed_source and displayed_source != null:
 		_discover_displayed_research_entry(_current_view, stage, displayed_source)
+	if stage == Stage.CCTV:
+		_discover_cctv_condition_observations(_current_view as CCTVView)
 	if discover_displayed_source and stage == Stage.CCTV:
 		_try_process_failure_event_opportunity(_current_view, "cctv:entry")
 	elif discover_displayed_source and stage == Stage.CONTAINMENT:
 		_try_process_failure_event_opportunity(_current_view, "containment:entry")
-	if stage == Stage.CCTV:
-		_discover_cctv_condition_observations(_current_view as CCTVView)
 
 
 func _on_cctv_review_requested(view: FlowView, source_stage: int) -> void:
@@ -200,6 +221,9 @@ func _on_cctv_review_requested(view: FlowView, source_stage: int) -> void:
 
 
 func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
+	if _is_normal_interrupt():
+		_on_source_archive_requested(view, source_stage)
+		return
 	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _is_active_view(view):
 		return
 	if _current_stage == Stage.RESULT and not case_runtime.has_monitoring_result():
@@ -306,7 +330,7 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 
 
 func _can_edit_hypotheses(case_id: String, view: ResearchLogView) -> bool:
-	return _current_stage == Stage.RESEARCH_LOG and _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
+	return not _is_normal_interrupt() and _current_stage == Stage.RESEARCH_LOG and _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
 
 
 func _on_hypothesis_add_requested(case_id: String, text: String, view: ResearchLogView) -> void:
@@ -331,12 +355,16 @@ func _on_hypothesis_remove_requested(case_id: String, id: String, view: Research
 
 
 func _on_research_archive_requested(view: ResearchLogView) -> void:
+	if _is_normal_interrupt():
+		return
 	if _current_stage != Stage.RESEARCH_LOG or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage) or view.get_hypothesis_case_id() != current_case.case_id:
 		return
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
 
 
 func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
+	if _is_normal_interrupt():
+		return
 	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
 		return
 	if _find_archive_case(case_id) == null:
@@ -346,6 +374,8 @@ func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
 
 
 func _on_archive_list_back_requested(view: ArchiveListView) -> void:
+	if _is_normal_interrupt():
+		return
 	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
 		return
 	_archive_detail_case_id = ""
@@ -354,6 +384,14 @@ func _on_archive_list_back_requested(view: ArchiveListView) -> void:
 
 func _on_archive_detail_back_requested(view: ArchiveDetailView) -> void:
 	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _is_active_view(view) or not view.is_visible_in_tree():
+		return
+	if _is_normal_interrupt():
+		if not _has_interrupt_context() or _source_archive_return_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or _archive_detail_case_id != incident_responses.get_active_response().get("source_case_id", "") or view.get("_snapshot").case_id != _archive_detail_case_id:
+			return
+		var return_stage: int = _source_archive_return_stage
+		_source_archive_return_stage = -1
+		_archive_detail_case_id = ""
+		_show_view(return_stage, false)
 		return
 	_archive_detail_case_id = ""
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
@@ -493,6 +531,8 @@ func _try_discover_research_entry(source_kind: int, source_id: String) -> bool:
 
 
 func _discover_displayed_research_entry(view: FlowView, stage: int, source: Resource) -> void:
+	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+		return
 	if stage != _current_stage or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime():
 		return
 	match stage:
@@ -581,6 +621,8 @@ func _get_monitoring_outcome() -> MonitoringOutcomeData:
 
 
 func _get_current_incident_data() -> IncidentData:
+	if _is_normal_interrupt():
+		return _response_incident()
 	if case_runtime.get_monitoring_result() != MonitoringOutcomeData.Result.FAILURE:
 		return null
 	if current_case == null:
@@ -619,6 +661,8 @@ func _get_current_incident_data() -> IncidentData:
 
 
 func _get_current_emergency_broadcast() -> EmergencyBroadcastData:
+	if _is_normal_interrupt():
+		return _response_broadcast()
 	if case_runtime.get_monitoring_result() != MonitoringOutcomeData.Result.FAILURE:
 		return null
 	if current_case == null:
@@ -672,6 +716,8 @@ func _has_current_broadcast_confirmation(broadcast: EmergencyBroadcastData) -> b
 
 
 func _get_current_confirmed_broadcast_option() -> BroadcastOptionData:
+	if _is_normal_interrupt():
+		return _response_option()
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not _has_current_broadcast_confirmation(broadcast):
 		return null
@@ -705,11 +751,16 @@ func _get_incident_result_for_option(option: BroadcastOptionData) -> IncidentRes
 
 
 func _get_current_incident_result() -> IncidentResultData:
+	if _is_normal_interrupt():
+		return _response_result()
 	return _get_incident_result_for_option(_get_current_confirmed_broadcast_option())
 
 
 func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
 	if _current_stage != Stage.BROADCAST or not _is_active_view(broadcast_view) or not _has_current_case_runtime():
+		return
+	if _is_normal_interrupt():
+		_confirm_response_option(broadcast_id, option_id, broadcast_view)
 		return
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == broadcast_id:
@@ -726,6 +777,9 @@ func _is_active_view(view: FlowView) -> bool:
 
 func _on_advance_requested(view: FlowView) -> void:
 	if not _is_active_view(view):
+		return
+	if _is_normal_interrupt() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+		_advance_response(view)
 		return
 	if _current_stage == Stage.CCTV and _cctv_review_return_stage in [Stage.EXPERIMENT, Stage.CONTAINMENT]:
 		var return_stage: int = _cctv_review_return_stage
@@ -826,12 +880,14 @@ func _try_resolve_current_pending() -> bool:
 	if not containment_resolutions.try_record_resolution(case_id, room_id, result, incident_id):
 		return false
 	if result == MonitoringOutcomeData.Result.FAILURE:
-		failure_candidates.try_add_candidate(case_id, incident_id, _event_rng.randi_range(PROTOTYPE_DISTURBANCE_THRESHOLD.x, PROTOTYPE_DISTURBANCE_THRESHOLD.y))
+		failure_candidates.try_add_candidate(case_id, incident_id, _event_rng.randi_range(PROTOTYPE_DISTURBANCE_THRESHOLD.x, PROTOTYPE_DISTURBANCE_THRESHOLD.y), PROTOTYPE_MAJOR_THRESHOLD)
 	pending_containment.remove_pending(case_id)
 	return true
 
 
 func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void:
+	if _is_normal_interrupt() or not incident_responses.get_active_response().is_empty():
+		return
 	if not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or _case_index < 0 or _case_index >= case_sequence.size() or case_sequence[_case_index] != current_case or _processed_opportunities.has(key):
 		return
 	var eligible: bool = (_current_stage == Stage.CCTV and key == "cctv:entry") or (_current_stage == Stage.CONTAINMENT and key == "containment:entry")
@@ -841,6 +897,9 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 	if not eligible:
 		return
 	_processed_opportunities[key] = true
+	# Snapshot major readiness before any new disturbance. Environmental notices
+	# take precedence; a single action never displays both interruptions.
+	var major_ready: Array[String] = failure_candidates.advance_major_opportunity(current_case.case_id)
 	for source_case_id: String in failure_candidates.advance_opportunity(current_case.case_id):
 		var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
 		var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
@@ -866,7 +925,10 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 		_show_disturbance_notice(disturbance, reaction)
 		if reaction != null:
 			_try_discover_research_entry(ResearchEntryData.SourceKind.DISTURBANCE_REACTION, reaction.reaction_id)
-		break
+		return
+	for source_case_id: String in major_ready:
+		if _try_start_major_incident(source_case_id):
+			break
 
 
 func _refresh_current_environment_conditions() -> void:
@@ -877,6 +939,197 @@ func _refresh_current_environment_conditions() -> void:
 		else:
 			view_host.custom_minimum_size.y = (500 if _current_view is CCTVView else 550) if not summary.entries.is_empty() else 360
 		_current_view.set_environment_conditions(summary)
+
+
+func _is_normal_interrupt() -> bool:
+	return _incident_route == IncidentRoute.NORMAL_INTERRUPT
+
+
+func _unique_response_content(items: Array, id_field: String, id: String) -> Resource:
+	var matches: Array[Resource] = []
+	for item: Resource in items:
+		if item != null and item.get(id_field) == id:
+			matches.append(item)
+	if id.strip_edges().is_empty() or matches.size() != 1:
+		push_warning("Main: response content missing or ambiguous for %s/%s; retaining response/candidate." % [id_field, id])
+		return null
+	return matches[0]
+
+
+func _response_source_case() -> CaseData:
+	var response: Dictionary = incident_responses.get_active_response()
+	return _find_failure_source_case(response.source_case_id) if not response.is_empty() else null
+
+
+func _response_incident() -> IncidentData:
+	var source: CaseData = _response_source_case()
+	return _unique_response_content(source.incidents, "incident_id", incident_responses.get_active_response().incident_id) as IncidentData if source != null else null
+
+
+func _response_broadcast() -> EmergencyBroadcastData:
+	var source: CaseData = _response_source_case()
+	var incident: IncidentData = _response_incident()
+	if source == null or incident == null or incident.broadcast_id != incident_responses.get_active_response().broadcast_id:
+		return null
+	return _unique_response_content(source.emergency_broadcasts, "broadcast_id", incident.broadcast_id) as EmergencyBroadcastData
+
+
+func _response_option(option_id: String = "") -> BroadcastOptionData:
+	var broadcast: EmergencyBroadcastData = _response_broadcast()
+	var id: String = option_id if not option_id.is_empty() else incident_responses.get_active_response().get("confirmed_option_id", "")
+	if broadcast == null or id.is_empty():
+		return null
+	return _unique_response_content(broadcast.options, "option_id", id) as BroadcastOptionData
+
+
+func _response_result(option: BroadcastOptionData = null) -> IncidentResultData:
+	var source: CaseData = _response_source_case()
+	var selected: BroadcastOptionData = option if option != null else _response_option()
+	if source == null or selected == null:
+		return null
+	if option == null and selected.result_id != incident_responses.get_active_response().get("incident_result_id", ""):
+		push_warning("Main: confirmed response result link changed; retaining response.")
+		return null
+	return _unique_response_content(source.incident_results, "result_id", selected.result_id) as IncidentResultData
+
+
+func _has_interrupt_context() -> bool:
+	return _has_current_case_runtime() and not _interrupt_context.is_empty() and _interrupt_context.interrupted_case_id == current_case.case_id and _interrupt_context.runtime_instance_id == case_runtime.get_instance_id() and _interrupt_context.case_instance_id == current_case.get_instance_id() and _interrupt_context.return_stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]
+
+
+func _try_start_major_incident(source_case_id: String) -> bool:
+	if _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
+		return false
+	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
+	var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
+	if candidate.is_empty() or not candidate.disturbance_triggered or candidate.major_incident_triggered or candidate.major_opportunity_count < candidate.major_trigger_threshold or resolution.get("result", MonitoringOutcomeData.Result.UNDEFINED) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != candidate.incident_id or incident_responses.has_response(source_case_id, candidate.incident_id):
+		return false
+	var source: CaseData = _find_failure_source_case(source_case_id)
+	if source == null:
+		return false
+	var incident: IncidentData = _unique_response_content(source.incidents, "incident_id", candidate.incident_id) as IncidentData
+	if incident == null or incident.display_name.strip_edges().is_empty() or incident.description.strip_edges().is_empty():
+		push_warning("Main: Major Incident has no valid display content; retaining candidate.")
+		return false
+	var broadcast: EmergencyBroadcastData = _unique_response_content(source.emergency_broadcasts, "broadcast_id", incident.broadcast_id) as EmergencyBroadcastData
+	if broadcast == null or broadcast.display_name.strip_edges().is_empty() or broadcast.prompt_text.strip_edges().is_empty():
+		push_warning("Main: Major Incident has no valid Broadcast; retaining candidate.")
+		return false
+	var usable: bool = false
+	for option: BroadcastOptionData in broadcast.options:
+		if option == null or option.option_id.strip_edges().is_empty() or option.display_text.strip_edges().is_empty():
+			continue
+		if _unique_response_content(broadcast.options, "option_id", option.option_id) != option:
+			continue
+		var result: IncidentResultData = _unique_response_content(source.incident_results, "result_id", option.result_id) as IncidentResultData
+		if result != null and not result.display_name.strip_edges().is_empty() and not result.description.strip_edges().is_empty():
+			usable = true
+	if not usable:
+		push_warning("Main: Major Incident has no usable response chain; retaining candidate.")
+		return false
+	if not incident_responses.try_begin(source_case_id, incident.incident_id, broadcast.broadcast_id):
+		return false
+	failure_candidates.try_mark_major_triggered(source_case_id)
+	_interrupt_context = {"interrupted_case_id": current_case.case_id, "return_stage": _current_stage, "runtime_instance_id": case_runtime.get_instance_id(), "case_instance_id": current_case.get_instance_id()}
+	_incident_route = IncidentRoute.NORMAL_INTERRUPT
+	_show_view(Stage.INCIDENT)
+	return true
+
+
+func _merge_response_research(source_kind: int, source_id: String) -> void:
+	var source: CaseData = _response_source_case()
+	if source == null:
+		return
+	var entry: ResearchEntryData = _find_research_entry(_get_valid_research_entries(source), source_kind, source_id)
+	if entry != null:
+		var ids: Array[String] = [entry.entry_id]
+		research_archive.merge_case_discoveries(source.case_id, ids)
+
+
+func _discover_response_research(stage: int, source: Resource) -> void:
+	if not _has_interrupt_context() or not _is_active_view(_current_view) or not _current_view.is_visible_in_tree():
+		return
+	match stage:
+		Stage.INCIDENT:
+			if source != null and source == _response_incident() and not _current_view.next_button.disabled:
+				_merge_response_research(ResearchEntryData.SourceKind.INCIDENT, (source as IncidentData).incident_id)
+		Stage.BROADCAST:
+			if source != null and source == _response_broadcast() and _has_valid_broadcast_options(source as EmergencyBroadcastData):
+				_merge_response_research(ResearchEntryData.SourceKind.BROADCAST, (source as EmergencyBroadcastData).broadcast_id)
+		Stage.INCIDENT_RESULT:
+			if source != null and source == _response_result() and not _current_view.next_button.disabled:
+				_merge_response_research(ResearchEntryData.SourceKind.INCIDENT_RESULT, (source as IncidentResultData).result_id)
+
+
+func _confirm_response_option(broadcast_id: String, option_id: String, view: BroadcastView) -> void:
+	if not _has_interrupt_context() or not view.is_visible_in_tree():
+		return
+	var response: Dictionary = incident_responses.get_active_response()
+	var broadcast: EmergencyBroadcastData = _response_broadcast()
+	if response.is_empty() or broadcast == null or broadcast.broadcast_id != broadcast_id or view.get("_broadcast_data") != broadcast:
+		return
+	if response.confirmed_option_id.is_empty():
+		var option: BroadcastOptionData = _response_option(option_id)
+		var result: IncidentResultData = _response_result(option) if option != null else null
+		if result != null and not option.display_text.strip_edges().is_empty() and not result.display_name.strip_edges().is_empty() and not result.description.strip_edges().is_empty():
+			if incident_responses.try_confirm(response.source_case_id, response.incident_id, broadcast_id, option_id, result.result_id):
+				_merge_response_research(ResearchEntryData.SourceKind.BROADCAST_OPTION, option_id)
+	response = incident_responses.get_active_response()
+	view.update_confirmation_state(response.broadcast_id if not response.confirmed_option_id.is_empty() else "", response.confirmed_option_id)
+
+
+func _advance_response(view: FlowView) -> void:
+	if not _has_interrupt_context() or not view.is_visible_in_tree() or view.next_button.disabled:
+		return
+	match _current_stage:
+		Stage.INCIDENT:
+			if view.get("_incident_data") == _response_incident() and _response_broadcast() != null:
+				_show_view(Stage.BROADCAST)
+		Stage.BROADCAST:
+			if view.get("_broadcast_data") == _response_broadcast() and _response_result() != null:
+				_show_view(Stage.INCIDENT_RESULT)
+		Stage.INCIDENT_RESULT:
+			var response: Dictionary = incident_responses.get_active_response()
+			var result: IncidentResultData = _response_result()
+			var candidate: Dictionary = failure_candidates.get_candidate(response.get("source_case_id", ""))
+			if result == null or view.get("_incident_result_data") != result or result.result_id != response.get("incident_result_id", "") or candidate.get("incident_id", "") != response.get("incident_id", "") or not candidate.get("major_incident_triggered", false):
+				return
+			if not incident_responses.try_complete(response.source_case_id, response.incident_id):
+				return
+			failure_candidates.remove_completed_candidate(response.source_case_id, response.incident_id)
+			var return_stage: int = _interrupt_context.return_stage
+			_interrupt_context.clear()
+			_source_archive_return_stage = -1
+			_incident_route = IncidentRoute.DEBUG_RUNTIME
+			_show_view(return_stage, false)
+			if return_stage == Stage.EXPERIMENT:
+				_restore_interrupted_experiment_result(_current_view as ExperimentView)
+
+
+func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
+	if not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _is_active_view(view) or not view.is_visible_in_tree():
+		return
+	var source: CaseData = _response_source_case()
+	if source == null or not research_archive.get_archived_case_ids().has(source.case_id):
+		return
+	_source_archive_return_stage = source_stage
+	_archive_detail_case_id = source.case_id
+	_show_view(Stage.RESEARCH_ARCHIVE_DETAIL, false)
+
+
+func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
+	var history: Array[String] = case_runtime.get_experiment_execution_history()
+	if history.is_empty():
+		return
+	var id: String = history[-1]
+	var snapshot := ExperimentView.ConditionSnapshot.new()
+	for observation_id: String in case_runtime.get_experiment_condition_observation_ids(id):
+		var data: ExperimentConditionObservationData = _unique_response_content(current_case.experiment_condition_observations, "observation_id", observation_id) as ExperimentConditionObservationData
+		if data == null or data.experiment_id != id:
+			continue
+		var condition: EnvironmentalDisturbanceData = _find_environment_condition_data(data.disturbance_id)
+		snapshot.entries.append(ExperimentView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text, condition.display_name if condition != null else "[Unavailable]", condition.condition_change_text if condition != null else "[Unavailable]"))
+	view.restore_recorded_result(id, snapshot)
 
 
 func _build_environment_summary() -> EnvironmentConditions.Summary:

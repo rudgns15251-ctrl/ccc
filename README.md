@@ -637,6 +637,30 @@ F5 키 자체를 자동 조작하지는 않았지만, 같은 `run/main_scene`을
 흐름 검증 Script는 `flow_validation.gd`이며 Godot의 `--script` 옵션으로 실행했습니다.
 이 자료는 Git 제외 대상이며 게임 실행에서 로드하지 않습니다.
 
+## 40단계 Delayed Major Incident Interrupt
+
+과거 Case의 hidden FAILURE 후보가 환경 교란을 먼저 일으키고, 이후 별개의 안전한 Gameplay opportunity에서 기존 INCIDENT → BROADCAST → INCIDENT_RESULT를 처리한다. 정상 대응은 같은 current Case/Runtime과 중단 stage로 복귀하며 RESULT로 가지 않는다. debug downstream 경로는 보존했다.
+
+Main 소유 IncidentResponseState가 source Case 응답 ID와 ACTIVE/COMPLETED만 보관한다. source Research는 실제 표시/Confirm 때 Archive에 incremental merge하고 current Case Runtime에 넣지 않는다. 대응 화면의 Open Source Archive는 과거 Case Research/Hypothesis를 읽기 전용으로 보여준다.
+
+**TEMPORARY / PROTOTYPE:** 기존 교란 threshold 2–4 유지, Major threshold는 Main 한 곳의 `PROTOTYPE_MAJOR_THRESHOLD = 1`. 교란 action/Dismiss/읽기/Resume는 Major 기회가 아니다. 마지막 Containment에서 교란이 발생하면 후속 기회가 없어 보류된다. 현 두 Case의 첫 CCTV Major는 기존 교란 fixture로만 검증했다.
+
+요청한 106개 보고 항목, 변경 범위, 정상/fixture 구분, 검증 결과와 한계는 [Step40 보고서](docs/step40_major_incident_interrupt.md)에 정리했다. 기존 Step39 미커밋 파일과 프로젝트/Scene/해상도 설정을 보존했다. 커밋·push하지 않는다.
+
+Godot 4.7.1에서 **215/215 검사(headless 126 + Windows GPU 89)**와 최종 editor import를 통과했다. 이번 단계는 기존 파일 4개 수정·3개 추가이며, 두 Step39 Resource/보고서와 이전 검증 소스 2,539개가 보존되었다. 세 해상도에서 Major/Source Archive/복귀와 기록된 실험 조건 결과 화면을 확인했다.
+
+## 39단계 Case Evidence 콘텐츠 정비
+
+기존 두 Case의 Profile·CCTV·실험·Room 설명과 연결된 Research 문구를 정비했습니다.
+Case01은 지지 구조/환기 전환, Case02는 벽 접촉의 기능/공기 반응을 기본 증거로 비교합니다.
+환경 사건은 순간 반응·지속 관찰·선택적 실험 비교로 역할을 나눴으며,
+조건 실험을 놓쳐도 기본 판단에 필요한 정보는 기존 CORE 출처에서 얻을 수 있습니다.
+실험 제한·ID·판정·Main·State·View·해상도 설정은 유지했습니다.
+Case02에는 기존 Outcome가 없으므로 ROOM01은 콘텐츠상 합리적인 후보이며,
+마지막 Case의 제출 후 Pending 경계는 그대로입니다.
+두 Evidence Map, 시점별 접근성, 요청한 70개 항목과 검증 결과는
+[Step39 콘텐츠 보고서](docs/step39_case_evidence.md)에 있습니다. 커밋·push하지 않았습니다.
+
 ## 38단계 Core Loop UX / 구조 감사
 
 새 Gameplay 기능 없이 현재 동선·클릭 수·정보 밀도·추리 효용·State/표시 경계를 감사했습니다.

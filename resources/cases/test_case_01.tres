@@ -20,51 +20,51 @@ script = ExtResource("2_profile")
 profile_id = "TEST_PROFILE_01"
 subject_name = "TEST SUBJECT"
 classification = "TEST CLASSIFICATION"
-basic_description = "Temporary profile data for prototype validation."
+basic_description = "TEST: metal-support pump cycles preceded strikes; no talk link."
 
 [sub_resource type="Resource" id="Resource_cctv"]
 script = ExtResource("3_cctv")
 camera_id = "TEST_CAM_01"
-observation_text = "Temporary CCTV observation data for prototype validation."
+observation_text = "TEST: strikes cluster at pump starts; vent cycling prompts turn-backs. Lamp sweeps alter travel, not strike timing. Wall tracing continues."
 
 [sub_resource type="Resource" id="Resource_experiment_01"]
 script = ExtResource("4_experiment")
 experiment_id = "TEST_EXP_01"
 display_name = "TEST EXPERIMENT 01"
-description = "Temporary experiment 01 data for prototype validation."
-result_text = "Temporary result for TEST EXPERIMENT 01."
+description = "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged."
+result_text = "Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
 
 [sub_resource type="Resource" id="Resource_experiment_02"]
 script = ExtResource("4_experiment")
 experiment_id = "TEST_EXP_02"
 display_name = "TEST EXPERIMENT 02"
-description = "Temporary experiment 02 data for prototype validation."
-result_text = "Temporary result for TEST EXPERIMENT 02."
+description = "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged."
+result_text = "Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
 
 [sub_resource type="Resource" id="Resource_experiment_03"]
 script = ExtResource("4_experiment")
 experiment_id = "TEST_EXP_03"
 display_name = "TEST EXPERIMENT 03"
-description = "Temporary experiment 03 data for prototype validation."
-result_text = "Temporary result for TEST EXPERIMENT 03."
+description = "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent."
+result_text = "The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
 
 [sub_resource type="Resource" id="Resource_room_01"]
 script = ExtResource("5_containment")
 room_id = "TEST_ROOM_01"
 display_name = "TEST ROOM 01"
-description = "Temporary containment room 01 for prototype validation."
+description = "TEST configuration: acoustic partition; rigid metal support connected to the service structure; continuous low airflow."
 
 [sub_resource type="Resource" id="Resource_room_02"]
 script = ExtResource("5_containment")
 room_id = "TEST_ROOM_02"
 display_name = "TEST ROOM 02"
-description = "Temporary containment room 02 for prototype validation."
+description = "TEST configuration: mechanically isolated padded support; continuous low airflow; ordinary task lighting."
 
 [sub_resource type="Resource" id="Resource_room_03"]
 script = ExtResource("5_containment")
 room_id = "TEST_ROOM_03"
 display_name = "TEST ROOM 03"
-description = "Temporary containment room 03 for prototype validation."
+description = "TEST configuration: mechanically isolated padded support; start/stop ventilation; reduced task lighting."
 
 [sub_resource type="Resource" id="Resource_stage_01_A"]
 script = ExtResource("6_stage")
@@ -253,24 +253,24 @@ script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_PROFILE_01"
 source_kind = 0
 source_id = "TEST_PROFILE_01"
-title = "Subject identification record"
-body_text = "TEST SUBJECT is listed under TEST CLASSIFICATION. The profile provides provisional identification information."
+title = "Intake record: support and machinery timing"
+body_text = "Intake: strikes followed pump cycles on metal supports; no timing link to speech was recorded."
 
 [sub_resource type="Resource" id="Resource_research_cctv"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_CCTV_01"
 source_kind = 1
 source_id = "TEST_CAM_01"
-title = "Camera 01 observation record"
-body_text = "Camera 01 supplied the provisional observation recorded for this Case."
+title = "Camera 01: pump, airflow and lamp comparison"
+body_text = "Pump starts coincided with strikes; vent transitions with turn-backs. Lamp sweeps changed travel rather than strike timing; wall tracing persisted."
 
 [sub_resource type="Resource" id="Resource_research_experiment"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_EXP_01"
 source_kind = 2
 source_id = "TEST_EXP_01"
-title = "Experiment 01: finding recorded"
-body_text = "Experiment 01 completed with its provisional test finding recorded."
+title = "Experiment 01: support comparison"
+body_text = "With sound and airflow held fixed, strike bursts followed metal-support impulses more often than padded-support impulses. Slow wall tracing continued on both; airflow cycles were not compared."
 
 [sub_resource type="Resource" id="Resource_research_room"]
 script = ExtResource("12_research")
@@ -278,7 +278,7 @@ entry_id = "TEST_RESEARCH_ROOM_02"
 source_kind = 3
 source_id = "TEST_ROOM_02"
 title = "Containment choice: room 02"
-body_text = "Room 02 was confirmed as the containment arrangement for this Case."
+body_text = "Room 02 submission: mechanically isolated padded support; continuous low airflow; ordinary task lighting. This is the submitted configuration, not a result."
 
 [sub_resource type="Resource" id="Resource_research_incident"]
 script = ExtResource("12_research")
@@ -317,16 +317,16 @@ script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_EXP_02"
 source_kind = 2
 source_id = "TEST_EXP_02"
-title = "Experiment 02: test result logged"
-body_text = "Test 02 returned its provisional result, which was recorded as the experiment 02 finding."
+title = "Experiment 02: airflow comparison"
+body_text = "With support and sound held fixed, continuous low airflow yielded fewer outlet-directed turn-backs than start/stop airflow. Wall tracing persisted; support isolation was not tested."
 
 [sub_resource type="Resource" id="Resource_research_experiment_03"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_EXP_03"
 source_kind = 2
 source_id = "TEST_EXP_03"
-title = "Experiment 03: observation noted"
-body_text = "The provisional result from test 03 was entered as the experiment 03 observation."
+title = "Experiment 03: sound-only comparison"
+body_text = "Sound-only replay caused brief orientation but did not reproduce pump-start strike bursts; wall tracing persisted. Airborne sound alone did not explain the earlier timing link."
 
 [sub_resource type="Resource" id="Resource_research_room_01"]
 script = ExtResource("12_research")
@@ -334,7 +334,7 @@ entry_id = "TEST_RESEARCH_ROOM_01"
 source_kind = 3
 source_id = "TEST_ROOM_01"
 title = "Containment choice: room 01"
-body_text = "Room 01 was confirmed as the containment arrangement for this Case."
+body_text = "Room 01 submission: acoustic partition; rigid metal support connected to the service structure; continuous low airflow. This is the submitted configuration, not a result."
 
 [sub_resource type="Resource" id="Resource_research_room_03"]
 script = ExtResource("12_research")
@@ -342,7 +342,7 @@ entry_id = "TEST_RESEARCH_ROOM_03"
 source_kind = 3
 source_id = "TEST_ROOM_03"
 title = "Containment choice: room 03"
-body_text = "Room 03 was confirmed as the containment arrangement for this Case."
+body_text = "Room 03 submission: mechanically isolated padded support; start/stop ventilation; reduced task lighting. This is the submitted configuration, not a result."
 
 [sub_resource type="Resource" id="Resource_research_incident_03"]
 script = ExtResource("12_research")

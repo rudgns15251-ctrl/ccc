@@ -136,6 +136,19 @@ func _on_run_experiment_pressed() -> void:
 	experiment_execution_requested.emit(experiment.experiment_id)
 
 
+func restore_recorded_result(experiment_id: String, conditions: ConditionSnapshot) -> void:
+	# Restore a completed execution after a safe interruption, not a selection.
+	if not _executed_ids.has(experiment_id):
+		return
+	for index in range(_experiments.size()):
+		if _experiments[index] != null and _experiments[index].experiment_id == experiment_id:
+			_selected_experiment_index = index
+			show_execution_result(experiment_id, true, conditions)
+			_selected_experiment_index = -1
+			_update_execution_ui()
+			return
+
+
 func show_execution_result(experiment_id: String, approved: bool, conditions: ConditionSnapshot = null) -> Array[String]:
 	var displayed_ids: Array[String] = []
 	var experiment: ExperimentData = _get_selected_experiment()
