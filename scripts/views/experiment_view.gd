@@ -37,6 +37,7 @@ var _selection_group: ButtonGroup
 var _executed_ids: Array[String] = []
 var _remaining_count: int = 0
 var _experiment_limit: int = 0
+var _displayed_result_id: String = ""
 
 
 func setup(experiments: Array[ExperimentData], executed_ids: Array[String] = [], remaining_count: int = 0, experiment_limit: int = 0) -> void:
@@ -153,6 +154,7 @@ func show_execution_result(experiment_id: String, approved: bool, conditions: Co
 	var displayed_ids: Array[String] = []
 	var experiment: ExperimentData = _get_selected_experiment()
 	if approved and experiment != null and experiment.experiment_id == experiment_id:
+		_displayed_result_id = experiment_id
 		result_label.text = _text_or_placeholder(experiment.result_text, "result_text", _selected_experiment_index)
 		_clear_condition_observations()
 		if conditions != null:
@@ -170,6 +172,14 @@ func show_execution_result(experiment_id: String, approved: bool, conditions: Co
 
 func is_displaying_selected_experiment(experiment: ExperimentData) -> bool:
 	return is_node_ready() and is_visible_in_tree() and experiment != null and _get_selected_experiment() == experiment and _can_select_experiment(_selected_experiment_index)
+
+
+func get_displayed_result_id() -> String:
+	return _displayed_result_id if is_node_ready() and is_visible_in_tree() and result_label.is_visible_in_tree() else ""
+
+
+func is_displaying_execution_result(experiment: ExperimentData) -> bool:
+	return experiment != null and _experiments.has(experiment) and get_displayed_result_id() == experiment.experiment_id and not experiment.result_text.strip_edges().is_empty() and result_label.text == experiment.result_text
 
 
 func update_execution_state(executed_ids: Array[String], remaining_count: int, experiment_limit: int) -> void:
@@ -210,6 +220,7 @@ func _update_execution_ui() -> void:
 
 
 func _reset_result() -> void:
+	_displayed_result_id = ""
 	result_label.text = "No experiment has been executed." if _executed_ids.is_empty() else "No result selected. Review executed experiments in Research Log."
 	_clear_condition_observations()
 	%ResultScroll.scroll_vertical = 0

@@ -20,6 +20,22 @@ CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응�
 Research Log의 WORKING HYPOTHESES에서 현재 Case의 자유 메모를 Add/Edit/Delete할 수 있습니다. Main 소유 WorkingHypothesisState가 Case별로 세션 동안 유지하며, Runtime 교체와 ResearchArchive 초기화로 삭제되지 않습니다. 가설을 추천하거나 평가하지 않고 연구 발견/게임 판정에도 연결하지 않습니다.
 최종 게임 시스템과 디자인은 아직 구현하지 않았습니다.
 
+## Step47: Oldest Actionable Event Ordering
+
+현재 safe boundary에서 실제 표시 가능한 이벤트를 Failure Candidate 등록 순서로 하나 선택합니다. Old Major/New Disturbance 경쟁에서는 Old Major를 먼저 표시하고, invalid/unready/EXP에서 non-presentable Major는 뒤 후보를 막지 않습니다. 기존 State/Resource/View/해상도·Stretch·Step46 Snapshot은 유지했습니다.
+
+144 matrix 재실행에서 age inversion9개를 제거했습니다. F44-02는 RESOLVED이며, F01/F44-01은 OPEN, F07-B는 PARTIALLY ADDRESSED입니다. 새 pacing gate나 Run 종료 처리는 없습니다.
+
+최종310개 Godot 실행, 9경로 Before/After 및144개 보고 항목: [Step47 보고서](docs/step47_oldest_actionable_event_ordering.md). 커밋·push하지 않았습니다.
+
+## Step46: Test Sequence Boundary Disposition Snapshot
+
+`Main.build_test_sequence_disposition_snapshot()`으로 현재 Pending/기록된 Resolution/미처리 Candidate phase/Active Response/완료 Response/연구·메모 보존 현황을 개발용으로 관찰합니다. 결과는 Resource를 보관하지 않는 detached read model이며, `to_dictionary()`의 중첩 복사본을 수정해도 Gameplay State가 바뀌지 않습니다.
+
+`TEST_SEQUENCE_END`는 Run End가 아닙니다. Case03의 Outcome 없는 Pending과 Next 비활성화를 유지하고, Snapshot은 판정·기회·RNG·이벤트·Research/Archive·Runtime을 변경하지 않습니다. player-facing UI나 실제 closure/Settlement/conversion/ordering/pacing gate를 추가하지 않았습니다.
+
+계약, 138개 보고 항목과 새 Godot 실행 검증: [Step46 보고서](docs/step46_test_sequence_boundary_disposition.md).
+
 ## Step45: Final Sequence Event Policy / Pacing Design Decision
 
 설계 문서만 작성했으며 현재 Gameplay 규칙은 유지합니다. 추천 기본안은 Case/같은 Run의 Shift에서는 후보 이월, 최종 Run에서는 미처리 의무 기록으로 전환하는 방식입니다. 자발 종료는 현재 active 응답만 마무리하고, 강제 종료는 자동 선택 없이 중단 사실을 보존합니다.
@@ -4124,3 +4140,16 @@ Broadcast Option 선택은 View 내부의 임시 상태이며, 현재 단계에�
 Incident Result 표시는 BroadcastOptionData.result_id → Main의 ID 검색 → IncidentResultView.setup() 경계에서 확장할 수 있습니다. 별도의 Runtime Result 상태 없이 기존 확정 쌍에서 파생합니다.
 Case Result 표시는 기존 Runtime 조회 → Main._build_result_summary() → ResultView.setup(Summary) 경계에서 확장할 수 있습니다. 현재는 읽기 전용 표시이며, 저장 결과/다음 Case/피해·점수 요구사항은 구현하지 않았습니다.
 Research Log 표시는 Main._build_research_log_snapshot() → ResearchLogView.setup(Snapshot) 경계에서 확장할 수 있습니다. 작성 문구는 현재 CaseData.research_entries의 ResearchEntryData를 kind+source_id로 연결해 추가할 수 있으며, MONITORING 중 열람이 필요해지면 Timer 정책을 먼저 정합니다. 영구/다중 Case 기록은 별도 요구가 있을 때 설계합니다.
+
+
+## Step48 — Meaningful Research / Read Boundary Pacing Gate
+
+기존 readiness threshold/count/RNG와 Step47 oldest actionable 순서를 유지하고, 실제 interruption 뒤 새 연구 완료와 자발적인 읽기 경계를 요구하는 Main-local shared gate를 적용했습니다.
+CCTV/EXP는 실제 내용을 먼저 표시하고 기존 Next에서만 고유 credit을 승인합니다. CONT Confirm은 credit만 승인하고 Event는 enabled Next에서 검사합니다. Dismiss/Resume/Log/Archive/Recheck/중복 입력은 credit이 아닙니다.
+Runtime 교체/reset에도 session token을 보존하며 stale Runtime View는 승인하지 않습니다. 마지막 Case03은 기존 Outcome0/Pending/Next disabled로 유지합니다.
+
+동일144 Journey에서 credited-progress-between 최소1/zero0, opportunity와 기존 meaningful 각각1296 유지, interruption301→247을 확인했습니다. final unresolved는85→128로 늘었고 종료 처리로 숨기지 않았습니다.
+최종318개 검증 프로세스는 historical core268개(과거 checkpoint 호환 fixture)와 실제 Step48 제품 검사50개를 구분했습니다. Godot4.7.1 import/지정 Main/headless/GPU3해상도와 Snapshot/ordering 검사를 통과했습니다.
+F44-01/F44-02는 RESOLVED, F01은 OPEN, F07-B는 PARTIALLY ADDRESSED입니다. double-Next/Resume/Next-event 공식과 실제 피로도는 사람 테스트가 필요합니다.
+
+변경 파일·metric·검증 범위·192개 응답은 [Step48 보고서](docs/step48_meaningful_research_pacing_gate.md)에 있습니다. 기존 Step46/47 미커밋 작업을 보존했고, 커밋/푸시는 하지 않았습니다.

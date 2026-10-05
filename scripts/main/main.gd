@@ -69,6 +69,9 @@ var _event_rng := RandomNumberGenerator.new()
 var _disturbance_notice: DisturbanceNotice
 var _focus_before_notice: Control
 var _view_process_mode_before_notice: Node.ProcessMode
+var _event_presentation_credit: bool = true
+var _completed_research_tokens: Dictionary[String, bool] = {}
+var _research_display: Dictionary = {}
 
 
 func _ready() -> void:
@@ -104,6 +107,7 @@ func _update_window_size() -> void:
 func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	if is_instance_valid(_disturbance_notice):
 		return
+	_research_display.clear()
 	if stage not in [Stage.BROADCAST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		_interrupt_context.erase("broadcast_draft")
 	if is_instance_valid(_current_view):
@@ -208,6 +212,8 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
 	view_host.add_child(_current_view)
+	if stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
+		_mark_research_display(_current_view)
 	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		var context: Dictionary = _build_response_display_context()
 		context["resume"] = stage == Stage.INCIDENT_RESULT
@@ -799,6 +805,8 @@ func _on_advance_requested(view: FlowView) -> void:
 		return
 	if not _has_unique_case_sequence():
 		return
+	if _current_stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] and (not view.is_visible_in_tree() or _research_display.get("runtime_id", 0) != case_runtime.get_instance_id()):
+		return
 	if _is_normal_interrupt() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		_advance_response(view)
 		return
@@ -807,7 +815,17 @@ func _on_advance_requested(view: FlowView) -> void:
 		_cctv_review_return_stage = -1
 		_show_view(return_stage, false)
 		return
+	if _current_stage in [Stage.CCTV, Stage.EXPERIMENT] and _has_failure_event_context(view):
+		var source_id: String = _displayed_research_source_id(view)
+		if not source_id.is_empty():
+			if not _has_drawn_research_display(view):
+				return
+			_grant_event_presentation_credit("cctv" if _current_stage == Stage.CCTV else "experiment", source_id)
+			if _try_present_ready_failure_event(view, true):
+				return
 	if _current_stage == Stage.CONTAINMENT:
+		if not view.next_button.disabled and _has_next_test_case() and case_runtime.has_confirmed_containment() and pending_containment.get_pending_room_id(current_case.case_id) == case_runtime.get_confirmed_containment_room_id() and _try_present_ready_failure_event(view):
+			return
 		_handoff_to_next_case()
 		return
 	if _current_stage == Stage.INCIDENT and not _has_valid_broadcast_options(_get_current_emergency_broadcast()):
@@ -857,6 +875,59 @@ func _has_next_test_case() -> bool:
 		return false
 	var next_case: CaseData = case_sequence[_case_index + 1]
 	return next_case != null and not next_case.case_id.strip_edges().is_empty() and not next_case.display_name.strip_edges().is_empty() and next_case.case_id != current_case.case_id and not pending_containment.has_pending(next_case.case_id) and not containment_resolutions.has_resolution(next_case.case_id)
+
+
+func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapshot:
+	# Explicit developer API, including controlled mid-sequence/response probes.
+	# Never invoked by Next, Confirm, handoff, or a player-facing View.
+	var current_id: String = current_case.case_id if current_case != null else ""
+	var sequence_valid: bool = not case_sequence.is_empty() and _has_unique_case_sequence()
+	var current_valid: bool = sequence_valid and _has_current_case_runtime() and _case_index >= 0 and _case_index < case_sequence.size() and case_sequence[_case_index] == current_case
+	var states_available: bool = pending_containment != null and containment_resolutions != null and failure_candidates != null and incident_responses != null and research_archive != null and working_hypotheses != null
+	var facts: Dictionary = {"boundary_valid": current_valid and states_available, "boundary_status": "INVALID_BOUNDARY", "current_case_id": current_id, "current_case_status": "INVALID_CURRENT_CASE", "runtime_instance_id": case_runtime.get_instance_id() if case_runtime != null else 0, "current_view_stage": Stage.keys()[_current_stage], "active_response": {}, "archived_cases": [], "hypotheses_by_case": [], "current_research_count": 0, "current_observed_source_count": 0, "current_hypothesis_count": 0}
+	var pending: Array[Dictionary] = []
+	var resolutions: Array[Dictionary] = []
+	var candidates: Array[Dictionary] = []
+	var responses: Array[Dictionary] = []
+	# Missing initialization produces an explicit invalid observation, not fallback.
+	if not states_available:
+		return TestSequenceDispositionSnapshot.build(facts, pending, resolutions, candidates, responses, _find_failure_source_case, _unique_response_content)
+	for id: String in pending_containment.get_pending_case_ids():
+		pending.append({"case_id": id, "confirmed_room_id": pending_containment.get_pending_room_id(id)})
+	for id: String in containment_resolutions.get_resolved_case_ids():
+		resolutions.append(containment_resolutions.get_resolution(id))
+	for id: String in failure_candidates.get_candidate_case_ids():
+		candidates.append(failure_candidates.get_candidate(id))
+	responses = incident_responses.get_responses()
+	var active: Dictionary = incident_responses.get_active_response()
+	if not active.is_empty():
+		var response_stage: int = _source_archive_return_stage if _current_stage == Stage.RESEARCH_ARCHIVE_DETAIL and _source_archive_return_stage != -1 else _current_stage
+		active["response_stage"] = Stage.keys()[response_stage]
+		active["context_valid"] = _is_normal_interrupt() and _has_interrupt_context()
+		active["incident_result_displayed"] = false
+		if active.context_valid and response_stage == Stage.INCIDENT_RESULT:
+			var result: IncidentResultData = _response_result()
+			active.incident_result_displayed = result != null and (_current_stage == Stage.RESEARCH_ARCHIVE_DETAIL or _current_view.get("_incident_result_data") == result)
+		facts.active_response = active
+	for id: String in research_archive.get_archived_case_ids():
+		facts.archived_cases.append({"case_id": id, "discovered_entry_count": research_archive.get_discovered_entry_ids(id).size()})
+	var hypothesis_case_ids: Array[String] = []
+	for data: CaseData in case_sequence:
+		if data != null and not hypothesis_case_ids.has(data.case_id):
+			hypothesis_case_ids.append(data.case_id)
+	if not current_id.is_empty() and not hypothesis_case_ids.has(current_id):
+		hypothesis_case_ids.append(current_id)
+	for id: String in hypothesis_case_ids:
+		facts.hypotheses_by_case.append({"case_id": id, "count": working_hypotheses.get_hypotheses(id).size()})
+	if current_valid:
+		facts.current_research_count = case_runtime.get_discovered_research_entry_ids().size()
+		facts.current_observed_source_count = case_runtime.get_observed_research_sources().size()
+		facts.current_hypothesis_count = working_hypotheses.get_hypotheses(current_id).size()
+		facts.current_case_status = "SUBMITTED_PENDING" if pending_containment.has_pending(current_id) else "RESOLVED" if containment_resolutions.has_resolution(current_id) else "RESEARCH_IN_PROGRESS"
+		facts.boundary_status = "NOT_AT_TEST_SEQUENCE_END"
+		if _case_index == case_sequence.size() - 1 and case_runtime.has_confirmed_containment() and pending_containment.get_pending_room_id(current_id) == case_runtime.get_confirmed_containment_room_id():
+			facts.boundary_status = "AT_TEST_SEQUENCE_END"
+	return TestSequenceDispositionSnapshot.build(facts, pending, resolutions, candidates, responses, _find_failure_source_case, _unique_response_content)
 
 
 func _handoff_to_next_case() -> void:
@@ -930,42 +1001,114 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 	if not eligible:
 		return
 	_processed_opportunities[key] = true
-	# Snapshot major readiness before any new disturbance. Environmental notices
-	# take precedence; a single action never displays both interruptions.
-	var major_ready: Array[String] = failure_candidates.advance_major_opportunity(current_case.case_id)
-	for source_case_id: String in failure_candidates.advance_opportunity(current_case.case_id):
+	# Advance Major counters first: this action cannot escalate its own new notice.
+	failure_candidates.advance_major_opportunity(current_case.case_id)
+	failure_candidates.advance_opportunity(current_case.case_id)
+	# New information draws first. Next checkpoints never advance these counters.
+	if _current_stage == Stage.CONTAINMENT:
+		_try_present_ready_failure_event(view)
+
+
+func _has_failure_event_context(view: FlowView) -> bool:
+	return _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and _research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and _has_unique_case_sequence() and _case_index >= 0 and _case_index < case_sequence.size() and case_sequence[_case_index] == current_case and not _is_normal_interrupt() and incident_responses.get_active_response().is_empty()
+
+
+func _mark_research_display(view: FlowView) -> void:
+	_research_display = {"view_id": view.get_instance_id(), "runtime_id": case_runtime.get_instance_id(), "process_frame": Engine.get_process_frames(), "draw_frame": Engine.get_frames_drawn()}
+
+
+func _has_drawn_research_display(view: FlowView) -> bool:
+	return _research_display.get("view_id", 0) == view.get_instance_id() and _research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and Engine.get_process_frames() > _research_display.process_frame and (DisplayServer.get_name() == "headless" or Engine.get_frames_drawn() > _research_display.draw_frame)
+
+
+func _displayed_research_source_id(view: FlowView) -> String:
+	if _current_stage == Stage.CCTV and view is CCTVView:
+		var cctv: CCTVData = current_case.cctv_data
+		if cctv != null and not cctv.camera_id.strip_edges().is_empty() and not cctv.observation_text.strip_edges().is_empty() and (view as CCTVView).is_displaying_cctv(cctv) and (view as CCTVView).observation_label.is_visible_in_tree() and (view as CCTVView).observation_label.text == cctv.observation_text:
+			return cctv.camera_id
+	elif _current_stage == Stage.EXPERIMENT and view is ExperimentView:
+		var id: String = (view as ExperimentView).get_displayed_result_id()
+		var matches: Array[ExperimentData] = []
+		for experiment: ExperimentData in current_case.available_experiments:
+			if experiment != null and experiment.experiment_id == id:
+				matches.append(experiment)
+		if not id.is_empty() and matches.size() == 1 and case_runtime.has_executed_experiment(id) and (view as ExperimentView).is_displaying_execution_result(matches[0]):
+			return id
+	return ""
+
+
+func _grant_event_presentation_credit(kind: String, source_id: String) -> void:
+	# JSON tuple avoids collisions between Case/local IDs; credit saturates at OPEN.
+	var token: String = JSON.stringify([current_case.case_id, kind, source_id])
+	if not _completed_research_tokens.has(token):
+		_completed_research_tokens[token] = true
+		_event_presentation_credit = true
+
+
+func _try_present_ready_failure_event(view: FlowView, allow_experiment: bool = false) -> bool:
+	if not _event_presentation_credit or not _has_failure_event_context(view) or (_current_stage not in [Stage.CCTV, Stage.CONTAINMENT] and not (_current_stage == Stage.EXPERIMENT and allow_experiment)):
+		return false
+	var disturbances: Array[String] = []
+	var majors: Array[String] = []
+	for id: String in failure_candidates.get_candidate_case_ids():
+		if id == current_case.case_id:
+			continue
+		var candidate: Dictionary = failure_candidates.get_candidate(id)
+		if not candidate.disturbance_triggered and candidate.opportunities_seen >= candidate.opportunity_threshold:
+			disturbances.append(id)
+		elif candidate.disturbance_triggered and not candidate.major_incident_triggered and candidate.major_opportunity_count >= candidate.major_trigger_threshold:
+			majors.append(id)
+	return _try_present_oldest_actionable_event(disturbances, majors, allow_experiment)
+
+
+func _try_present_oldest_actionable_event(disturbance_ready: Array[String], major_ready: Array[String], allow_experiment: bool = false) -> bool:
+	if not _event_presentation_credit:
+		return false
+	# Registration order is the source of truth, independent of event type/Case ID.
+	# A non-presentable older candidate does not block a later actionable one.
+	for source_case_id: String in failure_candidates.get_candidate_case_ids():
 		var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
-		var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
-		if resolution.get("result", MonitoringOutcomeData.Result.UNDEFINED) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != candidate.incident_id:
-			push_warning("Main: failure candidate does not match hidden resolution; retaining candidate.")
+		if incident_responses.has_response(source_case_id, candidate.incident_id):
 			continue
-		var source_case: CaseData = _find_failure_source_case(source_case_id)
-		if source_case == null:
-			continue
-		var incidents: Array[IncidentData] = []
-		for incident: IncidentData in source_case.incidents:
-			if incident != null and incident.incident_id == candidate.incident_id:
-				incidents.append(incident)
-		var disturbance: EnvironmentalDisturbanceData = incidents[0].environmental_disturbance if incidents.size() == 1 else null
-		if disturbance == null or disturbance.disturbance_id.strip_edges().is_empty() or disturbance.display_name.strip_edges().is_empty() or disturbance.notice_text.strip_edges().is_empty() or disturbance.condition_change_text.strip_edges().is_empty():
-			push_warning("Main: failure candidate has no unique valid environmental disturbance; retaining candidate.")
-			continue
-		var reaction: CaseDisturbanceReactionData = _find_disturbance_reaction(disturbance.disturbance_id)
-		if not case_runtime.try_apply_disturbance(disturbance.disturbance_id, reaction.reaction_id if reaction != null else ""):
-			continue
-		failure_candidates.try_mark_disturbance_triggered(source_case_id)
-		_refresh_current_environment_conditions()
-		_show_disturbance_notice(disturbance, reaction)
-		if reaction != null:
-			_try_discover_research_entry(ResearchEntryData.SourceKind.DISTURBANCE_REACTION, reaction.reaction_id)
-		return
-	# Execution consumes its original opportunity and records readiness, but
-	# keeps the result visible until a normal CCTV/Containment entry.
-	if _current_stage == Stage.EXPERIMENT:
-		return
-	for source_case_id: String in major_ready:
-		if _try_start_major_incident(source_case_id):
-			break
+		if disturbance_ready.has(source_case_id) and _try_present_candidate_disturbance(source_case_id):
+			return true
+		# EXP permits Major only at the caller's explicit result-read Next boundary.
+		if (_current_stage in [Stage.CCTV, Stage.CONTAINMENT] or (_current_stage == Stage.EXPERIMENT and allow_experiment)) and major_ready.has(source_case_id) and _try_start_major_incident(source_case_id):
+			return true
+	return false
+
+
+func _try_present_candidate_disturbance(source_case_id: String) -> bool:
+	if not _event_presentation_credit:
+		return false
+	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
+	var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
+	if candidate.is_empty() or candidate.disturbance_triggered or candidate.opportunities_seen < candidate.opportunity_threshold:
+		return false
+	if resolution.get("result", MonitoringOutcomeData.Result.UNDEFINED) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != candidate.incident_id:
+		push_warning("Main: failure candidate does not match hidden resolution; retaining candidate.")
+		return false
+	var source_case: CaseData = _find_failure_source_case(source_case_id)
+	if source_case == null:
+		return false
+	var incidents: Array[IncidentData] = []
+	for incident: IncidentData in source_case.incidents:
+		if incident != null and incident.incident_id == candidate.incident_id:
+			incidents.append(incident)
+	var disturbance: EnvironmentalDisturbanceData = incidents[0].environmental_disturbance if incidents.size() == 1 else null
+	if disturbance == null or disturbance.disturbance_id.strip_edges().is_empty() or disturbance.display_name.strip_edges().is_empty() or disturbance.notice_text.strip_edges().is_empty() or disturbance.condition_change_text.strip_edges().is_empty():
+		push_warning("Main: failure candidate has no unique valid environmental disturbance; retaining candidate.")
+		return false
+	var reaction: CaseDisturbanceReactionData = _find_disturbance_reaction(disturbance.disturbance_id)
+	if not case_runtime.try_apply_disturbance(disturbance.disturbance_id, reaction.reaction_id if reaction != null else ""):
+		return false
+	failure_candidates.try_mark_disturbance_triggered(source_case_id)
+	_refresh_current_environment_conditions()
+	_show_disturbance_notice(disturbance, reaction)
+	_event_presentation_credit = false
+	if reaction != null:
+		_try_discover_research_entry(ResearchEntryData.SourceKind.DISTURBANCE_REACTION, reaction.reaction_id)
+	return true
 
 
 func _refresh_current_environment_conditions() -> void:
@@ -1057,7 +1200,7 @@ func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 
 
 func _try_start_major_incident(source_case_id: String) -> bool:
-	if _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
+	if not _event_presentation_credit or _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
 		return false
 	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
 	var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
@@ -1092,6 +1235,7 @@ func _try_start_major_incident(source_case_id: String) -> bool:
 	_interrupt_context = {"interrupted_case_id": current_case.case_id, "return_stage": _current_stage, "runtime_instance_id": case_runtime.get_instance_id(), "case_instance_id": current_case.get_instance_id()}
 	_incident_route = IncidentRoute.NORMAL_INTERRUPT
 	_show_view(Stage.INCIDENT)
+	_event_presentation_credit = false
 	return true
 
 
@@ -1196,6 +1340,7 @@ func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
 		var condition: EnvironmentalDisturbanceData = _find_environment_condition_data(data.disturbance_id)
 		snapshot.entries.append(ExperimentView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text, condition.display_name if condition != null else "[Unavailable]", condition.condition_change_text if condition != null else "[Unavailable]"))
 	view.restore_recorded_result(id, snapshot)
+	_mark_research_display(view)
 
 
 func _build_environment_summary() -> EnvironmentConditions.Summary:
@@ -1476,6 +1621,8 @@ func _on_experiment_execution_requested(experiment_id: String, experiment_view: 
 		limit
 	)
 	if approved:
+		if _research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and experiment_view.get_displayed_result_id() == experiment_id:
+			_mark_research_display(experiment_view)
 		_try_process_failure_event_opportunity(experiment_view, "experiment:" + experiment_id)
 
 
@@ -1540,6 +1687,8 @@ func _append_experiment_condition_observations(snapshot: ResearchLogView.Snapsho
 func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:
 	if _current_stage != Stage.CONTAINMENT or not _is_active_view(containment_view) or not _has_current_case_runtime():
 		return
+	if not containment_view.is_visible_in_tree() or _research_display.get("runtime_id", 0) != case_runtime.get_instance_id():
+		return
 	if current_case != null and not room_id.strip_edges().is_empty():
 		for room: ContainmentData in current_case.available_containment_rooms:
 			if room != null and room.room_id == room_id:
@@ -1547,6 +1696,8 @@ func _on_containment_confirmation_requested(room_id: String, containment_view: C
 					# Submission survives Runtime reset; debug playback does not resolve it.
 					pending_containment.try_add_pending(current_case.case_id, case_runtime.get_confirmed_containment_room_id())
 					_try_discover_research_entry(ResearchEntryData.SourceKind.CONTAINMENT, room_id)
+					if _has_failure_event_context(containment_view):
+						_grant_event_presentation_credit("containment", room_id)
 				break
 	containment_view.update_confirmation_state(case_runtime.get_confirmed_containment_room_id())
 
