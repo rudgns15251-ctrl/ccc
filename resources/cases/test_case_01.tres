@@ -149,104 +149,104 @@ condition_change_text = "AIRFLOW: STEADY → INTERMITTENT"
 [sub_resource type="Resource" id="Resource_incident_01"]
 script = ExtResource("8_incident")
 incident_id = "TEST_INCIDENT_01"
-display_name = "TEST INCIDENT 01"
-description = "Temporary incident data for TEST_ROOM_01 failure."
+display_name = "TEST SERVICE-STRUCTURE INCIDENT"
+description = "TEST observation: strikes cluster at service-panel mounts after pump starts. Vibration travels along the service structure as emergency lighting drops out. Airflow is currently steady; wall tracing continues between strikes."
 broadcast_id = "TEST_BROADCAST_01"
 environmental_disturbance = SubResource("Resource_disturbance_power")
 
 [sub_resource type="Resource" id="Resource_incident_03"]
 script = ExtResource("8_incident")
 incident_id = "TEST_INCIDENT_03"
-display_name = "TEST INCIDENT 03"
-description = "Temporary incident data for TEST_ROOM_03 failure."
+display_name = "TEST VENTILATION INCIDENT"
+description = "TEST observation: vent stop/start pulses are followed by sharp turn-backs toward the outlet. Wall tracing is repeatedly interrupted by crossings of the ventilation path. Airflow remains unstable after each service restart."
 broadcast_id = "TEST_BROADCAST_03"
 environmental_disturbance = SubResource("Resource_disturbance_ventilation")
 
 [sub_resource type="Resource" id="Resource_option_01_A"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_A"
-display_text = "Temporary response 01-A"
+display_text = "Mechanically isolate the service mounts and keep airflow steady. Prioritizes transmitted impulses, but leaves movement near the access seam to be observed."
 result_id = "TEST_INCIDENT_RESULT_01_A"
 
 [sub_resource type="Resource" id="Resource_option_01_B"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_B"
-display_text = "Temporary response 01-B"
+display_text = "Quiet airborne machinery noise while retaining rigid service connections and steady airflow. Preserves the connection, but transmitted impulses remain."
 result_id = "TEST_INCIDENT_RESULT_01_B"
 
 [sub_resource type="Resource" id="Resource_option_01_C"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_01_C"
-display_text = "Temporary response 01-C"
+display_text = "Cycle ventilation to redirect movement away from service panels while keeping the supports connected. Repeated airflow transitions may draw attention to the outlet."
 result_id = "TEST_INCIDENT_RESULT_01_C"
 
 [sub_resource type="Resource" id="Resource_broadcast_01"]
 script = ExtResource("10_broadcast")
 broadcast_id = "TEST_BROADCAST_01"
-display_name = "TEST BROADCAST 01"
-prompt_text = "Temporary emergency broadcast prompt for incident 01."
+display_name = "TEST RESPONSE: SERVICE VIBRATION"
+prompt_text = "Strikes track pump starts; the earlier sound-only trial did not reproduce them. Outlet turn-backs track airflow changes. Choose which cue to alter while the service panels vibrate. These temporary responses do not establish long-term containment."
 options = Array[ExtResource("9_option")]([SubResource("Resource_option_01_A"), SubResource("Resource_option_01_B"), SubResource("Resource_option_01_C")])
 
 [sub_resource type="Resource" id="Resource_option_03_A"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_A"
-display_text = "Temporary response 03-A"
+display_text = "Hold continuous low airflow with the present lighting and supports. Removes repeated airflow transitions, while other sources of stimulation remain untested."
 result_id = "TEST_INCIDENT_RESULT_03_A"
 
 [sub_resource type="Resource" id="Resource_option_03_B"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_B"
-display_text = "Temporary response 03-B"
+display_text = "Reduce task lighting while retaining vent cycling and the present supports. Aims to reduce crossing movements, but does not remove airflow transitions."
 result_id = "TEST_INCIDENT_RESULT_03_B"
 
 [sub_resource type="Resource" id="Resource_option_03_C"]
 script = ExtResource("9_option")
 option_id = "TEST_OPTION_03_C"
-display_text = "Temporary response 03-C"
+display_text = "Add damping at the service mounts while retaining vent cycling. Prioritizes structural transmission, but leaves the repeating airflow cue in place."
 result_id = "TEST_INCIDENT_RESULT_03_C"
 
 [sub_resource type="Resource" id="Resource_broadcast_03"]
 script = ExtResource("10_broadcast")
 broadcast_id = "TEST_BROADCAST_03"
-display_name = "TEST BROADCAST 03"
-prompt_text = "Temporary emergency broadcast prompt for incident 03."
+display_name = "TEST RESPONSE: AIRFLOW CYCLING"
+prompt_text = "Outlet turn-backs coincide with airflow transitions. Earlier lamp sweeps changed travel rather than strike timing; mechanical isolation addresses transmitted impacts. Choose a temporary response while wall tracing is interrupted by vent pulses."
 options = Array[ExtResource("9_option")]([SubResource("Resource_option_03_A"), SubResource("Resource_option_03_B"), SubResource("Resource_option_03_C")])
 
 [sub_resource type="Resource" id="Resource_incident_result_01_A"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_01_A"
-display_name = "TEST INCIDENT RESULT 01-A"
-description = "Temporary incident result for option 01-A."
+display_name = "TEST MECHANICAL ISOLATION OBSERVATION"
+description = "Service mounts were isolated and airflow held steady. Panel strikes became less frequent; wall tracing and brief approaches to the access seam continued. Transmitted impacts were reduced, but movement near the seam remains to be observed."
 
 [sub_resource type="Resource" id="Resource_incident_result_01_B"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_01_B"
-display_name = "TEST INCIDENT RESULT 01-B"
-description = "Temporary incident result for option 01-B."
+display_name = "TEST NOISE REDUCTION OBSERVATION"
+description = "Airborne machinery noise was reduced while rigid connections remained. Brief orientations toward the speaker stopped, but strikes still clustered at pump starts. Steady airflow avoided added outlet turn-backs; structural transmission remains unresolved."
 
 [sub_resource type="Resource" id="Resource_incident_result_01_C"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_01_C"
-display_name = "TEST INCIDENT RESULT 01-C"
-description = "Temporary incident result for option 01-C."
+display_name = "TEST VENT CYCLING OBSERVATION"
+description = "Vent cycling initially drew movement away from the panel. Further restarts produced repeated outlet turn-backs; panel strikes continued after pump starts. The initial redirection did not remove transmitted impulses and added a repeating airflow cue."
 
 [sub_resource type="Resource" id="Resource_incident_result_03_A"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_03_A"
-display_name = "TEST INCIDENT RESULT 03-A"
-description = "Temporary incident result for option 03-A."
+display_name = "TEST STEADY AIRFLOW OBSERVATION"
+description = "Continuous low airflow replaced the stop/start pulses. Outlet turn-backs became less frequent and wall tracing resumed over longer stretches. Approaches to service panels continued; the airflow cue was reduced without testing all structural stimuli."
 
 [sub_resource type="Resource" id="Resource_incident_result_03_B"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_03_B"
-display_name = "TEST INCIDENT RESULT 03-B"
-description = "Temporary incident result for option 03-B."
+display_name = "TEST LIGHTING REDUCTION OBSERVATION"
+description = "Reduced lighting produced fewer crossings and longer pauses between movements. Each vent restart still prompted outlet turn-backs. The change altered travel but left the repeated airflow cue and interrupted wall tracing unresolved."
 
 [sub_resource type="Resource" id="Resource_incident_result_03_C"]
 script = ExtResource("11_incident_result")
 result_id = "TEST_INCIDENT_RESULT_03_C"
-display_name = "TEST INCIDENT RESULT 03-C"
-description = "Temporary incident result for option 03-C."
+display_name = "TEST SERVICE DAMPING OBSERVATION"
+description = "Added damping reduced pulse-linked vibration at service panels. Vent restarts still prompted outlet turn-backs and repeatedly interrupted wall tracing. Structural vibration was reduced, while the cycling airflow cue remained."
 
 [sub_resource type="Resource" id="Resource_research_profile"]
 script = ExtResource("12_research")
@@ -285,32 +285,32 @@ script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_INCIDENT_01"
 source_kind = 4
 source_id = "TEST_INCIDENT_01"
-title = "Incident 01: room 01 record"
-body_text = "The incident screen reported the provisional incident associated with the room 01 failure."
+title = "Service incident: repeated panel impacts"
+body_text = "Pump-start strikes clustered at service-panel mounts. Vibration travelled along the service structure during emergency lighting interruptions; wall tracing continued between strikes and airflow was steady."
 
 [sub_resource type="Resource" id="Resource_research_broadcast"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_BROADCAST_01"
 source_kind = 5
 source_id = "TEST_BROADCAST_01"
-title = "Broadcast 01: response requested"
-body_text = "The emergency prompt for incident 01 was presented for a response."
+title = "Response decision: vibration, sound or airflow"
+body_text = "Panel impacts tracked pump starts, while the prior sound-only comparison did not reproduce them. Outlet turns tracked airflow changes. A temporary response was requested to alter mechanical transmission, airborne noise or airflow timing."
 
 [sub_resource type="Resource" id="Resource_research_option"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_01_B"
 source_kind = 6
 source_id = "TEST_OPTION_01_B"
-title = "Broadcast 01: response B confirmed"
-body_text = "Response 01-B was chosen and confirmed for broadcast 01."
+title = "Selected response: airborne noise reduction"
+body_text = "Airborne machinery noise reduction was selected, retaining rigid service connections and steady airflow. Transmitted impulses were not addressed by this protocol."
 
 [sub_resource type="Resource" id="Resource_research_result"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_01_B"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_01_B"
-title = "Incident 01: response B follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 01-B."
+title = "Follow-up: quiet sound, persistent panel strikes"
+body_text = "After noise reduction, brief speaker orientations stopped but pump-start strikes persisted. Steady airflow avoided additional outlet turns; structural transmission remained unresolved."
 
 [sub_resource type="Resource" id="Resource_research_experiment_02"]
 script = ExtResource("12_research")
@@ -349,96 +349,96 @@ script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_INCIDENT_03"
 source_kind = 4
 source_id = "TEST_INCIDENT_03"
-title = "Incident 03: room 03 record"
-body_text = "The incident screen reported the provisional incident associated with the room 03 failure."
+title = "Ventilation incident: repeated outlet turns"
+body_text = "Vent stop/start pulses were followed by outlet-directed turn-backs and crossings of the ventilation path. Wall tracing was repeatedly interrupted, and airflow remained unstable after service restarts."
 
 [sub_resource type="Resource" id="Resource_research_broadcast_03"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_BROADCAST_03"
 source_kind = 5
 source_id = "TEST_BROADCAST_03"
-title = "Broadcast 03: response requested"
-body_text = "The emergency prompt for incident 03 was presented for a response."
+title = "Response decision: airflow, lighting or damping"
+body_text = "Outlet turns coincided with airflow transitions. Prior lamp sweeps altered travel rather than strike timing; mechanical isolation targeted transmitted impulses. A temporary airflow, lighting or damping response was requested."
 
 [sub_resource type="Resource" id="Resource_research_option_01_A"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_01_A"
 source_kind = 6
 source_id = "TEST_OPTION_01_A"
-title = "Broadcast 01: response A confirmed"
-body_text = "Response 01-A was chosen and confirmed for broadcast 01."
+title = "Selected response: service-mount isolation"
+body_text = "Mechanical isolation of service mounts with steady airflow was selected. The protocol targeted transmitted impulses while leaving access-seam movements for observation."
 
 [sub_resource type="Resource" id="Resource_research_option_01_C"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_01_C"
 source_kind = 6
 source_id = "TEST_OPTION_01_C"
-title = "Broadcast 01: response C confirmed"
-body_text = "Response 01-C was chosen and confirmed for broadcast 01."
+title = "Selected response: vent-driven redirection"
+body_text = "Vent cycling was selected to redirect movement away from service panels. Supports remained connected and repeated airflow transitions were introduced."
 
 [sub_resource type="Resource" id="Resource_research_option_03_A"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_03_A"
 source_kind = 6
 source_id = "TEST_OPTION_03_A"
-title = "Broadcast 03: response A confirmed"
-body_text = "Response 03-A was chosen and confirmed for broadcast 03."
+title = "Selected response: continuous low airflow"
+body_text = "Continuous low airflow was selected while retaining present lighting and supports. Other sources of stimulation were left untested."
 
 [sub_resource type="Resource" id="Resource_research_option_03_B"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_03_B"
 source_kind = 6
 source_id = "TEST_OPTION_03_B"
-title = "Broadcast 03: response B confirmed"
-body_text = "Response 03-B was chosen and confirmed for broadcast 03."
+title = "Selected response: reduced task lighting"
+body_text = "Reduced task lighting was selected to limit crossings, retaining vent cycling and the present support arrangement. Airflow transitions were left in place."
 
 [sub_resource type="Resource" id="Resource_research_option_03_C"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_OPTION_03_C"
 source_kind = 6
 source_id = "TEST_OPTION_03_C"
-title = "Broadcast 03: response C confirmed"
-body_text = "Response 03-C was chosen and confirmed for broadcast 03."
+title = "Selected response: extra service-mount damping"
+body_text = "Additional service-mount damping was selected to reduce structural transmission. Vent cycling and its repeated airflow cue remained."
 
 [sub_resource type="Resource" id="Resource_research_result_01_A"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_01_A"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_01_A"
-title = "Incident 01: response A follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 01-A."
+title = "Follow-up: fewer impacts, continued seam approaches"
+body_text = "After mount isolation with steady airflow, panel strikes became less frequent. Wall tracing and brief access-seam approaches continued; movement near the seam still required observation."
 
 [sub_resource type="Resource" id="Resource_research_result_01_C"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_01_C"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_01_C"
-title = "Incident 01: response C follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 01-C."
+title = "Follow-up: initial redirection, repeated outlet turns"
+body_text = "Vent cycling first drew movement away from the panel, then produced repeated outlet turn-backs. Pump-start strikes continued; transmitted impulses remained and the repeating airflow cue was added."
 
 [sub_resource type="Resource" id="Resource_research_result_03_A"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_03_A"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_03_A"
-title = "Incident 03: response A follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 03-A."
+title = "Follow-up: fewer turns under steady airflow"
+body_text = "Continuous low airflow reduced outlet turn-backs and allowed longer stretches of wall tracing. Service-panel approaches continued; not all structural stimuli were tested."
 
 [sub_resource type="Resource" id="Resource_research_result_03_B"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_03_B"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_03_B"
-title = "Incident 03: response B follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 03-B."
+title = "Follow-up: fewer crossings, continued restart turns"
+body_text = "Reduced lighting lowered crossing frequency and lengthened pauses. Vent restarts still prompted outlet turns and interrupted wall tracing; the repeated airflow cue remained unresolved."
 
 [sub_resource type="Resource" id="Resource_research_result_03_C"]
 script = ExtResource("12_research")
 entry_id = "TEST_RESEARCH_RESULT_03_C"
 source_kind = 7
 source_id = "TEST_INCIDENT_RESULT_03_C"
-title = "Incident 03: response C follow-up"
-body_text = "The follow-up screen reported the provisional incident result associated with response 03-C."
+title = "Follow-up: less vibration, continued vent turns"
+body_text = "Extra damping reduced pulse-linked service-panel vibration. Vent restarts continued to prompt outlet turns and interrupt wall tracing; cycling airflow remained."
 
 [resource]
 script = ExtResource("1_case")

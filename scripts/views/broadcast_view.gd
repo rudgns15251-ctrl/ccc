@@ -191,6 +191,30 @@ func _update_confirmation_ui() -> void:
 		next_button.grab_focus()
 
 
+func get_unconfirmed_option_id() -> String:
+	if not is_inside_tree() or is_queued_for_deletion() or _has_confirmation_snapshot():
+		return ""
+	var option: BroadcastOptionData = _get_option(_selected_option_index)
+	return option.option_id if option != null else ""
+
+
+func restore_unconfirmed_option(option_id: String) -> bool:
+	if not is_inside_tree() or is_queued_for_deletion() or _has_confirmation_snapshot() or _broadcast_data == null or option_id.strip_edges().is_empty():
+		return false
+	var matching_index: int = -1
+	for index: int in range(_broadcast_data.options.size()):
+		var option: BroadcastOptionData = _broadcast_data.options[index]
+		if option != null and option.option_id == option_id:
+			if matching_index >= 0 or option.display_text.strip_edges().is_empty():
+				return false
+			matching_index = index
+	if matching_index < 0:
+		return false
+	_selected_option_index = matching_index
+	_update_confirmation_ui()
+	return true
+
+
 func _text_or_placeholder(value: String, field_name: String) -> String:
 	if value.strip_edges().is_empty():
 		push_warning("BroadcastView: %s is empty." % field_name)

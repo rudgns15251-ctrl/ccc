@@ -20,6 +20,40 @@ CCTV는 **BASE OBSERVATION**을 유지하고, 실제 적용된 환경에 대응�
 Research Log의 WORKING HYPOTHESES에서 현재 Case의 자유 메모를 Add/Edit/Delete할 수 있습니다. Main 소유 WorkingHypothesisState가 Case별로 세션 동안 유지하며, Runtime 교체와 ResearchArchive 초기화로 삭제되지 않습니다. 가설을 추천하거나 평가하지 않고 연구 발견/게임 판정에도 연결하지 않습니다.
 최종 게임 시스템과 디자인은 아직 구현하지 않았습니다.
 
+## Step42 — Major Incident Response Content + Context + Read Boundary
+
+Case01의 두 사건·여섯 임시 대응에 기존 관찰/실험 근거와 서로 다른 조치·결과를 작성했습니다.
+정상 INCIDENT / BROADCAST / INCIDENT RESULT에 source Case와 중단된 current Case·Stage를 표시합니다.
+EXP 실행은 결과와 조건 관찰을 먼저 보여주고 Major 준비를 기록하며, 다음 정상 CCTV/Containment 진입에서 사건을 표시합니다.
+현재 정상 EXP 이후에는 Next: CONTAINMENT에서 중단하고 대응 후 같은 Case02 Containment로 복귀합니다.
+idle / Log 왕복은 사건을 발생시키지 않으며 threshold·기존 opportunity는 유지했습니다.
+정상 Broadcast의 미확정 Option은 직접 Source Archive 왕복 동안 보존하며, Confirm 승인과는 구분합니다.
+실패 Room을 노출하던 Incident 화면과 authored Incident Research 문구를 함께 제거했습니다.
+점수·정답·새 gameplay consequence·Timer·추가 Case/시스템은 구현하지 않았습니다.
+
+검증과 기존 Step41 변경 보존, 요청한 105개 항목은
+[Step42 보고서](docs/step42_major_incident_response_read_boundary.md)에 정리했습니다.
+기존 215개 + Step42 20개 suite와 별도 import/기본 Main 실행을 검증했습니다. 커밋·push하지 않았습니다.
+
+## Step41 — Major Incident Pacing / Response UX Audit
+
+정상 Case01 → Case02의 교란·Major·Source Archive·Broadcast·Result·Resume를
+실제 버튼 입력과 세 해상도 GPU 실행으로 감사했습니다. 게임 코드·Scene·Resource·
+프로젝트 설정·threshold는 변경하지 않았습니다.
+
+- 기술적 대응/복귀와 동일 current Runtime 보존은 확인했습니다.
+- 교란 이후 Major는 현재 **다음 유효 행동 1회**로 고정되어 예측 가능성이 높습니다.
+- EXP에서 발생한 Major는 새 결과의 첫 렌더 전에 화면을 전환합니다. Resume 후 결과는 복원됩니다.
+- Broadcast A/B/C는 아직 전략·근거·결과 의미가 없는 임시 콘텐츠입니다.
+- 기존 Incident 설명은 실패한 Room을 직접 표시합니다. 내부 판정 비공개와 별개의 콘텐츠 문제입니다.
+- 후속 기회가 없는 경로는 Candidate가 유지되는 **DEFERRED**로 확인했습니다.
+
+전체 107개 요청 항목, 실제 Journey/Trigger/Decision/UX 표와 상태·변경 범위,
+검증 결과는 [Step41 감사 보고서](docs/step41_major_incident_pacing_audit.md)에 정리했습니다.
+기존 215개와 새 18개 suite 실행, 별도 import/기본 실행을 검증했습니다.
+다음 단계는 기존 사건의 대응 콘텐츠와 source·resume 맥락, EXP 결과 읽기 정책을
+먼저 구체화하는 것이 적합합니다. 이번 감사에서는 커밋·push하지 않았습니다.
+
 ## 실행
 
 1. Godot 4.7.1에서 이 폴더의 `project.godot`를 가져오거나 엽니다.

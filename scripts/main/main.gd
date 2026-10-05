@@ -97,6 +97,8 @@ func _update_window_size() -> void:
 func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	if is_instance_valid(_disturbance_notice):
 		return
+	if stage not in [Stage.BROADCAST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		_interrupt_context.erase("broadcast_draft")
 	if is_instance_valid(_current_view):
 		view_host.remove_child(_current_view)
 		_current_view.queue_free()
@@ -144,12 +146,14 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		monitoring_view.monitoring_playback_completed.connect(_on_monitoring_playback_completed.bind(monitoring_view))
 		monitoring_view.setup(_get_monitoring_outcome(), case_runtime.get_monitoring_result())
 	elif stage == Stage.INCIDENT:
+		view_host.custom_minimum_size.y = 660
 		var incident_view: IncidentView = _current_view as IncidentView
 		var incident: IncidentData = _get_current_incident_data()
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast() if incident != null else null
 		incident_view.setup(incident, _has_valid_broadcast_options(broadcast))
 		displayed_source = incident
 	elif stage == Stage.BROADCAST:
+		view_host.custom_minimum_size.y = 660
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
@@ -166,6 +170,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		)
 		displayed_source = broadcast
 	elif stage == Stage.INCIDENT_RESULT:
+		view_host.custom_minimum_size.y = 660
 		var incident_result_view: IncidentResultView = _current_view as IncidentResultView
 		var incident_result: IncidentResultData = _get_current_incident_result()
 		incident_result_view.setup(incident_result)
@@ -197,11 +202,18 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 	_refresh_cctv_condition_observations()
 	view_host.add_child(_current_view)
 	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+		var context: Dictionary = _build_response_display_context()
+		context["resume"] = stage == Stage.INCIDENT_RESULT
+		_current_view.set_response_context(context)
 		_current_view.research_log_button.text = "Open Source Archive"
 		if stage == Stage.INCIDENT:
 			_current_view.get_node("%ScreenTitle").text = "MAJOR CONTAINMENT INCIDENT"
 		elif stage == Stage.INCIDENT_RESULT:
-			_current_view.next_button.text = "Resume: " + Stage.keys()[_interrupt_context.return_stage]
+			_current_view.next_button.text = "Resume: " + context.get("return_stage", "[Unavailable]")
+		if not context.has("source_case_id"):
+			_current_view.next_button.disabled = true
+		if stage == Stage.BROADCAST:
+			_restore_response_broadcast_draft(_current_view as BroadcastView)
 		_discover_response_research(stage, displayed_source)
 	if discover_displayed_source and displayed_source != null:
 		_discover_displayed_research_entry(_current_view, stage, displayed_source)
@@ -926,6 +938,10 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 		if reaction != null:
 			_try_discover_research_entry(ResearchEntryData.SourceKind.DISTURBANCE_REACTION, reaction.reaction_id)
 		return
+	# Execution consumes its original opportunity and records readiness, but
+	# keeps the result visible until a normal CCTV/Containment entry.
+	if _current_stage == Stage.EXPERIMENT:
+		return
 	for source_case_id: String in major_ready:
 		if _try_start_major_incident(source_case_id):
 			break
@@ -994,7 +1010,29 @@ func _response_result(option: BroadcastOptionData = null) -> IncidentResultData:
 
 
 func _has_interrupt_context() -> bool:
-	return _has_current_case_runtime() and not _interrupt_context.is_empty() and _interrupt_context.interrupted_case_id == current_case.case_id and _interrupt_context.runtime_instance_id == case_runtime.get_instance_id() and _interrupt_context.case_instance_id == current_case.get_instance_id() and _interrupt_context.return_stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]
+	return _has_current_case_runtime() and _interrupt_context.get("interrupted_case_id", "") == current_case.case_id and _interrupt_context.get("runtime_instance_id", -1) == case_runtime.get_instance_id() and _interrupt_context.get("case_instance_id", -1) == current_case.get_instance_id() and _interrupt_context.get("return_stage", -1) in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]
+
+
+func _build_response_display_context() -> Dictionary:
+	if not _is_normal_interrupt() or not _has_interrupt_context():
+		return {}
+	var source: CaseData = _response_source_case()
+	if source == null or source.display_name.strip_edges().is_empty():
+		return {}
+	return {"source_case_id": source.case_id, "source_case_display_name": source.display_name, "interrupted_case_id": current_case.case_id, "interrupted_case_display_name": current_case.display_name, "return_stage": Stage.keys()[_interrupt_context.return_stage]}
+
+
+func _restore_response_broadcast_draft(view: BroadcastView) -> void:
+	var draft: Dictionary = _interrupt_context.get("broadcast_draft", {}).duplicate()
+	_interrupt_context.erase("broadcast_draft")
+	if draft.is_empty() or not _is_normal_interrupt() or _current_stage != Stage.BROADCAST or not _has_interrupt_context() or not _is_active_view(view):
+		return
+	var response: Dictionary = incident_responses.get_active_response()
+	if not response.get("confirmed_option_id", "").is_empty() or draft.get("source_case_id", "") != response.get("source_case_id", "") or draft.get("incident_id", "") != response.get("incident_id", "") or draft.get("broadcast_id", "") != response.get("broadcast_id", ""):
+		return
+	var option: BroadcastOptionData = _response_option(draft.get("option_id", ""))
+	if option != null and _response_result(option) != null:
+		view.restore_unconfirmed_option(option.option_id)
 
 
 func _try_start_major_incident(source_case_id: String) -> bool:
@@ -1107,11 +1145,18 @@ func _advance_response(view: FlowView) -> void:
 
 
 func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
-	if not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _is_active_view(view) or not view.is_visible_in_tree():
+	if not _is_normal_interrupt() or not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _is_active_view(view) or not view.is_visible_in_tree():
 		return
 	var source: CaseData = _response_source_case()
 	if source == null or not research_archive.get_archived_case_ids().has(source.case_id):
 		return
+	_interrupt_context.erase("broadcast_draft")
+	if view is BroadcastView and incident_responses.get_active_response().confirmed_option_id.is_empty() and view.get("_broadcast_data") == _response_broadcast():
+		var option_id: String = (view as BroadcastView).get_unconfirmed_option_id()
+		var option: BroadcastOptionData = _response_option(option_id) if not option_id.is_empty() else null
+		if option != null and _response_result(option) != null:
+			var response: Dictionary = incident_responses.get_active_response()
+			_interrupt_context["broadcast_draft"] = {"source_case_id": response.source_case_id, "incident_id": response.incident_id, "broadcast_id": response.broadcast_id, "option_id": option_id}
 	_source_archive_return_stage = source_stage
 	_archive_detail_case_id = source.case_id
 	_show_view(Stage.RESEARCH_ARCHIVE_DETAIL, false)
