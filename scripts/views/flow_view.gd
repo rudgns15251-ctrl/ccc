@@ -7,6 +7,15 @@ signal research_log_requested
 @onready var research_log_button: Button = get_node_or_null("%OpenResearchLogButton") as Button
 
 var _response_context: Dictionary = {}
+var _input_guard: Callable
+
+
+func set_input_guard(guard: Callable) -> void:
+	_input_guard = guard
+
+
+func _allows_local_input() -> bool:
+	return _input_guard.is_null() or (_input_guard.is_valid() and _input_guard.call())
 
 
 func _ready() -> void:
@@ -18,10 +27,12 @@ func _ready() -> void:
 
 
 func _on_next_button_pressed() -> void:
+	if not _allows_local_input(): return
 	advance_requested.emit()
 
 
 func _on_research_log_button_pressed() -> void:
+	if not _allows_local_input(): return
 	if research_log_button != null and not research_log_button.disabled:
 		research_log_requested.emit()
 

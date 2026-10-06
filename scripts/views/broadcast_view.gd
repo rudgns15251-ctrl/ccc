@@ -110,6 +110,7 @@ func _append_option(option_id: String, display_text: String, index: int, selecta
 
 
 func _on_option_selected(index: int, button: CheckBox) -> void:
+	if not _allows_local_input(): return
 	if not is_inside_tree() or is_queued_for_deletion():
 		return
 	if _has_confirmation_snapshot():
@@ -145,6 +146,7 @@ func _has_matching_confirmation() -> bool:
 
 
 func _on_confirm_broadcast_pressed() -> void:
+	if not _allows_local_input(): return
 	if confirm_button.disabled or _has_confirmation_snapshot():
 		return
 	var option: BroadcastOptionData = _get_option(_selected_option_index)

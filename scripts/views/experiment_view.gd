@@ -109,6 +109,7 @@ func _append_item(display_name: String, description: String, index: int, selecta
 
 
 func _on_experiment_selected(index: int) -> void:
+	if not _allows_local_input(): return
 	if not _can_select_experiment(index):
 		return
 	if _selected_experiment_index != index:
@@ -124,6 +125,7 @@ func _get_selected_experiment() -> ExperimentData:
 
 
 func _on_run_experiment_pressed() -> void:
+	if not _allows_local_input(): return
 	var experiment: ExperimentData = _get_selected_experiment()
 	if experiment == null:
 		run_button.disabled = true

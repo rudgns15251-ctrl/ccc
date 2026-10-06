@@ -91,6 +91,7 @@ func _append_item(display_name: String, description: String, index: int, selecta
 
 
 func _on_room_selected(index: int) -> void:
+	if not _allows_local_input(): return
 	if not _confirmed_room_id.is_empty():
 		return
 	if index < 0 or index >= _rooms.size():
@@ -109,6 +110,7 @@ func _get_selected_room() -> ContainmentData:
 
 
 func _on_confirm_containment_pressed() -> void:
+	if not _allows_local_input(): return
 	if not _confirmed_room_id.is_empty():
 		return
 	var room: ContainmentData = _get_selected_room()

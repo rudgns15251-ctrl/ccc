@@ -57,3 +57,9 @@ func clear_case(case_id: String) -> void:
 
 func clear_all() -> void:
 	_records_by_case.clear()
+
+
+# Whole-session release; clear_all/clear_case retain their existing ID policy.
+func reset() -> void:
+	_records_by_case.clear()
+	_next_id_by_case.clear()

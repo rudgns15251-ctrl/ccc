@@ -4153,3 +4153,77 @@ Runtime 교체/reset에도 session token을 보존하며 stale Runtime View는 �
 F44-01/F44-02는 RESOLVED, F01은 OPEN, F07-B는 PARTIALLY ADDRESSED입니다. double-Next/Resume/Next-event 공식과 실제 피로도는 사람 테스트가 필요합니다.
 
 변경 파일·metric·검증 범위·192개 응답은 [Step48 보고서](docs/step48_meaningful_research_pacing_gate.md)에 있습니다. 기존 Step46/47 미커밋 작업을 보존했고, 커밋/푸시는 하지 않았습니다.
+
+
+## Step49 — Major Predictability / Threshold Audit
+
+제품 Major1/Disturbance2~4, Step47 ordering, Step48 gate와 UI를 그대로 유지한 Audit입니다.
+CURRENT1/Fixed2/Range1~2/Range2~3 및 참고 Fixed3의 같은144 Journey를 비교하고, 범위형 두 추가 seed family까지 총1296 matrix Journey를 새로 실행했습니다.
+기본 CURRENT D159/M88/잔여128은 Step48와 일치했습니다. 비교 모델의 M/잔여는 Fixed2 86/130, Range1~2 87/129, Range2~3 80/136, Fixed3 61/155입니다.
+전정책 사건 사이 credit 최소1/zero0을 유지했습니다. Range1~2는 readiness variation을 만들지만 세 seed family에서 Stage 집중·행동량 조작을 개선하지 못해 KEEP_MAJOR_1과 명시적 final disposition 책임 설계 우선을 추천합니다.
+대안 threshold는 제품에 적용하지 않았습니다. 인증204프로세스는 CURRENT73/Simulation130/controlled1을 구분하며, 제품40Script 검사와 Snapshot/ordering/gate/headless/native/GPU3해상도 핵심 회귀를 새로 수행했습니다.
+상세 표·seed sensitivity·한계·174개 답변은 [Step49 보고서](docs/step49_major_predictability_threshold_audit.md)에 있습니다. 기존 Step39 미커밋 편집을 보존했고, 커밋/푸시는 하지 않았습니다.
+
+## Step50 — Final Run Disposition Responsibility Contract
+
+**DESIGN ONLY · NOT IMPLEMENTED.** [Step50 책임 계약](docs/step50_final_run_disposition_responsibility_contract.md)에 Run/Case assignment identity, Pending 선행 판정, 전체 수락 시 ownership 이전, Run별 idempotent commit 및 실패/receipt retry 규칙을 정리했다.
+
+- voluntary는 현재 Active Response만 정상 완료하고, forced는 승인/노출 사실을 보존한 interrupted record로 인수한다. 미처리 후보 강제 drain/미발견 Research 해금은 하지 않는다.
+- F07-B는 PARTIALLY ADDRESSED 유지; DESIGN CONTRACT COMPLETE는 실제 Run End/Settlement 구현이나 RESOLVED 판정이 아니다. Major1/기존 pacing·ordering·UI·프로젝트 설정은 보존했다.
+- 다음 추천은 Step51의 작은 in-memory Record/ownership State다. 이번 제품 코드 변경0, 기존 Step39/Step49 변경 보존, commit/push 없음.
+
+## Step51 — In-Memory Run Disposition Record + Ownership State
+
+**in-memory recipient implemented / actual closure not implemented.** 독립 `RunDispositionRecord`와 `RunDispositionState`를 추가했습니다. 전체 primitive Record를 수락한 뒤 Run ID 하나에 결과·receipt를 함께 저장합니다. 같은 결과는 기존 receipt를 반환하고, boundary/payload 충돌과 duplicate typed identity는 거절합니다.
+
+- Main·기존 Gameplay State·Snapshot과 연결하지 않았으며 실제 Run 종료/판정/conversion/cleanup은 없습니다. 입력·출력·State-owned 복사를 분리했고 F07-B는 PARTIALLY ADDRESSED입니다.
+- Godot4.7.1 최종52실행: 제품42Script 검사/import/Main headless·native/독립274검사와 기존 Snapshot·ordering·gate smoke 포함3,678검사 통과. 예상 invalid-content warning4 외 정상warning0/runtime·parse error0입니다.
+- 파일·API·schema·계약대응·174개 답변은 [Step51 보고서](docs/step51_run_disposition_ownership_state.md)에 있습니다. 기존 Step39/49/50 변경과 설정을 보존했고, 커밋/푸시는 하지 않았습니다.
+
+
+## Step52 — Developer Closure API + Live State Preparation
+
+**DEVELOPER CLOSURE API ONLY**
+
+**NO PLAYER RUN END / NO SETTLEMENT**
+
+`Main.configure_developer_run_identity(run_id, assignments)`로 caller의 고정 identity를 바인딩하고,
+`Main.developer_commit_run_disposition(boundary_type, recipient)`를 명시 호출하여 live State의 valid Pending을 먼저 판정한 뒤 Step51 recipient에 primitive final Record/receipt를 인수한다. Active Response는 voluntary/forced 모두 차단한다.
+
+동일 요청·post-resolution retry는 재판정/재추첨 없이 기존 사실과 receipt를 사용한다. 일반 플레이 자동 호출, player 종료 UI, source freeze/cleanup, Settlement는 없다. Godot4.7.1 최종56 processes/5694 assertions 통과; 설정·Scene·Resource·기존State/Snapshot 보존. F07-B는 PARTIALLY ADDRESSED다.
+
+[Step52 통합 보고서: 정책·변경·검증·210항목](docs/step52_developer_closure_integration.md)
+
+
+## Step53 — Active Response Run-End Integration + Terminal Source Freeze
+
+**DEVELOPER RUN-END INTEGRATION ONLY**
+
+**NO PLAYER RUN END / NO SETTLEMENT / NO SOURCE CLEANUP**
+
+Step52의 Active 차단 정책을 확장했다. final boundary의 voluntary 요청은 현재 Response의 정상 completion만 허용하고 Resume 이후 explicit commit retry를 기다린다. forced 요청은 source를 진행시키지 않고 matching EVENT 하나를 INTERRUPTED_RESPONSE로 recipient에 인수한다. accepted intent/commit/error 이후 정상 source callbacks를 동결한다.
+
+Main-local intent/receipt proof는 결과 authority가 아니며 final Record/receipt의 owner는 caller-owned recipient다. forced source Response는 ACTIVE historical copy로 남을 수 있고 Step46 Snapshot과 final disposition은 역할이 다르다. 기존 정상 여정/설정/State/Record/Scene/Research 내용은 유지했다.
+
+Godot4.7.1 최종58 processes/7056 assertions 통과. 정상warning0, controlled invalid-fixture warning21, parse/runtime error0. F07-B는 PARTIALLY ADDRESSED: ACTIVE TERMINATION + TERMINAL FREEZE INTEGRATED / SOURCE CLEANUP + PLAYER RUN LIFECYCLE NOT IMPLEMENTED.
+
+[Step53 보고서: 변경·제한·검증·230항목](docs/step53_active_termination_and_terminal_freeze.md)
+
+Step54 추천은 verified receipt 기반 cleanup/reset + no-run/next-run boundary다. Settlement는 별도 단계 가능하다. 이번 작업은 stage/commit/push를 하지 않았다.
+
+
+## Step54 — Verified Source Cleanup + Terminal No-Run Boundary
+
+**DEVELOPER CLEANUP / NO-RUN BOUNDARY ONLY**
+
+**NO PLAYER RUN END / NO SETTLEMENT / NO NEW RUN START**
+
+`Main.developer_cleanup_committed_run(recipient)`는 Step53의 COMMITTED_FROZEN에서 bound recipient의 Run ID/receipt/Record/boundary를 재검증한 뒤 source State를 reset하고 Case/Runtime/View 참조를 해제한다. commit 성공 직후 자동 cleanup하지 않는다. 같은 cleanup은 ALREADY_CLEANED이며 recipient Record/receipt는 그대로 보존한다.
+
+cleanup 이후 Main은 CLEANED_NO_RUN이다. 과거 callback은 source를 재생성할 수 없고 동일 Main에 새 Run configure/closure prepare는 거절한다. authored case_sequence/Scene/Resource/설정은 유지한다. WorkingHypothesis에 whole-session reset만 추가했고 기존 clear_all의 ID 정책은 보존했다.
+
+Godot4.7.1 최종60 processes/9338 assertions 통과. 정상warning0, controlled invalid-fixture warning21, parse/runtime error0. F07-B는 PARTIALLY ADDRESSED: SOURCE OWNERSHIP RELEASE + NO-RUN BOUNDARY INTEGRATED / PLAYER RUN LIFECYCLE NOT IMPLEMENTED.
+
+[Step54 보고서: API·cleanup 정책·제한·검증·215항목](docs/step54_verified_source_cleanup_no_run_boundary.md)
+
+Step53 Active+resolvable Pending P2는 그대로 유지한다. 다음 추천은 명시적 no-run→new-run initializer 계약이며 이번에는 새 Run/Player 종료/Settlement/경제/Save를 구현하지 않았다. stage/commit/push도 하지 않았다.

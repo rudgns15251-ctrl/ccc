@@ -219,8 +219,8 @@ cap/
 ├── scripts/data/                   16 Resource Script 보존
 ├── scripts/views/                  View/common Script 보존
 └── docs/
-    ├── step38_core_loop_audit.md    보존
-    └── step39_case_evidence.md      추가
+	├── step38_core_loop_audit.md    보존
+	└── step39_case_evidence.md      추가
 ```
 
 기존 상위 Main이 View를 생성하고 요청 signal을 승인하며, Runtime이 실행/획득 상태를 유지하고 View가 Resource/Snapshot을 표시한다. 이번 단계에서는 이 책임 분리나 화면 전환 구조를 수정하지 않았다. Room의 설비 설명은 authored 비교 정보이며 실제 공기·접촉 물리 시뮬레이션을 추가한 것이 아니다. 시설 조건을 근거로 Room 정답을 동적으로 바꾸지도 않는다.

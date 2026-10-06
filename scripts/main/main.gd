@@ -15,12 +15,14 @@ const ArchiveListView = preload("res://scripts/views/research_archive_list_view.
 const ArchiveDetailView = preload("res://scripts/views/research_archive_detail_view.gd")
 const DisturbanceNotice = preload("res://scripts/views/environmental_disturbance_notice.gd")
 const EnvironmentConditions = preload("res://scripts/views/environment_conditions_view.gd")
+const DeveloperDispositionBuilder = preload("res://scripts/read_models/developer_run_disposition_builder.gd")
 const DISTURBANCE_NOTICE_SCENE = preload("res://scenes/views/environmental_disturbance_notice.tscn")
 # Temporary opportunity count range for this vertical slice, not final balance.
 const PROTOTYPE_DISTURBANCE_THRESHOLD := Vector2i(2, 4)
 # TEMPORARY/PROTOTYPE: one later eligible action, not final balance.
 const PROTOTYPE_MAJOR_THRESHOLD: int = 1
 enum IncidentRoute { DEBUG_RUNTIME, NORMAL_INTERRUPT }
+enum TerminalMode { NONE, VOLUNTARY_RESPONSE_ONLY, VOLUNTARY_AWAITING_COMMIT, FORCED_PREPARING, COMMITTED_FROZEN, TERMINAL_ERROR_FROZEN, CLEANED_NO_RUN }
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG, RESEARCH_ARCHIVE_LIST, RESEARCH_ARCHIVE_DETAIL }
 
@@ -72,6 +74,11 @@ var _view_process_mode_before_notice: Node.ProcessMode
 var _event_presentation_credit: bool = true
 var _completed_research_tokens: Dictionary[String, bool] = {}
 var _research_display: Dictionary = {}
+# Explicit developer/test integration only. No recipient is created or owned here.
+var _developer_closure_context: Dictionary = {}
+var _developer_closure_busy: bool = false
+var _developer_recipient_id: int = 0
+var _developer_terminal: Dictionary = {"mode": TerminalMode.NONE, "boundary_type": "", "source_case_id": "", "incident_id": "", "receipt": {}}
 
 
 func _ready() -> void:
@@ -105,9 +112,17 @@ func _update_window_size() -> void:
 
 
 func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
+	if not (_terminal_action_allowed("archive") or _terminal_action_allowed("resume")): return
+	if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY:
+		var response: Dictionary = incident_responses.get_active_response()
+		var allowed: bool = (_terminal_action_allowed("resume") and stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]) or (stage == Stage.RESEARCH_ARCHIVE_DETAIL and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]) or (_current_stage == Stage.RESEARCH_ARCHIVE_DETAIL and stage == _source_archive_return_stage) or (_current_stage == Stage.INCIDENT and stage == Stage.BROADCAST) or (_current_stage == Stage.BROADCAST and stage == Stage.INCIDENT_RESULT and not response.get("incident_result_id", "").is_empty())
+		if not allowed: return
 	if is_instance_valid(_disturbance_notice):
 		return
-	_research_display.clear()
+	# Keep the last research Runtime identity across read-only/response overlays.
+	# The view_id still prevents this receipt from counting as a newly drawn View.
+	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
+		_research_display.clear()
 	if stage not in [Stage.BROADCAST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		_interrupt_context.erase("broadcast_draft")
 	if is_instance_valid(_current_view):
@@ -211,6 +226,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		archive_detail.setup(_build_archive_detail_snapshot(_archive_detail_case_id))
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
+	_current_view.set_input_guard(_accept_view_action.bind(_current_view, "archive"))
 	view_host.add_child(_current_view)
 	if stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
 		_mark_research_display(_current_view)
@@ -239,7 +255,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 
 
 func _on_cctv_review_requested(view: FlowView, source_stage: int) -> void:
-	if source_stage != _current_stage or source_stage not in [Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or case_runtime.get_applied_disturbances().is_empty():
+	if source_stage != _current_stage or source_stage not in [Stage.EXPERIMENT, Stage.CONTAINMENT] or not _accept_view_action(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or case_runtime.get_applied_disturbances().is_empty():
 		return
 	_cctv_review_return_stage = source_stage
 	_show_view(Stage.CCTV, false)
@@ -249,7 +265,7 @@ func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
 	if _is_normal_interrupt():
 		_on_source_archive_requested(view, source_stage)
 		return
-	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _is_active_view(view):
+	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _accept_view_action(view):
 		return
 	if _current_stage == Stage.RESULT and not case_runtime.has_monitoring_result():
 		return
@@ -258,7 +274,7 @@ func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
 
 
 func _on_research_log_back_requested(research_log_view: ResearchLogView) -> void:
-	if _current_stage != Stage.RESEARCH_LOG or not _is_active_view(research_log_view):
+	if _current_stage != Stage.RESEARCH_LOG or not _accept_view_action(research_log_view):
 		return
 	if not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
 		push_warning("Main: Research Log return stage is invalid: %d." % _research_log_return_stage)
@@ -355,7 +371,7 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 
 
 func _can_edit_hypotheses(case_id: String, view: ResearchLogView) -> bool:
-	return not _is_normal_interrupt() and _current_stage == Stage.RESEARCH_LOG and _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
+	return not _is_normal_interrupt() and _current_stage == Stage.RESEARCH_LOG and _accept_view_action(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
 
 
 func _on_hypothesis_add_requested(case_id: String, text: String, view: ResearchLogView) -> void:
@@ -382,7 +398,7 @@ func _on_hypothesis_remove_requested(case_id: String, id: String, view: Research
 func _on_research_archive_requested(view: ResearchLogView) -> void:
 	if _is_normal_interrupt():
 		return
-	if _current_stage != Stage.RESEARCH_LOG or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage) or view.get_hypothesis_case_id() != current_case.case_id:
+	if _current_stage != Stage.RESEARCH_LOG or not _accept_view_action(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage) or view.get_hypothesis_case_id() != current_case.case_id:
 		return
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
 
@@ -390,7 +406,7 @@ func _on_research_archive_requested(view: ResearchLogView) -> void:
 func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
 	if _is_normal_interrupt():
 		return
-	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
+	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _accept_view_action(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
 		return
 	if _find_archive_case(case_id) == null:
 		return
@@ -401,22 +417,22 @@ func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
 func _on_archive_list_back_requested(view: ArchiveListView) -> void:
 	if _is_normal_interrupt():
 		return
-	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _is_active_view(view) or not view.is_visible_in_tree() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
+	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _accept_view_action(view) or not view.is_visible_in_tree() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
 		return
 	_archive_detail_case_id = ""
 	_show_view(Stage.RESEARCH_LOG, false)
 
 
 func _on_archive_detail_back_requested(view: ArchiveDetailView) -> void:
-	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _is_active_view(view) or not view.is_visible_in_tree():
+	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
 		return
 	if _is_normal_interrupt():
 		if not _has_interrupt_context() or _source_archive_return_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or _archive_detail_case_id != incident_responses.get_active_response().get("source_case_id", "") or view.get("_snapshot").case_id != _archive_detail_case_id:
 			return
 		var return_stage: int = _source_archive_return_stage
+		_show_view(return_stage, false)
 		_source_archive_return_stage = -1
 		_archive_detail_case_id = ""
-		_show_view(return_stage, false)
 		return
 	_archive_detail_case_id = ""
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
@@ -548,6 +564,7 @@ func _has_current_case_runtime() -> bool:
 
 
 func _try_discover_research_entry(source_kind: int, source_id: String) -> bool:
+	if not _terminal_action_allowed(): return false
 	if not _has_current_case_runtime() or source_id.strip_edges().is_empty():
 		return false
 	case_runtime.try_observe_research_source(source_kind, source_id)
@@ -782,7 +799,7 @@ func _get_current_incident_result() -> IncidentResultData:
 
 
 func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
-	if _current_stage != Stage.BROADCAST or not _is_active_view(broadcast_view) or not _has_current_case_runtime():
+	if _current_stage != Stage.BROADCAST or not _accept_view_action(broadcast_view, "response") or not _has_current_case_runtime():
 		return
 	if _is_normal_interrupt():
 		_confirm_response_option(broadcast_id, option_id, broadcast_view)
@@ -797,11 +814,11 @@ func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: Strin
 
 
 func _is_active_view(view: FlowView) -> bool:
-	return not is_instance_valid(_disturbance_notice) and is_instance_valid(view) and view == _current_view and view.is_inside_tree() and not view.is_queued_for_deletion()
+	return not _developer_closure_busy and not is_instance_valid(_disturbance_notice) and is_instance_valid(view) and view == _current_view and view.is_inside_tree() and not view.is_queued_for_deletion()
 
 
 func _on_advance_requested(view: FlowView) -> void:
-	if not _is_active_view(view):
+	if not _accept_view_action(view, "response"):
 		return
 	if not _has_unique_case_sequence():
 		return
@@ -849,6 +866,7 @@ func _archive_case_discoveries() -> void:
 
 
 func _merge_current_case_discoveries() -> void:
+	if not _terminal_action_allowed(): return
 	var valid_ids: Array[String] = []
 	for entry: ResearchEntryData in _get_valid_research_entries():
 		valid_ids.append(entry.entry_id)
@@ -931,6 +949,7 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 
 
 func _handoff_to_next_case() -> void:
+	if not _terminal_action_allowed(): return
 	if _current_stage != Stage.CONTAINMENT or not _is_active_view(_current_view):
 		return
 	if not _has_current_case_runtime() or not case_runtime.has_confirmed_containment() or not pending_containment.has_pending(current_case.case_id) or pending_containment.get_pending_room_id(current_case.case_id) != case_runtime.get_confirmed_containment_room_id():
@@ -960,13 +979,345 @@ func _handoff_to_next_case() -> void:
 
 
 func _try_resolve_current_pending() -> bool:
-	var case_id: String = current_case.case_id
+	return _try_resolve_pending_without_handoff(current_case)
+
+
+# DEVELOPER CLOSURE API ONLY. Caller allocates explicit assignment IDs once and
+# retains the injected recipient beyond Main's lifetime. No gameplay call site.
+# A committed receipt owns the final record. Source callbacks are then frozen;
+# physical cleanup and player Run End remain separate follow-up responsibilities.
+func configure_developer_run_identity(run_id: String, assignments: Dictionary) -> Dictionary:
+	if _developer_terminal.mode == TerminalMode.CLEANED_NO_RUN:
+		return _developer_closure_result("INVALID_PRECONDITION", "Cleaned Main cannot configure another Run.")
+	if _developer_closure_busy or not _has_unique_case_sequence() or run_id.is_empty() or run_id != run_id.strip_edges():
+		return _developer_closure_result("INVALID_PRECONDITION", "Invalid developer identity configuration.")
+	if assignments.size() != case_sequence.size():
+		return _developer_closure_result("INVALID_PRECONDITION", "Every configured Case requires exactly one assignment.")
+	var used: Array[String] = []
+	for source: CaseData in case_sequence:
+		var value: Variant = assignments.get(source.case_id)
+		if not value is String or value.is_empty() or value != value.strip_edges() or used.has(value):
+			return _developer_closure_result("INVALID_PRECONDITION", "Missing, blank or duplicate assignment: " + source.case_id)
+		used.append(value)
+	var context: Dictionary = {"run_instance_id": run_id, "case_assignments": assignments.duplicate(true), "sequence_ids": _developer_sequence_ids(), "state_ids": _developer_session_state_ids()}
+	if context.state_ids.has(0): return _developer_closure_result("INVALID_PRECONDITION", "Main has not initialized its States.")
+	if not _developer_closure_context.is_empty():
+		return _developer_closure_result("ALREADY_CONFIGURED" if RunDispositionRecord.values_equal(context, _developer_closure_context) else "INVALID_PRECONDITION", "Developer context is bound once per Main session.")
+	_developer_closure_context = context
+	return _developer_closure_result("CONFIGURED")
+
+
+func developer_commit_run_disposition(boundary_type: String, recipient: RunDispositionState) -> Dictionary:
+	if _developer_terminal.mode == TerminalMode.CLEANED_NO_RUN:
+		return _developer_closure_result("INVALID_PRECONDITION", "Cleaned source cannot prepare another disposition.")
+	if _developer_closure_busy:
+		return _developer_closure_result("INVALID_PRECONDITION", "Closure prepare is already running.")
+	_developer_closure_busy = true
+	var result: Dictionary = _prepare_and_commit_developer_disposition(boundary_type, recipient)
+	if result.status in ["COMMITTED", "ALREADY_COMMITTED"]:
+		_developer_terminal.mode = TerminalMode.COMMITTED_FROZEN
+		_developer_terminal.receipt = result.receipt.duplicate(true)
+	elif result.status != "WAITING_ACTIVE_RESPONSE" and result.status != "INVALID_PRECONDITION" and _developer_terminal.mode in [TerminalMode.FORCED_PREPARING, TerminalMode.VOLUNTARY_AWAITING_COMMIT, TerminalMode.VOLUNTARY_RESPONSE_ONLY]:
+		_developer_terminal.mode = TerminalMode.TERMINAL_ERROR_FROZEN
+	result["terminal_mode"] = TerminalMode.keys()[_developer_terminal.mode]
+	_developer_closure_busy = false
+	return result
+
+
+# DEVELOPER CLEANUP / NO-RUN BOUNDARY ONLY. No automatic commit call site.
+# Recipient remains caller-owned; keep only its instance ID and primitive proof.
+func developer_cleanup_committed_run(recipient: RunDispositionState) -> Dictionary:
+	if _developer_closure_busy:
+		return _developer_closure_result("INVALID_PRECONDITION", "Closure/cleanup is already running.")
+	_developer_closure_busy = true
+	var result: Dictionary = _cleanup_verified_source(recipient)
+	result["terminal_mode"] = TerminalMode.keys()[_developer_terminal.mode]
+	_developer_closure_busy = false
+	return result
+
+
+func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
+	var mode: int = _developer_terminal.mode
+	if recipient == null or recipient.get_instance_id() != _developer_recipient_id or mode not in [TerminalMode.COMMITTED_FROZEN, TerminalMode.CLEANED_NO_RUN]:
+		return _developer_closure_result("INVALID_PRECONDITION", "Cleanup requires the bound recipient and verified committed source.")
+	if mode == TerminalMode.COMMITTED_FROZEN and _developer_closure_context.is_empty():
+		return _developer_closure_result("INVALID_PRECONDITION", "Missing configured source identity.")
+	var proof: Dictionary = _developer_terminal.receipt
+	var run_id: String = _developer_closure_context.get("run_instance_id", proof.get("run_instance_id", ""))
+	if run_id.is_empty() or not _developer_receipt_valid(run_id, proof) or not recipient.has_committed_run(run_id) or recipient.get_commit_receipt(run_id) != proof:
+		return _developer_closure_result("RECEIPT_MISMATCH", "Missing or mismatched recipient receipt.")
+	var record: Dictionary = recipient.get_committed_record(run_id)
+	if record.is_empty() or record.get("run_instance_id", "") != run_id or record.get("boundary_type", "") != _developer_terminal.boundary_type:
+		return _developer_closure_result("RECEIPT_MISMATCH", "Committed Record identity/boundary differs from terminal proof.")
+	for category: String in RunDispositionState.CATEGORIES:
+		if not record.get(category) is Array:
+			return _developer_closure_result("RECEIPT_MISMATCH", "Committed Record category unavailable: " + category)
+	# No source re-projection, semantic rebuild, try_commit, or RNG operation.
+	if mode == TerminalMode.CLEANED_NO_RUN:
+		return _developer_closure_result("ALREADY_CLEANED" if _cleaned_source_is_empty() else "SOURCE_CLEANUP_ERROR", "", proof)
+	# Preflight before any destructive operation. Partial-error retry retains the
+	# configured State identity and verified proof, even after Runtime release.
+	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses]:
+		if state == null or not state.has_method("reset"):
+			return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Required source State/reset is unavailable.", proof)
+	if _developer_closure_context.state_ids != _developer_session_state_ids() or _developer_closure_context.sequence_ids != _developer_sequence_ids() or not is_instance_valid(view_host):
+		return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Source identity or ViewHost changed.", proof)
+	for child: Node in view_host.get_children():
+		if child != _current_view:
+			return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Unexpected ViewHost child; source retained.", proof)
+	if is_instance_valid(_current_view) and _current_view.get_parent() != view_host or is_instance_valid(_disturbance_notice) and _disturbance_notice.get_parent() != self:
+		return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Source View/notice parent changed.", proof)
+	if is_instance_valid(_current_view):
+		view_host.remove_child(_current_view)
+		_current_view.queue_free()
+	_current_view = null
+	if is_instance_valid(_disturbance_notice):
+		remove_child(_disturbance_notice)
+		_disturbance_notice.queue_free()
+	_disturbance_notice = null
+	_focus_before_notice = null
+	view_host.process_mode = Node.PROCESS_MODE_INHERIT
+	_view_process_mode_before_notice = Node.PROCESS_MODE_INHERIT
+	_interrupt_context.clear()
+	_incident_route = IncidentRoute.DEBUG_RUNTIME
+	_source_archive_return_stage = -1
+	_research_log_return_stage = -1
+	_archive_detail_case_id = ""
+	_cctv_review_return_stage = -1
+	_research_display.clear()
+	_processed_opportunities.clear()
+	_completed_research_tokens.clear()
+	_event_presentation_credit = false
+	pending_containment.reset()
+	containment_resolutions.reset()
+	failure_candidates.reset()
+	incident_responses.reset()
+	research_archive.reset()
+	working_hypotheses.reset()
+	if case_runtime != null: case_runtime.reset()
+	case_runtime = null
+	current_case = null
+	_case_index = -1
+	# Keep last valid Stage for safe array indexing. Mode is lifecycle authority.
+	if not _cleaned_source_is_empty():
+		return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Source reset postcondition failed; committed source stays frozen for explicit retry.", proof)
+	_developer_closure_context.clear()
+	_developer_terminal = {"mode": TerminalMode.CLEANED_NO_RUN, "boundary_type": record.boundary_type, "receipt": proof.duplicate(true)}
+	return _developer_closure_result("CLEANED", "", proof)
+
+
+func _cleaned_source_is_empty() -> bool:
+	return (
+		pending_containment != null and containment_resolutions != null and failure_candidates != null
+		and incident_responses != null and research_archive != null and working_hypotheses != null
+		and pending_containment.get_pending_case_ids().is_empty() and containment_resolutions.get_resolved_case_ids().is_empty()
+		and failure_candidates.get_candidate_case_ids().is_empty() and incident_responses.get_responses().is_empty()
+		and incident_responses.get_active_response().is_empty() and research_archive.get_archived_case_ids().is_empty()
+		and working_hypotheses.get("_records_by_case").is_empty() and working_hypotheses.get("_next_id_by_case").is_empty()
+		and case_runtime == null and current_case == null and _case_index == -1
+		and not is_instance_valid(_current_view) and is_instance_valid(view_host) and view_host.get_child_count() == 0
+		and not is_instance_valid(_disturbance_notice) and not is_instance_valid(_focus_before_notice)
+		and _interrupt_context.is_empty() and _source_archive_return_stage == -1 and _research_log_return_stage == -1
+		and _archive_detail_case_id.is_empty() and _cctv_review_return_stage == -1 and _research_display.is_empty()
+		and _processed_opportunities.is_empty() and _completed_research_tokens.is_empty() and not _event_presentation_credit
+	)
+
+
+func _prepare_and_commit_developer_disposition(boundary: String, recipient: RunDispositionState) -> Dictionary:
+	if recipient == null or _developer_closure_context.is_empty() or boundary not in RunDispositionState.BOUNDARIES:
+		return _developer_closure_result("INVALID_PRECONDITION", "Requires configured identity, recipient and final boundary.")
+	if _developer_recipient_id != 0 and _developer_recipient_id != recipient.get_instance_id():
+		return _developer_closure_result("INVALID_PRECONDITION", "This source session is bound to a different recipient.")
+	if _developer_terminal.boundary_type == "FORCED_RUN_END" and boundary == "VOLUNTARY_RUN_END" and _developer_terminal.mode != TerminalMode.COMMITTED_FROZEN:
+		return _developer_closure_result("INVALID_PRECONDITION", "Forced terminal intent cannot be downgraded.")
+	var run_id: String = _developer_closure_context.run_instance_id
+	# Receipt authority first, before any Pending mutation or RNG draw.
+	if recipient.has_committed_run(run_id):
+		var existing: Dictionary = recipient.get_committed_record(run_id)
+		var receipt: Dictionary = recipient.get_commit_receipt(run_id)
+		if not _developer_receipt_valid(run_id, receipt): return _developer_closure_result("RECIPIENT_INVALID", "Invalid existing receipt.")
+		if not _developer_source_valid(): return _developer_closure_result("INVALID_SOURCE_STATE", "Committed source identity changed.", receipt)
+		if _developer_terminal.mode == TerminalMode.NONE:
+			_developer_recipient_id = recipient.get_instance_id()
+			_begin_developer_terminal_intent(boundary, {})
+		if existing.boundary_type != boundary: return _developer_closure_result("RECIPIENT_CONFLICT", "Run already committed with another boundary.", receipt)
+		var projected: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, _developer_source_facts(), case_sequence, boundary)
+		if not projected.issue.is_empty() or not RunDispositionRecord.values_equal(projected.data, existing):
+			return _developer_closure_result("INVALID_SOURCE_STATE", "COMMITTED_SOURCE_MISMATCH::" + projected.issue, receipt)
+		_developer_recipient_id = recipient.get_instance_id()
+		return _developer_closure_result("ALREADY_COMMITTED", "", receipt)
+	if not _developer_source_valid(): return _developer_closure_result("INVALID_PRECONDITION", "Not a valid final configured test boundary/source identity.")
+	if not incident_responses.get_active_response().is_empty() and not _is_normal_interrupt():
+		return _developer_closure_result("INVALID_SOURCE_STATE", "DEBUG_RESPONSE_ROUTE_UNSUPPORTED")
+	_developer_recipient_id = recipient.get_instance_id()
+	_begin_developer_terminal_intent(boundary, incident_responses.get_active_response())
+	var identities: Array = _developer_live_identity()
+	var facts: Dictionary = _developer_source_facts()
+	var active_facts: Dictionary = facts.active_response_facts
+	if active_facts.has("reference_issue"): return _developer_closure_result("INVALID_SOURCE_STATE", active_facts.reference_issue)
+	var issue: String = DeveloperDispositionBuilder.source_issue(facts, _developer_closure_context.case_assignments)
+	if not issue.is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", issue)
+	if not active_facts.is_empty() and boundary == "VOLUNTARY_RUN_END":
+		return _developer_closure_result("WAITING_ACTIVE_RESPONSE", "Complete only the current response, then explicitly retry with this recipient.")
+	for pending: Dictionary in facts.pending:
+		# Forced ACTIVE closure is a read-only projection of the live source. The
+		# current authored final Case has no Outcome; unprepared resolvable/residue
+		# Pending in a changed developer fixture requires a separate prepare first.
+		if not active_facts.is_empty():
+			var classification: Dictionary = DeveloperDispositionBuilder.classify_pending(pending, facts, case_sequence)
+			if containment_resolutions.has_resolution(pending.case_id) or classification.classification == "RESOLVABLE_PENDING":
+				return _developer_closure_result("INVALID_SOURCE_STATE", "ACTIVE_FORCE_REQUIRES_PREPARED_PENDING")
+			continue
+		if containment_resolutions.has_resolution(pending.case_id):
+			# Integrity and same-Room agreement were checked above. No rejudge/RNG.
+			pending_containment.remove_pending(pending.case_id)
+			continue
+		var classified: Dictionary = DeveloperDispositionBuilder.classify_pending(pending, facts, case_sequence)
+		if classified.classification == "RESOLVABLE_PENDING":
+			if not _try_resolve_pending_without_handoff(DeveloperDispositionBuilder.find_case(case_sequence, pending.case_id), true):
+				return _developer_closure_result("INVALID_SOURCE_STATE", "Hidden resolution subtransaction failed; Pending retained.")
+	var prepared: Dictionary = _developer_source_facts()
+	var built: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, prepared, case_sequence, boundary)
+	if not built.issue.is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", built.issue)
+	var record := RunDispositionRecord.new(built.data)
+	if not record.get_input_issue().is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", record.get_input_issue())
+	# Re-read direct State identity/content, never trust the earlier plan or Snapshot.
+	if not _developer_source_valid() or identities != _developer_live_identity() or not RunDispositionRecord.values_equal(prepared, _developer_source_facts()):
+		return _developer_closure_result("INVALID_SOURCE_STATE", "Source changed during synchronous prepare.")
+	var committed: Dictionary = recipient.try_commit(record)
+	if committed.status == "CONFLICT": return _developer_closure_result("RECIPIENT_CONFLICT", committed.reference_issue, committed.receipt)
+	if committed.status not in ["COMMITTED", "ALREADY_COMMITTED"]: return _developer_closure_result("RECIPIENT_INVALID", committed.reference_issue)
+	if committed.run_instance_id != run_id or not _developer_receipt_valid(run_id, committed.receipt) or not RunDispositionRecord.values_equal(committed.receipt, recipient.get_commit_receipt(run_id)) or not RunDispositionRecord.values_equal(built.data, recipient.get_committed_record(run_id)):
+		return _developer_closure_result("RECIPIENT_INVALID", "Recipient failed record/receipt acknowledgement.")
+	return _developer_closure_result(committed.status, "", committed.receipt)
+
+
+func _developer_source_valid() -> bool:
+	if _developer_closure_context.is_empty() or not _has_unique_case_sequence() or _developer_closure_context.sequence_ids != _developer_sequence_ids() or _developer_closure_context.state_ids != _developer_session_state_ids(): return false
+	if not _has_current_case_runtime() or _case_index != case_sequence.size() - 1 or current_case != case_sequence[_case_index] or not case_runtime.has_confirmed_containment(): return false
+	if not is_instance_valid(_current_view) or _current_view.is_queued_for_deletion() or _research_display.get("runtime_id", 0) != case_runtime.get_instance_id(): return false
+	var room: String = case_runtime.get_confirmed_containment_room_id()
+	if pending_containment.has_pending(current_case.case_id): return pending_containment.get_pending_room_id(current_case.case_id) == room
+	# Prepare may already have resolved the final Pending on a failed commit attempt.
+	return containment_resolutions.has_resolution(current_case.case_id) and containment_resolutions.get_resolution(current_case.case_id).room_id == room
+
+
+func _developer_sequence_ids() -> Array:
+	var ids: Array = []
+	for source: CaseData in case_sequence: ids.append([source.case_id, source.get_instance_id()])
+	return ids
+
+
+func _developer_session_state_ids() -> Array:
+	var ids: Array = []
+	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses]: ids.append(state.get_instance_id() if state != null else 0)
+	return ids
+
+
+func _developer_live_identity() -> Array:
+	return [_developer_sequence_ids(), _developer_session_state_ids(), case_runtime.get_instance_id(), current_case.get_instance_id(), _case_index, _current_stage, _current_view.get_instance_id()]
+
+
+func _developer_source_facts() -> Dictionary:
+	var facts: Dictionary = {"current_case_id": current_case.case_id, "pending": [], "resolutions": [], "candidates": [], "responses": incident_responses.get_responses(), "archives": [], "notes": []}
+	for id: String in pending_containment.get_pending_case_ids(): facts.pending.append({"case_id": id, "confirmed_room_id": pending_containment.get_pending_room_id(id)})
+	for id: String in containment_resolutions.get_resolved_case_ids(): facts.resolutions.append(containment_resolutions.get_resolution(id))
+	for id: String in failure_candidates.get_candidate_case_ids(): facts.candidates.append(failure_candidates.get_candidate(id))
+	for id: String in research_archive.get_archived_case_ids(): facts.archives.append({"case_id": id, "entry_ids": research_archive.get_discovered_entry_ids(id)})
+	# State has no enumeration getter. Read keys only; obtain detached records with
+	# the existing getter, including foreign-source diagnostics rather than omission.
+	for id: String in working_hypotheses.get("_records_by_case"): facts.notes.append({"case_id": id, "hypotheses": working_hypotheses.get_hypotheses(id)})
+	var conditions: Dictionary = {}
+	for id: String in case_runtime.get_experiment_execution_history(): conditions[id] = case_runtime.get_experiment_condition_observation_ids(id)
+	facts["runtime"] = {"case_id": case_runtime.case_id, "confirmed_room_id": case_runtime.get_confirmed_containment_room_id(), "discovered_entry_ids": case_runtime.get_discovered_research_entry_ids(), "observed_sources": case_runtime.get_observed_research_sources(), "experiment_history": case_runtime.get_experiment_execution_history(), "experiment_condition_observations": conditions, "applied_disturbances": case_runtime.get_applied_disturbances()}
+	facts["active_response_facts"] = _developer_active_response_facts()
+	return facts
+
+
+func _developer_closure_result(status: String, issue: String = "", receipt: Dictionary = {}) -> Dictionary:
+	return {"status": status, "run_instance_id": _developer_closure_context.get("run_instance_id", _developer_terminal.receipt.get("run_instance_id", "")), "receipt": receipt.duplicate(true), "reference_issue": issue}
+
+
+func _developer_receipt_valid(run_id: String, receipt: Dictionary) -> bool:
+	return receipt == {"run_instance_id": run_id, "receipt_id": "RUN_DISPOSITION_RECEIPT::" + run_id}
+
+
+func _begin_developer_terminal_intent(boundary: String, active: Dictionary) -> void:
+	_developer_terminal.boundary_type = boundary
+	if not active.is_empty():
+		_developer_terminal.source_case_id = active.source_case_id
+		_developer_terminal.incident_id = active.incident_id
+	_developer_terminal.mode = TerminalMode.FORCED_PREPARING if boundary == "FORCED_RUN_END" else (TerminalMode.VOLUNTARY_RESPONSE_ONLY if not active.is_empty() else TerminalMode.VOLUNTARY_AWAITING_COMMIT)
+
+
+func _terminal_action_allowed(action: String = "gameplay") -> bool:
+	if _developer_terminal.mode == TerminalMode.NONE: return true
+	# Resume restores the interrupted View only after actual completion. It is
+	# followed synchronously by AWAITING_COMMIT, never a fresh opportunity.
+	if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY and action == "resume":
+		return _current_stage == Stage.INCIDENT_RESULT and DeveloperDispositionBuilder.completed_for(_developer_terminal.source_case_id, _developer_terminal.incident_id, incident_responses.get_responses())
+	if _developer_terminal.mode != TerminalMode.VOLUNTARY_RESPONSE_ONLY or action not in ["response", "archive"] or not _is_normal_interrupt(): return false
+	var active: Dictionary = incident_responses.get_active_response()
+	if active.is_empty() or active.source_case_id != _developer_terminal.source_case_id or active.incident_id != _developer_terminal.incident_id or not _has_interrupt_context(): return false
+	if action == "archive" and _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		return _source_archive_return_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] and _archive_detail_case_id == active.source_case_id
+	return _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]
+
+
+func _accept_view_action(view: FlowView, action: String = "gameplay") -> bool:
+	return _is_active_view(view) and _terminal_action_allowed(action)
+
+
+func _developer_active_response_facts() -> Dictionary:
+	var active: Dictionary = incident_responses.get_active_response()
+	var active_count: int = 0
+	for response: Dictionary in incident_responses.get_responses():
+		if response.status == IncidentResponseState.Status.ACTIVE: active_count += 1
+	if active_count == 0: return {}
+	if active_count != 1 or active.is_empty() or not _is_normal_interrupt() or not _has_interrupt_context(): return {"reference_issue": "INVALID_ACTIVE_RESPONSE_CONTEXT"}
+	var candidate: Dictionary = failure_candidates.get_candidate(active.source_case_id)
+	var resolution: Dictionary = containment_resolutions.get_resolution(active.source_case_id)
+	if candidate.get("incident_id", "") != active.incident_id or not candidate.get("major_incident_triggered", false) or not candidate.get("disturbance_triggered", false) or resolution.get("result", 0) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != active.incident_id:
+		return {"reference_issue": "ACTIVE_RESPONSE_CANDIDATE_MISMATCH"}
+	var source: CaseData = DeveloperDispositionBuilder.find_case(case_sequence, active.source_case_id)
+	var incident: IncidentData = DeveloperDispositionBuilder.unique_content(source.incidents, "incident_id", active.incident_id) as IncidentData if source != null else null
+	var broadcast: EmergencyBroadcastData = DeveloperDispositionBuilder.unique_content(source.emergency_broadcasts, "broadcast_id", active.broadcast_id) as EmergencyBroadcastData if incident != null and incident.broadcast_id == active.broadcast_id else null
+	if broadcast == null: return {"reference_issue": "INVALID_ACTIVE_INCIDENT_BROADCAST_LINK"}
+	var result: IncidentResultData = null
+	if not active.confirmed_option_id.is_empty():
+		var option: BroadcastOptionData = DeveloperDispositionBuilder.unique_content(broadcast.options, "option_id", active.confirmed_option_id) as BroadcastOptionData
+		result = DeveloperDispositionBuilder.unique_content(source.incident_results, "result_id", active.incident_result_id) as IncidentResultData if option != null and option.result_id == active.incident_result_id else null
+		if result == null: return {"reference_issue": "INVALID_ACTIVE_CONFIRMED_RESULT_LINK"}
+	elif not active.incident_result_id.is_empty(): return {"reference_issue": "UNCONFIRMED_ACTIVE_RESULT_ID"}
+	var stage: int = _current_stage
+	var overlay: bool = stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]
+	if overlay:
+		stage = _source_archive_return_stage
+		if _archive_detail_case_id != active.source_case_id: return {"reference_issue": "INVALID_ACTIVE_ARCHIVE_SOURCE"}
+	if stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]: return {"reference_issue": "INVALID_ACTIVE_RESPONSE_STAGE"}
+	if stage == Stage.INCIDENT_RESULT and result == null: return {"reference_issue": "RESULT_STAGE_WITHOUT_CONFIRMED_RESULT"}
+	var stage_index: int = [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT].find(stage)
+	var known_display: bool = overlay or (is_instance_valid(_current_view) and _current_view.is_visible_in_tree() and _current_view.get_script() == [IncidentView, BroadcastView, IncidentResultView][stage_index] and _current_view.get(["_incident_data", "_broadcast_data", "_incident_result_data"][stage_index]) == [incident, broadcast, result][stage_index])
+	var facts: Dictionary = active.duplicate(true)
+	facts["interrupted_case_id"] = current_case.case_id
+	facts["response_stage"] = Stage.keys()[stage]
+	facts["incident_presented"] = true if known_display else "UNKNOWN"
+	facts["broadcast_presented"] = (stage != Stage.INCIDENT) if known_display else "UNKNOWN"
+	facts["result_displayed"] = (stage == Stage.INCIDENT_RESULT) if known_display else "UNKNOWN"
+	if active.confirmed_option_id.is_empty(): facts.confirmed_option_id = null
+	if active.incident_result_id.is_empty(): facts.incident_result_id = null
+	return facts
+
+
+func _try_resolve_pending_without_handoff(source: CaseData, closure_prepare: bool = false) -> bool:
+	if not _terminal_action_allowed() and not (closure_prepare and _developer_closure_busy and _developer_terminal.mode in [TerminalMode.VOLUNTARY_AWAITING_COMMIT, TerminalMode.FORCED_PREPARING]): return false
+	var case_id: String = source.case_id
 	var room_id: String = pending_containment.get_pending_room_id(case_id)
 	if containment_resolutions.has_resolution(case_id):
 		push_warning("Main: hidden containment resolution already exists; retaining Pending.")
 		return false
 	var matches: Array[MonitoringOutcomeData] = []
-	for outcome: MonitoringOutcomeData in current_case.containment_outcomes:
+	for outcome: MonitoringOutcomeData in source.containment_outcomes:
 		if outcome != null and outcome.room_id == room_id:
 			matches.append(outcome)
 	if matches.size() != 1:
@@ -978,13 +1329,16 @@ func _try_resolve_current_pending() -> bool:
 	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE or (result == MonitoringOutcomeData.Result.FAILURE and (incident_id.strip_edges().is_empty() or failure_candidates.has_candidate(case_id))):
 		push_warning("Main: invalid hidden resolution or existing failure candidate; retaining Pending.")
 		return false
-	if result == MonitoringOutcomeData.Result.FAILURE and _unique_response_content(current_case.incidents, "incident_id", incident_id) == null:
+	if result == MonitoringOutcomeData.Result.FAILURE and _unique_response_content(source.incidents, "incident_id", incident_id) == null:
 		push_warning("Main: hidden FAILURE requires a unique Incident; retaining Pending.")
 		return false
 	if not containment_resolutions.try_record_resolution(case_id, room_id, result, incident_id):
 		return false
 	if result == MonitoringOutcomeData.Result.FAILURE:
-		failure_candidates.try_add_candidate(case_id, incident_id, _event_rng.randi_range(PROTOTYPE_DISTURBANCE_THRESHOLD.x, PROTOTYPE_DISTURBANCE_THRESHOLD.y), PROTOTYPE_MAJOR_THRESHOLD)
+		if not failure_candidates.try_add_candidate(case_id, incident_id, _event_rng.randi_range(PROTOTYPE_DISTURBANCE_THRESHOLD.x, PROTOTYPE_DISTURBANCE_THRESHOLD.y), PROTOTYPE_MAJOR_THRESHOLD):
+			# No cross-State transaction API: retain the monotonic Resolution AND
+			# Pending on insertion failure; never pretend a full prepare succeeded.
+			return false
 	pending_containment.remove_pending(case_id)
 	return true
 
@@ -992,7 +1346,7 @@ func _try_resolve_current_pending() -> bool:
 func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void:
 	if _is_normal_interrupt() or not incident_responses.get_active_response().is_empty():
 		return
-	if not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or _case_index < 0 or _case_index >= case_sequence.size() or case_sequence[_case_index] != current_case or _processed_opportunities.has(key):
+	if not _accept_view_action(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or _case_index < 0 or _case_index >= case_sequence.size() or case_sequence[_case_index] != current_case or _processed_opportunities.has(key):
 		return
 	var eligible: bool = (_current_stage == Stage.CCTV and key == "cctv:entry") or (_current_stage == Stage.CONTAINMENT and key == "containment:entry")
 	if _current_stage == Stage.EXPERIMENT and key.begins_with("experiment:"):
@@ -1010,7 +1364,7 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 
 
 func _has_failure_event_context(view: FlowView) -> bool:
-	return _is_active_view(view) and view.is_visible_in_tree() and _has_current_case_runtime() and _research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and _has_unique_case_sequence() and _case_index >= 0 and _case_index < case_sequence.size() and case_sequence[_case_index] == current_case and not _is_normal_interrupt() and incident_responses.get_active_response().is_empty()
+	return _accept_view_action(view) and view.is_visible_in_tree() and _has_current_case_runtime() and _research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and _has_unique_case_sequence() and _case_index >= 0 and _case_index < case_sequence.size() and case_sequence[_case_index] == current_case and not _is_normal_interrupt() and incident_responses.get_active_response().is_empty()
 
 
 func _mark_research_display(view: FlowView) -> void:
@@ -1038,6 +1392,7 @@ func _displayed_research_source_id(view: FlowView) -> String:
 
 
 func _grant_event_presentation_credit(kind: String, source_id: String) -> void:
+	if not _terminal_action_allowed(): return
 	# JSON tuple avoids collisions between Case/local IDs; credit saturates at OPEN.
 	var token: String = JSON.stringify([current_case.case_id, kind, source_id])
 	if not _completed_research_tokens.has(token):
@@ -1062,6 +1417,7 @@ func _try_present_ready_failure_event(view: FlowView, allow_experiment: bool = f
 
 
 func _try_present_oldest_actionable_event(disturbance_ready: Array[String], major_ready: Array[String], allow_experiment: bool = false) -> bool:
+	if not _terminal_action_allowed(): return false
 	if not _event_presentation_credit:
 		return false
 	# Registration order is the source of truth, independent of event type/Case ID.
@@ -1079,6 +1435,7 @@ func _try_present_oldest_actionable_event(disturbance_ready: Array[String], majo
 
 
 func _try_present_candidate_disturbance(source_case_id: String) -> bool:
+	if not _terminal_action_allowed(): return false
 	if not _event_presentation_credit:
 		return false
 	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
@@ -1189,7 +1546,7 @@ func _build_response_display_context() -> Dictionary:
 func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 	var draft: Dictionary = _interrupt_context.get("broadcast_draft", {}).duplicate()
 	_interrupt_context.erase("broadcast_draft")
-	if draft.is_empty() or not _is_normal_interrupt() or _current_stage != Stage.BROADCAST or not _has_interrupt_context() or not _is_active_view(view):
+	if draft.is_empty() or not _is_normal_interrupt() or _current_stage != Stage.BROADCAST or not _has_interrupt_context() or not _accept_view_action(view, "response"):
 		return
 	var response: Dictionary = incident_responses.get_active_response()
 	if not response.get("confirmed_option_id", "").is_empty() or draft.get("source_case_id", "") != response.get("source_case_id", "") or draft.get("incident_id", "") != response.get("incident_id", "") or draft.get("broadcast_id", "") != response.get("broadcast_id", ""):
@@ -1200,6 +1557,7 @@ func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 
 
 func _try_start_major_incident(source_case_id: String) -> bool:
+	if not _terminal_action_allowed(): return false
 	if not _event_presentation_credit or _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
 		return false
 	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
@@ -1240,6 +1598,16 @@ func _try_start_major_incident(source_case_id: String) -> bool:
 
 
 func _merge_response_research(source_kind: int, source_id: String) -> void:
+	if not _terminal_action_allowed("response"): return
+	if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY:
+		var active: Dictionary = incident_responses.get_active_response()
+		var actual: Dictionary = {
+			ResearchEntryData.SourceKind.INCIDENT: [Stage.INCIDENT, active.incident_id],
+			ResearchEntryData.SourceKind.BROADCAST: [Stage.BROADCAST, active.broadcast_id],
+			ResearchEntryData.SourceKind.BROADCAST_OPTION: [Stage.BROADCAST, active.confirmed_option_id],
+			ResearchEntryData.SourceKind.INCIDENT_RESULT: [Stage.INCIDENT_RESULT, active.incident_result_id],
+		}
+		if not actual.has(source_kind) or actual[source_kind] != [_current_stage, source_id] or source_id.is_empty(): return
 	var source: CaseData = _response_source_case()
 	if source == null:
 		return
@@ -1265,6 +1633,7 @@ func _discover_response_research(stage: int, source: Resource) -> void:
 
 
 func _confirm_response_option(broadcast_id: String, option_id: String, view: BroadcastView) -> void:
+	if not _accept_view_action(view, "response"): return
 	if not _has_interrupt_context() or not view.is_visible_in_tree():
 		return
 	var response: Dictionary = incident_responses.get_active_response()
@@ -1282,6 +1651,7 @@ func _confirm_response_option(broadcast_id: String, option_id: String, view: Bro
 
 
 func _advance_response(view: FlowView) -> void:
+	if not _accept_view_action(view, "response"): return
 	if not _has_interrupt_context() or not view.is_visible_in_tree() or view.next_button.disabled:
 		return
 	match _current_stage:
@@ -1307,10 +1677,12 @@ func _advance_response(view: FlowView) -> void:
 			_show_view(return_stage, false)
 			if return_stage == Stage.EXPERIMENT:
 				_restore_interrupted_experiment_result(_current_view as ExperimentView)
+			if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY:
+				_developer_terminal.mode = TerminalMode.VOLUNTARY_AWAITING_COMMIT
 
 
 func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
-	if not _is_normal_interrupt() or not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _is_active_view(view) or not view.is_visible_in_tree():
+	if not _is_normal_interrupt() or not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
 		return
 	var source: CaseData = _response_source_case()
 	if source == null or not research_archive.get_archived_case_ids().has(source.case_id):
@@ -1328,6 +1700,7 @@ func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
 
 
 func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
+	if _developer_terminal.mode not in [TerminalMode.NONE, TerminalMode.VOLUNTARY_RESPONSE_ONLY] or not _is_active_view(view): return
 	var history: Array[String] = case_runtime.get_experiment_execution_history()
 	if history.is_empty():
 		return
@@ -1405,6 +1778,7 @@ func _refresh_cctv_condition_observations() -> void:
 
 
 func _discover_cctv_condition_observations(view: CCTVView) -> void:
+	if not _terminal_action_allowed(): return
 	if _current_stage != Stage.CCTV or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime():
 		return
 	if current_case.cctv_data == null or not view.is_displaying_cctv(current_case.cctv_data):
@@ -1511,6 +1885,7 @@ func _append_disturbance_observations(snapshot: ResearchLogView.Snapshot, entrie
 
 
 func _show_disturbance_notice(disturbance: EnvironmentalDisturbanceData, reaction: CaseDisturbanceReactionData) -> void:
+	if not _terminal_action_allowed(): return
 	_focus_before_notice = get_viewport().gui_get_focus_owner()
 	_view_process_mode_before_notice = view_host.process_mode
 	view_host.process_mode = Node.PROCESS_MODE_DISABLED
@@ -1521,6 +1896,7 @@ func _show_disturbance_notice(disturbance: EnvironmentalDisturbanceData, reactio
 
 
 func _on_disturbance_dismissed(notice: DisturbanceNotice) -> void:
+	if _developer_closure_busy or not _terminal_action_allowed(): return
 	if not is_instance_valid(notice) or notice != _disturbance_notice or not notice.is_inside_tree() or notice.is_queued_for_deletion():
 		return
 	remove_child(notice)
@@ -1561,7 +1937,7 @@ func _get_next_stage(stage: int) -> int:
 
 
 func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
-	if _current_stage != Stage.MONITORING or not _is_active_view(monitoring_view):
+	if _current_stage != Stage.MONITORING or not _accept_view_action(monitoring_view):
 		return
 	if current_case == null:
 		push_warning("Main: current_case is missing for Monitoring result.")
@@ -1591,7 +1967,7 @@ func _on_monitoring_playback_completed(monitoring_view: MonitoringView) -> void:
 
 
 func _on_experiment_execution_requested(experiment_id: String, experiment_view: ExperimentView) -> void:
-	if _current_stage != Stage.EXPERIMENT or not _is_active_view(experiment_view) or not experiment_view.is_visible_in_tree() or not _has_current_case_runtime():
+	if _current_stage != Stage.EXPERIMENT or not _accept_view_action(experiment_view) or not experiment_view.is_visible_in_tree() or not _has_current_case_runtime():
 		return
 	var source: ExperimentData
 	for experiment: ExperimentData in current_case.available_experiments:
@@ -1685,7 +2061,7 @@ func _append_experiment_condition_observations(snapshot: ResearchLogView.Snapsho
 
 
 func _on_containment_confirmation_requested(room_id: String, containment_view: ContainmentView) -> void:
-	if _current_stage != Stage.CONTAINMENT or not _is_active_view(containment_view) or not _has_current_case_runtime():
+	if _current_stage != Stage.CONTAINMENT or not _accept_view_action(containment_view) or not _has_current_case_runtime():
 		return
 	if not containment_view.is_visible_in_tree() or _research_display.get("runtime_id", 0) != case_runtime.get_instance_id():
 		return
