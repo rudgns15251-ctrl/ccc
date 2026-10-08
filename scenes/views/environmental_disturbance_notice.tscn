@@ -1,100 +1,104 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/views/environmental_disturbance_notice.gd" id="1_notice"]
+[ext_resource type="Script" path="res://scripts/views/environmental_disturbance_notice.gd" id="script"]
 
 [node name="EnvironmentalDisturbanceNotice" type="Control"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("script")
 z_index = 10
-script = ExtResource("1_notice")
+mouse_filter = 0
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Banner" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = "WarningPanel"
 layout_mode = 1
-anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0, 0, 0, 0.8)
+offset_left = 176.0
+offset_right = -56.0
+offset_top = 72.0
+offset_bottom = 160.0
 
-[node name="Center" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Panel" type="PanelContainer" parent="Center"]
-custom_minimum_size = Vector2(1000, 0)
+[node name="BannerRow" type="HBoxContainer" parent="Banner"]
+unique_name_in_owner = true
 layout_mode = 2
-
-[node name="Margin" type="MarginContainer" parent="Center/Panel"]
-layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
-
-[node name="Content" type="VBoxContainer" parent="Center/Panel/Margin"]
-layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="FacilityTitle" type="Label" parent="Center/Panel/Margin/Content"]
+[node name="WarningIconSlot" type="TextureRect" parent="Banner/BannerRow"]
+visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "FACILITY DISTURBANCE"
-horizontal_alignment = 1
+custom_minimum_size = Vector2(32, 32)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="TextScroll" type="ScrollContainer" parent="Center/Panel/Margin/Content"]
-custom_minimum_size = Vector2(936, 360)
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="Text" type="VBoxContainer" parent="Center/Panel/Margin/Content/TextScroll"]
+[node name="TextScroll" type="ScrollContainer" parent="Banner/BannerRow"]
+follow_focus = true
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Text" type="VBoxContainer" parent="Banner/BannerRow/TextScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="DisturbanceTitle" type="Label" parent="Center/Panel/Margin/Content/TextScroll/Text"]
+[node name="DisturbanceTitle" type="Label" parent="Banner/BannerRow/TextScroll/Text"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+text = ""
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
 
-[node name="NoticeText" type="Label" parent="Center/Panel/Margin/Content/TextScroll/Text"]
+[node name="NoticeText" type="Label" parent="Banner/BannerRow/TextScroll/Text"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+text = ""
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
 
-[node name="ConditionChange" type="Label" parent="Center/Panel/Margin/Content/TextScroll/Text"]
+[node name="ConditionChange" type="Label" parent="Banner/BannerRow/TextScroll/Text"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+text = ""
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
 
-[node name="ObservationTitle" type="Label" parent="Center/Panel/Margin/Content/TextScroll/Text"]
+[node name="ObservationTitle" type="Label" parent="Banner/BannerRow/TextScroll/Text"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 text = "UNPLANNED OBSERVATION"
-
-[node name="ObservationText" type="Label" parent="Center/Panel/Margin/Content/TextScroll/Text"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
 
-[node name="DismissButton" type="Button" parent="Center/Panel/Margin/Content"]
+[node name="ObservationText" type="Label" parent="Banner/BannerRow/TextScroll/Text"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
-text = "Dismiss"
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
+
+[node name="DismissButton" type="Button" parent="Banner/BannerRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ACKNOWLEDGE"
+custom_minimum_size = Vector2(0, 48)

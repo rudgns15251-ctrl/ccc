@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CampaignData" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/campaign_data.gd" id="1_campaign"]
+[ext_resource type="Script" path="res://scripts/data/campaign_entry_data.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_01.tres" id="3_case01"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_02.tres" id="4_case02"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="5_case03"]
+
+[ext_resource type="Resource" path="res://resources/incidents/temp_mandatory_incident_01.tres" id="6_temp_mandatory01"]
+
+[sub_resource type="Resource" id="Resource_entry_case01"]
+script = ExtResource("2_entry")
+entry_id = "TEST_ENTRY_CASE_01"
+entry_kind = 0
+case_data = ExtResource("3_case01")
+
+[sub_resource type="Resource" id="Resource_entry_case02"]
+script = ExtResource("2_entry")
+entry_id = "TEST_ENTRY_CASE_02"
+entry_kind = 0
+case_data = ExtResource("4_case02")
+
+; [TEMP STORY CONTENT] CASE02 -> sequential Mandatory 01 -> CASE03.
+[sub_resource type="Resource" id="Resource_entry_temp_mandatory01"]
+script = ExtResource("2_entry")
+entry_id = "TEMP_ENTRY_MANDATORY_01"
+entry_kind = 1
+scripted_incident_data = ExtResource("6_temp_mandatory01")
+
+[sub_resource type="Resource" id="Resource_entry_case03"]
+script = ExtResource("2_entry")
+entry_id = "TEST_ENTRY_CASE_03"
+entry_kind = 0
+case_data = ExtResource("5_case03")
+
+[resource]
+script = ExtResource("1_campaign")
+campaign_id = "TEST_CAMPAIGN_01"
+display_name = "TEST CAMPAIGN 01 — Prototype Case Sequence"
+entries = Array[ExtResource("2_entry")]([SubResource("Resource_entry_case01"), SubResource("Resource_entry_case02"), SubResource("Resource_entry_temp_mandatory01"), SubResource("Resource_entry_case03")])

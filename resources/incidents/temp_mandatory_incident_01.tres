@@ -1,0 +1,80 @@
+[gd_resource type="Resource" script_class="ScriptedIncidentData" load_steps=16 format=3]
+
+; [TEMP STORY CONTENT] Replaceable prototype story, not final scenario or lore.
+; Evidence: TEST_CASE_01 Profile/CCTV, TEST_EXP_01/02/03 and existing Research.
+; Maintenance fault is independent of the player containment outcome.
+
+[ext_resource type="Script" path="res://scripts/data/scripted_incident_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="2_incident"]
+[ext_resource type="Script" path="res://scripts/data/emergency_broadcast_data.gd" id="3_broadcast"]
+[ext_resource type="Script" path="res://scripts/data/broadcast_option_data.gd" id="4_option"]
+[ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="5_result"]
+
+[sub_resource type="Resource" id="Resource_temp_incident"]
+script = ExtResource("2_incident")
+incident_id = "TEMP_INCIDENT_MANDATORY_01"
+display_name = "TEMP: SUPPORT CONTROL INTERRUPTION"
+description = "Maintenance control fault: a service bypass is transmitting pump impulses into the supports of TEST SUBJECT (TEST_CASE_01). Strikes coincide with pump starts; airflow is steady. Staff await an immediate broadcast instruction. Review the earlier research records to distinguish support, sound and airflow cues."
+broadcast_id = "TEMP_BROADCAST_MANDATORY_01"
+
+[sub_resource type="Resource" id="Resource_temp_option_A"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MANDATORY_01_A"
+display_text = "Disconnect the maintenance bypass and restore mechanical isolation of the supports. Keep low airflow continuous and retain task lighting."
+result_id = "TEMP_RESULT_MANDATORY_01_A"
+
+[sub_resource type="Resource" id="Resource_temp_option_B"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MANDATORY_01_B"
+display_text = "Reduce airborne pump noise with the acoustic partition. Keep the bypass connected, low airflow continuous and task lighting unchanged."
+result_id = "TEMP_RESULT_MANDATORY_01_B"
+
+[sub_resource type="Resource" id="Resource_temp_option_C"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MANDATORY_01_C"
+display_text = "Cycle ventilation to draw movement away from the service panel. Keep the bypass connected and task lighting unchanged."
+result_id = "TEMP_RESULT_MANDATORY_01_C"
+
+[sub_resource type="Resource" id="Resource_temp_option_D"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MANDATORY_01_D"
+display_text = "Reduce task lighting to limit crossings near the panel. Keep the bypass connected and low airflow continuous."
+result_id = "TEMP_RESULT_MANDATORY_01_D"
+
+[sub_resource type="Resource" id="Resource_temp_broadcast"]
+script = ExtResource("3_broadcast")
+broadcast_id = "TEMP_BROADCAST_MANDATORY_01"
+display_name = "TEMP: IMMEDIATE SUPPORT RESPONSE"
+prompt_text = "Which instruction should staff follow while pump-start strikes continue? Address the current support fault using the earlier observations. This instruction is a temporary response, not a new containment decision."
+options = Array[ExtResource("4_option")]([SubResource("Resource_temp_option_A"), SubResource("Resource_temp_option_B"), SubResource("Resource_temp_option_C"), SubResource("Resource_temp_option_D")])
+
+[sub_resource type="Resource" id="Resource_temp_result_A"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MANDATORY_01_A"
+display_name = "TEMP: SUPPORT TRANSMISSION CONTROLLED"
+description = "The bypass was disconnected and support isolation restored. Pump-start strikes became less frequent; wall tracing continues under steady airflow. Staff hold this protocol while maintenance checks the fault. The immediate support disturbance is controlled; long-term containment is not reassessed here."
+
+[sub_resource type="Resource" id="Resource_temp_result_B"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MANDATORY_01_B"
+display_name = "TEMP: QUIETER SOUND, PERSISTENT STRIKES"
+description = "Airborne pump noise was reduced, but the bypass still transmits impulses. Strikes remain clustered at pump starts. Staff withdraw the noise-only instruction and request support isolation; steady airflow is retained. The selected instruction did not address the current fault."
+
+[sub_resource type="Resource" id="Resource_temp_result_C"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MANDATORY_01_C"
+display_name = "TEMP: ADDED OUTLET TURN-BACKS"
+description = "Vent cycling prompted repeated turn-backs toward the outlet while pump-start strikes continued. Staff cancel the cycling instruction, restore steady airflow and request support isolation. The selected instruction added an airflow cue without removing transmitted impulses."
+
+[sub_resource type="Resource" id="Resource_temp_result_D"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MANDATORY_01_D"
+display_name = "TEMP: FEWER CROSSINGS, UNRESOLVED SUPPORT FAULT"
+description = "Reduced lighting changed crossing movements, but pump-start strikes persisted through the connected bypass. Staff restore task lighting and request support isolation. The selected instruction changed travel without addressing the support fault."
+
+[resource]
+script = ExtResource("1_event")
+event_id = "TEMP_EVENT_MANDATORY_01"
+incident_data = SubResource("Resource_temp_incident")
+emergency_broadcasts = Array[ExtResource("3_broadcast")]([SubResource("Resource_temp_broadcast")])
+incident_results = Array[ExtResource("5_result")]([SubResource("Resource_temp_result_A"), SubResource("Resource_temp_result_B"), SubResource("Resource_temp_result_C"), SubResource("Resource_temp_result_D")])

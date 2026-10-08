@@ -1,65 +1,265 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_main"]
-[ext_resource type="Resource" path="res://resources/cases/test_case_01.tres" id="2_case"]
-[ext_resource type="Resource" path="res://resources/cases/test_case_02.tres" id="3_case"]
-[ext_resource type="Script" path="res://scripts/data/case_data.gd" id="4_case_data"]
-[ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="5_case"]
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="script"]
+
+[ext_resource type="Script" path="res://scripts/ui/game_shell.gd" id="shell"]
+
+[ext_resource type="Theme" path="res://resources/ui/temp_industrial_theme.tres" id="theme"]
+
+[ext_resource type="Resource" path="res://resources/campaigns/test_campaign_01.tres" id="campaign"]
 
 [node name="Main" type="Control"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_main")
-case_sequence = Array[ExtResource("4_case_data")]([ExtResource("2_case"), ExtResource("3_case"), ExtResource("5_case")])
+script = ExtResource("script")
+theme = ExtResource("theme")
+campaign_data = ExtResource("campaign")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="GameShell" type="Control" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 64
-theme_override_constants/margin_top = 64
-theme_override_constants/margin_right = 64
-theme_override_constants/margin_bottom = 64
+script = ExtResource("shell")
 
-[node name="Center" type="CenterContainer" parent="Margin"]
+[node name="Background" type="Panel" parent="GameShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_type_variation = "BackgroundPanel"
+
+[node name="Frame" type="VBoxContainer" parent="GameShell"]
+unique_name_in_owner = true
+theme_override_constants/separation = 0
 layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 
-[node name="Content" type="VBoxContainer" parent="Margin/Center"]
+[node name="Header" type="PanelContainer" parent="GameShell/Frame"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 72)
+
+[node name="HeaderRow" type="HBoxContainer" parent="GameShell/Frame/Header"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 24
 
-[node name="Title" type="Label" parent="Margin/Center/Content"]
+[node name="HeaderIconSlot" type="TextureRect" parent="GameShell/Frame/Header/HeaderRow"]
+visible = false
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "Case flow UI prototype"
-horizontal_alignment = 1
+custom_minimum_size = Vector2(32, 32)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="ReferenceSize" type="Label" parent="Margin/Center/Content"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Reference UI: 1920 × 1080 (16:9)"
-horizontal_alignment = 1
-
-[node name="WindowSize" type="Label" parent="Margin/Center/Content"]
+[node name="Facility" type="Label" parent="GameShell/Frame/Header/HeaderRow"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-horizontal_alignment = 1
+text = "FACILITY / OPERATIONS"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
 
-[node name="Notice" type="Label" parent="Margin/Center/Content"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Temporary Case gameplay prototype — test content"
-horizontal_alignment = 1
-
-[node name="ViewHost" type="Control" parent="Margin/Center/Content"]
+[node name="Subject" type="Label" parent="GameShell/Frame/Header/HeaderRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(1000, 360)
 layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
+
+[node name="Stage" type="Label" parent="GameShell/Frame/Header/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="Environment" type="Label" parent="GameShell/Frame/Header/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "WarningLabel"
+
+[node name="Body" type="HBoxContainer" parent="GameShell/Frame"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+theme_override_constants/separation = 0
+
+[node name="PrimaryNavigation" type="PanelContainer" parent="GameShell/Frame/Body"]
+unique_name_in_owner = true
+theme_type_variation = "RailPanel"
+layout_mode = 2
+custom_minimum_size = Vector2(176, 0)
+size_flags_vertical = 3
+
+[node name="Navigation" type="VBoxContainer" parent="GameShell/Frame/Body/PrimaryNavigation"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="PROFILE" type="Button" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PROFILE"
+custom_minimum_size = Vector2(0, 48)
+
+[node name="CCTV" type="Button" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "CCTV"
+custom_minimum_size = Vector2(0, 48)
+
+[node name="EXPERIMENT" type="Button" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "EXPERIMENT"
+custom_minimum_size = Vector2(0, 48)
+
+[node name="CONTAINMENT" type="Button" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "CONTAINMENT"
+custom_minimum_size = Vector2(0, 48)
+
+[node name="NavigationHint" type="Label" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "STAGE INDEX\nProgress follows work actions."
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="Workspace" type="Control" parent="GameShell/Frame/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
+
+[node name="ViewHost" type="Control" parent="GameShell/Frame/Body/Workspace"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="UtilityRail" type="PanelContainer" parent="GameShell/Frame/Body"]
+unique_name_in_owner = true
+theme_type_variation = "RailPanel"
+layout_mode = 2
+custom_minimum_size = Vector2(56, 0)
+size_flags_vertical = 3
+
+[node name="Utilities" type="VBoxContainer" parent="GameShell/Frame/Body/UtilityRail"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Research" type="Button" parent="GameShell/Frame/Body/UtilityRail/Utilities"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "R"
+tooltip_text = "RESEARCH LOG"
+custom_minimum_size = Vector2(24, 56)
+
+[node name="Archive" type="Button" parent="GameShell/Frame/Body/UtilityRail/Utilities"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "A"
+tooltip_text = "RESEARCH ARCHIVE"
+custom_minimum_size = Vector2(24, 56)
+
+[node name="Hypothesis" type="Button" parent="GameShell/Frame/Body/UtilityRail/Utilities"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "N"
+tooltip_text = "WORKING HYPOTHESIS"
+custom_minimum_size = Vector2(24, 56)
+
+[node name="DrawerLayer" type="Control" parent="GameShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="OverlayLayer" type="Control" parent="GameShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ModalLayer" type="Control" parent="GameShell"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SystemBar" type="PanelContainer" parent="GameShell/Frame"]
+theme_type_variation = "SystemPanel"
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="SystemStatus" type="Label" parent="GameShell/Frame/SystemBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SESSION MEMORY / NO PERSISTENT SAVE"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="WindowSize" type="Label" parent="GameShell"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+visible = false

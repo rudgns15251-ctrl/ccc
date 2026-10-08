@@ -92,17 +92,17 @@ func _display_experiments() -> void:
 
 func _append_item(display_name: String, description: String, index: int, selectable: bool = true) -> void:
 	var item := VBoxContainer.new()
+	item.name = "Experiment%d" % index
 	item.add_theme_constant_override("separation", 2)
 	var select_button := CheckBox.new()
+	select_button.name = "Select"
 	select_button.text = display_name
-	select_button.add_theme_font_size_override("font_size", 18)
 	select_button.button_group = _selection_group
 	select_button.disabled = not selectable
 	select_button.pressed.connect(_on_experiment_selected.bind(index))
 	item.add_child(select_button)
 	var item_description := Label.new()
 	item_description.text = description
-	item_description.add_theme_font_size_override("font_size", 18)
 	item_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	item.add_child(item_description)
 	experiment_list.add_child(item)
@@ -116,6 +116,7 @@ func _on_experiment_selected(index: int) -> void:
 		_reset_result()
 	_selected_experiment_index = index
 	run_button.disabled = false
+	_display_detail(_get_selected_experiment())
 
 
 func _get_selected_experiment() -> ExperimentData:
@@ -157,6 +158,7 @@ func show_execution_result(experiment_id: String, approved: bool, conditions: Co
 	var experiment: ExperimentData = _get_selected_experiment()
 	if approved and experiment != null and experiment.experiment_id == experiment_id:
 		_displayed_result_id = experiment_id
+		_display_detail(experiment)
 		result_label.text = _text_or_placeholder(experiment.result_text, "result_text", _selected_experiment_index)
 		_clear_condition_observations()
 		if conditions != null:
@@ -164,7 +166,6 @@ func show_execution_result(experiment_id: String, approved: bool, conditions: Co
 				var label := Label.new()
 				label.text = "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s" % [entry.condition_name, entry.condition_change_text, entry.display_name, entry.observation_text]
 				label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				label.add_theme_font_size_override("font_size", 18)
 				label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 				%ConditionObservationList.add_child(label)
 				displayed_ids.append(entry.observation_id)
@@ -223,6 +224,8 @@ func _update_execution_ui() -> void:
 
 func _reset_result() -> void:
 	_displayed_result_id = ""
+	%SelectedName.text = "SELECT AN EXPERIMENT"
+	%SelectedDescription.text = ""
 	result_label.text = "No experiment has been executed." if _executed_ids.is_empty() else "No result selected. Review executed experiments in Research Log."
 	_clear_condition_observations()
 	%ResultScroll.scroll_vertical = 0
@@ -245,3 +248,36 @@ func set_environment_conditions(summary: EnvironmentConditions.Summary) -> void:
 	var conditions: EnvironmentConditions = get_node("%EnvironmentConditions")
 	conditions.set_summary(summary)
 	%RecheckCCTVButton.visible = summary != null and not summary.entries.is_empty()
+
+
+func capture_work_state() -> Dictionary:
+	var state: Dictionary = super.capture_work_state()
+	var selected: ExperimentData = _get_selected_experiment()
+	state.merge({"selected_experiment_id": selected.experiment_id if selected != null else "", "displayed_result_id": get_displayed_result_id(), "experiment_scroll": experiment_scroll.scroll_vertical, "result_scroll": %ResultScroll.scroll_vertical})
+	return state
+
+
+func restore_work_result(state: Dictionary, conditions: ConditionSnapshot) -> bool:
+	var id: String = state.displayed_result_id
+	if not id.is_empty(): restore_recorded_result(id, conditions)
+	if get_displayed_result_id() != id: return false
+	_selected_experiment_index = -1
+	for index: int in range(_experiments.size()):
+		if _experiments[index] != null and _experiments[index].experiment_id == state.selected_experiment_id:
+			if not _can_select_experiment(index): return false
+			_selected_experiment_index = index
+			(experiment_list.get_child(index).get_child(0) as CheckBox).set_pressed_no_signal(true)
+	_update_execution_ui()
+	if _get_selected_experiment() != null: _display_detail(_get_selected_experiment())
+	return _get_selected_experiment() == null if state.selected_experiment_id.is_empty() else _get_selected_experiment() != null and _get_selected_experiment().experiment_id == state.selected_experiment_id
+
+
+func restore_work_state(state: Dictionary) -> bool:
+	experiment_scroll.scroll_vertical = state.experiment_scroll
+	%ResultScroll.scroll_vertical = state.result_scroll
+	return restore_work_focus(state)
+
+func _display_detail(experiment: ExperimentData) -> void:
+	if experiment == null: return
+	%SelectedName.text = experiment.display_name
+	%SelectedDescription.text = experiment.description

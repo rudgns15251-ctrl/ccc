@@ -156,11 +156,9 @@ func _append_item(time_text: String, observation: String) -> void:
 	item.add_theme_constant_override("separation", 2)
 	var time_label := Label.new()
 	time_label.text = time_text
-	time_label.add_theme_font_size_override("font_size", 18)
 	item.add_child(time_label)
 	var observation_label := Label.new()
 	observation_label.text = observation
-	observation_label.add_theme_font_size_override("font_size", 18)
 	observation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	item.add_child(observation_label)
 	stage_list.add_child(item)

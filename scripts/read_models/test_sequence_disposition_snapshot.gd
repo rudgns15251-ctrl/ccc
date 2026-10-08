@@ -26,6 +26,7 @@ static func build(facts: Dictionary, pending: Array[Dictionary], resolutions: Ar
 	for record: Dictionary in pending:
 		projected.pending_submissions.append(_pending_entry(record, resolutions, candidates, lookup_case, lookup_content))
 	for record: Dictionary in responses:
+		if record.get("origin_kind", IncidentSource.OriginKind.CASE) != IncidentSource.OriginKind.CASE: continue
 		if record.status == IncidentResponseState.Status.COMPLETED:
 			var completed: Dictionary = record.duplicate(true)
 			completed["phase"] = "COMPLETED"
@@ -98,7 +99,7 @@ static func _candidate_entry(record: Dictionary, index: int, resolutions: Array[
 	entry["reference_issue"] = ""
 	if record.disturbance_triggered:
 		entry.phase = "MAJOR_READY" if entry.major_ready else "DISTURBED_NOT_READY"
-	if not active_response.is_empty() and active_response.source_case_id == record.source_case_id and active_response.incident_id == record.incident_id:
+	if not active_response.is_empty() and active_response.get("source_case_id", "") == record.source_case_id and active_response.incident_id == record.incident_id:
 		entry.phase = "ACTIVE_RESPONSE"
 	var source: CaseData = lookup_case.call(record.source_case_id) as CaseData
 	if source == null:
@@ -121,6 +122,6 @@ static func _candidate_entry(record: Dictionary, index: int, resolutions: Array[
 
 static func _has_completed_response(candidate: Dictionary, responses: Array[Dictionary]) -> bool:
 	for response: Dictionary in responses:
-		if response.status == IncidentResponseState.Status.COMPLETED and response.source_case_id == candidate.source_case_id and response.incident_id == candidate.incident_id:
+		if response.status == IncidentResponseState.Status.COMPLETED and response.get("source_case_id", "") == candidate.source_case_id and response.incident_id == candidate.incident_id:
 			return true
 	return false

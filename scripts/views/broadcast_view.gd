@@ -92,17 +92,22 @@ func _on_next_button_pressed() -> void:
 		super._on_next_button_pressed()
 
 
-func _append_option(option_id: String, display_text: String, index: int, selectable: bool) -> void:
+func _append_option(_option_id: String, display_text: String, index: int, selectable: bool) -> void:
 	var item := HBoxContainer.new()
 	item.set_meta("option_index", index)
 	var select_button := CheckBox.new()
 	select_button.button_group = _selection_group
+	select_button.text = display_text
+	select_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	select_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	select_button.custom_minimum_size.y = 48
 	select_button.disabled = not selectable
 	select_button.pressed.connect(_on_option_selected.bind(index, select_button))
 	item.add_child(select_button)
 	var text_label := Label.new()
-	text_label.text = "%s: %s" % [option_id, display_text]
-	text_label.add_theme_font_size_override("font_size", 18)
+	text_label.text = display_text
+	# Keep the existing display snapshot node; the full text row is the hit area.
+	text_label.visible = false
 	text_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	item.add_child(text_label)
@@ -152,7 +157,11 @@ func _on_confirm_broadcast_pressed() -> void:
 	var option: BroadcastOptionData = _get_option(_selected_option_index)
 	if _broadcast_data == null or _broadcast_data.broadcast_id.strip_edges().is_empty() or option == null or option.option_id.strip_edges().is_empty():
 		return
-	broadcast_confirmation_requested.emit(_broadcast_data.broadcast_id, option.option_id)
+	var broadcast: EmergencyBroadcastData = _broadcast_data
+	var id: String = option.option_id
+	open_confirmation("TRANSMIT EMERGENCY ORDERS", option.display_text, "TRANSMIT", Vector2(680, 420), func() -> void:
+		if not _has_confirmation_snapshot() and _broadcast_data == broadcast and _get_option(_selected_option_index) == option and option.option_id == id:
+			broadcast_confirmation_requested.emit(broadcast.broadcast_id, id))
 
 
 func update_confirmation_state(confirmed_broadcast_id: String, confirmed_option_id: String) -> void:
@@ -187,7 +196,10 @@ func _update_confirmation_ui() -> void:
 		text_label.text = text_label.text.trim_suffix(" [Confirmed]")
 		if is_confirmed:
 			text_label.text += " [Confirmed]"
+		button.text = text_label.text
 	confirm_button.disabled = has_snapshot or _broadcast_data == null or _broadcast_data.broadcast_id.strip_edges().is_empty() or _selected_option_index == -1
+	confirm_button.visible = not confirmed
+	next_button.visible = confirmed
 	next_button.disabled = not confirmed
 	if confirmed:
 		next_button.grab_focus()

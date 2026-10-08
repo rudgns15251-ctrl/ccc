@@ -40,13 +40,12 @@ func _display_snapshot() -> void:
 		var row := VBoxContainer.new()
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var label := Label.new()
-		label.text = "%s (%s)\nResearch: %d\nHypotheses: %d" % [item.display_name, item.case_id, item.research_count, item.hypothesis_count]
+		label.text = "%s\nResearch: %d / Notes: %d" % [item.display_name, item.research_count, item.hypothesis_count]
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.add_theme_font_size_override("font_size", 20)
 		row.add_child(label)
 		var button := Button.new()
 		button.text = "Open" if item.available else "Unavailable"
-		button.custom_minimum_size = Vector2(120, 36)
+		button.custom_minimum_size = Vector2(120, 48)
 		button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		button.disabled = not item.available or item.case_id.strip_edges().is_empty()
 		button.pressed.connect(func() -> void: case_requested.emit(item.case_id))

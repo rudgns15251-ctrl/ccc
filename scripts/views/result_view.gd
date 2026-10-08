@@ -90,7 +90,6 @@ func _display_summary() -> void:
 		var id: String = _summary.experiment_ids[index]
 		var experiment: ExperimentData = _summary.experiments[index] if index < _summary.experiments.size() else null
 		var item := Label.new()
-		item.add_theme_font_size_override("font_size", 18)
 		item.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if id.strip_edges().is_empty():

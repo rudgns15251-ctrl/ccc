@@ -43,6 +43,7 @@ func _display_cctv() -> void:
 		observation_label.text = "No CCTVData was provided to this View."
 		return
 
+	%CameraTab.text = "CAMERA 01 / UPDATED" if not _condition_observations.is_empty() else "CAMERA 01"
 	camera_id_label.text = _text_or_placeholder(_cctv_data.camera_id, "camera_id")
 	observation_label.text = _text_or_placeholder(_cctv_data.observation_text, "observation_text")
 
@@ -75,11 +76,11 @@ func _display_condition_observations() -> void:
 		list.remove_child(item)
 		item.queue_free()
 	%ConditionObservationSection.visible = not _condition_observations.is_empty()
+	%CameraTab.text = "CAMERA 01 / UPDATED" if not _condition_observations.is_empty() else "CAMERA 01"
 	for entry: ConditionObservation in _condition_observations:
 		var label := Label.new()
 		label.text = "%s\n%s" % [entry.display_name, entry.observation_text]
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_font_size_override("font_size", 20)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(label)
 		_displayed_observation_ids.append(entry.observation_id)
@@ -93,3 +94,14 @@ func get_displayed_condition_observation_ids() -> Array[String]:
 
 func is_displaying_cctv(cctv_data: CCTVData) -> bool:
 	return is_node_ready() and _cctv_data != null and _cctv_data == cctv_data and camera_id_label.text == cctv_data.camera_id
+
+
+func capture_work_state() -> Dictionary:
+	var state: Dictionary = super.capture_work_state()
+	state["condition_scroll"] = %ConditionObservationScroll.scroll_vertical
+	return state
+
+
+func restore_work_state(state: Dictionary) -> bool:
+	%ConditionObservationScroll.scroll_vertical = state.condition_scroll
+	return restore_work_focus(state)

@@ -4227,3 +4227,152 @@ Godot4.7.1 최종60 processes/9338 assertions 통과. 정상warning0, controlled
 [Step54 보고서: API·cleanup 정책·제한·검증·215항목](docs/step54_verified_source_cleanup_no_run_boundary.md)
 
 Step53 Active+resolvable Pending P2는 그대로 유지한다. 다음 추천은 명시적 no-run→new-run initializer 계약이며 이번에는 새 Run/Player 종료/Settlement/경제/Save를 구현하지 않았다. stage/commit/push도 하지 않았다.
+
+
+## Step55 — Data-Driven Campaign Case Sequence Foundation
+
+**DATA-DRIVEN CAMPAIGN CASE SEQUENCE FOUNDATION**
+
+**PROTOTYPE CASE01→02→03 BEHAVIOR PRESERVED**
+
+**NO STORY EVENT EXECUTION YET**
+
+**NO ECONOMY / QUOTA / SETTLEMENT**
+
+기존 Main Scene의 Case01→02→03 목록을 `CampaignData` authored Resource로 옮겼다. Main은 전체 Campaign을 검증한 뒤 배열만 복사해 navigation에 사용한다. null/blank/empty/duplicate Case 입력은 partial startup 없이 명시 developer error로 중단한다. fallback/새 Manager/State/Autoload 없음.
+
+실제3 Case 연구·격리·Incident/Broadcast/Research 및 Step46~54 경계는 유지한다. Campaign 끝의 Case03 Outcome0/Pending/Next disabled도 그대로이며 Ending/cleanup/new Run 자동 실행0. 기존 RunDisposition 명칭은 기술 API로 유지하고 Campaign ID와 Run ID를 구분한다.
+
+Godot4.7.1 최종64processes/9680assertions 통과. 정상warning0, runtime·parse error0; controlled invalid warnings21과 예상 Campaign developer errors8은 별도다. 순서 변경/2·1 Case/alias isolation 및 actual A/B Journey·Active/cleanup native 회귀를 새로 실행했다. UI/1920×1080/stretch/3 Case/기존 State 설정은 보존했다.
+
+[Step55 보고서: 변경·검증·127항목](docs/step55_campaign_case_sequence_foundation.md)
+
+본편 순서·Story/Event/Final Incident/Ending/Flags/Save는 아직 구현하지 않았다. 기존 Step54의 반복 Run 초기화 방향보다 현재 명시된 Story Campaign 방향이 우선한다. 다음은 승인된 Story/Event 데이터·실행 책임 계약 설계가 적합하다. stage/commit/push하지 않았다.
+
+
+## Step56 — Campaign Story/Event Execution Contract Design
+
+**DESIGN ONLY / NOT IMPLEMENTED**. Case-only Campaign을 Story Campaign으로 확장할 entry identity·실행·과거 사실·ordering·Ending 입력 계약을 정리했다. 권장안은 얕은 typed entry wrapper, definition/occurrence 분리, source-aware IncidentResponse와 기존 Incident/Broadcast UI 재사용이다. fake Case/Failure/Candidate는 쓰지 않는다.
+
+Case 연구 checkpoint의 기존 failure pacing을 보존하고, future transition당 past offer를 최대1회로 제한한 뒤 시작한 Scripted entry는 중첩 대응 없이 완료한다. 기존 historical State를 query하고 Runtime 교체 시 사라지는 실제 필요 사실만 보존하며 generic flags/경제/Quota/Settlement는 추가하지 않는다.
+
+다음 추천은 Step57 CASE-only entry migration이며 actual Story/Mandatory/Final/Ending/Save는 아직 미구현·내용 미확정이다. Step55 미커밋 변경과 모든 제품 Script/Scene/Resource/설정을 byte 그대로 보존했다. 이번 검증은 static hash/Git 보호만이며 Godot gameplay 새 실행0; Step55 검사 수치를 이번 결과로 재사용하지 않았다.
+
+[Step56 설계 계약:22섹션·대안 비교·130보고 항목·사용자 자료](docs/step56_campaign_story_event_execution_contract.md)
+
+README append와 설계 문서만 변경했고 stage/commit/push하지 않았다.
+
+
+## Step57 — Typed Campaign Entry Foundation + Existing 3-Case Migration
+
+**TYPED CAMPAIGN ENTRY FOUNDATION / EXISTING CASE01→02→03 MIGRATED / CASE ENTRIES ONLY.** CampaignData.entries:Array[CampaignEntryData]를 유일한 authored source로 사용한다. 세 CASE subresource는 stable entry_id와 typed CaseData를 가지며 Main은 전체 검증 후 기존 navigation용 detached Case projection을 만든다.
+
+entry_id와 case_id는 다르다. 기존 Runtime States는 아직 case_id 기반이므로 duplicate entry ID와 duplicate Case ID 모두 거절한다. 반복 Case·mixed dispatch·ProgressState·generalized Incident source는 미구현이다. **NO STORY EVENT EXECUTION / NO ECONOMY / QUOTA / SETTLEMENT.**
+
+Godot4.7.1 새 최종 검증 세트65processes/9778assertions PASS. 제품45 Script parsing, editor import, configured Main headless/native, typed Campaign 정상·13 invalid 종류, actual A/B 및 Step46~55 회귀 통과. 정상 warning/runtime/parse0. GPU 대표 PROFILE/CCTV/handoff 확인,1920×1080 및 기존 Scene/설정 그대로.
+
+[Step57 보고서: identity·migration·검증·166개 답변](docs/step57_typed_campaign_entry_foundation.md)
+
+Step55·56 기존 변경/자료를 보존했다. Main +1행/새 함수0, Scene 변경0. stage/commit/push하지 않았다. 다음은 사용자 승인 범위의 Step58 source-aware Scripted response/completion 최소 확장이다.
+
+
+## Step58 — Scripted Campaign Incident Foundation + Source-Aware Response
+
+2026-10-07. 기존 CampaignEntryData에 typed SCRIPTED_INCIDENT와 ScriptedIncidentData bundle을 추가했다. IncidentResponseState key는 origin/entry occurrence/incident tuple이며, Case Failure와 Scripted source를 별도 scope로 확인한다. 작은 CampaignProgressState가 sole entry cursor/once completed IDs/Case→Scripted bounded offer intent를 소유한다. 기존 Incident/Broadcast/IncidentResult와 Archive Scene을 재사용하고, Scripted Result는 Continue Campaign으로 다음 entry를 실행한다. Scripted 동안 current_case/Runtime는 null이며 fake Failure/Resolution/Candidate, failure RNG/read opportunity/credit 변화는 없다.
+
+제품 TEST_CAMPAIGN_01은 여전히 CASE01→02→03만 포함하며 .tres/Scene/project settings는 이번 단계에서 변경하지 않았다. Scripted 콘텐츠는 ignored in-memory fixture에서만 검증했다. 실제 Story/Mandatory/Final/Ending/반복 Case/Save/경제는 미구현이다. ACTIVE Scripted terminal closure는 UNSUPPORTED_ACTIVE_CAMPAIGN_RESPONSE로 mutation0 block한다. Completed Scripted는 session history에 남지만 기존 Case terminal record에 포함하지 않는다. 모든 Scripted terminal 지원을 뜻하지 않는다.
+
+Godot4.7.1 fresh editor import, 제품 GD48개 check-only, configured Main headless/Windows native, mixed/bounded/반복 Event/단독 Scripted/invalid Scripted17종 및 Step46~57 회귀: 최종73프로세스/10591assertions 통과. 정상 warning0, runtime/script/parse error0. controlled warning21 및 developer error30을 별도 집계했다. S01~S35 통과. 대표 native GPU 4화면을 확인했다. 기존 Step55~57 evidence1189개와 기존127파일 byte 보존, README 원본435768 byte prefix 보존, staged0/commit0/push0.
+
+파일 책임·identity/response/progression·source inventory·terminal 지원 한계·222개 보고 항목은 [Step58 상세 보고서](docs/step58_scripted_campaign_incident_foundation.md)에 정리했다. 이번 단계만 기존8파일 수정/7파일 추가/삭제0. 검증 증거와 before→after patch는 `.godot/verification/step58/`에 있다.
+
+
+## Step59 — Campaign Historical Facts + Story Condition Contract Design
+
+**DESIGN ONLY — CAMPAIGN HISTORICAL FACT CONTRACT**
+
+**NO STORY CONTENT · NO ECONOMY / QUOTA / SETTLEMENT · NO PRODUCT GAMEPLAY CODE CHANGE**
+
+2026-10-07. 현재 저장소의 실제 owner/lifetime를 조사해 Historical Gameplay Fact와 Explicit Story Flag의 책임을 분리했다. 권장안은 새 CampaignHistoryState를 추가하지 않고 기존 Resolution/Response/Archive/Progress를 읽는 작은 Campaign-scoped typed read-only query 계층이다. Case 판정과 Room, 실제 Case/Scripted response option/result, 발견 Research, entry 완료는 기존 source를 query하며 동일 boolean을 중복 저장하지 않는다. Runtime 교체로 잃는 과거 실험/관찰은 실제 Story가 요구한 항목만 최소 보존한다.
+
+제안 query 계약은 entry occurrence/definition identity, draft·confirmed link·actual completion, UNKNOWN/INVALID/source release를 구분한다. Progress는 cursor/completion/transition만 유지한다. Hypothesis는 자유 메모로서 Story/Ending truth가 아니다. 실제 player forced termination trigger는 프로젝트에서 확인되지 않아 ACTIVE Scripted terminal block 유지(A)를 권장한다. Completed Scripted는 live Response owner에서 읽고,향후 terminal이 필요한 historical projection을 인수하도록 설계했다. 기존 Case-oriented recipient 통합 gap은 구현 OPEN이다. Ending 전/chapter 중 developer cleanup을 자동 사용하지 않으며 필요한 사실을 조회/인수하기 전에 source를 지우지 않는다.
+
+새 State/Condition/Flag/Ending/Save/Scene/Resource/Gameplay code는 구현·변경하지 않았다. 제품118파일/README 제외 기존141파일, 이전 verification54987개 SHA-256 동일. README 기존437959 byte prefix 보존. Godot 새 gameplay 실행0이며 Step58의73processes/10591assertions를 Step59 새 검증으로 재집계하지 않았다. stage/commit/push0.
+
+[Step59 설계 보고서](docs/step59_campaign_historical_fact_contract.md)에 필수22섹션, ownership/lifetime/condition/terminal matrices,확정·추천·미정 결정,요청한144개 보고 항목과 Step60 최소 query foundation 제안을 정리했다. Story 소재가 필요한 조건·Mandatory·Ending과 transient capture는 자료 확정 후 좁게 구현한다.
+
+
+## Step60 — Campaign-Scoped Typed Fact Query Foundation + Source Lifetime Guard
+
+CAMPAIGN-SCOPED TYPED FACT QUERY FOUNDATION / READ-ONLY EXISTING OWNER QUERIES / NO CAMPAIGN HISTORY COPY / SOURCE LIFETIME / RELEASE GUARD / NO STORY CONTENT / NO ECONOMY / QUOTA / SETTLEMENT.
+
+- CampaignFactQueries는 기존 Progress/Resolution/Pending/Response/Archive와 current Runtime을 읽고 3개의 detached typed result를 반환한다. entry 완료, Case 판정/Room, CASE·Scripted 응답 완료/승인 Option/Result, 실제 Research 발견 조회를 제공한다.
+- KNOWN(false), UNKNOWN, INVALID, UNSUPPORTED, SOURCE_RELEASED를 구분한다. verified cleanup preflight 성공 뒤 첫 reset 전 source를 해제하며 partial cleanup/retry/Main free에서도 수명 guard를 유지한다.
+- Main은 lifecycle 연결14행/2함수만 추가(2253행/123함수); Progress는 Campaign scope read getter 하나 추가. project.godot/Scene/View/.tres 변경0. Story/Ending/Save/history copy/반복Case/경제 시스템 추가0.
+- Godot4.7.1 최종 고유73 processes / 832118 assertions PASS(반복 field 검사 포함). editor import, GD49개 check-only, Main headless/native, query headless/native, Step46~58 핵심 regression과 actual Major journey를 fresh 실행했다. normal warnings0, expected controlled warnings19/startup diagnostics30, 최종 parse/runtime errors0. 이전 verification55000개 보존.
+- ACTIVE Scripted terminal block / completed Scripted terminal projection gap / Step53 prepared-pending / Step54 atomic rollback 한계는 그대로다. stage/commit/push 없음.
+- [Step60 상세 보고서: 필수20섹션 및 193개 답변](docs/step60_campaign_fact_query_foundation.md). 새 검증 증거: `.godot/verification/step60/`.
+
+
+## Step61 — Scripted Mid-Case Incident Interrupt Contract Design
+
+DESIGN ONLY / NO PRODUCT GAMEPLAY, SCENE, RESOURCE OR STATE CHANGES.
+
+- [확정] Mandatory Incident01은 CASE02 완료→Sequential Scripted→CASE03. 후속1~2개는 특정 CASE 진행 중 발생하고 같은 Case Runtime/이전 업무 위치로 복귀한다. fake Failure/Resolution/Candidate/Case 없음. 실제 사건 내용/Case/Stage/Action은 [미정].
+- [추천] 기존 ScriptedIncidentData content를 공유하고 CampaignData의 side schedule에서 occurrence/target/checkpoint를 분리한다. sole Case cursor는 유지한다. interrupt_id + 별도 origin/occurrence source semantics, route-derived return policy, deterministic Stage/Action checkpoint(B 우선)를 추천한다.
+- [추천] 기존 response UI를 재사용하되 unconfirmed Containment draft/Experiment 실제 표시 Result·선택·scroll/CCTV Recheck 목적지를 작은 UI memento로 보존한다. 현재 Failure Resume만으로 exact 업무 복귀가 보장되는 것은 아니다.
+- [추천] active response/notice는 유지, same checkpoint의 due Story는 old Failure presentation보다 먼저, Resume에서 자동 drain0. 기존 accepted work accounting은 once 유지하고 새 사건은 credit/RNG/counter와 분리한다. ACTIVE Scripted terminal block/completed terminal gap은 OPEN 유지한다.
+- 제품120개/49개 GDScript/Scene15개/.tres4개/project.godot 변경0, Main2253행/123함수 유지. 새 Godot/gameplay 실행0. Step60 테스트 수치를 Step61 성과로 재사용하지 않는다. README prefix와 기존 파일/verification evidence를 hash로 보호한다. stage/commit/push 없음.
+- [Step61 설계 보고서: 필수22섹션·20개 핵심 질문·현재 코드 근거](docs/step61_scripted_mid_case_interrupt_contract.md). 새 static audit 증거: `.godot/verification/step61/`.
+
+
+## Step62 — Scripted Mid-Case Interrupt Foundation + Exact Work Resume
+
+SCRIPTED MID-CASE INTERRUPT FOUNDATION · CURSOR-PRESERVING SIDE OCCURRENCE · DETERMINISTIC CHECKPOINTS · SAME RUNTIME / STAGE RESUME · TRANSIENT WORK VIEW RESTORE · NO ACTUAL MANDATORY STORY CONTENT · NO ECONOMY / QUOTA / SETTLEMENT
+
+CampaignData의 typed side occurrence가 cursor/completed CASE/transition을 바꾸지 않고 deterministic 업무 checkpoint에서 기존 Incident/Broadcast/Result UI를 실행한 뒤 same Case Runtime/Stage 및 actual selection/displayed Result/scroll/focus를 복원한다. full CAMPAIGN_INTERRUPT source binding, canonical source_occurrence_id, shared read-only side fact queries, early due/active/resume-pending terminal guards를 구현했다. 제품 Campaign의3CASE/empty side array, 모든 Scene/.tres/프로젝트 해상도 설정은 유지한다. 실제 Mandatory Story/Ending/Save/Flags 콘텐츠는 아직 추가하지 않았다.
+
+Godot4.7.1 fresh import/제품51scripts/Main headless·Windows 및 신규/기존 전체81개 final process를 검증했다. 850,510 assertion 호출(신규15,032)은 독립 scenario 수가 아니다. controlled diagnostics와 초기 실패 로그는 따로 보존했다. GPU1280×720에서 EXP Result response/정확한 복귀와 Room draft 복원을 확인했다. completed Scripted terminal projection gap, Step53 prepared-pending/Step54 atomicity 한계는 OPEN 유지한다.
+
+상세 구현/262항목/검증/수정파일/known gaps: [Step62 보고서](docs/step62_scripted_mid_case_interrupt_foundation.md). 검증 증거는 `.godot/verification/step62/`에 있다. 커밋/푸시하지 않았다.
+
+
+## Step63 — Temporary Mandatory Incident 01 Authored Campaign Integration
+
+TEMPORARY MANDATORY INCIDENT 01 · FIRST PRODUCT AUTHORED SCRIPTED STORY ENTRY · CASE02 → TEMP INCIDENT → CASE03 · DATA-DRIVEN REPLACEABLE CONTENT · ALL-SUCCESS PLAYERS STILL EXPERIENCE BROADCAST · NO FINAL STORY CLAIM · NO ECONOMY / QUOTA / SETTLEMENT
+
+제품 Campaign에 CASE01→CASE02→TEMP_ENTRY_MANDATORY_01→CASE03 순차 authored entry를 추가했다. CASE01의 기존 support/sound/airflow/light 관찰을 근거로 작성한 Incident/Broadcast/네 Option/네 Result는 전부 [TEMP STORY CONTENT]이며 최종 시나리오가 아니다. 두 격리를 모두 성공한 플레이어도 방송을 경험하며, Case02 실패 Candidate와 기존 bounded old-Failure 정책은 보존한다. Story 문구/대상/선택/결과/위치는 기존 Resource만 편집하여 교체할 수 있다.
+
+Main/GDScript/Scene/View/project.godot 및 기존 Case/Research 변경0, side schedule empty 유지, Mandatory02/03/Ending/Save/Flags/Condition/Economy/Quota/Settlement 추가0. Godot4.7.1 fresh import/51개 script/실제 Main 및 제품 7개 journey와 기존 회귀를 포함한 최종83개 process가 통과했다. 854,344 assertion 호출은 독립 scenario 수가 아니다. 일반 warning/runtime/script/parse 오류0, controlled diagnostics와 초기 fixture 실패는 분리 보존했다. 실제 GPU1280×720 화면과 네 Option scroll 표시를 확인했다. completed Scripted terminal gap 및 Step53/54/62 한계는 OPEN이다.
+
+22개 필수 섹션·171개 답변·Evidence/Result/Route/Replaceability matrix: [Step63 보고서](docs/step63_temporary_mandatory_incident_01.md). 새 검증 증거 `.godot/verification/step63/`. 기존 prefix/보고서/검증 증거를 보호했다. 커밋·푸시하지 않았다.
+
+
+## Step64 — Final UI/UX Structural Rebuild + Temporary Industrial Theme
+
+FINAL UI/UX STRUCTURAL REBUILD · TEMP INDUSTRIAL THEME · ASSET-INDEPENDENT · FINAL-ASSET-REPLACEABLE · STEP62 EXACT RESUME PRESERVED · STEP63 PRODUCT STORY FLOW PRESERVED · NO FINAL VISUAL POLISH · NO AUTO-DOWNLOADED EXTERNAL ASSETS
+
+기존 Main에 1920×1080 GameShell(Header72/Nav176/Workspace1688×968/Rail56/SystemBar40)을 적용했다. 업무와 source-aware 사건 화면을 재배치하고, Research680/Hypothesis560 Drawer, 전체 Workspace3열 Archive, Containment640×360/Broadcast680×420 최종 확인 Modal을 추가했다. 기존 업무·선택·결과·scroll·focus와 판정·진행·source ownership을 보존한다. Godot-native Theme/default font만 사용하며 외부 Asset 다운로드·구매·사용0이다.
+
+Godot4.7.1 fresh import/제품53 scripts/check-only/configured Main/기존 회귀와 새 UI 최종94개 process slot 통과(native15). 857,207 assertion 호출은 독립 scenario 수가 아니다. 정상 warning/runtime/script/parse0, 의도한 controlled WARN19/developer ERROR70은 분리 기록한다. GPU1280×720/1920×1080 각19필수+15long 화면과 추가1024×768 keep 검사를 수행했다. 발견한 side resume Header/rail 갱신 누락을 수정하고 전체 검증을 재실행했다. Modal 키 입력 차단도 수정하고 Tab/Space/ESC 및 중복 확정을 headless/native에서 검증했다.
+
+Step64 baseline 비교 modified28/created8/deleted0. project.godot/Case/Campaign/TEMP/side schedule/data/runtime/query 보호71파일과 기존 검증57,500파일의 byte hash 동일. 기존 README prefix 뒤에 append했다. completed Scripted terminal projection gap, Step53 P2, Step54 atomicity, Step62 failed-restore 한계는 OPEN. 최종 Asset/shader/audio/Save/Ending/Mandatory02/03 완성을 주장하지 않는다.
+
+31개 섹션·263개 답변·Screen/CTA/Incident/Memento/Dynamic/Asset matrix: [Step64 보고서](docs/step64_ui_ux_structural_rebuild.md). 증거 `.godot/verification/step64/`. stage/commit/push하지 않았다.
+
+
+## Step65 — UI/UX Acceptance Validation + Structural Stabilization
+
+Step64의 실제 Campaign과 Shell/Drawer/Archive/Modal을 검증하고 Drawer focus loop, active Rail 표시, Broadcast 전체 문구 클릭, 긴 목록 focus-follow, 보조 버튼 목표 높이를 보완했습니다. Main은 142함수를 유지하고 표시 갱신 한 줄만 추가했습니다.
+
+- UI/UX ACCEPTANCE & STABILIZATION
+- PLAYER-JOURNEY VALIDATED
+- KEYBOARD / MOUSE / SCROLL VERIFIED
+- ASSET SWAP MANIFEST READY
+- NO FINAL LICENSED ASSET
+- NO FINAL VISUAL POLISH
+- GAMEPLAY CONTRACTS PRESERVED
+
+Godot 4.7.1 최종75 실행(제품53 script check 포함)과 새 입력 검사 환경별588개가 통과했습니다. 1920/1280 각19 상태 화면 및 contact sheet를 QA 폴더에 보관했습니다. 전체 literal assertion428,626은 반복 Facts 검사를 포함하며 독립 journey 수와 구별합니다. 기존 제품 `.tres`/설정/owner·판정·resume 계약과 이전 검증 증거를 보존했습니다. 정식 skin/Save/Ending을 구현하지 않았고 기존 terminal OPEN은 유지합니다.
+
+[Step65 검증·안정화 보고서](docs/step65_ui_ux_acceptance_and_stabilization.md) — 필수31섹션, 종료170항목, Asset Swap Manifest, 원본 screenshot 링크와 YES/CHANGE 시각 검토10항목.

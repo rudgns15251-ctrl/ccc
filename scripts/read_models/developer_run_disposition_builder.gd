@@ -29,7 +29,7 @@ static func classify_pending(pending: Dictionary, facts: Dictionary, sequence: A
 
 static func completed_for(source_id: String, incident_id: String, responses: Array) -> bool:
 	for response: Dictionary in responses:
-		if response.source_case_id == source_id and response.incident_id == incident_id and response.status == IncidentResponseState.Status.COMPLETED:
+		if response.get("origin_kind", IncidentSource.OriginKind.CASE) == IncidentSource.OriginKind.CASE and response.get("source_case_id", "") == source_id and response.incident_id == incident_id and response.status == IncidentResponseState.Status.COMPLETED:
 			return true
 	return false
 
@@ -40,6 +40,8 @@ static func matches_active(row: Dictionary, facts: Dictionary) -> bool:
 
 
 static func source_issue(facts: Dictionary, mapping: Dictionary) -> String:
+	for response: Dictionary in facts.responses:
+		if response.get("origin_kind", IncidentSource.OriginKind.CASE) != IncidentSource.OriginKind.CASE: return "UNSUPPORTED_CAMPAIGN_RESPONSE_HISTORY"
 	for category: String in ["pending", "resolutions", "candidates", "responses", "archives", "notes"]:
 		for row: Dictionary in facts[category]:
 			var id: String = row.get("case_id", row.get("source_case_id", ""))

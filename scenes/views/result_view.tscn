@@ -1,148 +1,153 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/views/result_view.gd" id="1_result"]
+[ext_resource type="Script" path="res://scripts/views/result_view.gd" id="script"]
 
 [node name="ResultView" type="Control"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_result")
+script = ExtResource("script")
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 24
 
-[node name="Content" type="VBoxContainer" parent="Center"]
-custom_minimum_size = Vector2(900, 0)
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ScreenTitle" type="Label" parent="Center/Content"]
+[node name="Content" type="VBoxContainer" parent="Margin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
-text = "RESULT"
-horizontal_alignment = 1
-
-[node name="SummaryScroll" type="ScrollContainer" parent="Center/Content"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(900, 220)
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="SummaryColumns" type="HBoxContainer" parent="Center/Content/SummaryScroll"]
-layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
 size_flags_horizontal = 3
-theme_override_constants/separation = 24
-
-[node name="Common" type="VBoxContainer" parent="Center/Content/SummaryScroll/SummaryColumns"]
-custom_minimum_size = Vector2(420, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-
-[node name="Description" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Case: [Unavailable]"
-autowrap_mode = 3
-
-[node name="FinalResult" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Final Result: [Unavailable]"
-autowrap_mode = 3
-
-[node name="Containment" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Containment: None"
-autowrap_mode = 3
-
-[node name="ExperimentUsage" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Experiment Usage: 0 / 0"
-autowrap_mode = 3
-
-[node name="ExperimentTitle" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Experiments (execution order):"
-
-[node name="ExperimentEmpty" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "No experiments executed"
-
-[node name="ExperimentList" type="VBoxContainer" parent="Center/Content/SummaryScroll/SummaryColumns/Common"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="FailureDetails" type="VBoxContainer" parent="Center/Content/SummaryScroll/SummaryColumns"]
-custom_minimum_size = Vector2(420, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="IncidentInfo" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/FailureDetails"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Incident: [Unavailable]"
-autowrap_mode = 3
-
-[node name="BroadcastInfo" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/FailureDetails"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Emergency Broadcast: [Unavailable]"
-autowrap_mode = 3
-
-[node name="ResponseInfo" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/FailureDetails"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Selected Response: [Unavailable]"
-autowrap_mode = 3
-
-[node name="IncidentResultInfo" type="Label" parent="Center/Content/SummaryScroll/SummaryColumns/FailureDetails"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Incident Result: [Unavailable]"
-autowrap_mode = 3
-
-[node name="Actions" type="HBoxContainer" parent="Center/Content"]
-layout_mode = 2
-size_flags_horizontal = 4
+size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="OpenResearchLogButton" type="Button" parent="Center/Content/Actions"]
+[node name="ScreenTitle" type="Label" parent="Margin/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-disabled = true
-text = "Open Research Log"
+text = "RESULT"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "TitleLabel"
 
-[node name="NextButton" type="Button" parent="Center/Content/Actions"]
+[node name="SummaryScroll" type="ScrollContainer" parent="Margin/Content"]
+follow_focus = true
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
-text = "Restart: PROFILE"
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SummaryBody" type="VBoxContainer" parent="Margin/Content/SummaryScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Description" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="FinalResult" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="Containment" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="ExperimentUsage" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="ExperimentEmpty" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="IncidentInfo" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="BroadcastInfo" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="ResponseInfo" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="IncidentResultInfo" type="Label" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="ExperimentList" type="VBoxContainer" parent="Margin/Content/SummaryScroll/SummaryBody"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="OpenResearchLogButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCH LOG"
+custom_minimum_size = Vector2(0, 48)
+visible = false
+
+[node name="Spacer" type="Control" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NextButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESTART"
+custom_minimum_size = Vector2(240, 48)
+theme_type_variation = "PrimaryButton"

@@ -21,7 +21,7 @@ const DISTURBANCE_NOTICE_SCENE = preload("res://scenes/views/environmental_distu
 const PROTOTYPE_DISTURBANCE_THRESHOLD := Vector2i(2, 4)
 # TEMPORARY/PROTOTYPE: one later eligible action, not final balance.
 const PROTOTYPE_MAJOR_THRESHOLD: int = 1
-enum IncidentRoute { DEBUG_RUNTIME, NORMAL_INTERRUPT }
+enum IncidentRoute { DEBUG_RUNTIME, NORMAL_INTERRUPT, SCRIPTED_CAMPAIGN, SCRIPTED_INTERRUPT }
 enum TerminalMode { NONE, VOLUNTARY_RESPONSE_ONLY, VOLUNTARY_AWAITING_COMMIT, FORCED_PREPARING, COMMITTED_FROZEN, TERMINAL_ERROR_FROZEN, CLEANED_NO_RUN }
 
 enum Stage { PROFILE, CCTV, EXPERIMENT, CONTAINMENT, MONITORING, RESULT, INCIDENT, BROADCAST, INCIDENT_RESULT, RESEARCH_LOG, RESEARCH_ARCHIVE_LIST, RESEARCH_ARCHIVE_DETAIL }
@@ -43,8 +43,11 @@ const VIEW_SCENES: Array[PackedScene] = [
 	preload("res://scenes/views/research_archive_detail_view.tscn"),
 ]
 
-@export var current_case: CaseData
-@export var case_sequence: Array[CaseData] = []
+@export var campaign_data: CampaignData
+
+var current_case: CaseData
+# Derived navigation Array from Campaign entries; authored references stay read-only.
+var case_sequence: Array[CaseData] = []
 
 var case_runtime: CaseRuntimeState
 var research_archive: ResearchArchiveState
@@ -56,16 +59,43 @@ var incident_responses: IncidentResponseState
 var _incident_route: IncidentRoute = IncidentRoute.DEBUG_RUNTIME
 var _interrupt_context: Dictionary = {}
 var _source_archive_return_stage: int = -1
+# Presentation intent only; completion remains in IncidentResponseState.
+var _side_due: Dictionary = {}
+var _side_restore_pending: bool = false
+var _side_resume_error: String = ""
 
 @onready var window_size_label: Label = %WindowSize
 @onready var view_host: Control = %ViewHost
+@onready var game_shell: Control = $GameShell
+var _drawer_view: ResearchLogView
+var _drawer_panel: PanelContainer
+var _drawer_kind: String = ""
+var _drawer_cache: Dictionary = {}
+var _drawer_runtime_id: int = 0
+var _drawer_focus: Control
+var _utility_work_view: FlowView
+var _utility_focus: Control
+var _utility_work_stage: int = -1
+var _utility_research_display: Dictionary = {}
 
 var _current_stage: int = Stage.PROFILE
 var _current_view: FlowView
 var _research_log_return_stage: int = -1
 var _archive_detail_case_id: String = ""
 var _cctv_review_return_stage: int = -1
-var _case_index: int = -1
+# Compatibility Case ordinal, derived from the sole Campaign cursor.
+var _case_index: int:
+	get:
+		var entry: CampaignEntryData = _current_campaign_entry()
+		if entry == null or entry.entry_kind != CampaignEntryData.EntryKind.CASE: return -1
+		var ordinal: int = 0
+		for item: CampaignEntryData in campaign_data.entries:
+			if item == entry: return ordinal
+			if item.entry_kind == CampaignEntryData.EntryKind.CASE: ordinal += 1
+		return -1
+
+var _campaign_fact_queries: CampaignFactQueries
+var campaign_progress: CampaignProgressState
 var _processed_opportunities: Dictionary[String, bool] = {}
 var _event_rng := RandomNumberGenerator.new()
 var _disturbance_notice: DisturbanceNotice
@@ -82,28 +112,52 @@ var _developer_terminal: Dictionary = {"mode": TerminalMode.NONE, "boundary_type
 
 
 func _ready() -> void:
+	game_shell.research_requested.connect(_shell_research_requested)
+	game_shell.archive_requested.connect(_shell_archive_requested)
+	game_shell.hypothesis_requested.connect(_open_drawer.bind("HYPOTHESIS"))
 	get_viewport().size_changed.connect(_update_window_size)
 	_update_window_size()
-	if not case_sequence.is_empty():
-		if _has_unique_case_sequence():
-			_case_index = 0
-			current_case = case_sequence[_case_index]
-		else:
-			push_warning("Main: case_sequence requires nonempty unique Case IDs; no Case selected.")
-			current_case = null
-	_validate_case()
-	case_runtime = CaseRuntimeState.new(current_case.case_id if current_case != null else "")
+	# Fail before creating any Gameplay State or View; no direct-Case fallback.
+	current_case = null
+	case_sequence.clear()
+	if campaign_data == null:
+		push_error("Main: CampaignData is not assigned; initialization stopped.")
+		return
+	var campaign_error: String = campaign_data.get_validation_error()
+	if not campaign_error.is_empty():
+		push_error("Main: invalid CampaignData: " + campaign_error + " Initialization stopped.")
+		return
+	var entry_ids: Array[String] = []
+	for entry: CampaignEntryData in campaign_data.entries:
+		entry_ids.append(entry.entry_id)
+		if entry.entry_kind == CampaignEntryData.EntryKind.CASE: case_sequence.append(entry.case_data)
+	campaign_progress = CampaignProgressState.new()
+	if not campaign_progress.configure(campaign_data.campaign_id, entry_ids):
+		push_error("Main: Campaign progression initialization failed.")
+		return
 	research_archive = ResearchArchiveState.new()
 	working_hypotheses = WorkingHypothesisState.new()
 	pending_containment = PendingContainmentState.new()
 	containment_resolutions = ContainmentResolutionState.new()
 	failure_candidates = FailureEventCandidateState.new()
 	incident_responses = IncidentResponseState.new()
+	_campaign_fact_queries = CampaignFactQueries.new(campaign_data, campaign_progress, containment_resolutions, pending_containment, incident_responses, research_archive)
 	_event_rng.randomize()
-	_show_view(Stage.PROFILE)
-	if current_case == null:
-		_current_view.next_button.disabled = true
-		_current_view.research_log_button.disabled = true
+	_dispatch_campaign_entry()
+
+
+func get_campaign_fact_queries() -> CampaignFactQueries:
+	return _campaign_fact_queries
+
+
+func _exit_tree() -> void:
+	_dispose_auxiliary_ui()
+	if _campaign_fact_queries != null: _campaign_fact_queries.release_sources()
+	_side_due.clear()
+	_interrupt_context.clear()
+	_side_restore_pending = false
+	_side_resume_error = ""
+	_source_archive_return_stage = -1
 
 
 func _update_window_size() -> void:
@@ -111,7 +165,7 @@ func _update_window_size() -> void:
 	window_size_label.text = "Window: %d × %d" % [window_size.x, window_size.y]
 
 
-func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
+func _show_view(stage: int, discover_displayed_source: bool = true, restoring_work: bool = false) -> void:
 	if not (_terminal_action_allowed("archive") or _terminal_action_allowed("resume")): return
 	if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY:
 		var response: Dictionary = incident_responses.get_active_response()
@@ -119,11 +173,12 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		if not allowed: return
 	if is_instance_valid(_disturbance_notice):
 		return
+	_close_drawer(false)
 	# Keep the last research Runtime identity across read-only/response overlays.
 	# The view_id still prevents this receipt from counting as a newly drawn View.
 	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
 		_research_display.clear()
-	if stage not in [Stage.BROADCAST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+	if stage not in [Stage.BROADCAST, Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		_interrupt_context.erase("broadcast_draft")
 	if is_instance_valid(_current_view):
 		view_host.remove_child(_current_view)
@@ -131,8 +186,8 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 
 	_current_stage = stage
 	_current_view = VIEW_SCENES[stage].instantiate()
-	view_host.custom_minimum_size.y = 360
 	var displayed_source: Resource
+	_current_view.confirmation_changed.connect(_on_confirmation_changed)
 	_current_view.research_log_requested.connect(_on_research_log_requested.bind(_current_view, stage))
 	if stage not in [Stage.RESEARCH_LOG, Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		_current_view.advance_requested.connect(_on_advance_requested.bind(_current_view))
@@ -166,26 +221,24 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 			case_runtime.get_confirmed_containment_room_id()
 		)
 		var has_next: bool = _has_next_test_case()
-		containment_view.configure_next_action("Next: CASE" if has_next else "No next test case configured", has_next)
+		containment_view.configure_next_action(("Next: SCRIPTED INCIDENT" if _next_campaign_entry().entry_kind == CampaignEntryData.EntryKind.SCRIPTED_INCIDENT else "Next: CASE") if has_next else "No next test case configured", has_next)
 	elif stage == Stage.MONITORING:
 		var monitoring_view: MonitoringView = _current_view as MonitoringView
 		monitoring_view.monitoring_playback_completed.connect(_on_monitoring_playback_completed.bind(monitoring_view))
 		monitoring_view.setup(_get_monitoring_outcome(), case_runtime.get_monitoring_result())
 	elif stage == Stage.INCIDENT:
-		view_host.custom_minimum_size.y = 660
 		var incident_view: IncidentView = _current_view as IncidentView
 		var incident: IncidentData = _get_current_incident_data()
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast() if incident != null else null
 		incident_view.setup(incident, _has_valid_broadcast_options(broadcast))
 		displayed_source = incident
 	elif stage == Stage.BROADCAST:
-		view_host.custom_minimum_size.y = 660
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
-		var confirmed_broadcast_id: String = case_runtime.get_confirmed_broadcast_id()
-		var confirmed_option_id: String = case_runtime.get_confirmed_broadcast_option_id()
-		if _is_normal_interrupt():
+		var confirmed_broadcast_id: String = case_runtime.get_confirmed_broadcast_id() if case_runtime != null else ""
+		var confirmed_option_id: String = case_runtime.get_confirmed_broadcast_option_id() if case_runtime != null else ""
+		if _is_response_route():
 			var response: Dictionary = incident_responses.get_active_response()
 			confirmed_option_id = response.get("confirmed_option_id", "")
 			confirmed_broadcast_id = response.get("broadcast_id", "") if not confirmed_option_id.is_empty() else ""
@@ -196,7 +249,6 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		)
 		displayed_source = broadcast
 	elif stage == Stage.INCIDENT_RESULT:
-		view_host.custom_minimum_size.y = 660
 		var incident_result_view: IncidentResultView = _current_view as IncidentResultView
 		var incident_result: IncidentResultData = _get_current_incident_result()
 		incident_result_view.setup(incident_result)
@@ -206,7 +258,6 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		result_view.setup(_build_result_summary())
 	elif stage == Stage.RESEARCH_LOG:
 		var research_log_view: ResearchLogView = _current_view as ResearchLogView
-		view_host.custom_minimum_size.y = 660
 		research_log_view.advance_requested.connect(_on_research_log_back_requested.bind(research_log_view))
 		research_log_view.archive_requested.connect(_on_research_archive_requested.bind(research_log_view))
 		research_log_view.hypothesis_add_requested.connect(_on_hypothesis_add_requested.bind(research_log_view))
@@ -215,43 +266,59 @@ func _show_view(stage: int, discover_displayed_source: bool = true) -> void:
 		research_log_view.setup(_build_research_log_snapshot())
 	elif stage == Stage.RESEARCH_ARCHIVE_LIST:
 		var archive_list: ArchiveListView = _current_view as ArchiveListView
-		view_host.custom_minimum_size.y = 660
 		archive_list.case_requested.connect(_on_archive_case_requested.bind(archive_list))
 		archive_list.advance_requested.connect(_on_archive_list_back_requested.bind(archive_list))
 		archive_list.setup(_build_archive_list_snapshot())
 	elif stage == Stage.RESEARCH_ARCHIVE_DETAIL:
 		var archive_detail: ArchiveDetailView = _current_view as ArchiveDetailView
-		view_host.custom_minimum_size.y = 660
 		archive_detail.advance_requested.connect(_on_archive_detail_back_requested.bind(archive_detail))
 		archive_detail.setup(_build_archive_detail_snapshot(_archive_detail_case_id))
+		var case_summaries: Array = _build_archive_list_snapshot().cases
+		if _is_normal_interrupt():
+			case_summaries = case_summaries.filter(func(item: RefCounted) -> bool: return item.case_id == _archive_detail_case_id)
+		archive_detail.set_case_summaries(case_summaries)
+		archive_detail.case_requested.connect(_on_archive_case_requested.bind(archive_detail))
 	_refresh_current_environment_conditions()
 	_refresh_cctv_condition_observations()
+	if _is_side_interrupt():
+		_current_view.set_meta("interrupt_response_binding", incident_responses.get_active_response())
 	_current_view.set_input_guard(_accept_view_action.bind(_current_view, "archive"))
+	_current_view.set_meta("campaign_entry_id", campaign_progress.get_current_entry_id())
 	view_host.add_child(_current_view)
-	if stage in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
+	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
 		_mark_research_display(_current_view)
-	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+	if _is_response_route() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		var context: Dictionary = _build_response_display_context()
 		context["resume"] = stage == Stage.INCIDENT_RESULT
 		_current_view.set_response_context(context)
-		_current_view.research_log_button.text = "Open Source Archive"
+		_current_view.research_log_button.text = "SOURCE ARCHIVE"
+		_current_view.research_log_button.visible = true
 		if stage == Stage.INCIDENT:
-			_current_view.get_node("%ScreenTitle").text = "MAJOR CONTAINMENT INCIDENT"
+			_current_view.get_node("%ScreenTitle").text = "SCRIPTED CAMPAIGN INCIDENT" if _is_scripted_response() or _is_side_interrupt() else "MAJOR CONTAINMENT INCIDENT"
 		elif stage == Stage.INCIDENT_RESULT:
-			_current_view.next_button.text = "Resume: " + context.get("return_stage", "[Unavailable]")
-		if not context.has("source_case_id"):
+			_current_view.next_button.text = "CONTINUE CAMPAIGN" if _is_scripted_response() else "RESUME WORK"
+			var orders: BroadcastOptionData = _get_current_confirmed_broadcast_option()
+			_current_view.get_node("%SelectedOrders").text = "TRANSMITTED ORDERS\n" + orders.display_text if orders != null else ""
+		if context.is_empty():
 			_current_view.next_button.disabled = true
 		if stage == Stage.BROADCAST:
 			_restore_response_broadcast_draft(_current_view as BroadcastView)
 		_discover_response_research(stage, displayed_source)
 	if discover_displayed_source and displayed_source != null:
 		_discover_displayed_research_entry(_current_view, stage, displayed_source)
-	if stage == Stage.CCTV:
+	if stage == Stage.CCTV and not restoring_work:
 		_discover_cctv_condition_observations(_current_view as CCTVView)
+	# Account the accepted work once before choosing a presentation. A matching
+	# Story checkpoint suppresses only the old event presentation, not counters.
+	var occurrence: ScriptedInterruptOccurrenceData = _side_checkpoint_at(ScriptedInterruptOccurrenceData.CheckpointKind.STAGE_PRESENTED, "") if discover_displayed_source else null
 	if discover_displayed_source and stage == Stage.CCTV:
-		_try_process_failure_event_opportunity(_current_view, "cctv:entry")
+		_try_process_failure_event_opportunity(_current_view, "cctv:entry", occurrence == null)
 	elif discover_displayed_source and stage == Stage.CONTAINMENT:
-		_try_process_failure_event_opportunity(_current_view, "containment:entry")
+		_try_process_failure_event_opportunity(_current_view, "containment:entry", occurrence == null)
+	if occurrence != null and _latch_side_checkpoint(occurrence, _current_view):
+		_present_due_side_after_draw(_current_view)
+
+	_refresh_shell()
 
 
 func _on_cctv_review_requested(view: FlowView, source_stage: int) -> void:
@@ -262,15 +329,14 @@ func _on_cctv_review_requested(view: FlowView, source_stage: int) -> void:
 
 
 func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
-	if _is_normal_interrupt():
+	if _is_response_route():
 		_on_source_archive_requested(view, source_stage)
 		return
 	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _accept_view_action(view):
 		return
 	if _current_stage == Stage.RESULT and not case_runtime.has_monitoring_result():
 		return
-	_research_log_return_stage = _current_stage
-	_show_view(Stage.RESEARCH_LOG)
+	_open_drawer("RESEARCH")
 
 
 func _on_research_log_back_requested(research_log_view: ResearchLogView) -> void:
@@ -371,7 +437,7 @@ func _build_research_log_snapshot() -> ResearchLogView.Snapshot:
 
 
 func _can_edit_hypotheses(case_id: String, view: ResearchLogView) -> bool:
-	return not _is_normal_interrupt() and _current_stage == Stage.RESEARCH_LOG and _accept_view_action(view) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
+	return not _is_response_route() and ((_current_stage == Stage.RESEARCH_LOG and _accept_view_action(view)) or (_drawer_kind == "HYPOTHESIS" and _accept_drawer_action(view))) and view.is_visible_in_tree() and _has_current_case_runtime() and working_hypotheses != null and case_id == current_case.case_id and view.get_hypothesis_case_id() == case_id
 
 
 func _on_hypothesis_add_requested(case_id: String, text: String, view: ResearchLogView) -> void:
@@ -396,6 +462,9 @@ func _on_hypothesis_remove_requested(case_id: String, id: String, view: Research
 
 
 func _on_research_archive_requested(view: ResearchLogView) -> void:
+	if view == _drawer_view and _accept_drawer_action(view):
+		_shell_archive_requested()
+		return
 	if _is_normal_interrupt():
 		return
 	if _current_stage != Stage.RESEARCH_LOG or not _accept_view_action(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage) or view.get_hypothesis_case_id() != current_case.case_id:
@@ -403,10 +472,10 @@ func _on_research_archive_requested(view: ResearchLogView) -> void:
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
 
 
-func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
-	if _is_normal_interrupt():
+func _on_archive_case_requested(case_id: String, view: FlowView) -> void:
+	if _is_normal_interrupt() or (_is_scripted_response() and not _has_response_context()):
 		return
-	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _accept_view_action(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
+	if _current_stage not in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] or not _accept_view_action(view) or not view.is_visible_in_tree() or research_archive == null or not research_archive.get_archived_case_ids().has(case_id):
 		return
 	if _find_archive_case(case_id) == null:
 		return
@@ -415,6 +484,16 @@ func _on_archive_case_requested(case_id: String, view: ArchiveListView) -> void:
 
 
 func _on_archive_list_back_requested(view: ArchiveListView) -> void:
+	if is_instance_valid(_utility_work_view) and _current_stage == Stage.RESEARCH_ARCHIVE_LIST and _accept_view_action(view, "archive"):
+		_restore_utility_work()
+		return
+	if _is_scripted_response() or _is_side_interrupt():
+		if _current_stage == Stage.RESEARCH_ARCHIVE_LIST and _accept_view_action(view, "archive") and _has_response_context() and _source_archive_return_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+			var response_stage: int = _source_archive_return_stage
+			_show_view(response_stage, false)
+			_source_archive_return_stage = -1
+			_archive_detail_case_id = ""
+		return
 	if _is_normal_interrupt():
 		return
 	if _current_stage != Stage.RESEARCH_ARCHIVE_LIST or not _accept_view_action(view) or not view.is_visible_in_tree() or not RESEARCH_LOG_STAGES.has(_research_log_return_stage):
@@ -425,6 +504,11 @@ func _on_archive_list_back_requested(view: ArchiveListView) -> void:
 
 func _on_archive_detail_back_requested(view: ArchiveDetailView) -> void:
 	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
+		return
+	if _is_scripted_response() or _is_side_interrupt():
+		if _has_response_context() and view.get("_snapshot").case_id == _archive_detail_case_id:
+			_archive_detail_case_id = ""
+			_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
 		return
 	if _is_normal_interrupt():
 		if not _has_interrupt_context() or _source_archive_return_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or _archive_detail_case_id != incident_responses.get_active_response().get("source_case_id", "") or view.get("_snapshot").case_id != _archive_detail_case_id:
@@ -573,6 +657,7 @@ func _try_discover_research_entry(source_kind: int, source_id: String) -> bool:
 
 
 func _discover_displayed_research_entry(view: FlowView, stage: int, source: Resource) -> void:
+	if _is_side_interrupt(): return
 	if _is_normal_interrupt() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		return
 	if stage != _current_stage or not _is_active_view(view) or not view.is_visible_in_tree() or not _has_current_case_runtime():
@@ -663,7 +748,7 @@ func _get_monitoring_outcome() -> MonitoringOutcomeData:
 
 
 func _get_current_incident_data() -> IncidentData:
-	if _is_normal_interrupt():
+	if _is_response_route():
 		return _response_incident()
 	if case_runtime.get_monitoring_result() != MonitoringOutcomeData.Result.FAILURE:
 		return null
@@ -703,7 +788,7 @@ func _get_current_incident_data() -> IncidentData:
 
 
 func _get_current_emergency_broadcast() -> EmergencyBroadcastData:
-	if _is_normal_interrupt():
+	if _is_response_route():
 		return _response_broadcast()
 	if case_runtime.get_monitoring_result() != MonitoringOutcomeData.Result.FAILURE:
 		return null
@@ -758,7 +843,7 @@ func _has_current_broadcast_confirmation(broadcast: EmergencyBroadcastData) -> b
 
 
 func _get_current_confirmed_broadcast_option() -> BroadcastOptionData:
-	if _is_normal_interrupt():
+	if _is_response_route():
 		return _response_option()
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not _has_current_broadcast_confirmation(broadcast):
@@ -793,17 +878,18 @@ func _get_incident_result_for_option(option: BroadcastOptionData) -> IncidentRes
 
 
 func _get_current_incident_result() -> IncidentResultData:
-	if _is_normal_interrupt():
+	if _is_response_route():
 		return _response_result()
 	return _get_incident_result_for_option(_get_current_confirmed_broadcast_option())
 
 
 func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: String, broadcast_view: BroadcastView) -> void:
-	if _current_stage != Stage.BROADCAST or not _accept_view_action(broadcast_view, "response") or not _has_current_case_runtime():
+	if _current_stage != Stage.BROADCAST or not _accept_view_action(broadcast_view, "response"):
 		return
-	if _is_normal_interrupt():
+	if _is_response_route():
 		_confirm_response_option(broadcast_id, option_id, broadcast_view)
 		return
+	if not _has_current_case_runtime(): return
 	var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
 	if not case_runtime.has_confirmed_broadcast_option() and broadcast != null and broadcast.broadcast_id == broadcast_id:
 		var option: BroadcastOptionData = _get_broadcast_option(broadcast, option_id)
@@ -814,11 +900,17 @@ func _on_broadcast_confirmation_requested(broadcast_id: String, option_id: Strin
 
 
 func _is_active_view(view: FlowView) -> bool:
-	return not _developer_closure_busy and not is_instance_valid(_disturbance_notice) and is_instance_valid(view) and view == _current_view and view.is_inside_tree() and not view.is_queued_for_deletion()
+	return not _developer_closure_busy and not is_instance_valid(_drawer_view) and not (is_instance_valid(_current_view) and _current_view.has_open_confirmation()) and not is_instance_valid(_disturbance_notice) and is_instance_valid(view) and view == _current_view and view.is_inside_tree() and not view.is_queued_for_deletion()
 
 
 func _on_advance_requested(view: FlowView) -> void:
 	if not _accept_view_action(view, "response"):
+		return
+	if _is_response_route() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
+		_advance_response(view)
+		return
+	if not _side_due.is_empty():
+		_try_present_side_interrupt()
 		return
 	if not _has_unique_case_sequence():
 		return
@@ -832,15 +924,27 @@ func _on_advance_requested(view: FlowView) -> void:
 		_cctv_review_return_stage = -1
 		_show_view(return_stage, false)
 		return
-	if _current_stage in [Stage.CCTV, Stage.EXPERIMENT] and _has_failure_event_context(view):
+	if _current_stage in [Stage.CCTV, Stage.EXPERIMENT] and _has_failure_event_context(view) and campaign_progress.get_transition().is_empty():
 		var source_id: String = _displayed_research_source_id(view)
 		if not source_id.is_empty():
 			if not _has_drawn_research_display(view):
 				return
 			_grant_event_presentation_credit("cctv" if _current_stage == Stage.CCTV else "experiment", source_id)
+			if _current_stage == Stage.EXPERIMENT:
+				var occurrence: ScriptedInterruptOccurrenceData = _side_checkpoint_at(ScriptedInterruptOccurrenceData.CheckpointKind.ACTION_ACCEPTED, ScriptedInterruptOccurrenceData.EXPERIMENT_RESULT_READ)
+				if occurrence != null and _latch_side_checkpoint(occurrence, view):
+					_try_present_side_interrupt()
+					return
 			if _try_present_ready_failure_event(view, true):
 				return
 	if _current_stage == Stage.CONTAINMENT:
+		var target: CampaignEntryData = _next_campaign_entry()
+		if target != null and target.entry_kind == CampaignEntryData.EntryKind.SCRIPTED_INCIDENT:
+			if view.next_button.disabled or not _has_next_test_case() or not case_runtime.has_confirmed_containment() or pending_containment.get_pending_room_id(current_case.case_id) != case_runtime.get_confirmed_containment_room_id(): return
+			if not campaign_progress.bind_transition(target.entry_id): return
+			if campaign_progress.consume_failure_offer() and _try_present_ready_failure_event(view): return
+			_handoff_to_next_case()
+			return
 		if not view.next_button.disabled and _has_next_test_case() and case_runtime.has_confirmed_containment() and pending_containment.get_pending_room_id(current_case.case_id) == case_runtime.get_confirmed_containment_room_id() and _try_present_ready_failure_event(view):
 			return
 		_handoff_to_next_case()
@@ -880,6 +984,8 @@ func _merge_current_case_discoveries() -> void:
 
 
 func _has_unique_case_sequence() -> bool:
+	if case_sequence.is_empty():
+		return false
 	var ids: Array[String] = []
 	for data: CaseData in case_sequence:
 		if data == null or data.case_id.strip_edges().is_empty() or ids.has(data.case_id):
@@ -889,10 +995,13 @@ func _has_unique_case_sequence() -> bool:
 
 
 func _has_next_test_case() -> bool:
-	if not _has_unique_case_sequence() or _case_index < 0 or _case_index + 1 >= case_sequence.size() or case_sequence[_case_index] != current_case:
-		return false
-	var next_case: CaseData = case_sequence[_case_index + 1]
-	return next_case != null and not next_case.case_id.strip_edges().is_empty() and not next_case.display_name.strip_edges().is_empty() and next_case.case_id != current_case.case_id and not pending_containment.has_pending(next_case.case_id) and not containment_resolutions.has_resolution(next_case.case_id)
+	if not _has_unique_case_sequence() or not _has_current_case_runtime() or _case_index < 0 or _case_index >= case_sequence.size() or case_sequence[_case_index] != current_case: return false
+	var entry: CampaignEntryData = _current_campaign_entry()
+	var target: CampaignEntryData = _next_campaign_entry()
+	if entry == null or entry.case_data != current_case or target == null or not target.get_validation_error().is_empty(): return false
+	if target.entry_kind == CampaignEntryData.EntryKind.SCRIPTED_INCIDENT: return true
+	var next_case: CaseData = target.case_data
+	return not next_case.display_name.strip_edges().is_empty() and next_case.case_id != current_case.case_id and not pending_containment.has_pending(next_case.case_id) and not containment_resolutions.has_resolution(next_case.case_id)
 
 
 func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapshot:
@@ -907,6 +1016,11 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 	var resolutions: Array[Dictionary] = []
 	var candidates: Array[Dictionary] = []
 	var responses: Array[Dictionary] = []
+	var side_boundary: String = _side_boundary_status()
+	if not side_boundary.is_empty():
+		facts.boundary_valid = false
+		facts.boundary_status = side_boundary
+		return TestSequenceDispositionSnapshot.build(facts, pending, resolutions, candidates, responses, _find_failure_source_case, _unique_response_content)
 	# Missing initialization produces an explicit invalid observation, not fallback.
 	if not states_available:
 		return TestSequenceDispositionSnapshot.build(facts, pending, resolutions, candidates, responses, _find_failure_source_case, _unique_response_content)
@@ -916,8 +1030,11 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 		resolutions.append(containment_resolutions.get_resolution(id))
 	for id: String in failure_candidates.get_candidate_case_ids():
 		candidates.append(failure_candidates.get_candidate(id))
-	responses = incident_responses.get_responses()
+	responses = _case_response_records()
 	var active: Dictionary = incident_responses.get_active_response()
+	if _is_scripted_response():
+		active = {}
+		facts.boundary_status = "UNSUPPORTED_CAMPAIGN_ENTRY"
 	if not active.is_empty():
 		var response_stage: int = _source_archive_return_stage if _current_stage == Stage.RESEARCH_ARCHIVE_DETAIL and _source_archive_return_stage != -1 else _current_stage
 		active["response_stage"] = Stage.keys()[response_stage]
@@ -949,6 +1066,7 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 
 
 func _handoff_to_next_case() -> void:
+	if not _side_due.is_empty() or _side_restore_pending or _is_side_interrupt(): return
 	if not _terminal_action_allowed(): return
 	if _current_stage != Stage.CONTAINMENT or not _is_active_view(_current_view):
 		return
@@ -969,13 +1087,9 @@ func _handoff_to_next_case() -> void:
 	if not _try_resolve_current_pending():
 		return
 	_merge_current_case_discoveries()
-	_case_index += 1
-	current_case = case_sequence[_case_index]
-	case_runtime = CaseRuntimeState.new(current_case.case_id)
-	_research_log_return_stage = -1
-	_cctv_review_return_stage = -1
-	_processed_opportunities.clear()
-	_show_view(Stage.PROFILE)
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if not campaign_progress.try_complete_and_advance(entry.entry_id): return
+	_dispatch_campaign_entry()
 
 
 func _try_resolve_current_pending() -> bool:
@@ -1008,6 +1122,15 @@ func configure_developer_run_identity(run_id: String, assignments: Dictionary) -
 
 
 func developer_commit_run_disposition(boundary_type: String, recipient: RunDispositionState) -> Dictionary:
+	var side_boundary: String = _side_boundary_status()
+	if not side_boundary.is_empty():
+		var blocked: Dictionary = _developer_closure_result(side_boundary, "Campaign interrupt terminal integration is not implemented.")
+		blocked["terminal_mode"] = TerminalMode.keys()[_developer_terminal.mode]
+		return blocked
+	if _is_scripted_response() and not incident_responses.get_active_response().is_empty():
+		var blocked: Dictionary = _developer_closure_result("UNSUPPORTED_ACTIVE_CAMPAIGN_RESPONSE", "Campaign response terminal integration is not implemented.")
+		blocked["terminal_mode"] = TerminalMode.keys()[_developer_terminal.mode]
+		return blocked
 	if _developer_terminal.mode == TerminalMode.CLEANED_NO_RUN:
 		return _developer_closure_result("INVALID_PRECONDITION", "Cleaned source cannot prepare another disposition.")
 	if _developer_closure_busy:
@@ -1037,6 +1160,7 @@ func developer_cleanup_committed_run(recipient: RunDispositionState) -> Dictiona
 
 
 func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
+	if not _side_boundary_status().is_empty(): return _developer_closure_result("INVALID_PRECONDITION", "Campaign interrupt is not at a verified cleanup boundary.")
 	var mode: int = _developer_terminal.mode
 	if recipient == null or recipient.get_instance_id() != _developer_recipient_id or mode not in [TerminalMode.COMMITTED_FROZEN, TerminalMode.CLEANED_NO_RUN]:
 		return _developer_closure_result("INVALID_PRECONDITION", "Cleanup requires the bound recipient and verified committed source.")
@@ -1057,7 +1181,7 @@ func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
 		return _developer_closure_result("ALREADY_CLEANED" if _cleaned_source_is_empty() else "SOURCE_CLEANUP_ERROR", "", proof)
 	# Preflight before any destructive operation. Partial-error retry retains the
 	# configured State identity and verified proof, even after Runtime release.
-	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses]:
+	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses, campaign_progress]:
 		if state == null or not state.has_method("reset"):
 			return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Required source State/reset is unavailable.", proof)
 	if _developer_closure_context.state_ids != _developer_session_state_ids() or _developer_closure_context.sequence_ids != _developer_sequence_ids() or not is_instance_valid(view_host):
@@ -1067,6 +1191,9 @@ func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
 			return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Unexpected ViewHost child; source retained.", proof)
 	if is_instance_valid(_current_view) and _current_view.get_parent() != view_host or is_instance_valid(_disturbance_notice) and _disturbance_notice.get_parent() != self:
 		return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Source View/notice parent changed.", proof)
+	# Verified preflight passed. Release before any destructive source operation.
+	_dispose_auxiliary_ui()
+	if _campaign_fact_queries != null: _campaign_fact_queries.release_sources()
 	if is_instance_valid(_current_view):
 		view_host.remove_child(_current_view)
 		_current_view.queue_free()
@@ -1079,6 +1206,9 @@ func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
 	view_host.process_mode = Node.PROCESS_MODE_INHERIT
 	_view_process_mode_before_notice = Node.PROCESS_MODE_INHERIT
 	_interrupt_context.clear()
+	_side_due.clear()
+	_side_restore_pending = false
+	_side_resume_error = ""
 	_incident_route = IncidentRoute.DEBUG_RUNTIME
 	_source_archive_return_stage = -1
 	_research_log_return_stage = -1
@@ -1097,18 +1227,20 @@ func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
 	if case_runtime != null: case_runtime.reset()
 	case_runtime = null
 	current_case = null
-	_case_index = -1
+	campaign_progress.reset()
 	# Keep last valid Stage for safe array indexing. Mode is lifecycle authority.
 	if not _cleaned_source_is_empty():
 		return _developer_closure_result("SOURCE_CLEANUP_ERROR", "Source reset postcondition failed; committed source stays frozen for explicit retry.", proof)
 	_developer_closure_context.clear()
 	_developer_terminal = {"mode": TerminalMode.CLEANED_NO_RUN, "boundary_type": record.boundary_type, "receipt": proof.duplicate(true)}
+	_refresh_shell()
 	return _developer_closure_result("CLEANED", "", proof)
 
 
 func _cleaned_source_is_empty() -> bool:
 	return (
-		pending_containment != null and containment_resolutions != null and failure_candidates != null
+		campaign_progress != null and campaign_progress.get_current_entry_id().is_empty() and campaign_progress.get_completed_entry_ids().is_empty() and campaign_progress.get_transition().is_empty()
+		and pending_containment != null and containment_resolutions != null and failure_candidates != null
 		and incident_responses != null and research_archive != null and working_hypotheses != null
 		and pending_containment.get_pending_case_ids().is_empty() and containment_resolutions.get_resolved_case_ids().is_empty()
 		and failure_candidates.get_candidate_case_ids().is_empty() and incident_responses.get_responses().is_empty()
@@ -1117,6 +1249,7 @@ func _cleaned_source_is_empty() -> bool:
 		and case_runtime == null and current_case == null and _case_index == -1
 		and not is_instance_valid(_current_view) and is_instance_valid(view_host) and view_host.get_child_count() == 0
 		and not is_instance_valid(_disturbance_notice) and not is_instance_valid(_focus_before_notice)
+		and _side_due.is_empty() and not _side_restore_pending and _side_resume_error.is_empty()
 		and _interrupt_context.is_empty() and _source_archive_return_stage == -1 and _research_log_return_stage == -1
 		and _archive_detail_case_id.is_empty() and _cctv_review_return_stage == -1 and _research_display.is_empty()
 		and _processed_opportunities.is_empty() and _completed_research_tokens.is_empty() and not _event_presentation_credit
@@ -1210,16 +1343,16 @@ func _developer_sequence_ids() -> Array:
 
 func _developer_session_state_ids() -> Array:
 	var ids: Array = []
-	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses]: ids.append(state.get_instance_id() if state != null else 0)
+	for state: RefCounted in [pending_containment, containment_resolutions, failure_candidates, incident_responses, research_archive, working_hypotheses, campaign_progress]: ids.append(state.get_instance_id() if state != null else 0)
 	return ids
 
 
 func _developer_live_identity() -> Array:
-	return [_developer_sequence_ids(), _developer_session_state_ids(), case_runtime.get_instance_id(), current_case.get_instance_id(), _case_index, _current_stage, _current_view.get_instance_id()]
+	return [campaign_progress.get_current_entry_id(), campaign_progress.get_completed_entry_ids(), _developer_sequence_ids(), _developer_session_state_ids(), case_runtime.get_instance_id(), current_case.get_instance_id(), _case_index, _current_stage, _current_view.get_instance_id()]
 
 
 func _developer_source_facts() -> Dictionary:
-	var facts: Dictionary = {"current_case_id": current_case.case_id, "pending": [], "resolutions": [], "candidates": [], "responses": incident_responses.get_responses(), "archives": [], "notes": []}
+	var facts: Dictionary = {"current_case_id": current_case.case_id, "pending": [], "resolutions": [], "candidates": [], "responses": _case_response_records(), "archives": [], "notes": []}
 	for id: String in pending_containment.get_pending_case_ids(): facts.pending.append({"case_id": id, "confirmed_room_id": pending_containment.get_pending_room_id(id)})
 	for id: String in containment_resolutions.get_resolved_case_ids(): facts.resolutions.append(containment_resolutions.get_resolution(id))
 	for id: String in failure_candidates.get_candidate_case_ids(): facts.candidates.append(failure_candidates.get_candidate(id))
@@ -1265,7 +1398,14 @@ func _terminal_action_allowed(action: String = "gameplay") -> bool:
 
 
 func _accept_view_action(view: FlowView, action: String = "gameplay") -> bool:
-	return _is_active_view(view) and _terminal_action_allowed(action)
+	if _side_restore_pending: return false
+	if not _side_due.is_empty() and action != "response": return false
+	if _is_side_interrupt():
+		if _bound_side_interrupt() == null: return false
+		var active: Dictionary = incident_responses.get_active_response()
+		var binding: Dictionary = view.get_meta("interrupt_response_binding", {}) if is_instance_valid(view) else {}
+		if not IncidentSource.from_record(active).matches(binding) or binding.get("incident_id", "") != active.get("incident_id", "") or binding.get("broadcast_id", "") != active.get("broadcast_id", "") or binding.get("incident_result_id", "") != active.get("incident_result_id", ""): return false
+	return _is_active_view(view) and _terminal_action_allowed(action) and campaign_progress != null and view.get_meta("campaign_entry_id", "") == campaign_progress.get_current_entry_id()
 
 
 func _developer_active_response_facts() -> Dictionary:
@@ -1343,7 +1483,8 @@ func _try_resolve_pending_without_handoff(source: CaseData, closure_prepare: boo
 	return true
 
 
-func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void:
+func _try_process_failure_event_opportunity(view: FlowView, key: String, present_event: bool = true) -> void:
+	if not campaign_progress.get_transition().is_empty(): return
 	if _is_normal_interrupt() or not incident_responses.get_active_response().is_empty():
 		return
 	if not _accept_view_action(view) or not view.is_visible_in_tree() or not _has_current_case_runtime() or _case_index < 0 or _case_index >= case_sequence.size() or case_sequence[_case_index] != current_case or _processed_opportunities.has(key):
@@ -1359,7 +1500,7 @@ func _try_process_failure_event_opportunity(view: FlowView, key: String) -> void
 	failure_candidates.advance_major_opportunity(current_case.case_id)
 	failure_candidates.advance_opportunity(current_case.case_id)
 	# New information draws first. Next checkpoints never advance these counters.
-	if _current_stage == Stage.CONTAINMENT:
+	if present_event and _current_stage == Stage.CONTAINMENT:
 		_try_present_ready_failure_event(view)
 
 
@@ -1392,7 +1533,7 @@ func _displayed_research_source_id(view: FlowView) -> String:
 
 
 func _grant_event_presentation_credit(kind: String, source_id: String) -> void:
-	if not _terminal_action_allowed(): return
+	if not _terminal_action_allowed() or not _has_current_case_runtime() or _is_scripted_response() or not campaign_progress.get_transition().is_empty(): return
 	# JSON tuple avoids collisions between Case/local IDs; credit saturates at OPEN.
 	var token: String = JSON.stringify([current_case.case_id, kind, source_id])
 	if not _completed_research_tokens.has(token):
@@ -1401,7 +1542,7 @@ func _grant_event_presentation_credit(kind: String, source_id: String) -> void:
 
 
 func _try_present_ready_failure_event(view: FlowView, allow_experiment: bool = false) -> bool:
-	if not _event_presentation_credit or not _has_failure_event_context(view) or (_current_stage not in [Stage.CCTV, Stage.CONTAINMENT] and not (_current_stage == Stage.EXPERIMENT and allow_experiment)):
+	if not _side_due.is_empty() or _is_side_interrupt() or not _event_presentation_credit or not _has_failure_event_context(view) or (_current_stage not in [Stage.CCTV, Stage.CONTAINMENT] and not (_current_stage == Stage.EXPERIMENT and allow_experiment)):
 		return false
 	var disturbances: Array[String] = []
 	var majors: Array[String] = []
@@ -1424,7 +1565,7 @@ func _try_present_oldest_actionable_event(disturbance_ready: Array[String], majo
 	# A non-presentable older candidate does not block a later actionable one.
 	for source_case_id: String in failure_candidates.get_candidate_case_ids():
 		var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
-		if incident_responses.has_response(source_case_id, candidate.incident_id):
+		if incident_responses.has_response(_case_response_source(source_case_id), candidate.incident_id):
 			continue
 		if disturbance_ready.has(source_case_id) and _try_present_candidate_disturbance(source_case_id):
 			return true
@@ -1435,7 +1576,7 @@ func _try_present_oldest_actionable_event(disturbance_ready: Array[String], majo
 
 
 func _try_present_candidate_disturbance(source_case_id: String) -> bool:
-	if not _terminal_action_allowed(): return false
+	if not _terminal_action_allowed() or not _has_current_case_runtime() or not incident_responses.get_active_response().is_empty(): return false
 	if not _event_presentation_credit:
 		return false
 	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
@@ -1471,10 +1612,6 @@ func _try_present_candidate_disturbance(source_case_id: String) -> bool:
 func _refresh_current_environment_conditions() -> void:
 	if _current_view is CCTVView or _current_view is ExperimentView or _current_view is ContainmentView:
 		var summary: EnvironmentConditions.Summary = _build_environment_summary()
-		if _current_view is ExperimentView:
-			view_host.custom_minimum_size.y = 580 if not summary.entries.is_empty() else 400
-		else:
-			view_host.custom_minimum_size.y = (500 if _current_view is CCTVView else 550) if not summary.entries.is_empty() else 360
 		_current_view.set_environment_conditions(summary)
 
 
@@ -1495,20 +1632,25 @@ func _unique_response_content(items: Array, id_field: String, id: String) -> Res
 
 func _response_source_case() -> CaseData:
 	var response: Dictionary = incident_responses.get_active_response()
-	return _find_failure_source_case(response.source_case_id) if not response.is_empty() else null
+	if response.get("origin_kind", -1) != IncidentSource.OriginKind.CASE: return null
+	var source: IncidentSource = _case_response_source(response.source_definition_id)
+	return _find_failure_source_case(response.source_definition_id) if source != null and source.matches(response) else null
 
 
 func _response_incident() -> IncidentData:
-	var source: CaseData = _response_source_case()
-	return _unique_response_content(source.incidents, "incident_id", incident_responses.get_active_response().incident_id) as IncidentData if source != null else null
+	var scope: Resource = _response_content_scope()
+	if scope is ScriptedIncidentData:
+		var incident: IncidentData = (scope as ScriptedIncidentData).incident_data
+		return incident if incident.incident_id == incident_responses.get_active_response().incident_id else null
+	return _unique_response_content(scope.get("incidents"), "incident_id", incident_responses.get_active_response().incident_id) as IncidentData if scope != null else null
 
 
 func _response_broadcast() -> EmergencyBroadcastData:
-	var source: CaseData = _response_source_case()
+	var source: Resource = _response_content_scope()
 	var incident: IncidentData = _response_incident()
 	if source == null or incident == null or incident.broadcast_id != incident_responses.get_active_response().broadcast_id:
 		return null
-	return _unique_response_content(source.emergency_broadcasts, "broadcast_id", incident.broadcast_id) as EmergencyBroadcastData
+	return _unique_response_content(source.get("emergency_broadcasts"), "broadcast_id", incident.broadcast_id) as EmergencyBroadcastData
 
 
 func _response_option(option_id: String = "") -> BroadcastOptionData:
@@ -1520,21 +1662,28 @@ func _response_option(option_id: String = "") -> BroadcastOptionData:
 
 
 func _response_result(option: BroadcastOptionData = null) -> IncidentResultData:
-	var source: CaseData = _response_source_case()
+	var source: Resource = _response_content_scope()
 	var selected: BroadcastOptionData = option if option != null else _response_option()
 	if source == null or selected == null:
 		return null
 	if option == null and selected.result_id != incident_responses.get_active_response().get("incident_result_id", ""):
 		push_warning("Main: confirmed response result link changed; retaining response.")
 		return null
-	return _unique_response_content(source.incident_results, "result_id", selected.result_id) as IncidentResultData
+	return _unique_response_content(source.get("incident_results"), "result_id", selected.result_id) as IncidentResultData
 
 
 func _has_interrupt_context() -> bool:
+	if _is_side_interrupt(): return _bound_side_interrupt() != null
 	return _has_current_case_runtime() and _interrupt_context.get("interrupted_case_id", "") == current_case.case_id and _interrupt_context.get("runtime_instance_id", -1) == case_runtime.get_instance_id() and _interrupt_context.get("case_instance_id", -1) == current_case.get_instance_id() and _interrupt_context.get("return_stage", -1) in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]
 
 
 func _build_response_display_context() -> Dictionary:
+	if _is_side_interrupt():
+		var occurrence: ScriptedInterruptOccurrenceData = _bound_side_interrupt()
+		return {"origin_kind": IncidentSource.OriginKind.CAMPAIGN_INTERRUPT, "source_occurrence_id": occurrence.interrupt_id, "event_id": occurrence.scripted_incident_data.event_id, "interrupted_case_id": current_case.case_id, "interrupted_case_display_name": current_case.display_name, "return_stage": Stage.keys()[_interrupt_context.return_stage], "return_policy": "RESUME_INTERRUPTED_CASE"} if occurrence != null else {}
+	if _is_scripted_response():
+		var entry: CampaignEntryData = _bound_scripted_entry()
+		return {"origin_kind": IncidentSource.OriginKind.CAMPAIGN_ENTRY, "source_entry_id": entry.entry_id, "event_id": entry.scripted_incident_data.event_id, "return_policy": "ADVANCE_CAMPAIGN_ENTRY"} if entry != null else {}
 	if not _is_normal_interrupt() or not _has_interrupt_context():
 		return {}
 	var source: CaseData = _response_source_case()
@@ -1546,10 +1695,10 @@ func _build_response_display_context() -> Dictionary:
 func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 	var draft: Dictionary = _interrupt_context.get("broadcast_draft", {}).duplicate()
 	_interrupt_context.erase("broadcast_draft")
-	if draft.is_empty() or not _is_normal_interrupt() or _current_stage != Stage.BROADCAST or not _has_interrupt_context() or not _accept_view_action(view, "response"):
+	if draft.is_empty() or not _is_response_route() or _current_stage != Stage.BROADCAST or not _has_response_context() or not _accept_view_action(view, "response"):
 		return
 	var response: Dictionary = incident_responses.get_active_response()
-	if not response.get("confirmed_option_id", "").is_empty() or draft.get("source_case_id", "") != response.get("source_case_id", "") or draft.get("incident_id", "") != response.get("incident_id", "") or draft.get("broadcast_id", "") != response.get("broadcast_id", ""):
+	if not response.get("confirmed_option_id", "").is_empty() or not IncidentSource.from_record(response).matches(draft) or draft.get("incident_id", "") != response.get("incident_id", "") or draft.get("broadcast_id", "") != response.get("broadcast_id", ""):
 		return
 	var option: BroadcastOptionData = _response_option(draft.get("option_id", ""))
 	if option != null and _response_result(option) != null:
@@ -1558,11 +1707,11 @@ func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 
 func _try_start_major_incident(source_case_id: String) -> bool:
 	if not _terminal_action_allowed(): return false
-	if not _event_presentation_credit or _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
+	if not _side_due.is_empty() or _is_side_interrupt() or not _event_presentation_credit or _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
 		return false
 	var candidate: Dictionary = failure_candidates.get_candidate(source_case_id)
 	var resolution: Dictionary = containment_resolutions.get_resolution(source_case_id)
-	if candidate.is_empty() or not candidate.disturbance_triggered or candidate.major_incident_triggered or candidate.major_opportunity_count < candidate.major_trigger_threshold or resolution.get("result", MonitoringOutcomeData.Result.UNDEFINED) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != candidate.incident_id or incident_responses.has_response(source_case_id, candidate.incident_id):
+	if candidate.is_empty() or not candidate.disturbance_triggered or candidate.major_incident_triggered or candidate.major_opportunity_count < candidate.major_trigger_threshold or resolution.get("result", MonitoringOutcomeData.Result.UNDEFINED) != MonitoringOutcomeData.Result.FAILURE or resolution.get("incident_id", "") != candidate.incident_id or incident_responses.has_response(_case_response_source(source_case_id), candidate.incident_id):
 		return false
 	var source: CaseData = _find_failure_source_case(source_case_id)
 	if source == null:
@@ -1587,7 +1736,7 @@ func _try_start_major_incident(source_case_id: String) -> bool:
 	if not usable:
 		push_warning("Main: Major Incident has no usable response chain; retaining candidate.")
 		return false
-	if not incident_responses.try_begin(source_case_id, incident.incident_id, broadcast.broadcast_id):
+	if not incident_responses.try_begin(_case_response_source(source_case_id), incident.incident_id, broadcast.broadcast_id):
 		return false
 	failure_candidates.try_mark_major_triggered(source_case_id)
 	_interrupt_context = {"interrupted_case_id": current_case.case_id, "return_stage": _current_stage, "runtime_instance_id": case_runtime.get_instance_id(), "case_instance_id": current_case.get_instance_id()}
@@ -1634,7 +1783,7 @@ func _discover_response_research(stage: int, source: Resource) -> void:
 
 func _confirm_response_option(broadcast_id: String, option_id: String, view: BroadcastView) -> void:
 	if not _accept_view_action(view, "response"): return
-	if not _has_interrupt_context() or not view.is_visible_in_tree():
+	if not _has_response_context() or not view.is_visible_in_tree():
 		return
 	var response: Dictionary = incident_responses.get_active_response()
 	var broadcast: EmergencyBroadcastData = _response_broadcast()
@@ -1644,15 +1793,16 @@ func _confirm_response_option(broadcast_id: String, option_id: String, view: Bro
 		var option: BroadcastOptionData = _response_option(option_id)
 		var result: IncidentResultData = _response_result(option) if option != null else null
 		if result != null and not option.display_text.strip_edges().is_empty() and not result.display_name.strip_edges().is_empty() and not result.description.strip_edges().is_empty():
-			if incident_responses.try_confirm(response.source_case_id, response.incident_id, broadcast_id, option_id, result.result_id):
+			if incident_responses.try_confirm(IncidentSource.from_record(response), response.incident_id, broadcast_id, option_id, result.result_id):
 				_merge_response_research(ResearchEntryData.SourceKind.BROADCAST_OPTION, option_id)
 	response = incident_responses.get_active_response()
+	if _is_side_interrupt(): view.set_meta("interrupt_response_binding", response)
 	view.update_confirmation_state(response.broadcast_id if not response.confirmed_option_id.is_empty() else "", response.confirmed_option_id)
 
 
 func _advance_response(view: FlowView) -> void:
 	if not _accept_view_action(view, "response"): return
-	if not _has_interrupt_context() or not view.is_visible_in_tree() or view.next_button.disabled:
+	if not _has_response_context() or not view.is_visible_in_tree() or view.next_button.disabled:
 		return
 	match _current_stage:
 		Stage.INCIDENT:
@@ -1664,10 +1814,24 @@ func _advance_response(view: FlowView) -> void:
 		Stage.INCIDENT_RESULT:
 			var response: Dictionary = incident_responses.get_active_response()
 			var result: IncidentResultData = _response_result()
+			if _is_side_interrupt():
+				if result == null or view.get("_incident_result_data") != result or result.result_id != response.get("incident_result_id", ""): return
+				_resume_side_work(response)
+				return
+			if _is_scripted_response():
+				var entry: CampaignEntryData = _bound_scripted_entry()
+				if entry == null or result == null or view.get("_incident_result_data") != result or result.result_id != response.get("incident_result_id", "") or not campaign_progress.can_complete_current(entry.entry_id): return
+				if not incident_responses.try_complete(IncidentSource.from_record(response), response.incident_id): return
+				if not campaign_progress.try_complete_and_advance(entry.entry_id): return
+				_interrupt_context.clear()
+				_source_archive_return_stage = -1
+				_incident_route = IncidentRoute.DEBUG_RUNTIME
+				_dispatch_campaign_entry()
+				return
 			var candidate: Dictionary = failure_candidates.get_candidate(response.get("source_case_id", ""))
 			if result == null or view.get("_incident_result_data") != result or result.result_id != response.get("incident_result_id", "") or candidate.get("incident_id", "") != response.get("incident_id", "") or not candidate.get("major_incident_triggered", false):
 				return
-			if not incident_responses.try_complete(response.source_case_id, response.incident_id):
+			if not incident_responses.try_complete(IncidentSource.from_record(response), response.incident_id):
 				return
 			failure_candidates.remove_completed_candidate(response.source_case_id, response.incident_id)
 			var return_stage: int = _interrupt_context.return_stage
@@ -1682,10 +1846,10 @@ func _advance_response(view: FlowView) -> void:
 
 
 func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
-	if not _is_normal_interrupt() or not _has_interrupt_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
+	if not _is_response_route() or not _has_response_context() or source_stage != _current_stage or source_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
 		return
 	var source: CaseData = _response_source_case()
-	if source == null or not research_archive.get_archived_case_ids().has(source.case_id):
+	if not (_is_scripted_response() or _is_side_interrupt()) and (source == null or not research_archive.get_archived_case_ids().has(source.case_id)):
 		return
 	_interrupt_context.erase("broadcast_draft")
 	if view is BroadcastView and incident_responses.get_active_response().confirmed_option_id.is_empty() and view.get("_broadcast_data") == _response_broadcast():
@@ -1693,10 +1857,12 @@ func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
 		var option: BroadcastOptionData = _response_option(option_id) if not option_id.is_empty() else null
 		if option != null and _response_result(option) != null:
 			var response: Dictionary = incident_responses.get_active_response()
-			_interrupt_context["broadcast_draft"] = {"source_case_id": response.source_case_id, "incident_id": response.incident_id, "broadcast_id": response.broadcast_id, "option_id": option_id}
+			var draft: Dictionary = IncidentSource.from_record(response).to_dictionary()
+			draft.merge({"incident_id": response.incident_id, "broadcast_id": response.broadcast_id, "option_id": option_id})
+			_interrupt_context["broadcast_draft"] = draft
 	_source_archive_return_stage = source_stage
-	_archive_detail_case_id = source.case_id
-	_show_view(Stage.RESEARCH_ARCHIVE_DETAIL, false)
+	_archive_detail_case_id = source.case_id if source != null else ""
+	_show_view(Stage.RESEARCH_ARCHIVE_LIST if _is_scripted_response() or _is_side_interrupt() else Stage.RESEARCH_ARCHIVE_DETAIL, false)
 
 
 func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
@@ -1705,6 +1871,11 @@ func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
 	if history.is_empty():
 		return
 	var id: String = history[-1]
+	view.restore_recorded_result(id, _recorded_experiment_conditions(id))
+	_mark_research_display(view)
+
+
+func _recorded_experiment_conditions(id: String) -> ExperimentView.ConditionSnapshot:
 	var snapshot := ExperimentView.ConditionSnapshot.new()
 	for observation_id: String in case_runtime.get_experiment_condition_observation_ids(id):
 		var data: ExperimentConditionObservationData = _unique_response_content(current_case.experiment_condition_observations, "observation_id", observation_id) as ExperimentConditionObservationData
@@ -1712,8 +1883,7 @@ func _restore_interrupted_experiment_result(view: ExperimentView) -> void:
 			continue
 		var condition: EnvironmentalDisturbanceData = _find_environment_condition_data(data.disturbance_id)
 		snapshot.entries.append(ExperimentView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text, condition.display_name if condition != null else "[Unavailable]", condition.condition_change_text if condition != null else "[Unavailable]"))
-	view.restore_recorded_result(id, snapshot)
-	_mark_research_display(view)
+	return snapshot
 
 
 func _build_environment_summary() -> EnvironmentConditions.Summary:
@@ -1773,8 +1943,6 @@ func _refresh_cctv_condition_observations() -> void:
 	for data: CCTVConditionObservationData in _get_active_cctv_condition_observations():
 		snapshot.entries.append(CCTVView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text))
 	(_current_view as CCTVView).set_condition_observations(snapshot)
-	if not snapshot.entries.is_empty():
-		view_host.custom_minimum_size.y = 660
 
 
 func _discover_cctv_condition_observations(view: CCTVView) -> void:
@@ -1885,6 +2053,7 @@ func _append_disturbance_observations(snapshot: ResearchLogView.Snapshot, entrie
 
 
 func _show_disturbance_notice(disturbance: EnvironmentalDisturbanceData, reaction: CaseDisturbanceReactionData) -> void:
+	_close_drawer(false)
 	if not _terminal_action_allowed(): return
 	_focus_before_notice = get_viewport().gui_get_focus_owner()
 	_view_process_mode_before_notice = view_host.process_mode
@@ -1893,6 +2062,7 @@ func _show_disturbance_notice(disturbance: EnvironmentalDisturbanceData, reactio
 	_disturbance_notice.setup(disturbance, reaction)
 	_disturbance_notice.dismissed.connect(_on_disturbance_dismissed.bind(_disturbance_notice))
 	add_child(_disturbance_notice)
+	_refresh_shell()
 
 
 func _on_disturbance_dismissed(notice: DisturbanceNotice) -> void:
@@ -1909,6 +2079,8 @@ func _on_disturbance_dismissed(notice: DisturbanceNotice) -> void:
 	_refresh_cctv_condition_observations()
 	if _current_view is CCTVView:
 		_discover_cctv_condition_observations(_current_view as CCTVView)
+	if not _side_due.is_empty(): _present_due_side_after_draw(_current_view)
+	_refresh_shell()
 
 
 func _get_next_stage(stage: int) -> int:
@@ -2088,3 +2260,342 @@ func _validate_case() -> void:
 		push_warning("Main: current_case.display_name is empty.")
 	if current_case.experiment_limit < 0:
 		push_warning("Main: current_case.experiment_limit is negative; treating it as zero.")
+func _current_campaign_entry() -> CampaignEntryData:
+	return campaign_data.get_entry(campaign_progress.get_current_entry_id()) if campaign_data != null and campaign_progress != null else null
+
+
+func _next_campaign_entry() -> CampaignEntryData:
+	return campaign_data.get_entry(campaign_progress.get_next_entry_id()) if campaign_data != null and campaign_progress != null else null
+
+
+func _case_response_source(case_id: String) -> IncidentSource:
+	var entry: CampaignEntryData = campaign_data.get_case_entry(case_id) if campaign_data != null else null
+	return IncidentSource.new(IncidentSource.OriginKind.CASE, entry.entry_id, case_id) if entry != null else null
+
+
+func _is_scripted_response() -> bool:
+	return _incident_route == IncidentRoute.SCRIPTED_CAMPAIGN
+
+
+func _is_response_route() -> bool:
+	return _is_normal_interrupt() or _is_scripted_response() or _is_side_interrupt()
+
+
+func _bound_scripted_entry() -> CampaignEntryData:
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if entry == null or entry.entry_kind != CampaignEntryData.EntryKind.SCRIPTED_INCIDENT or current_case != null or case_runtime != null or not entry.get_validation_error().is_empty(): return null
+	var source := IncidentSource.new(IncidentSource.OriginKind.CAMPAIGN_ENTRY, entry.entry_id, entry.scripted_incident_data.event_id)
+	return entry if source.matches(incident_responses.get_active_response()) and _interrupt_context.get("source_occurrence_id", "") == entry.entry_id and _interrupt_context.get("event_id", "") == source.source_definition_id else null
+
+
+func _has_response_context() -> bool:
+	if _is_side_interrupt(): return _bound_side_interrupt() != null
+	return _has_interrupt_context() if _is_normal_interrupt() else (_is_scripted_response() and _bound_scripted_entry() != null)
+
+
+func _response_content_scope() -> Resource:
+	if _is_side_interrupt():
+		var occurrence: ScriptedInterruptOccurrenceData = _bound_side_interrupt()
+		return occurrence.scripted_incident_data if occurrence != null else null
+	if _is_scripted_response():
+		var entry: CampaignEntryData = _bound_scripted_entry()
+		return entry.scripted_incident_data if entry != null else null
+	return _response_source_case()
+
+
+func _case_response_records() -> Array[Dictionary]:
+	var records: Array[Dictionary] = []
+	for response: Dictionary in incident_responses.get_responses():
+		if response.origin_kind == IncidentSource.OriginKind.CASE: records.append(response)
+	return records
+
+
+func _dispatch_campaign_entry() -> void:
+	if not _terminal_action_allowed(): return
+	if _campaign_fact_queries != null: _campaign_fact_queries.clear_current_runtime()
+	current_case = null
+	case_runtime = null
+	_research_log_return_stage = -1
+	_cctv_review_return_stage = -1
+	_archive_detail_case_id = ""
+	_processed_opportunities.clear()
+	_research_display.clear()
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if entry == null:
+		# Last scripted test entry may complete, but there is no Ending dispatch.
+		if is_instance_valid(_current_view):
+			_current_view.next_button.disabled = true
+			_current_view.next_button.text = "No next Campaign entry configured"
+			if _current_view.research_log_button != null: _current_view.research_log_button.disabled = true
+		return
+	if entry.entry_kind == CampaignEntryData.EntryKind.CASE:
+		current_case = entry.case_data
+		_validate_case()
+		case_runtime = CaseRuntimeState.new(current_case.case_id)
+		_campaign_fact_queries.set_current_runtime(entry.entry_id, current_case.case_id, case_runtime)
+		_show_view(Stage.PROFILE)
+		return
+	var data: ScriptedIncidentData = entry.scripted_incident_data
+	var source := IncidentSource.new(IncidentSource.OriginKind.CAMPAIGN_ENTRY, entry.entry_id, data.event_id)
+	if not incident_responses.try_begin(source, data.incident_data.incident_id, data.incident_data.broadcast_id):
+		push_error("Main: Campaign response could not start for entry " + entry.entry_id)
+		return
+	_interrupt_context = {"source_occurrence_id": entry.entry_id, "event_id": data.event_id}
+	_incident_route = IncidentRoute.SCRIPTED_CAMPAIGN
+	_show_view(Stage.INCIDENT)
+
+
+func _is_side_interrupt() -> bool:
+	return _incident_route == IncidentRoute.SCRIPTED_INTERRUPT
+
+
+func _side_boundary_status() -> String:
+	if _side_restore_pending: return "UNSUPPORTED_INTERRUPT_RESUME_PENDING"
+	if incident_responses != null and incident_responses.get_active_response().get("origin_kind", -1) == IncidentSource.OriginKind.CAMPAIGN_INTERRUPT: return "UNSUPPORTED_ACTIVE_CAMPAIGN_RESPONSE"
+	if not _side_due.is_empty(): return "UNSUPPORTED_DUE_CAMPAIGN_INTERRUPT"
+	if _is_side_interrupt(): return "UNSUPPORTED_INTERRUPT_CONTEXT"
+	return ""
+
+
+func _side_checkpoint_at(kind: int, action: String) -> ScriptedInterruptOccurrenceData:
+	if campaign_data == null or campaign_progress == null or _current_stage not in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not campaign_data.get_validation_error().is_empty(): return null
+	var occurrence: ScriptedInterruptOccurrenceData = campaign_data.get_interrupt_at_checkpoint(campaign_progress.get_current_entry_id(), kind, Stage.keys()[_current_stage], action)
+	if occurrence == null or incident_responses.has_response(occurrence.get_source(), occurrence.scripted_incident_data.incident_data.incident_id): return null
+	return occurrence
+
+
+func _latch_side_checkpoint(occurrence: ScriptedInterruptOccurrenceData, view: FlowView) -> bool:
+	# A notice may disable input after a reached checkpoint; retain its intent.
+	# No progression, history, failure credit or completed-occurrence set lives here.
+	if occurrence == null or campaign_data == null or not campaign_data.get_validation_error().is_empty() or campaign_data.get_interrupt(occurrence.interrupt_id) != occurrence or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or _side_restore_pending: return false
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if entry == null or entry.entry_kind != CampaignEntryData.EntryKind.CASE or entry.entry_id != occurrence.target_entry_id or entry.case_data != current_case or not _has_current_case_runtime() or Stage.keys()[_current_stage] != occurrence.stage_id: return false
+	if not is_instance_valid(view) or view != _current_view or not view.is_inside_tree() or view.is_queued_for_deletion() or not view.is_visible_in_tree(): return false
+	if occurrence.checkpoint_kind == ScriptedInterruptOccurrenceData.CheckpointKind.ACTION_ACCEPTED and (not _has_drawn_research_display(view) or _displayed_research_source_id(view).is_empty() or occurrence.action_id != ScriptedInterruptOccurrenceData.EXPERIMENT_RESULT_READ): return false
+	if incident_responses.has_response(occurrence.get_source(), occurrence.scripted_incident_data.incident_data.incident_id): return false
+	var intent: Dictionary = {"interrupt_id": occurrence.interrupt_id, "target_entry_id": entry.entry_id, "checkpoint_key": occurrence.checkpoint_key(), "view_id": view.get_instance_id(), "runtime_instance_id": case_runtime.get_instance_id(), "case_instance_id": current_case.get_instance_id(), "action_source_id": _displayed_research_source_id(view) if occurrence.checkpoint_kind == ScriptedInterruptOccurrenceData.CheckpointKind.ACTION_ACCEPTED else ""}
+	if not _side_due.is_empty(): return _side_due == intent
+	_side_due = intent
+	return true
+
+
+func _present_due_side_after_draw(view: FlowView) -> void:
+	# Setup/add_child precede this checkpoint. Yield for actual state/layout/draw.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+	if not is_inside_tree() or not is_instance_valid(view) or view != _current_view or view.is_queued_for_deletion(): return
+	_try_present_side_interrupt()
+
+
+func _try_present_side_interrupt() -> bool:
+	if not _side_due.is_empty() and is_instance_valid(_drawer_view): _close_drawer()
+	if _side_due.is_empty() or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or _side_restore_pending or _is_response_route() or not _interrupt_context.is_empty() or not _is_active_view(_current_view) or not incident_responses.get_active_response().is_empty(): return false
+	if campaign_data == null or not campaign_data.get_validation_error().is_empty() or not _has_current_case_runtime(): return false
+	var occurrence: ScriptedInterruptOccurrenceData = campaign_data.get_interrupt(_side_due.get("interrupt_id", ""))
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if occurrence == null or entry == null or entry.entry_kind != CampaignEntryData.EntryKind.CASE or entry.entry_id != occurrence.target_entry_id or entry.entry_id != _side_due.get("target_entry_id", "") or entry.case_data != current_case or occurrence.checkpoint_key() != _side_due.get("checkpoint_key", "") or occurrence.stage_id != Stage.keys()[_current_stage]: return false
+	if _side_due.get("view_id", 0) != _current_view.get_instance_id() or _side_due.get("runtime_instance_id", 0) != case_runtime.get_instance_id() or _side_due.get("case_instance_id", 0) != current_case.get_instance_id() or not _has_drawn_research_display(_current_view): return false
+	if occurrence.checkpoint_kind == ScriptedInterruptOccurrenceData.CheckpointKind.ACTION_ACCEPTED and (_side_due.get("action_source_id", "").is_empty() or _side_due.action_source_id != _displayed_research_source_id(_current_view)): return false
+	var state: Dictionary = _current_view.capture_work_state()
+	if not InterruptedWorkViewState.get_validation_error(occurrence.stage_id, state, current_case, case_runtime, pending_containment, containment_resolutions).is_empty(): return false
+	var source: IncidentSource = occurrence.get_source()
+	var incident: IncidentData = occurrence.scripted_incident_data.incident_data
+	if incident_responses.has_response(source, incident.incident_id): return false
+	var context: Dictionary = source.to_dictionary()
+	context.merge({"interrupted_entry_id": entry.entry_id, "interrupted_case_id": current_case.case_id, "return_stage": _current_stage, "runtime_instance_id": case_runtime.get_instance_id(), "case_instance_id": current_case.get_instance_id(), "incident_id": incident.incident_id, "return_policy": "RESUME_INTERRUPTED_CASE", "work_view_state": state.duplicate(true), "cctv_review_return_stage": _cctv_review_return_stage})
+	if not incident_responses.try_begin(source, incident.incident_id, incident.broadcast_id): return false
+	_interrupt_context = context
+	_side_due.clear()
+	_side_resume_error = ""
+	_incident_route = IncidentRoute.SCRIPTED_INTERRUPT
+	_show_view(Stage.INCIDENT, false)
+	return true
+
+
+func _bound_side_interrupt(allow_completed: bool = false) -> ScriptedInterruptOccurrenceData:
+	if not _is_side_interrupt() or campaign_data == null or campaign_progress == null or not campaign_data.get_validation_error().is_empty() or not _has_current_case_runtime(): return null
+	var occurrence: ScriptedInterruptOccurrenceData = campaign_data.get_interrupt(_interrupt_context.get("source_occurrence_id", ""))
+	var entry: CampaignEntryData = _current_campaign_entry()
+	if occurrence == null or entry == null or entry.entry_kind != CampaignEntryData.EntryKind.CASE or entry.entry_id != occurrence.target_entry_id or entry.case_data != current_case or _interrupt_context.get("interrupted_entry_id", "") != entry.entry_id or _interrupt_context.get("interrupted_case_id", "") != current_case.case_id or _interrupt_context.get("runtime_instance_id", 0) != case_runtime.get_instance_id() or _interrupt_context.get("case_instance_id", 0) != current_case.get_instance_id() or _interrupt_context.get("return_policy", "") != "RESUME_INTERRUPTED_CASE" or _interrupt_context.get("return_stage", -1) not in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]: return null
+	if Stage.keys()[_interrupt_context.return_stage] != occurrence.stage_id: return null
+	var source: IncidentSource = occurrence.get_source()
+	var incident: IncidentData = occurrence.scripted_incident_data.incident_data
+	if not source.matches(_interrupt_context) or _interrupt_context.get("incident_id", "") != incident.incident_id: return null
+	for record: Dictionary in incident_responses.get_responses():
+		if source.matches(record) and record.get("incident_id", "") == incident.incident_id and record.get("broadcast_id", "") == incident.broadcast_id and record.get("status", -1) == (IncidentResponseState.Status.COMPLETED if allow_completed else IncidentResponseState.Status.ACTIVE): return occurrence
+	return null
+
+
+func _resume_side_work(response: Dictionary) -> void:
+	var occurrence: ScriptedInterruptOccurrenceData = _bound_side_interrupt()
+	if occurrence == null or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or _side_restore_pending: return
+	var stage_id: String = Stage.keys()[_interrupt_context.return_stage]
+	var error: String = InterruptedWorkViewState.get_validation_error(stage_id, _interrupt_context.get("work_view_state", {}), current_case, case_runtime, pending_containment, containment_resolutions)
+	if not error.is_empty():
+		_side_resume_error = error
+		return
+	if _interrupt_context.get("cctv_review_return_stage", -2) not in [-1, Stage.EXPERIMENT, Stage.CONTAINMENT]:
+		_side_resume_error = "INVALID_CCTV_REVIEW_RETURN"
+		return
+	if not occurrence.get_source().matches(response) or response.get("incident_result_id", "").is_empty(): return
+	if not incident_responses.try_complete(occurrence.get_source(), response.incident_id): return
+	_side_restore_pending = true
+	_restore_side_work()
+
+
+func _restore_side_work() -> void:
+	# Also supports an explicit developer retry of retained resume-pending state.
+	# Completion and UI restoration are not an atomic cross-object transaction.
+	if not _side_restore_pending or _bound_side_interrupt(true) == null or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy: return
+	var state: Dictionary = _interrupt_context.work_view_state.duplicate(true)
+	var stage: int = _interrupt_context.return_stage
+	var error: String = InterruptedWorkViewState.get_validation_error(Stage.keys()[stage], state, current_case, case_runtime, pending_containment, containment_resolutions)
+	if not error.is_empty():
+		_side_resume_error = error
+		return
+	_cctv_review_return_stage = _interrupt_context.cctv_review_return_stage
+	_show_view(stage, false, true)
+	var restored: FlowView = _current_view
+	if stage == Stage.EXPERIMENT and not (restored as ExperimentView).restore_work_result(state, _recorded_experiment_conditions(state.displayed_result_id)):
+		_side_resume_error = "EXPERIMENT_RESULT_RESTORE_FAILED"
+		return
+	# Containers recalculate scroll ranges after layout. Keep all input closed.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+	if not is_inside_tree(): return
+	if not is_instance_valid(restored) or restored != _current_view or restored.is_queued_for_deletion() or _bound_side_interrupt(true) == null:
+		_side_resume_error = "RESTORED_VIEW_OR_SOURCE_UNAVAILABLE"
+		return
+	if not restored.restore_work_state(state) or restored.capture_work_state() != state:
+		_side_resume_error = "WORK_VIEW_RESTORE_FAILED"
+		return
+	_interrupt_context.clear()
+	_source_archive_return_stage = -1
+	_archive_detail_case_id = ""
+	_side_restore_pending = false
+	_side_resume_error = ""
+	_incident_route = IncidentRoute.DEBUG_RUNTIME
+	# No Next replay, checkpoint, discovery, opportunity, credit or event drain.
+	_refresh_shell()
+
+# Shell / auxiliary UI wiring only. These paths do not count gameplay opportunities.
+func _refresh_shell() -> void:
+	if not is_node_ready() or not is_inside_tree() or not game_shell.is_inside_tree(): return
+	var stage: String = Stage.keys()[_current_stage].replace("_", " ")
+	var work_stage: int = _current_stage if _current_stage <= Stage.CONTAINMENT else -1
+	var runtime_id: int = case_runtime.get_instance_id() if case_runtime != null else 0
+	if _drawer_runtime_id != runtime_id:
+		_drawer_cache.clear()
+		_drawer_runtime_id = runtime_id
+	var subject: String = current_case.display_name if _has_current_case_runtime() else "FACILITY EVENT"
+	if _developer_terminal.mode == TerminalMode.CLEANED_NO_RUN:
+		subject = "NO ACTIVE RUN"
+		stage = "NO ACTIVE RUN"
+	if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		stage = "UTILITY / ARCHIVE"
+	elif _is_side_interrupt() or _is_normal_interrupt():
+		stage += " / PAUSED " + Stage.keys()[_interrupt_context.get("return_stage", Stage.PROFILE)]
+	var environment: String = ""
+	for condition: EnvironmentConditions.Condition in _build_environment_summary().entries:
+		environment += (" / " if not environment.is_empty() else "") + condition.display_name
+	var blocked: bool = _developer_closure_busy or is_instance_valid(_disturbance_notice) or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_current_view) and _current_view.has_open_confirmation() or not _terminal_action_allowed("archive")
+	var work: bool = _current_stage <= Stage.CONTAINMENT and _has_current_case_runtime() and not _is_response_route()
+	var response: bool = _is_response_route() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] and _has_response_context()
+	var tool: bool = not blocked and (work or response)
+	var status: String = "SESSION MEMORY / NO PERSISTENT SAVE"
+	if _has_current_case_runtime() and case_runtime.has_confirmed_containment(): status += " / CONTAINMENT DECISION RECORDED"
+	game_shell.display(subject, stage, environment, work_stage if work else -1, tool, tool, not blocked and work, status, runtime_id)
+	game_shell.show_active_utility(_drawer_kind if is_instance_valid(_drawer_view) else "ARCHIVE" if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] else "")
+
+func _shell_research_requested() -> void:
+	if is_instance_valid(_drawer_view):
+		if _drawer_kind == "RESEARCH":
+			_close_drawer()
+			return
+		_close_drawer()
+	if is_instance_valid(_current_view): _on_research_log_requested(_current_view, _current_stage)
+
+func _accept_drawer_action(view: ResearchLogView) -> bool:
+	return view == _drawer_view and is_instance_valid(view) and view.is_inside_tree() and not view.is_queued_for_deletion() and _drawer_runtime_id == (case_runtime.get_instance_id() if case_runtime != null else 0) and _has_current_case_runtime() and not _is_response_route() and not _developer_closure_busy and not is_instance_valid(_disturbance_notice) and _side_due.is_empty() and _terminal_action_allowed("archive")
+
+func _open_drawer(kind: String) -> void:
+	if is_instance_valid(_drawer_view):
+		var same: bool = _drawer_kind == kind
+		_close_drawer()
+		if same: return
+	if _current_stage > Stage.CONTAINMENT or not _has_current_case_runtime() or _is_response_route() or not _accept_view_action(_current_view, "archive"): return
+	if _drawer_runtime_id != case_runtime.get_instance_id(): _drawer_cache.clear()
+	_drawer_runtime_id = case_runtime.get_instance_id()
+	_drawer_focus = get_viewport().gui_get_focus_owner()
+	_drawer_kind = kind
+	_drawer_view = VIEW_SCENES[Stage.RESEARCH_LOG].instantiate()
+	_drawer_view.configure_drawer_mode(kind)
+	_drawer_view.setup(_build_research_log_snapshot())
+	var drawer: ResearchLogView = _drawer_view
+	drawer.set_input_guard(_accept_drawer_action.bind(drawer))
+	drawer.advance_requested.connect(func() -> void:
+		if _accept_drawer_action(drawer): _close_drawer())
+	drawer.archive_requested.connect(_on_research_archive_requested.bind(drawer))
+	drawer.hypothesis_add_requested.connect(_on_hypothesis_add_requested.bind(drawer))
+	drawer.hypothesis_update_requested.connect(_on_hypothesis_update_requested.bind(drawer))
+	drawer.hypothesis_remove_requested.connect(_on_hypothesis_remove_requested.bind(drawer))
+	_drawer_panel = game_shell.add_drawer(drawer, kind)
+	drawer.restore_drawer_state(_drawer_cache.get(kind, {}))
+	_refresh_shell()
+
+func _close_drawer(restore_focus: bool = true) -> void:
+	if is_instance_valid(_drawer_view) and _drawer_view.is_node_ready(): _drawer_cache[_drawer_kind] = _drawer_view.capture_drawer_state()
+	_drawer_view = null
+	_drawer_kind = ""
+	if is_instance_valid(_drawer_panel):
+		_drawer_panel.get_parent().remove_child(_drawer_panel)
+		_drawer_panel.queue_free()
+	_drawer_panel = null
+	if restore_focus and is_instance_valid(_drawer_focus) and _drawer_focus.is_inside_tree() and _drawer_focus.is_visible_in_tree(): _drawer_focus.grab_focus()
+	_drawer_focus = null
+	_refresh_shell()
+
+func _shell_archive_requested() -> void:
+	_close_drawer()
+	if _is_response_route():
+		_on_source_archive_requested(_current_view, _current_stage)
+		return
+	if _current_stage > Stage.CONTAINMENT or not _accept_view_action(_current_view, "archive") or not _has_current_case_runtime(): return
+	_utility_focus = get_viewport().gui_get_focus_owner()
+	_utility_work_view = _current_view
+	_utility_work_stage = _current_stage
+	_utility_research_display = _research_display.duplicate(true)
+	_research_log_return_stage = _current_stage
+	view_host.remove_child(_current_view)
+	_current_view = null
+	_show_view(Stage.RESEARCH_ARCHIVE_LIST, false)
+
+func _restore_utility_work() -> void:
+	if not is_instance_valid(_utility_work_view): return
+	view_host.remove_child(_current_view)
+	_current_view.queue_free()
+	_current_view = _utility_work_view
+	_current_stage = _utility_work_stage
+	_utility_work_view = null
+	_utility_work_stage = -1
+	_research_display = _utility_research_display.duplicate(true)
+	_utility_research_display.clear()
+	view_host.add_child(_current_view)
+	if is_instance_valid(_utility_focus) and _utility_focus.is_inside_tree() and _utility_focus.is_visible_in_tree(): _utility_focus.grab_focus()
+	_utility_focus = null
+	_refresh_shell()
+
+func _on_confirmation_changed() -> void:
+	_refresh_shell()
+	if not _side_due.is_empty() and is_instance_valid(_current_view) and not _current_view.has_open_confirmation(): _present_due_side_after_draw(_current_view)
+
+func _dispose_auxiliary_ui() -> void:
+	_close_drawer(false)
+	_drawer_cache.clear()
+	_drawer_runtime_id = 0
+	if is_instance_valid(_utility_work_view): _utility_work_view.free()
+	_utility_work_view = null
+	_utility_work_stage = -1
+	_utility_research_display.clear()

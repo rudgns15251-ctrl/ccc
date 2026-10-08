@@ -1,60 +1,154 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/views/research_archive_list_view.gd" id="1_archive"]
+[ext_resource type="Script" path="res://scripts/views/research_archive_list_view.gd" id="script"]
 
 [node name="ResearchArchiveListView" type="Control"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_archive")
+script = ExtResource("script")
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 24
 
-[node name="Content" type="VBoxContainer" parent="Center"]
-custom_minimum_size = Vector2(900, 0)
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="ScreenTitle" type="Label" parent="Center/Content"]
+[node name="Content" type="VBoxContainer" parent="Margin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="ScreenTitle" type="Label" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
 text = "RESEARCH ARCHIVE"
-horizontal_alignment = 1
-
-[node name="EmptyState" type="Label" parent="Center/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "No archived research available."
-horizontal_alignment = 1
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "TitleLabel"
 
-[node name="CaseScroll" type="ScrollContainer" parent="Center/Content"]
+[node name="Workspace" type="HBoxContainer" parent="Margin/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(900, 440)
 layout_mode = 2
-horizontal_scroll_mode = 0
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="CaseList" type="VBoxContainer" parent="Center/Content/CaseScroll"]
+[node name="Cases" type="VBoxContainer" parent="Margin/Content/Workspace"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(300, 0)
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="EmptyState" type="Label" parent="Margin/Content/Workspace/Cases"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No recorded Cases."
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="CaseScroll" type="ScrollContainer" parent="Margin/Content/Workspace/Cases"]
+follow_focus = true
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CaseList" type="VBoxContainer" parent="Margin/Content/Workspace/Cases/CaseScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="NextButton" type="Button" parent="Center/Content"]
+[node name="Entries" type="VBoxContainer" parent="Margin/Content/Workspace"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 64)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
-text = "Back"
+custom_minimum_size = Vector2(420, 0)
+size_flags_horizontal = 0
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="EntryHeading" type="Label" parent="Margin/Content/Workspace/Entries"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RECORDED ENTRIES"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
+
+[node name="EntryHint" type="Label" parent="Margin/Content/Workspace/Entries"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select a recorded Case."
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="Detail" type="VBoxContainer" parent="Margin/Content/Workspace"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="DetailHeading" type="Label" parent="Margin/Content/Workspace/Detail"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCH ARCHIVE"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
+
+[node name="ReadOnlyHint" type="Label" parent="Margin/Content/Workspace/Detail"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Read-only session records."
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="OpenResearchLogButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCH LOG"
+custom_minimum_size = Vector2(0, 48)
+visible = false
+
+[node name="Spacer" type="Control" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NextButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "BACK TO WORK"
+custom_minimum_size = Vector2(240, 48)
+theme_type_variation = "PrimaryButton"

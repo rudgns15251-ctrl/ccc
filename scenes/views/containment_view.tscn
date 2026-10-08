@@ -1,95 +1,129 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/views/containment_view.gd" id="1_containment"]
+[ext_resource type="Script" path="res://scripts/views/containment_view.gd" id="script"]
 
-[ext_resource type="PackedScene" path="res://scenes/views/environment_conditions_view.tscn" id="2_conditions"]
+[ext_resource type="PackedScene" path="res://scenes/views/environment_conditions_view.tscn" id="conditions"]
 
 [node name="ContainmentView" type="Control"]
+unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_containment")
+script = ExtResource("script")
 
-[node name="Center" type="CenterContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 24
 
-[node name="Content" type="VBoxContainer" parent="Center"]
-custom_minimum_size = Vector2(900, 0)
-layout_mode = 2
-theme_override_constants/separation = 3
-
-[node name="ScreenTitle" type="Label" parent="Center/Content"]
+[node name="Content" type="VBoxContainer" parent="Margin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="ScreenTitle" type="Label" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
 text = "CONTAINMENT"
-horizontal_alignment = 1
-
-[node name="Description" type="Label" parent="Center/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-horizontal_alignment = 1
 autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "TitleLabel"
 
-[node name="RoomScroll" type="ScrollContainer" parent="Center/Content"]
+[node name="Description" type="Label" parent="Margin/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(900, 202)
 layout_mode = 2
-horizontal_scroll_mode = 0
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
 
-[node name="RoomList" type="VBoxContainer" parent="Center/Content/RoomScroll"]
+[node name="EnvironmentConditions" parent="Margin/Content" instance=ExtResource("conditions")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RoomScroll" type="ScrollContainer" parent="Margin/Content"]
+follow_focus = true
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="EnvironmentConditions" parent="Center/Content" instance=ExtResource("2_conditions")]
+[node name="RoomList" type="VBoxContainer" parent="Margin/Content/RoomScroll"]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="RecheckCCTVButton" type="Button" parent="Center/Content"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(240, 36)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 18
-text = "Recheck CCTV"
-
-[node name="Actions" type="HBoxContainer" parent="Center/Content"]
-layout_mode = 2
-size_flags_horizontal = 4
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="ConfirmButton" type="Button" parent="Center/Content/Actions"]
+[node name="RoomDetailScroll" type="ScrollContainer" parent="Margin/Content"]
+follow_focus = true
 unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 64)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-disabled = true
-text = "Confirm Containment"
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+custom_minimum_size = Vector2(0, 140)
 
-[node name="NextButton" type="Button" parent="Center/Content/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 64)
+[node name="RoomDetailBody" type="VBoxContainer" parent="Margin/Content/RoomDetailScroll"]
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 28
-disabled = true
-text = "Next: CASE"
+size_flags_horizontal = 3
 
-[node name="OpenResearchLogButton" type="Button" parent="Center/Content/Actions"]
+[node name="RoomDetail" type="Label" parent="Margin/Content/RoomDetailScroll/RoomDetailBody"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(240, 64)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Open Research Log"
+text = "SELECT A ROOM"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
+[node name="RecheckCCTVButton" type="Button" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RECHECK CCTV"
+custom_minimum_size = Vector2(0, 48)
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="OpenResearchLogButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCH LOG"
+custom_minimum_size = Vector2(0, 48)
+visible = false
+
+[node name="Spacer" type="Control" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ConfirmButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "AUTHORIZE"
+custom_minimum_size = Vector2(240, 48)
+theme_type_variation = "PrimaryButton"
+
+[node name="NextButton" type="Button" parent="Margin/Content/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "CONTINUE"
+custom_minimum_size = Vector2(240, 48)
+theme_type_variation = "PrimaryButton"

@@ -1,5 +1,8 @@
 extends "res://scripts/views/flow_view.gd"
 
+signal case_requested(case_id: String)
+var _case_summaries: Array = []
+
 class ResearchEntry extends RefCounted:
 	var entry_id: String = ""
 	var category: String = ""
@@ -25,6 +28,7 @@ func setup(snapshot: Snapshot) -> void:
 func _ready() -> void:
 	super._ready()
 	_display_snapshot()
+	_display_cases()
 
 
 func _display_snapshot() -> void:
@@ -39,19 +43,52 @@ func _display_snapshot() -> void:
 	%HypothesisEmpty.visible = _snapshot == null or _snapshot.hypotheses.is_empty()
 	if _snapshot == null:
 		return
-	%Description.text = "Case: %s (%s)" % [_snapshot.display_name, _snapshot.case_id]
+	%Description.text = _snapshot.display_name
 	for entry: ResearchEntry in _snapshot.research_entries:
 		if entry == null:
 			continue
-		_append_text(%ResearchList, ("[%s]\n" % entry.category if not entry.category.is_empty() else "") + "%s\nEntry ID: %s\n%s" % [entry.title, entry.entry_id, entry.body_text])
+		var button := Button.new()
+		button.text = entry.category + " / " + entry.title
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.custom_minimum_size.y = 48
+		button.pressed.connect(func() -> void:
+			if _allows_local_input():
+				%EntryTitle.text = entry.title
+				%EntryBody.text = entry.body_text
+				%DetailScroll.scroll_vertical = 0)
+		%ResearchList.add_child(button)
 	for record: Dictionary in _snapshot.hypotheses:
-		_append_text(%HypothesisList, "%s\n%s" % [record.hypothesis_id, record.text])
+		var button := Button.new()
+		button.text = "WORKING NOTE"
+		button.custom_minimum_size.y = 48
+		button.pressed.connect(func() -> void:
+			if _allows_local_input():
+				%EntryTitle.text = "WORKING NOTE"
+				%EntryBody.text = record.text)
+		%HypothesisList.add_child(button)
 
 
 func _append_text(list: VBoxContainer, text: String) -> void:
 	var label := Label.new()
 	label.text = text
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 18)
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_child(label)
+
+func set_case_summaries(summaries: Array) -> void:
+	_case_summaries = summaries
+	if is_node_ready(): _display_cases()
+
+func _display_cases() -> void:
+	for child: Node in %CaseList.get_children():
+		%CaseList.remove_child(child)
+		child.queue_free()
+	for summary: RefCounted in _case_summaries:
+		var button := Button.new()
+		button.text = summary.display_name
+		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		button.disabled = not summary.available or summary.case_id == _snapshot.case_id
+		button.custom_minimum_size.y = 48
+		button.pressed.connect(func() -> void:
+			if _allows_local_input(): case_requested.emit(summary.case_id))
+		%CaseList.add_child(button)

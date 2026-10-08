@@ -13,6 +13,7 @@ theme_override_font_sizes/font_size = 18
 text = "ACTIVE FACILITY CONDITION"
 
 [node name="ConditionScroll" type="ScrollContainer" parent="."]
+follow_focus = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
