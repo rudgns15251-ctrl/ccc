@@ -39,7 +39,144 @@ static func matches_active(row: Dictionary, facts: Dictionary) -> bool:
 	return not active.is_empty() and not active.has("reference_issue") and row.source_case_id == active.get("source_case_id", "") and row.incident_id == active.get("incident_id", "")
 
 
-static func source_issue(facts: Dictionary, mapping: Dictionary) -> String:
+# All raw responses must belong to an authored occurrence; never silently filter.
+static func classify_response_records(records: Array, campaign: CampaignData) -> Dictionary:
+	var result: Dictionary = {"issue": "", "responses": [], "scripted_responses": []}
+	if campaign == null or not campaign.get_validation_error().is_empty():
+		result.issue = "INVALID_RESPONSE_CAMPAIGN"
+		return result
+	var seen: Dictionary = {}
+	for value: Variant in records:
+		if not value is Dictionary:
+			result.issue = "INVALID_RESPONSE_RECORD"
+			return result
+		var row: Dictionary = value
+		if not _response_has_primitive_shape(row):
+			result.issue = "INVALID_RESPONSE_PRIMITIVE_SHAPE"
+			return result
+		if not row.get("status") is int or row.status not in [IncidentResponseState.Status.ACTIVE, IncidentResponseState.Status.COMPLETED] or not row.get("confirmed_option_id") is String or not row.get("incident_result_id") is String:
+			result.issue = "INVALID_RESPONSE_STATUS_OR_FACT_TYPE"
+			return result
+		for field: String in ["source_occurrence_id", "source_definition_id", "incident_id", "broadcast_id"]:
+			if not _is_id(row.get(field)):
+				result.issue = "INVALID_RESPONSE_ID::" + field
+				return result
+		if not row.get("origin_kind") is int or row.origin_kind not in [IncidentSource.OriginKind.CASE, IncidentSource.OriginKind.CAMPAIGN_ENTRY, IncidentSource.OriginKind.CAMPAIGN_INTERRUPT]:
+			result.issue = "INVALID_RESPONSE_ORIGIN"
+			return result
+		var source := IncidentSource.new(row.origin_kind, row.source_occurrence_id, row.source_definition_id)
+		if not source.matches(row):
+			result.issue = "INVALID_RESPONSE_SOURCE_ALIAS"
+			return result
+		var key: String = JSON.stringify([row.origin_kind, row.source_occurrence_id, row.incident_id])
+		if seen.has(key):
+			result.issue = "DUPLICATE_RESPONSE_SOURCE"
+			return result
+		seen[key] = true
+		if row.origin_kind == IncidentSource.OriginKind.CASE:
+			var authored: CampaignEntryData = campaign.get_entry(row.source_occurrence_id)
+			if authored == null or authored.entry_kind != CampaignEntryData.EntryKind.CASE or authored.case_data.case_id != row.source_definition_id or row.get("source_case_id") != authored.case_data.case_id:
+				result.issue = "INVALID_CASE_RESPONSE_SOURCE"
+				return result
+			result.responses.append(row.duplicate(true))
+		else:
+			result.scripted_responses.append(row.duplicate(true))
+	return result
+
+
+static func _response_has_primitive_shape(row: Dictionary) -> bool:
+	var fields: Array[String] = ["origin_kind", "source_occurrence_id", "source_definition_id", "incident_id", "broadcast_id", "confirmed_option_id", "incident_result_id", "status", "source_entry_id", "source_case_id"]
+	for key: Variant in row:
+		if not key is String or not fields.has(key): return false
+		if key in ["origin_kind", "status"]:
+			if not row[key] is int: return false
+		elif not row[key] is String: return false
+	return true
+
+
+static func _is_id(value: Variant) -> bool:
+	return value is String and not value.is_empty() and value == value.strip_edges()
+
+
+# Read-only projection, including status/link checks for ACTIVE rows (no history).
+# Optional Campaign input keeps legacy Case-only fixture callers compatible.
+static func project_completed_scripted_responses(facts: Dictionary, campaign: CampaignData = null) -> Dictionary:
+	var rejected: Dictionary = {"issue": "INVALID_SCRIPTED_SOURCE", "rows": []}
+	if not facts.get("scripted_responses", []) is Array: return rejected
+	var responses: Array = facts.get("scripted_responses", [])
+	if not facts.has("scripted_responses") and campaign == null: return {"issue": "", "rows": []}
+	if campaign == null or not campaign.get_validation_error().is_empty():
+		rejected.issue = "INVALID_SCRIPTED_CAMPAIGN"
+		return rejected
+	# No Scripted source exists to project: preserve legacy Case-only fixture scope.
+	if responses.is_empty(): return {"issue": "", "rows": []}
+	var scope: Variant = facts.get("campaign_scope")
+	if not scope is Dictionary or scope.size() != 3 or not _is_id(scope.get("campaign_id")) or scope.campaign_id != campaign.campaign_id or not scope.get("current_entry_id") is String or not scope.get("completed_entry_ids") is Array:
+		rejected.issue = "INVALID_SCRIPTED_CAMPAIGN_SCOPE"
+		return rejected
+	var completed: Array = scope.completed_entry_ids
+	if completed.size() > campaign.entries.size(): return rejected
+	for index: int in range(completed.size()):
+		if not _is_id(completed[index]) or completed[index] != campaign.entries[index].entry_id: return rejected
+	var expected_current: String = campaign.entries[completed.size()].entry_id if completed.size() < campaign.entries.size() else ""
+	if scope.current_entry_id != expected_current: return rejected
+	var rows: Array[Dictionary] = []
+	var seen: Dictionary = {}
+	for value: Variant in responses:
+		if not value is Dictionary: return rejected
+		var response: Dictionary = value
+		if not _response_has_primitive_shape(response): return rejected
+		for field: String in ["source_occurrence_id", "source_definition_id", "incident_id", "broadcast_id"]:
+			if not _is_id(response.get(field)): return rejected
+		if not response.get("origin_kind") is int or response.origin_kind not in [IncidentSource.OriginKind.CAMPAIGN_ENTRY, IncidentSource.OriginKind.CAMPAIGN_INTERRUPT]: return rejected
+		var source := IncidentSource.new(response.origin_kind, response.source_occurrence_id, response.source_definition_id)
+		if not source.matches(response) or response.has("source_case_id"): return rejected
+		var occurrence_key: String = JSON.stringify([source.origin_kind, source.source_occurrence_id])
+		if seen.has(occurrence_key):
+			rejected.issue = "DUPLICATE_SCRIPTED_OCCURRENCE"
+			return rejected
+		seen[occurrence_key] = true
+		var definition: ScriptedIncidentData
+		if source.origin_kind == IncidentSource.OriginKind.CAMPAIGN_ENTRY:
+			var authored: CampaignEntryData = campaign.get_entry(source.source_occurrence_id)
+			if authored == null or authored.entry_kind != CampaignEntryData.EntryKind.SCRIPTED_INCIDENT: return rejected
+			definition = authored.scripted_incident_data
+		else:
+			var occurrence: ScriptedInterruptOccurrenceData = campaign.get_interrupt(source.source_occurrence_id)
+			if occurrence == null: return rejected
+			var host: CampaignEntryData = campaign.get_entry(occurrence.target_entry_id)
+			if host == null or host.entry_kind != CampaignEntryData.EntryKind.CASE or host.case_data == null or not _is_id(host.case_data.case_id): return rejected
+			# A reached host may still be current/uncompleted after exact work resume.
+			if occurrence.target_entry_id != scope.current_entry_id and not completed.has(occurrence.target_entry_id): return rejected
+			definition = occurrence.scripted_incident_data
+		if definition == null or not definition.get_validation_error().is_empty() or definition.event_id != source.source_definition_id or definition.incident_data.incident_id != response.incident_id or definition.incident_data.broadcast_id != response.broadcast_id: return rejected
+		var broadcast: EmergencyBroadcastData = unique_content(definition.emergency_broadcasts, "broadcast_id", response.broadcast_id) as EmergencyBroadcastData
+		if broadcast == null: return rejected
+		if not response.get("status") is int or response.status not in [IncidentResponseState.Status.ACTIVE, IncidentResponseState.Status.COMPLETED]: return rejected
+		if not response.get("confirmed_option_id") is String or not response.get("incident_result_id") is String: return rejected
+		var option_id: String = response.confirmed_option_id
+		var result_id: String = response.incident_result_id
+		if not option_id.is_empty() or not result_id.is_empty() or response.status == IncidentResponseState.Status.COMPLETED:
+			if not _is_id(option_id) or not _is_id(result_id): return rejected
+			var option: BroadcastOptionData = unique_content(broadcast.options, "option_id", option_id) as BroadcastOptionData
+			if option == null or option.result_id != result_id or unique_content(definition.incident_results, "result_id", result_id) == null: return rejected
+		if source.origin_kind == IncidentSource.OriginKind.CAMPAIGN_ENTRY:
+			if response.status == IncidentResponseState.Status.COMPLETED:
+				if not completed.has(source.source_occurrence_id): return rejected
+			elif completed.has(source.source_occurrence_id) or scope.current_entry_id != source.source_occurrence_id: return rejected
+		if response.status != IncidentResponseState.Status.COMPLETED: continue
+		rows.append({"identity_domain": "SCRIPTED_EVENT", "entry_kind": "COMPLETED_SCRIPTED_RESPONSE_FACT", "origin_kind": source.origin_kind, "source_occurrence_id": source.source_occurrence_id, "source_definition_id": source.source_definition_id, "incident_id": response.incident_id, "phase": "COMPLETED", "actual_facts": {"broadcast_id": response.broadcast_id, "confirmed_option_id": option_id, "incident_result_id": result_id}})
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		if a.origin_kind != b.origin_kind: return a.origin_kind < b.origin_kind
+		if a.source_occurrence_id != b.source_occurrence_id: return a.source_occurrence_id < b.source_occurrence_id
+		return a.incident_id < b.incident_id)
+	return {"issue": "", "rows": rows}
+
+
+static func source_issue(facts: Dictionary, mapping: Dictionary, campaign: CampaignData = null) -> String:
+	if not facts.get("response_source_issue", "").is_empty(): return facts.response_source_issue
+	var scripted: Dictionary = project_completed_scripted_responses(facts, campaign)
+	if not scripted.issue.is_empty(): return scripted.issue
 	for response: Dictionary in facts.responses:
 		if response.get("origin_kind", IncidentSource.OriginKind.CASE) != IncidentSource.OriginKind.CASE: return "UNSUPPORTED_CAMPAIGN_RESPONSE_HISTORY"
 	for category: String in ["pending", "resolutions", "candidates", "responses", "archives", "notes"]:
@@ -83,9 +220,9 @@ static func entry(mapping: Dictionary, id: String, domain: String, kind: String,
 	return {"source_case_definition_id": id, "source_case_instance_id": mapping[id], "identity_domain": domain, "entry_kind": kind, "actual_facts": facts.duplicate(true)}
 
 
-static func build(context: Dictionary, facts: Dictionary, sequence: Array[CaseData], boundary: String) -> Dictionary:
+static func build(context: Dictionary, facts: Dictionary, sequence: Array[CaseData], boundary: String, campaign: CampaignData = null) -> Dictionary:
 	var mapping: Dictionary = context.case_assignments
-	var issue: String = source_issue(facts, mapping)
+	var issue: String = source_issue(facts, mapping, campaign)
 	if not issue.is_empty(): return {"issue": issue, "data": {}}
 	var data: Dictionary = {"run_instance_id": context.run_instance_id, "boundary_type": boundary, "historical_facts": [], "obligations": [], "discoveries": [], "hypotheses": []}
 	for resolution: Dictionary in facts.resolutions:
@@ -111,6 +248,8 @@ static func build(context: Dictionary, facts: Dictionary, sequence: Array[CaseDa
 		value["incident_id"] = response.incident_id
 		value["phase"] = "COMPLETED"
 		data.historical_facts.append(value)
+	# Preserve existing Case row order; append only the canonical Scripted block.
+	data.historical_facts.append_array(project_completed_scripted_responses(facts, campaign).rows)
 	for index: int in range(facts.candidates.size()):
 		var candidate: Dictionary = facts.candidates[index]
 		if completed_for(candidate.source_case_id, candidate.incident_id, facts.responses): continue

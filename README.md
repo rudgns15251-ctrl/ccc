@@ -4376,3 +4376,35 @@ Step64의 실제 Campaign과 Shell/Drawer/Archive/Modal을 검증하고 Drawer f
 Godot 4.7.1 최종75 실행(제품53 script check 포함)과 새 입력 검사 환경별588개가 통과했습니다. 1920/1280 각19 상태 화면 및 contact sheet를 QA 폴더에 보관했습니다. 전체 literal assertion428,626은 반복 Facts 검사를 포함하며 독립 journey 수와 구별합니다. 기존 제품 `.tres`/설정/owner·판정·resume 계약과 이전 검증 증거를 보존했습니다. 정식 skin/Save/Ending을 구현하지 않았고 기존 terminal OPEN은 유지합니다.
 
 [Step65 검증·안정화 보고서](docs/step65_ui_ux_acceptance_and_stabilization.md) — 필수31섹션, 종료170항목, Asset Swap Manifest, 원본 screenshot 링크와 YES/CHANGE 시각 검토10항목.
+
+
+## Step66 — Direct Navigation + Archive Exit UX Rework
+
+왼쪽 업무 메뉴로 허용된 다음 화면과 이미 접근한 화면을 직접 탐색할 수 있습니다. canonical 진행과 review 표시를 구분하여 EXP draft/recorded result, CONT draft/confirmed lock, scroll/focus, CCTV recheck를 보존합니다. Archive는 A 재클릭·Esc·BACK으로 원래 업무/Response로 돌아가며 정상 업무 Archive에서는 허용된 Nav로 바로 이동합니다. Source Archive는 사건 처리를 우회하지 않습니다.
+
+Godot 4.7.1 최종86 실행(slot; native10)과 새 실제 입력 검사 headless/1920/1280 각각766 assertion 호출을 통과했습니다. Stage 첫 진입은 기존 CTA 승인 경로를 사용하고 순수 재방문은 발견/실행/accounting/RNG/진행을 변경하지 않습니다. 프로젝트 설정·17 Scene·authored Case/Campaign/TEMP 데이터와 이전 검증 증거60,896파일을 보존했습니다. 정식 Asset/Save/Ending 및 기존 terminal OPEN은 유지합니다.
+
+[Step66 Nav·Archive 검증 보고서](docs/step66_navigation_interaction_ux_rework.md) — 22개 섹션, Navigation/Archive matrix, 실제 Campaign/exact resume, 필수 두 해상도 GPU 캡처. stage/commit/push하지 않았습니다.
+
+
+## Step66.1 — Utility Rail Direct Switching UX Fix
+
+일반 업무 Archive의 R/N 직접 전환을 연결하고 기존 held-work/Runtime 및 미저장 Hypothesis 편집·scroll·focus를 유지한다. Source Archive의 Response 경계는 유지하며 Drawer+활성 Rail 안에서 Tab/ShiftTab 전환을 허용한다. 게임 진행/데이터/Scene/Theme/프로젝트 설정은 이번 단계에서 변경하지 않았다.
+
+Godot 4.7.1: 신규 Utility 2,170 assertion 호출 × headless/native1920/native1280, 기존 회귀 포함 최종 84 process slots 통과. Archive 자체의 재열기 선택 복원은 기존 초기 List 정책으로 남긴다. 단계 시작의 Step66 미커밋 변경을 보존하고 stage/commit/push하지 않았다.
+
+상세 Matrix·실제 Journey/controlled fixture 구분·초기 실패·검증·변경 범위: [Step66.1 보고서](docs/step66_1_utility_rail_direct_switching.md).
+
+
+[Step67 — Completed Scripted Incident Historical Fact Contract Design](docs/step67_scripted_terminal_fact_contract_design.md)
+
+
+## Step68 — Completed Scripted Historical Fact Preservation Implementation
+
+Step67 DESIGN의 권장안 B를 제품 코드 4개에 구현했다. 완료된 Sequential/Mid-Case Scripted Response를 실제 origin/occurrence/definition 및 authored approved IDs로 검증해 기존 historical_facts의 SCRIPTED_EVENT 행으로 보존한다. Case legacy/six-field envelope/receipt, 반복 commit 및 cleanup, SOURCE_RELEASED, 기존 UI/exact resume는 유지한다.
+
+Godot 4.7.1 최종 88 process slots(headless 80, native 8), 452,494 assertion calls. 새 필수12 시나리오와 source/schema negative96개를 headless/1920/1280 각각 검증했고 실제 TEMP A/C 전체 경로, Side exact resume, terminal recipient 보존 및 prepared 재캡처 검사를 통과했다. 최종 오류0; 기존 controlled regression 예상 warning21. 전체 실행은 초기 실패/재시도를 포함해 172회이며 원본 로그를 보존했다.
+
+기존 파일/설정/Step66·66.1·67 변경과 verification evidence63,477개를 보호했다. Save/Ending/Campaign 최종 완료·경제·StoryFlags를 추가하지 않았다. Pending P2/atomic rollback/failed restore retry/Hypothesis getter OPEN은 유지한다. stage/commit/push하지 않았다.
+
+상세 schema/source/key·12 scenario·실패/재실행·파일 보호 결과: [Step68 구현 보고서](docs/step68_scripted_historical_fact_preservation.md).

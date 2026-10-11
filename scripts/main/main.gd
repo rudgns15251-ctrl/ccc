@@ -78,6 +78,14 @@ var _utility_focus: Control
 var _utility_work_stage: int = -1
 var _utility_research_display: Dictionary = {}
 
+# Canonical progression remains _current_stage; review never rolls it back.
+var _presented_work_stage: int = -1
+var _navigation_busy: bool = false
+var _work_screens: Dictionary = {}
+var _work_focus: Dictionary = {}
+var _work_runtime_id: int = 0
+var _utility_presented_stage: int = -1
+
 var _current_stage: int = Stage.PROFILE
 var _current_view: FlowView
 var _research_log_return_stage: int = -1
@@ -112,6 +120,8 @@ var _developer_terminal: Dictionary = {"mode": TerminalMode.NONE, "boundary_type
 
 
 func _ready() -> void:
+	game_shell.navigation_requested.connect(_on_work_navigation_requested)
+	get_viewport().gui_focus_changed.connect(_on_work_focus_changed)
 	game_shell.research_requested.connect(_shell_research_requested)
 	game_shell.archive_requested.connect(_shell_archive_requested)
 	game_shell.hypothesis_requested.connect(_open_drawer.bind("HYPOTHESIS"))
@@ -165,7 +175,7 @@ func _update_window_size() -> void:
 	window_size_label.text = "Window: %d × %d" % [window_size.x, window_size.y]
 
 
-func _show_view(stage: int, discover_displayed_source: bool = true, restoring_work: bool = false) -> void:
+func _show_view(stage: int, discover_displayed_source: bool = true, restoring_work: bool = false, presentation_only: bool = false) -> void:
 	if not (_terminal_action_allowed("archive") or _terminal_action_allowed("resume")): return
 	if _developer_terminal.mode == TerminalMode.VOLUNTARY_RESPONSE_ONLY:
 		var response: Dictionary = incident_responses.get_active_response()
@@ -173,7 +183,10 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		if not allowed: return
 	if is_instance_valid(_disturbance_notice):
 		return
+	_navigation_busy = false
 	_close_drawer(false)
+	_capture_work_navigation()
+	var canonical_stage: int = _current_stage
 	# Keep the last research Runtime identity across read-only/response overlays.
 	# The view_id still prevents this receipt from counting as a newly drawn View.
 	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
@@ -185,6 +198,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		_current_view.queue_free()
 
 	_current_stage = stage
+	_presented_work_stage = stage if stage <= Stage.CONTAINMENT else -1
 	_current_view = VIEW_SCENES[stage].instantiate()
 	var displayed_source: Resource
 	_current_view.confirmation_changed.connect(_on_confirmation_changed)
@@ -279,13 +293,13 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		archive_detail.set_case_summaries(case_summaries)
 		archive_detail.case_requested.connect(_on_archive_case_requested.bind(archive_detail))
 	_refresh_current_environment_conditions()
-	_refresh_cctv_condition_observations()
+	_refresh_cctv_condition_observations(presentation_only)
 	if _is_side_interrupt():
 		_current_view.set_meta("interrupt_response_binding", incident_responses.get_active_response())
 	_current_view.set_input_guard(_accept_view_action.bind(_current_view, "archive"))
 	_current_view.set_meta("campaign_entry_id", campaign_progress.get_current_entry_id())
 	view_host.add_child(_current_view)
-	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT]:
+	if stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] and not presentation_only:
 		_mark_research_display(_current_view)
 	if _is_response_route() and stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
 		var context: Dictionary = _build_response_display_context()
@@ -318,6 +332,12 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 	if occurrence != null and _latch_side_checkpoint(occurrence, _current_view):
 		_present_due_side_after_draw(_current_view)
 
+	if presentation_only: _current_stage = canonical_stage
+	if stage <= Stage.CONTAINMENT and not restoring_work:
+		if _work_screens.has(stage):
+			_restore_navigation_screen(_current_view, stage, _work_screens[stage].duplicate(true))
+		else:
+			_capture_work_navigation()
 	_refresh_shell()
 
 
@@ -332,7 +352,7 @@ func _on_research_log_requested(view: FlowView, source_stage: int) -> void:
 	if _is_response_route():
 		_on_source_archive_requested(view, source_stage)
 		return
-	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != _current_stage or not _accept_view_action(view):
+	if not RESEARCH_LOG_STAGES.has(_current_stage) or source_stage != (_presented_work_stage if _current_stage <= Stage.CONTAINMENT else _current_stage) or not _accept_view_action(view, "archive"):
 		return
 	if _current_stage == Stage.RESULT and not case_runtime.has_monitoring_result():
 		return
@@ -484,6 +504,7 @@ func _on_archive_case_requested(case_id: String, view: FlowView) -> void:
 
 
 func _on_archive_list_back_requested(view: ArchiveListView) -> void:
+	if _close_archive(view): return
 	if is_instance_valid(_utility_work_view) and _current_stage == Stage.RESEARCH_ARCHIVE_LIST and _accept_view_action(view, "archive"):
 		_restore_utility_work()
 		return
@@ -503,6 +524,7 @@ func _on_archive_list_back_requested(view: ArchiveListView) -> void:
 
 
 func _on_archive_detail_back_requested(view: ArchiveDetailView) -> void:
+	if _close_archive(view): return
 	if _current_stage != Stage.RESEARCH_ARCHIVE_DETAIL or not _accept_view_action(view, "archive") or not view.is_visible_in_tree():
 		return
 	if _is_scripted_response() or _is_side_interrupt():
@@ -904,6 +926,9 @@ func _is_active_view(view: FlowView) -> bool:
 
 
 func _on_advance_requested(view: FlowView) -> void:
+	if _is_work_review():
+		if _accept_view_action(view, "archive"): _on_work_navigation_requested(_get_next_stage(_presented_work_stage))
+		return
 	if not _accept_view_action(view, "response"):
 		return
 	if _is_response_route() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]:
@@ -1030,7 +1055,12 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 		resolutions.append(containment_resolutions.get_resolution(id))
 	for id: String in failure_candidates.get_candidate_case_ids():
 		candidates.append(failure_candidates.get_candidate(id))
-	responses = _case_response_records()
+	var response_capture: Dictionary = _response_source_capture()
+	responses.assign(response_capture.responses)
+	var scripted: Dictionary = DeveloperDispositionBuilder.project_completed_scripted_responses(response_capture, campaign_data)
+	var response_issue: String = response_capture.response_source_issue if not response_capture.response_source_issue.is_empty() else scripted.issue
+	facts["completed_scripted_responses"] = scripted.rows
+	facts["scripted_source_issue"] = response_issue
 	var active: Dictionary = incident_responses.get_active_response()
 	if _is_scripted_response():
 		active = {}
@@ -1062,6 +1092,9 @@ func build_test_sequence_disposition_snapshot() -> TestSequenceDispositionSnapsh
 		facts.boundary_status = "NOT_AT_TEST_SEQUENCE_END"
 		if _case_index == case_sequence.size() - 1 and case_runtime.has_confirmed_containment() and pending_containment.get_pending_room_id(current_id) == case_runtime.get_confirmed_containment_room_id():
 			facts.boundary_status = "AT_TEST_SEQUENCE_END"
+	if not response_issue.is_empty():
+		facts.boundary_valid = false
+		facts.boundary_status = "INVALID_RESPONSE_SOURCE"
 	return TestSequenceDispositionSnapshot.build(facts, pending, resolutions, candidates, responses, _find_failure_source_case, _unique_response_content)
 
 
@@ -1274,7 +1307,7 @@ func _prepare_and_commit_developer_disposition(boundary: String, recipient: RunD
 			_developer_recipient_id = recipient.get_instance_id()
 			_begin_developer_terminal_intent(boundary, {})
 		if existing.boundary_type != boundary: return _developer_closure_result("RECIPIENT_CONFLICT", "Run already committed with another boundary.", receipt)
-		var projected: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, _developer_source_facts(), case_sequence, boundary)
+		var projected: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, _developer_source_facts(), case_sequence, boundary, campaign_data)
 		if not projected.issue.is_empty() or not RunDispositionRecord.values_equal(projected.data, existing):
 			return _developer_closure_result("INVALID_SOURCE_STATE", "COMMITTED_SOURCE_MISMATCH::" + projected.issue, receipt)
 		_developer_recipient_id = recipient.get_instance_id()
@@ -1288,7 +1321,7 @@ func _prepare_and_commit_developer_disposition(boundary: String, recipient: RunD
 	var facts: Dictionary = _developer_source_facts()
 	var active_facts: Dictionary = facts.active_response_facts
 	if active_facts.has("reference_issue"): return _developer_closure_result("INVALID_SOURCE_STATE", active_facts.reference_issue)
-	var issue: String = DeveloperDispositionBuilder.source_issue(facts, _developer_closure_context.case_assignments)
+	var issue: String = DeveloperDispositionBuilder.source_issue(facts, _developer_closure_context.case_assignments, campaign_data)
 	if not issue.is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", issue)
 	if not active_facts.is_empty() and boundary == "VOLUNTARY_RUN_END":
 		return _developer_closure_result("WAITING_ACTIVE_RESPONSE", "Complete only the current response, then explicitly retry with this recipient.")
@@ -1310,8 +1343,10 @@ func _prepare_and_commit_developer_disposition(boundary: String, recipient: RunD
 			if not _try_resolve_pending_without_handoff(DeveloperDispositionBuilder.find_case(case_sequence, pending.case_id), true):
 				return _developer_closure_result("INVALID_SOURCE_STATE", "Hidden resolution subtransaction failed; Pending retained.")
 	var prepared: Dictionary = _developer_source_facts()
-	var built: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, prepared, case_sequence, boundary)
+	var built: Dictionary = DeveloperDispositionBuilder.build(_developer_closure_context, prepared, case_sequence, boundary, campaign_data)
 	if not built.issue.is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", built.issue)
+	if not RunDispositionRecord.values_equal(facts.scripted_responses, prepared.scripted_responses) or not RunDispositionRecord.values_equal(facts.campaign_scope, prepared.campaign_scope):
+		return _developer_closure_result("INVALID_SOURCE_STATE", "Scripted source changed during prepare.")
 	var record := RunDispositionRecord.new(built.data)
 	if not record.get_input_issue().is_empty(): return _developer_closure_result("INVALID_SOURCE_STATE", record.get_input_issue())
 	# Re-read direct State identity/content, never trust the earlier plan or Snapshot.
@@ -1351,8 +1386,21 @@ func _developer_live_identity() -> Array:
 	return [campaign_progress.get_current_entry_id(), campaign_progress.get_completed_entry_ids(), _developer_sequence_ids(), _developer_session_state_ids(), case_runtime.get_instance_id(), current_case.get_instance_id(), _case_index, _current_stage, _current_view.get_instance_id()]
 
 
+func _response_source_capture() -> Dictionary:
+	# Getter returns detached primitive rows from the sole canonical response owner.
+	var records: Array[Dictionary] = incident_responses.get_responses()
+	var classified: Dictionary = DeveloperDispositionBuilder.classify_response_records(records, campaign_data)
+	if classified.issue.is_empty():
+		for record: Dictionary in records:
+			if not incident_responses.has_response(IncidentSource.from_record(record), record.incident_id):
+				classified.issue = "INVALID_RESPONSE_OWNER_KEY"
+				break
+	return {"responses": classified.responses, "scripted_responses": classified.scripted_responses, "response_source_issue": classified.issue, "campaign_scope": {"campaign_id": campaign_progress.get_campaign_id(), "current_entry_id": campaign_progress.get_current_entry_id(), "completed_entry_ids": campaign_progress.get_completed_entry_ids()}}
+
+
 func _developer_source_facts() -> Dictionary:
-	var facts: Dictionary = {"current_case_id": current_case.case_id, "pending": [], "resolutions": [], "candidates": [], "responses": _case_response_records(), "archives": [], "notes": []}
+	var facts: Dictionary = {"current_case_id": current_case.case_id, "pending": [], "resolutions": [], "candidates": [], "responses": [], "archives": [], "notes": []}
+	facts.merge(_response_source_capture(), true)
 	for id: String in pending_containment.get_pending_case_ids(): facts.pending.append({"case_id": id, "confirmed_room_id": pending_containment.get_pending_room_id(id)})
 	for id: String in containment_resolutions.get_resolved_case_ids(): facts.resolutions.append(containment_resolutions.get_resolution(id))
 	for id: String in failure_candidates.get_candidate_case_ids(): facts.candidates.append(failure_candidates.get_candidate(id))
@@ -1363,7 +1411,7 @@ func _developer_source_facts() -> Dictionary:
 	var conditions: Dictionary = {}
 	for id: String in case_runtime.get_experiment_execution_history(): conditions[id] = case_runtime.get_experiment_condition_observation_ids(id)
 	facts["runtime"] = {"case_id": case_runtime.case_id, "confirmed_room_id": case_runtime.get_confirmed_containment_room_id(), "discovered_entry_ids": case_runtime.get_discovered_research_entry_ids(), "observed_sources": case_runtime.get_observed_research_sources(), "experiment_history": case_runtime.get_experiment_execution_history(), "experiment_condition_observations": conditions, "applied_disturbances": case_runtime.get_applied_disturbances()}
-	facts["active_response_facts"] = _developer_active_response_facts()
+	facts["active_response_facts"] = {} if not facts.response_source_issue.is_empty() else _developer_active_response_facts()
 	return facts
 
 
@@ -1398,6 +1446,7 @@ func _terminal_action_allowed(action: String = "gameplay") -> bool:
 
 
 func _accept_view_action(view: FlowView, action: String = "gameplay") -> bool:
+	if _navigation_busy or action == "gameplay" and _is_work_review(): return false
 	if _side_restore_pending: return false
 	if not _side_due.is_empty() and action != "response": return false
 	if _is_side_interrupt():
@@ -1706,6 +1755,7 @@ func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 
 
 func _try_start_major_incident(source_case_id: String) -> bool:
+	if _is_work_review() or _navigation_busy: return false
 	if not _terminal_action_allowed(): return false
 	if not _side_due.is_empty() or _is_side_interrupt() or not _event_presentation_credit or _is_normal_interrupt() or not incident_responses.get_active_response().is_empty() or _current_stage not in [Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not _is_active_view(_current_view):
 		return false
@@ -1936,11 +1986,12 @@ func _get_active_cctv_condition_observations() -> Array[CCTVConditionObservation
 	return result
 
 
-func _refresh_cctv_condition_observations() -> void:
+func _refresh_cctv_condition_observations(known_only: bool = false) -> void:
 	if not _current_view is CCTVView or is_instance_valid(_disturbance_notice):
 		return
 	var snapshot := CCTVView.ConditionSnapshot.new()
 	for data: CCTVConditionObservationData in _get_active_cctv_condition_observations():
+		if known_only and not case_runtime.has_observed_research_source(ResearchEntryData.SourceKind.CCTV_CONDITION_OBSERVATION, data.observation_id): continue
 		snapshot.entries.append(CCTVView.ConditionObservation.new(data.observation_id, data.display_name, data.observation_text))
 	(_current_view as CCTVView).set_condition_observations(snapshot)
 
@@ -2312,6 +2363,7 @@ func _case_response_records() -> Array[Dictionary]:
 
 func _dispatch_campaign_entry() -> void:
 	if not _terminal_action_allowed(): return
+	_clear_work_navigation()
 	if _campaign_fact_queries != null: _campaign_fact_queries.clear_current_runtime()
 	current_case = null
 	case_runtime = null
@@ -2358,6 +2410,7 @@ func _side_boundary_status() -> String:
 
 
 func _side_checkpoint_at(kind: int, action: String) -> ScriptedInterruptOccurrenceData:
+	if _is_work_review(): return null
 	if campaign_data == null or campaign_progress == null or _current_stage not in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] or not campaign_data.get_validation_error().is_empty(): return null
 	var occurrence: ScriptedInterruptOccurrenceData = campaign_data.get_interrupt_at_checkpoint(campaign_progress.get_current_entry_id(), kind, Stage.keys()[_current_stage], action)
 	if occurrence == null or incident_responses.has_response(occurrence.get_source(), occurrence.scripted_incident_data.incident_data.incident_id): return null
@@ -2365,6 +2418,7 @@ func _side_checkpoint_at(kind: int, action: String) -> ScriptedInterruptOccurren
 
 
 func _latch_side_checkpoint(occurrence: ScriptedInterruptOccurrenceData, view: FlowView) -> bool:
+	if _is_work_review() or _navigation_busy: return false
 	# A notice may disable input after a reached checkpoint; retain its intent.
 	# No progression, history, failure credit or completed-occurrence set lives here.
 	if occurrence == null or campaign_data == null or not campaign_data.get_validation_error().is_empty() or campaign_data.get_interrupt(occurrence.interrupt_id) != occurrence or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or _side_restore_pending: return false
@@ -2389,6 +2443,7 @@ func _present_due_side_after_draw(view: FlowView) -> void:
 
 
 func _try_present_side_interrupt() -> bool:
+	if _is_work_review() or _navigation_busy: return false
 	if not _side_due.is_empty() and is_instance_valid(_drawer_view): _close_drawer()
 	if _side_due.is_empty() or _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or _side_restore_pending or _is_response_route() or not _interrupt_context.is_empty() or not _is_active_view(_current_view) or not incident_responses.get_active_response().is_empty(): return false
 	if campaign_data == null or not campaign_data.get_validation_error().is_empty() or not _has_current_case_runtime(): return false
@@ -2484,7 +2539,8 @@ func _restore_side_work() -> void:
 func _refresh_shell() -> void:
 	if not is_node_ready() or not is_inside_tree() or not game_shell.is_inside_tree(): return
 	var stage: String = Stage.keys()[_current_stage].replace("_", " ")
-	var work_stage: int = _current_stage if _current_stage <= Stage.CONTAINMENT else -1
+	var work_stage: int = _presented_work_stage if _current_stage <= Stage.CONTAINMENT else -1
+	if _is_work_review(): stage = Stage.keys()[work_stage] + " / REVIEW / WORK " + Stage.keys()[_current_stage]
 	var runtime_id: int = case_runtime.get_instance_id() if case_runtime != null else 0
 	if _drawer_runtime_id != runtime_id:
 		_drawer_cache.clear()
@@ -2500,27 +2556,47 @@ func _refresh_shell() -> void:
 	var environment: String = ""
 	for condition: EnvironmentConditions.Condition in _build_environment_summary().entries:
 		environment += (" / " if not environment.is_empty() else "") + condition.display_name
-	var blocked: bool = _developer_closure_busy or is_instance_valid(_disturbance_notice) or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_current_view) and _current_view.has_open_confirmation() or not _terminal_action_allowed("archive")
+	var blocked: bool = _navigation_busy or _developer_closure_busy or is_instance_valid(_disturbance_notice) or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_current_view) and _current_view.has_open_confirmation() or not _terminal_action_allowed("archive")
 	var work: bool = _current_stage <= Stage.CONTAINMENT and _has_current_case_runtime() and not _is_response_route()
 	var response: bool = _is_response_route() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] and _has_response_context()
-	var tool: bool = not blocked and (work or response)
+	var archive_work: bool = _has_normal_work_archive()
+	var tool: bool = not blocked and (work or response or archive_work)
 	var status: String = "SESSION MEMORY / NO PERSISTENT SAVE"
 	if _has_current_case_runtime() and case_runtime.has_confirmed_containment(): status += " / CONTAINMENT DECISION RECORDED"
-	game_shell.display(subject, stage, environment, work_stage if work else -1, tool, tool, not blocked and work, status, runtime_id)
+	game_shell.display(subject, stage, environment, work_stage if work else -1, tool, tool, not blocked and (work or archive_work), status, runtime_id)
+	var archive_open: bool = _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] and (is_instance_valid(_utility_work_view) or _has_response_context())
+	if archive_open and not blocked: game_shell.get_node("%Archive").disabled = false
+	game_shell.display_navigation(work_stage, _navigation_work_stage(), _work_screens.keys(), not blocked and not _is_response_route() and (_current_stage <= Stage.CONTAINMENT or is_instance_valid(_utility_work_view)))
 	game_shell.show_active_utility(_drawer_kind if is_instance_valid(_drawer_view) else "ARCHIVE" if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] else "")
 
+# Only a normal work Archive owns a detached work View. Source Archives never do.
+func _has_normal_work_archive() -> bool:
+	return _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] and not _is_response_route() and _has_current_case_runtime() and incident_responses.get_active_response().is_empty() and is_instance_valid(_utility_work_view) and not _utility_work_view.is_queued_for_deletion() and not _utility_work_view.is_inside_tree() and _utility_work_stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] and _utility_presented_stage in [Stage.PROFILE, Stage.CCTV, Stage.EXPERIMENT, Stage.CONTAINMENT] and _utility_research_display.get("runtime_id", 0) == case_runtime.get_instance_id() and campaign_progress != null and _utility_work_view.get_meta("campaign_entry_id", "") == campaign_progress.get_current_entry_id()
+
+func _restore_archive_for_drawer() -> bool:
+	if not _has_normal_work_archive() or not _accept_view_action(_current_view, "archive"): return false
+	var held: FlowView = _utility_work_view
+	var runtime: CaseRuntimeState = case_runtime
+	var entry_id: String = campaign_progress.get_current_entry_id()
+	# Synchronous UI restoration, then open the requested Drawer in this callback.
+	# No Next, checkpoint, execution, discovery or response completion is replayed.
+	if not _close_archive(_current_view): return false
+	return _current_view == held and _is_active_view(held) and case_runtime == runtime and _has_current_case_runtime() and campaign_progress.get_current_entry_id() == entry_id and not _is_response_route()
+
 func _shell_research_requested() -> void:
+	if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] and not _restore_archive_for_drawer(): return
 	if is_instance_valid(_drawer_view):
 		if _drawer_kind == "RESEARCH":
 			_close_drawer()
 			return
 		_close_drawer()
-	if is_instance_valid(_current_view): _on_research_log_requested(_current_view, _current_stage)
+	if is_instance_valid(_current_view): _on_research_log_requested(_current_view, _presented_work_stage if _current_stage <= Stage.CONTAINMENT else _current_stage)
 
 func _accept_drawer_action(view: ResearchLogView) -> bool:
 	return view == _drawer_view and is_instance_valid(view) and view.is_inside_tree() and not view.is_queued_for_deletion() and _drawer_runtime_id == (case_runtime.get_instance_id() if case_runtime != null else 0) and _has_current_case_runtime() and not _is_response_route() and not _developer_closure_busy and not is_instance_valid(_disturbance_notice) and _side_due.is_empty() and _terminal_action_allowed("archive")
 
 func _open_drawer(kind: String) -> void:
+	if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] and not _restore_archive_for_drawer(): return
 	if is_instance_valid(_drawer_view):
 		var same: bool = _drawer_kind == kind
 		_close_drawer()
@@ -2542,11 +2618,13 @@ func _open_drawer(kind: String) -> void:
 	drawer.hypothesis_update_requested.connect(_on_hypothesis_update_requested.bind(drawer))
 	drawer.hypothesis_remove_requested.connect(_on_hypothesis_remove_requested.bind(drawer))
 	_drawer_panel = game_shell.add_drawer(drawer, kind)
+	drawer.set_utility_focus_controls([game_shell.get_node("%Research"), game_shell.get_node("%Archive"), game_shell.get_node("%Hypothesis")])
 	drawer.restore_drawer_state(_drawer_cache.get(kind, {}))
 	_refresh_shell()
 
 func _close_drawer(restore_focus: bool = true) -> void:
 	if is_instance_valid(_drawer_view) and _drawer_view.is_node_ready(): _drawer_cache[_drawer_kind] = _drawer_view.capture_drawer_state()
+	if is_instance_valid(_drawer_view): _drawer_view.set_utility_focus_controls([])
 	_drawer_view = null
 	_drawer_kind = ""
 	if is_instance_valid(_drawer_panel):
@@ -2558,11 +2636,16 @@ func _close_drawer(restore_focus: bool = true) -> void:
 	_refresh_shell()
 
 func _shell_archive_requested() -> void:
+	if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		_close_archive(_current_view)
+		return
 	_close_drawer()
 	if _is_response_route():
 		_on_source_archive_requested(_current_view, _current_stage)
 		return
 	if _current_stage > Stage.CONTAINMENT or not _accept_view_action(_current_view, "archive") or not _has_current_case_runtime(): return
+	_capture_work_navigation()
+	_utility_presented_stage = _presented_work_stage
 	_utility_focus = get_viewport().gui_get_focus_owner()
 	_utility_work_view = _current_view
 	_utility_work_stage = _current_stage
@@ -2578,6 +2661,8 @@ func _restore_utility_work() -> void:
 	_current_view.queue_free()
 	_current_view = _utility_work_view
 	_current_stage = _utility_work_stage
+	_presented_work_stage = _utility_presented_stage
+	_utility_presented_stage = -1
 	_utility_work_view = null
 	_utility_work_stage = -1
 	_research_display = _utility_research_display.duplicate(true)
@@ -2592,6 +2677,7 @@ func _on_confirmation_changed() -> void:
 	if not _side_due.is_empty() and is_instance_valid(_current_view) and not _current_view.has_open_confirmation(): _present_due_side_after_draw(_current_view)
 
 func _dispose_auxiliary_ui() -> void:
+	_clear_work_navigation()
 	_close_drawer(false)
 	_drawer_cache.clear()
 	_drawer_runtime_id = 0
@@ -2599,3 +2685,125 @@ func _dispose_auxiliary_ui() -> void:
 	_utility_work_view = null
 	_utility_work_stage = -1
 	_utility_research_display.clear()
+
+
+# Small, Runtime-scoped primitive presentation snapshots. No owner/history copy.
+func _clear_work_navigation() -> void:
+	_work_screens.clear()
+	_work_focus.clear()
+	_work_runtime_id = 0
+	_presented_work_stage = -1
+	_utility_presented_stage = -1
+	_navigation_busy = false
+
+func _is_work_review() -> bool:
+	return _current_stage <= Stage.CONTAINMENT and _presented_work_stage >= 0 and _presented_work_stage != _current_stage
+
+func _navigation_work_stage() -> int:
+	if is_instance_valid(_utility_work_view): return _cctv_review_return_stage if _cctv_review_return_stage >= 0 else _utility_work_stage
+	return _cctv_review_return_stage if _cctv_review_return_stage >= 0 else _current_stage if _current_stage <= Stage.CONTAINMENT else -1
+
+func _on_work_focus_changed(control: Control) -> void:
+	if control != null and is_instance_valid(_current_view) and not _current_view.has_open_confirmation() and _presented_work_stage >= 0 and _current_view.is_ancestor_of(control):
+		_work_focus[_presented_work_stage] = String(_current_view.get_path_to(control))
+
+func _capture_work_navigation() -> void:
+	if not _has_current_case_runtime() or _presented_work_stage < 0 or not is_instance_valid(_current_view) or not _current_view.is_inside_tree(): return
+	if _work_runtime_id != case_runtime.get_instance_id():
+		_work_screens.clear()
+		_work_focus.clear()
+	_work_runtime_id = case_runtime.get_instance_id()
+	var state: Dictionary = _current_view.capture_work_state()
+	if state.focus_path.is_empty(): state.focus_path = _work_focus.get(_presented_work_stage, "")
+	# A Modal is not a work focus target, including standalone debug Scenes.
+	if InterruptedWorkViewState.get_validation_error(Stage.keys()[_presented_work_stage], state, current_case, case_runtime, pending_containment, containment_resolutions) == "INVALID_WORK_FOCUS": state.focus_path = ""
+	var focus: Control = _current_view.get_node_or_null(NodePath(state.focus_path)) as Control if not state.focus_path.is_empty() else null
+	if focus != null and not focus.is_visible_in_tree():
+		state.focus_path = String(_current_view.get_path_to(_current_view.next_button)) if _current_view.next_button.is_visible_in_tree() else ""
+	var scrolls: Dictionary = {}
+	for node: Node in _current_view.find_children("*", "ScrollContainer", true, false):
+		scrolls[String(_current_view.get_path_to(node))] = node.scroll_vertical
+	_work_screens[_presented_work_stage] = {"work": state, "scrolls": scrolls}
+
+func _restore_navigation_screen(view: FlowView, stage: int, snapshot: Dictionary) -> void:
+	_navigation_busy = true
+	var error: String = InterruptedWorkViewState.get_validation_error(Stage.keys()[stage], snapshot.get("work", {}), current_case, case_runtime, pending_containment, containment_resolutions)
+	if not error.is_empty():
+		push_warning("Main: navigation snapshot rejected: " + error)
+		return
+	if stage == Stage.EXPERIMENT and not (view as ExperimentView).restore_work_result(snapshot.work, _recorded_experiment_conditions(snapshot.work.displayed_result_id)):
+		push_warning("Main: navigation result restore rejected.")
+		return
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_inside_tree() or not is_instance_valid(view) or view != _current_view or view.is_queued_for_deletion(): return
+	if not view.restore_work_state(snapshot.work):
+		push_warning("Main: navigation focus/state restore rejected.")
+		return
+	for path: String in snapshot.scrolls:
+		var scroll: ScrollContainer = view.get_node_or_null(NodePath(path)) as ScrollContainer
+		if scroll != null: scroll.scroll_vertical = snapshot.scrolls[path]
+	_navigation_busy = false
+	# A restored canonical display must draw before any existing read CTA accepts it.
+	if not _is_work_review(): _mark_research_display(view)
+	if view is ExperimentView: (view as ExperimentView).set_review_only(_is_work_review())
+	_refresh_shell()
+
+func _on_work_navigation_requested(destination: int) -> void:
+	if destination < Stage.PROFILE or destination > Stage.CONTAINMENT or _navigation_busy or _developer_closure_busy or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_disturbance_notice) or _is_response_route() or not _terminal_action_allowed() or not _has_current_case_runtime(): return
+	var canonical: int = _navigation_work_stage()
+	if canonical < 0 or is_instance_valid(_current_view) and _current_view.has_open_confirmation(): return
+	var known: bool = _work_runtime_id == case_runtime.get_instance_id() and _work_screens.has(destination)
+	var next: bool = destination == _get_next_stage(canonical) and canonical < Stage.CONTAINMENT
+	if not known and destination != canonical and not next: return
+	if is_instance_valid(_drawer_view): _close_drawer()
+	if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		if not _close_archive(_current_view): return
+	if destination == _presented_work_stage: return
+	if _cctv_review_return_stage >= 0 and destination == _cctv_review_return_stage:
+		if _is_work_review():
+			_show_view(Stage.CCTV, false, true, true)
+			_restore_navigation_screen(_current_view, Stage.CCTV, _work_screens[Stage.CCTV].duplicate(true))
+			while _navigation_busy and is_inside_tree(): await get_tree().process_frame
+		if is_inside_tree(): _on_advance_requested(_current_view)
+		return
+	if known:
+		_show_view(destination, false, true, true)
+		_restore_navigation_screen(_current_view, destination, _work_screens[destination].duplicate(true))
+		return
+	# Finish the original CCTV recheck Back before authorizing a new next stage.
+	if _cctv_review_return_stage >= 0:
+		if _is_work_review():
+			_show_view(Stage.CCTV, false, true, true)
+			_restore_navigation_screen(_current_view, Stage.CCTV, _work_screens[Stage.CCTV].duplicate(true))
+			while _navigation_busy and is_inside_tree(): await get_tree().process_frame
+		if not is_inside_tree(): return
+		_on_advance_requested(_current_view)
+		while _navigation_busy and is_inside_tree(): await get_tree().process_frame
+		if not is_inside_tree() or _current_stage != canonical: return
+		await get_tree().process_frame
+	# First access uses exactly the existing Next authorization, never raw _show_view.
+	if _is_work_review():
+		_show_view(canonical, false, true, true)
+		_restore_navigation_screen(_current_view, canonical, _work_screens[canonical].duplicate(true))
+		while _navigation_busy and is_inside_tree(): await get_tree().process_frame
+		if not is_inside_tree() or _current_stage != canonical: return
+		await get_tree().process_frame
+	if not _current_view.next_button.disabled: _on_advance_requested(_current_view)
+
+func _close_archive(view: FlowView) -> bool:
+	if _current_stage not in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] or not _accept_view_action(view, "archive"): return false
+	if is_instance_valid(_utility_work_view):
+		_archive_detail_case_id = ""
+		_restore_utility_work()
+		return true
+	if not _is_response_route() or not _has_response_context() or _source_archive_return_stage not in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT]: return false
+	var response_stage: int = _source_archive_return_stage
+	_show_view(response_stage, false)
+	_source_archive_return_stage = -1
+	_archive_detail_case_id = ""
+	return true
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not event.is_echo() and _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		if _close_archive(_current_view): get_viewport().set_input_as_handled()

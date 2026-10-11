@@ -41,6 +41,8 @@ var _hypothesis_case_id: String = ""
 var _hypothesis_records: Array[Dictionary] = []
 var _hypothesis_max_length: int = 0
 var _editing_hypothesis_id: String = ""
+var _utility_focus_controls: Array[Control] = []
+var _last_drawer_focus: String = ""
 
 
 func setup(snapshot: Snapshot) -> void:
@@ -51,6 +53,7 @@ func setup(snapshot: Snapshot) -> void:
 
 func _ready() -> void:
 	super._ready()
+	get_viewport().gui_focus_changed.connect(_remember_drawer_focus)
 	%OpenArchiveButton.pressed.connect(func() -> void: archive_requested.emit())
 	%HypothesisInput.text_changed.connect(_update_hypothesis_input)
 	%SaveHypothesisButton.pressed.connect(_on_save_hypothesis_pressed)
@@ -114,6 +117,7 @@ func _render_entries() -> void:
 		var entry: Entry = _snapshot.entries[index]
 		if entry == null or not category.is_empty() and entry.category != category: continue
 		var button := Button.new()
+		button.name = "Entry%d" % index
 		button.text = entry.category + " / " + entry.title
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -131,7 +135,7 @@ func _select_entry(index: int) -> void:
 	%EntryDetailScroll.scroll_vertical = 0
 
 func capture_drawer_state() -> Dictionary:
-	return {"draft": %HypothesisInput.text, "editing": _editing_hypothesis_id, "selected_entry": _selected_entry, "category": %CategoryFilter.selected, "list_scroll": %EntryScroll.scroll_vertical, "detail_scroll": %EntryDetailScroll.scroll_vertical, "note_scroll": %HypothesisScroll.scroll_vertical}
+	return {"focus_path": _last_drawer_focus, "draft": %HypothesisInput.text, "editing": _editing_hypothesis_id, "selected_entry": _selected_entry, "category": %CategoryFilter.selected, "list_scroll": %EntryScroll.scroll_vertical, "detail_scroll": %EntryDetailScroll.scroll_vertical, "note_scroll": %HypothesisScroll.scroll_vertical}
 
 func restore_drawer_state(state: Dictionary) -> void:
 	if state.is_empty(): return
@@ -145,6 +149,7 @@ func restore_drawer_state(state: Dictionary) -> void:
 	%EntryScroll.scroll_vertical = state.get("list_scroll", 0)
 	%EntryDetailScroll.scroll_vertical = state.get("detail_scroll", 0)
 	%HypothesisScroll.scroll_vertical = state.get("note_scroll", 0)
+	_restore_drawer_presentation.call_deferred(state.duplicate(true))
 
 
 func _append_label(item: VBoxContainer, text: String, _font_size: int) -> void:
@@ -166,12 +171,15 @@ func _display_hypotheses() -> void:
 	%HypothesisEmpty.visible = _hypothesis_records.is_empty()
 	for record: Dictionary in _hypothesis_records:
 		var item := VBoxContainer.new()
+		item.name = record.hypothesis_id
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_append_label(item, "WORKING NOTE", 18)
 		_append_label(item, record.text, 18)
 		var actions := HBoxContainer.new()
+		actions.name = "Actions"
 		for action: String in ["Edit", "Delete"]:
 			var button := Button.new()
+			button.name = action
 			button.text = action
 			button.custom_minimum_size = Vector2(100, 48)
 			button.disabled = _hypothesis_case_id.strip_edges().is_empty() or _hypothesis_max_length <= 0
@@ -249,6 +257,30 @@ func _input(event: InputEvent) -> void:
 			target.grab_focus()
 
 
+# These are UI-only paths, scoped by Main's existing per-Runtime Drawer cache.
+func _remember_drawer_focus(control: Control) -> void:
+	if _drawer_mode != "LEGACY" and control != null and is_ancestor_of(control):
+		_last_drawer_focus = String(get_path_to(control))
+
+func _restore_drawer_presentation(state: Dictionary) -> void:
+	if not is_inside_tree() or is_queued_for_deletion(): return
+	await get_tree().process_frame
+	if not is_inside_tree() or is_queued_for_deletion() or not _allows_local_input(): return
+	%EntryScroll.scroll_vertical = state.get("list_scroll", 0)
+	%EntryDetailScroll.scroll_vertical = state.get("detail_scroll", 0)
+	%HypothesisScroll.scroll_vertical = state.get("note_scroll", 0)
+	var path: String = state.get("focus_path", "")
+	var control: Control = get_node_or_null(NodePath(path)) as Control if not path.is_empty() else null
+	if control != null and control.is_visible_in_tree() and control.focus_mode != Control.FOCUS_NONE and not (control is BaseButton and control.disabled): control.grab_focus()
+
+func set_utility_focus_controls(controls: Array[Control]) -> void:
+	for control: Control in _utility_focus_controls:
+		if is_instance_valid(control):
+			control.focus_next = NodePath()
+			control.focus_previous = NodePath()
+	_utility_focus_controls.assign(controls)
+	_refresh_drawer_focus.call_deferred()
+
 # Local presentation loop: hidden/disabled/generated controls are re-evaluated.
 func _refresh_drawer_focus() -> void:
 	if _drawer_mode == "LEGACY" or not is_inside_tree() or is_queued_for_deletion(): return
@@ -258,6 +290,8 @@ func _refresh_drawer_focus() -> void:
 		if control.focus_mode == Control.FOCUS_NONE or not control.is_visible_in_tree(): continue
 		if control is BaseButton and control.disabled: continue
 		controls.append(control)
+	for control: Control in _utility_focus_controls:
+		if is_instance_valid(control) and control.is_visible_in_tree() and control.focus_mode != Control.FOCUS_NONE and not (control is BaseButton and control.disabled): controls.append(control)
 	for index: int in range(controls.size()):
 		controls[index].focus_next = controls[index].get_path_to(controls[(index + 1) % controls.size()])
 		controls[index].focus_previous = controls[index].get_path_to(controls[(index - 1 + controls.size()) % controls.size()])

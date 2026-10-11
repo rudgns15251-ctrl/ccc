@@ -67,6 +67,7 @@ static func _validation_issue(data: Dictionary) -> String:
 		return "Unknown final Run boundary."
 	var seen: Dictionary = {}
 	var definitions: Dictionary = {}
+	var scripted_occurrences: Dictionary = {}
 	var submissions: Dictionary = {}
 	var resolutions: Dictionary = {}
 	for category: String in CATEGORIES:
@@ -79,6 +80,16 @@ static func _validation_issue(data: Dictionary) -> String:
 			var issue: String = _entry_issue(entry, category)
 			if not issue.is_empty():
 				return issue
+			if entry.identity_domain == "SCRIPTED_EVENT":
+				var occurrence_key: String = JSON.stringify([entry.origin_kind, entry.source_occurrence_id])
+				var payload: Array = [entry.source_definition_id, entry.incident_id, entry.actual_facts.broadcast_id]
+				if scripted_occurrences.has(occurrence_key) and scripted_occurrences[occurrence_key] != payload:
+					return "Scripted occurrence refers to conflicting source/payload."
+				scripted_occurrences[occurrence_key] = payload
+				var scripted_key: String = JSON.stringify([data.run_instance_id, "SCRIPTED_EVENT", entry.origin_kind, entry.source_occurrence_id, entry.incident_id])
+				if seen.has(scripted_key): return "Duplicate typed identity: " + scripted_key
+				seen[scripted_key] = true
+				continue
 			var assignment: String = entry.source_case_instance_id
 			if definitions.has(assignment) and definitions[assignment] != entry.source_case_definition_id:
 				return "Assignment refers to different Case definitions."
@@ -101,7 +112,25 @@ static func _validation_issue(data: Dictionary) -> String:
 	return ""
 
 
+static func _scripted_entry_issue(entry: Dictionary, category: String) -> String:
+	if category != "historical_facts" or entry.size() != 8: return "Invalid Scripted category/field count."
+	var fields: Array[String] = ["identity_domain", "entry_kind", "origin_kind", "source_occurrence_id", "source_definition_id", "incident_id", "phase", "actual_facts"]
+	for field: String in entry:
+		if not fields.has(field): return "Unexpected Scripted field: " + field
+	for field: String in ["identity_domain", "entry_kind", "phase"]:
+		if not _is_id(entry.get(field)): return "Invalid Scripted discriminator type: " + field
+	if entry.identity_domain != "SCRIPTED_EVENT" or entry.entry_kind != "COMPLETED_SCRIPTED_RESPONSE_FACT" or entry.phase != "COMPLETED": return "Invalid Scripted discriminator/completion."
+	if not entry.get("origin_kind") is int or entry.origin_kind not in [IncidentSource.OriginKind.CAMPAIGN_ENTRY, IncidentSource.OriginKind.CAMPAIGN_INTERRUPT]: return "Invalid Scripted origin."
+	for field: String in ["source_occurrence_id", "source_definition_id", "incident_id"]:
+		if not _is_id(entry.get(field)): return "Missing or invalid Scripted identity: " + field
+	if not entry.get("actual_facts") is Dictionary or entry.actual_facts.size() != 3: return "Expected three Scripted actual fact IDs."
+	for field: String in ["broadcast_id", "confirmed_option_id", "incident_result_id"]:
+		if not _is_id(entry.actual_facts.get(field)): return "Missing or invalid Scripted fact: " + field
+	return ""
+
+
 static func _entry_issue(entry: Dictionary, category: String) -> String:
+	if entry.get("identity_domain") is String and entry.identity_domain == "SCRIPTED_EVENT": return _scripted_entry_issue(entry, category)
 	for field: String in ["identity_domain", "source_case_definition_id", "source_case_instance_id", "entry_kind"]:
 		if not _is_id(entry.get(field)):
 			return "Missing or invalid entry identity: " + field

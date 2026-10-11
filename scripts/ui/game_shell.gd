@@ -1,13 +1,16 @@
 extends Control
 
 # Presentation only: all enabled flags and text arrive from Main's real owners.
+signal navigation_requested(stage: int)
 signal research_requested
 signal archive_requested
 signal hypothesis_requested
-var _runtime_id: int = -1
-var _visited: Array[int] = []
 
 func _ready() -> void:
+	for index: int in range(4):
+		var button: Button = get_node("%" + ["PROFILE", "CCTV", "EXPERIMENT", "CONTAINMENT"][index])
+		button.pressed.connect(func() -> void:
+			if not button.disabled: navigation_requested.emit(index))
 	%Research.pressed.connect(func() -> void:
 		if not %Research.disabled: research_requested.emit())
 	%Archive.pressed.connect(func() -> void:
@@ -23,17 +26,6 @@ func display(subject: String, stage: String, environment: String, work_stage: in
 	%Research.disabled = not tools
 	%Archive.disabled = not archive
 	%Hypothesis.disabled = not hypothesis
-	if _runtime_id != runtime_id:
-		_runtime_id = runtime_id
-		_visited.clear()
-	if work_stage >= 0 and not _visited.has(work_stage): _visited.append(work_stage)
-	var stages: Array[String] = ["PROFILE", "CCTV", "EXPERIMENT", "CONTAINMENT"]
-	for index: int in range(stages.size()):
-		var button: Button = get_node("%" + stages[index])
-		# Indicators cannot introduce free back-navigation.
-		button.disabled = true
-		button.theme_type_variation = "CurrentNavButton" if index == work_stage else "NavButton"
-		button.text = stages[index] + "\n" + ("CURRENT" if index == work_stage else "VISITED" if _visited.has(index) or index < work_stage else "AVAILABLE" if index == work_stage + 1 else "LOCKED") if work_stage >= 0 else stages[index] + "\nLOCKED"
 
 func add_drawer(view: Control, kind: String) -> PanelContainer:
 	var panel: PanelContainer = preload("res://scenes/ui/utility_drawer.tscn").instantiate()
@@ -48,3 +40,15 @@ func show_active_utility(kind: String) -> void:
 		var button: Button = get_node("%" + name)
 		var active: bool = kind == ("RESEARCH" if name == "Research" else "ARCHIVE" if name == "Archive" else "HYPOTHESIS")
 		button.theme_type_variation = "ActiveRailButton" if active else "Button"
+
+
+func display_navigation(presented: int, canonical: int, unlocked: Array, enabled: bool) -> void:
+	var stages: Array[String] = ["PROFILE", "CCTV", "EXPERIMENT", "CONTAINMENT"]
+	for index: int in range(stages.size()):
+		var button: Button = get_node("%" + stages[index])
+		var known: bool = unlocked.has(index) or index == canonical
+		var allowed: bool = enabled and canonical >= 0 and (known or index == canonical + 1 and canonical < 3)
+		button.disabled = not allowed
+		button.theme_type_variation = "CurrentNavButton" if index == presented else "NavButton"
+		var status: String = "CURRENT" if index == presented else "REVIEW" if known and index != canonical else "UNLOCKED" if known else "AVAILABLE" if allowed else "LOCKED"
+		button.text = stages[index] + "\n" + status

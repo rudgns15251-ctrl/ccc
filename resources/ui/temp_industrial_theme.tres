@@ -366,3 +366,5 @@ ModalBackdropPanel/styles/panel = SubResource("modal_backdrop")
 
 ActiveRailButton/base_type = "Button"
 ActiveRailButton/styles/normal = SubResource("primary")
+
+CurrentNavButton/styles/normal = SubResource("primary")

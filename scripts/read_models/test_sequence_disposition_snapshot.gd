@@ -23,6 +23,8 @@ static func build(facts: Dictionary, pending: Array[Dictionary], resolutions: Ar
 	projected["resolutions"] = resolutions.duplicate(true)
 	projected["unresolved_candidates"] = []
 	projected["completed_responses"] = []
+	# Supplied by Main after pure source validation; this observation is not authority.
+	projected["completed_scripted_responses"] = facts.get("completed_scripted_responses", []).duplicate(true)
 	for record: Dictionary in pending:
 		projected.pending_submissions.append(_pending_entry(record, resolutions, candidates, lookup_case, lookup_content))
 	for record: Dictionary in responses:

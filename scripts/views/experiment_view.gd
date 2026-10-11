@@ -32,6 +32,7 @@ class ConditionSnapshot extends RefCounted:
 @onready var remaining_label: Label = %RemainingCount
 
 var _experiments: Array[ExperimentData] = []
+var _review_only: bool = false
 var _selected_experiment_index: int = -1
 var _selection_group: ButtonGroup
 var _executed_ids: Array[String] = []
@@ -109,6 +110,7 @@ func _append_item(display_name: String, description: String, index: int, selecta
 
 
 func _on_experiment_selected(index: int) -> void:
+	if _review_only: return
 	if not _allows_local_input(): return
 	if not _can_select_experiment(index):
 		return
@@ -126,6 +128,7 @@ func _get_selected_experiment() -> ExperimentData:
 
 
 func _on_run_experiment_pressed() -> void:
+	if _review_only: return
 	if not _allows_local_input(): return
 	var experiment: ExperimentData = _get_selected_experiment()
 	if experiment == null:
@@ -207,7 +210,7 @@ func _update_execution_ui() -> void:
 	for index in range(experiment_list.get_child_count()):
 		var button: CheckBox = experiment_list.get_child(index).get_child(0) as CheckBox
 		var experiment: ExperimentData = _experiments[index]
-		button.disabled = not _can_select_experiment(index)
+		button.disabled = _review_only or not _can_select_experiment(index)
 		if experiment != null:
 			button.text = experiment.display_name if not experiment.display_name.strip_edges().is_empty() else "[Missing display_name]"
 			if _executed_ids.has(experiment.experiment_id):
@@ -219,7 +222,7 @@ func _update_execution_ui() -> void:
 			_selection_group.allow_unpress = true
 			selected_button.set_pressed_no_signal(false)
 			_selection_group.allow_unpress = false
-	run_button.disabled = not _can_select_experiment(_selected_experiment_index)
+	run_button.disabled = _review_only or not _can_select_experiment(_selected_experiment_index)
 
 
 func _reset_result() -> void:
@@ -281,3 +284,9 @@ func _display_detail(experiment: ExperimentData) -> void:
 	if experiment == null: return
 	%SelectedName.text = experiment.display_name
 	%SelectedDescription.text = experiment.description
+
+
+func set_review_only(value: bool) -> void:
+	_review_only = value
+	_update_execution_ui()
+	%RecheckCCTVButton.disabled = value
