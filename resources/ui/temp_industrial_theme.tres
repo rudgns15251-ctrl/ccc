@@ -232,6 +232,23 @@ content_margin_left = 12.0
 [sub_resource type="StyleBoxFlat" id="modal_backdrop"]
 bg_color = Color(0,0,0,0.68)
 
+[sub_resource type="StyleBoxFlat" id="paper_document"]
+bg_color = Color(0.847059, 0.835294, 0.784314, 1)
+border_color = Color(0.572549, 0.580392, 0.529412, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 32.0
+content_margin_right = 32.0
+content_margin_top = 32.0
+content_margin_bottom = 32.0
+
+[sub_resource type="StyleBoxFlat" id="paper_separator"]
+bg_color = Color(0.572549, 0.580392, 0.529412, 1)
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+
 [resource]
 
 default_font_size = 22
@@ -368,3 +385,16 @@ ActiveRailButton/base_type = "Button"
 ActiveRailButton/styles/normal = SubResource("primary")
 
 CurrentNavButton/styles/normal = SubResource("primary")
+
+PaperDocumentPanel/base_type = "PanelContainer"
+PaperDocumentPanel/styles/panel = SubResource("paper_document")
+PaperBodyLabel/base_type = "Label"
+PaperBodyLabel/colors/font_color = Color(0.145098, 0.156863, 0.137255, 1)
+PaperBodyLabel/constants/line_spacing = 6
+PaperHeadingLabel/base_type = "PaperBodyLabel"
+PaperHeadingLabel/font_sizes/font_size = 30
+PaperMetadataLabel/base_type = "Label"
+PaperMetadataLabel/colors/font_color = Color(0.34902, 0.372549, 0.333333, 1)
+PaperMetadataLabel/font_sizes/font_size = 18
+PaperSeparator/base_type = "HSeparator"
+PaperSeparator/styles/separator = SubResource("paper_separator")

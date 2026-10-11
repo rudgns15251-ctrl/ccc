@@ -4408,3 +4408,29 @@ Godot 4.7.1 최종 88 process slots(headless 80, native 8), 452,494 assertion ca
 기존 파일/설정/Step66·66.1·67 변경과 verification evidence63,477개를 보호했다. Save/Ending/Campaign 최종 완료·경제·StoryFlags를 추가하지 않았다. Pending P2/atomic rollback/failed restore retry/Hypothesis getter OPEN은 유지한다. stage/commit/push하지 않았다.
 
 상세 schema/source/key·12 scenario·실패/재실행·파일 보호 결과: [Step68 구현 보고서](docs/step68_scripted_historical_fact_preservation.md).
+
+
+## Step69 — First Authored Mid-Case Scripted Incident Integration
+
+CASE01→CASE02→TEMP Mandatory Incident01→CASE03 순서를 유지하고 CASE03 첫 EXPERIMENT / STAGE_PRESENTED에 단일 임시 시설 장비 사건을 연결했다. 새 TEMP Resource와 Campaign schedule만 변경했으며 Main/Runtime/UI/프로젝트 설정은 보존했다.
+
+실제 Profile·최초 CCTV·Incident 본문으로 판단 가능한 projector reset 사건과 4개 option별 Result를 제공한다. Source Archive/모달 Cancel/TRANSMIT/RESUME WORK로 같은 CASE03 Runtime과 업무 상태에 복귀하고 재발생하지 않는다. 완료된 Mandatory/Side 사건은 Step68 terminal recipient에 별도 역사 행으로 보존된다. 사건 완료만으로 자동 종료하지 않는다.
+
+Godot 4.7.1 최종 73 process slots(headless70/native3), 전체 79 실행. 독립 제품 Journey 변형7개를 최종13회 실행했고 native1920/1280 각19 GPU 화면을 확인했다. 신규 실제 검증4,089 assertion calls, 기존 회귀 포함432,194 calls(반복 Query 포함). 정상 제품 오류0; controlled invalid startup 예상 ERROR20/legacy WARNING15는 별도 집계했다.
+
+기존 파일165개 및 이전 검증 증거64,871개를 보존했다. Save/Ending/경제/새 UI·owner를 추가하지 않았고 기존 OPEN은 유지한다. 이번 단계는 stage/commit/push하지 않았다.
+
+상세 콘텐츠·공정성·실제 Journey/controlled fixture·검증 수·변경 범위: [Step69 보고서](docs/step69_first_authored_midcase_incident.md).
+
+
+## Step70 — Research Document Profile UI Pilot
+
+기존 Profile 우측을 Godot-native 종이 연구기록 뷰어로 개선했다. 기존 이름·분류·Description 원문과 TEMP 이미지, 좌측 520px, Dark GameShell 및 고정 Actions를 유지한다. 긴 본문과 긴 식별 정보는 각각 독립 ScrollContainer로 읽으며 기존 Step66 Navigation이 위치를 복원한다.
+
+제품 변경은 Profile Scene/Script와 paper Theme variation뿐이다. Main/Runtime/Case/Campaign/Step69 schedule 및 사건 Resource는 보존한다. 기존 PROFILE Side memento는 focus-only이며 정상 Navigation의 scroll 복원과 구분한다.
+
+Godot 4.7.1 최종 74 process slots(headless71/native3), 전체 76 실행. 모든 제품 GDScript 53개·fresh import·Main 실행, Profile 전용 검사 1,461 calls씩 세 환경, 실제 Step69 7개 경로 회귀를 통과했다. GPU 1920/1280 각35 capture calls(고유33 PNG)와 contact sheet를 확인했다. 이전 검증 증거66,016개를 변경·삭제 없이 보존했다. 정상 제품 오류0이며 의도된 negative ERROR20/legacy WARNING15는 별도 검사했다.
+
+기존 미커밋 Step69 변경과 README 전체 prefix를 보호했다. 새 Story Fact/Metadata/Asset/Gameplay/Save/Ending을 추가하지 않았고 기존 OPEN을 유지한다. stage/commit/push하지 않았다.
+
+상세 데이터·레이아웃·Navigation 지원 범위·GPU/회귀 검증·변경 파일: [Step70 보고서](docs/step70_profile_paper_document_ui_pilot.md).

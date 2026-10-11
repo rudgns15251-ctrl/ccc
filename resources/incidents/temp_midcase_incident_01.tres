@@ -1,0 +1,80 @@
+[gd_resource type="Resource" script_class="ScriptedIncidentData" load_steps=16 format=3]
+
+; [TEMP STORY CONTENT] Replaceable facility equipment incident, not final lore.
+; Mandatory evidence: actual CASE03 Profile, initial CCTV and this Incident body.
+; No optional Experiment or previous Case failure is required.
+
+[ext_resource type="Script" path="res://scripts/data/scripted_incident_data.gd" id="1_event"]
+[ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="2_incident"]
+[ext_resource type="Script" path="res://scripts/data/emergency_broadcast_data.gd" id="3_broadcast"]
+[ext_resource type="Script" path="res://scripts/data/broadcast_option_data.gd" id="4_option"]
+[ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="5_result"]
+
+[sub_resource type="Resource" id="Resource_temp_incident"]
+script = ExtResource("2_incident")
+incident_id = "TEMP_INCIDENT_MIDCASE_01"
+display_name = "[TEMP STORY CONTENT] ROUTE PROJECTOR RESET"
+description = "[TEMP STORY CONTENT] The facility guidance projector beside CASE03's work area is repeatedly resetting. Its projected floor strip now has dark gaps. The maintenance panel reports stable task lighting and ventilation; a continuous passive backup strip is available. CASE03's intake records following contrasting floor strips with pauses at gaps. Its initial CCTV shows pauses and turns at a gap, then a return to the visible strip under steady lighting and airflow. Staff need an immediate instruction for the guidance equipment fault before routine experiments continue. This equipment fault is independent of any containment decision."
+broadcast_id = "TEMP_BROADCAST_MIDCASE_01"
+
+[sub_resource type="Resource" id="Resource_temp_option_A"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MIDCASE_01_A"
+display_text = "[TEMP STORY CONTENT] Isolate the resetting projector and use the continuous contrasting backup strip. Keep task lighting and airflow steady."
+result_id = "TEMP_RESULT_MIDCASE_01_A"
+
+[sub_resource type="Resource" id="Resource_temp_option_B"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MIDCASE_01_B"
+display_text = "[TEMP STORY CONTENT] Repeat audible route instructions. Leave the resetting projector and its interrupted strip active, with lighting and airflow unchanged."
+result_id = "TEMP_RESULT_MIDCASE_01_B"
+
+[sub_resource type="Resource" id="Resource_temp_option_C"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MIDCASE_01_C"
+display_text = "[TEMP STORY CONTENT] Turn off task lighting to conceal the strip gaps. Leave the resetting projector active and airflow steady."
+result_id = "TEMP_RESULT_MIDCASE_01_C"
+
+[sub_resource type="Resource" id="Resource_temp_option_D"]
+script = ExtResource("4_option")
+option_id = "TEMP_OPTION_MIDCASE_01_D"
+display_text = "[TEMP STORY CONTENT] Pulse ventilation to redirect movement across the gaps. Leave the resetting projector active and task lighting unchanged."
+result_id = "TEMP_RESULT_MIDCASE_01_D"
+
+[sub_resource type="Resource" id="Resource_temp_broadcast"]
+script = ExtResource("3_broadcast")
+broadcast_id = "TEMP_BROADCAST_MIDCASE_01"
+display_name = "[TEMP STORY CONTENT] GUIDANCE EQUIPMENT RESPONSE"
+prompt_text = "[TEMP STORY CONTENT] Which instruction addresses the resetting floor-guidance equipment using CASE03's intake, initial CCTV and the maintenance report above? No experiment result is required. Preserve the observed steady lighting and airflow while addressing the interrupted visual route."
+options = Array[ExtResource("4_option")]([SubResource("Resource_temp_option_A"), SubResource("Resource_temp_option_B"), SubResource("Resource_temp_option_C"), SubResource("Resource_temp_option_D")])
+
+[sub_resource type="Resource" id="Resource_temp_result_A"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MIDCASE_01_A"
+display_name = "[TEMP STORY CONTENT] CONTINUOUS BACKUP ROUTE"
+description = "[TEMP STORY CONTENT] Staff isolated the resetting projector and installed the continuous contrasting backup strip. The equipment no longer introduces dark gaps; task lighting and airflow remain steady. This addresses the reported guidance fault using the strip-following observations. It does not establish long-term containment or complete an experiment. RESUME WORK returns to the same CASE03 experiment screen."
+
+[sub_resource type="Resource" id="Resource_temp_result_B"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MIDCASE_01_B"
+display_name = "[TEMP STORY CONTENT] ANNOUNCEMENT, GAPS REMAIN"
+description = "[TEMP STORY CONTENT] Staff repeated the audible instruction, but the projector continued resetting and the visual route still had gaps. The supplied observations support strip following, not following spoken directions. Staff withdrew the announcement-only response and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+[sub_resource type="Resource" id="Resource_temp_result_C"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MIDCASE_01_C"
+display_name = "[TEMP STORY CONTENT] VISIBILITY LOST, RESET UNRESOLVED"
+description = "[TEMP STORY CONTENT] Staff switched off task lighting. This removed the steady lighting used in the initial observation and made the contrasting route harder to inspect; it did not stop the projector resets. No supplied observation established a benefit from darkness. Staff restored task lighting and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+[sub_resource type="Resource" id="Resource_temp_result_D"]
+script = ExtResource("5_result")
+result_id = "TEMP_RESULT_MIDCASE_01_D"
+display_name = "[TEMP STORY CONTENT] AIRFLOW CHANGED, GAPS REMAIN"
+description = "[TEMP STORY CONTENT] Staff pulsed ventilation, but the projector kept resetting and the visual gaps remained. This changed a previously steady condition without addressing the equipment fault; the supplied intake and initial CCTV did not establish airflow as a route instruction. Staff restored steady airflow and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+[resource]
+script = ExtResource("1_event")
+event_id = "TEMP_EVENT_MIDCASE_01"
+incident_data = SubResource("Resource_temp_incident")
+emergency_broadcasts = Array[ExtResource("3_broadcast")]([SubResource("Resource_temp_broadcast")])
+incident_results = Array[ExtResource("5_result")]([SubResource("Resource_temp_result_A"), SubResource("Resource_temp_result_B"), SubResource("Resource_temp_result_C"), SubResource("Resource_temp_result_D")])

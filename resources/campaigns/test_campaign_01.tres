@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CampaignData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="CampaignData" load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/campaign_data.gd" id="1_campaign"]
 [ext_resource type="Script" path="res://scripts/data/campaign_entry_data.gd" id="2_entry"]
@@ -7,6 +7,8 @@
 [ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="5_case03"]
 
 [ext_resource type="Resource" path="res://resources/incidents/temp_mandatory_incident_01.tres" id="6_temp_mandatory01"]
+[ext_resource type="Script" path="res://scripts/data/scripted_interrupt_occurrence_data.gd" id="7_interrupt"]
+[ext_resource type="Resource" path="res://resources/incidents/temp_midcase_incident_01.tres" id="8_temp_midcase01"]
 
 [sub_resource type="Resource" id="Resource_entry_case01"]
 script = ExtResource("2_entry")
@@ -33,8 +35,19 @@ entry_id = "TEST_ENTRY_CASE_03"
 entry_kind = 0
 case_data = ExtResource("5_case03")
 
+; [TEMP STORY CONTENT] Side occurrence; never advances the entry sequence.
+[sub_resource type="Resource" id="Resource_interrupt_temp_midcase01"]
+script = ExtResource("7_interrupt")
+interrupt_id = "TEMP_INTERRUPT_MIDCASE_01"
+target_entry_id = "TEST_ENTRY_CASE_03"
+scripted_incident_data = ExtResource("8_temp_midcase01")
+checkpoint_kind = 0
+stage_id = "EXPERIMENT"
+action_id = ""
+
 [resource]
 script = ExtResource("1_campaign")
 campaign_id = "TEST_CAMPAIGN_01"
 display_name = "TEST CAMPAIGN 01 — Prototype Case Sequence"
 entries = Array[ExtResource("2_entry")]([SubResource("Resource_entry_case01"), SubResource("Resource_entry_case02"), SubResource("Resource_entry_temp_mandatory01"), SubResource("Resource_entry_case03")])
+scripted_interrupts = Array[ExtResource("7_interrupt")]([SubResource("Resource_interrupt_temp_midcase01")])
