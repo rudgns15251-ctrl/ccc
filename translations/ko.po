@@ -1,0 +1,1809 @@
+# CAP game text. English msgid values preserve the original prototype.
+# Source strings are shared; add another PO file for another locale.
+msgid ""
+msgstr ""
+"Project-Id-Version: CAP\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: resources/campaigns/test_campaign_01.tres:51
+msgid "TEST CAMPAIGN 01 — Prototype Case Sequence"
+msgstr "테스트 캠페인 01 — 사례 진행 프로토타입"
+
+#: resources/cases/test_case_01.tres:21
+msgid "TEST SUBJECT"
+msgstr "테스트 대상"
+
+#: resources/cases/test_case_01.tres:22
+msgid "TEST CLASSIFICATION"
+msgstr "임시 분류"
+
+#: resources/cases/test_case_01.tres:23
+msgid "TEST: metal-support pump cycles preceded strikes; no talk link."
+msgstr "테스트 기록: 금속 지지대에서 펌프가 작동한 뒤 타격이 발생했다. 말소리와의 연관성은 확인되지 않았다."
+
+#: resources/cases/test_case_01.tres:28
+msgid "TEST: strikes cluster at pump starts; vent cycling prompts turn-backs. Lamp sweeps alter travel, not strike timing. Wall tracing continues."
+msgstr "테스트 관찰: 펌프 가동 시점에 타격이 집중된다. 환기가 멈췄다가 다시 시작되면 방향을 되돌린다. 조명을 훑어 비추면 이동 경로가 달라지지만 타격 시점은 변하지 않는다. 벽면을 따라가는 행동은 계속된다."
+
+#: resources/cases/test_case_01.tres:33
+msgid "TEST EXPERIMENT 01"
+msgstr "테스트 실험 01"
+
+#: resources/cases/test_case_01.tres:34
+msgid "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged."
+msgstr "지지대 비교 실험: 금속 지지대와 완충 지지대에 같은 크기의 작은 충격을 전달한다. 공기를 통해 들리는 펌프 소리와 기류는 유지한다."
+
+#: resources/cases/test_case_01.tres:35
+msgid "Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+msgstr "완충 지지대보다 금속 지지대에 충격을 전달했을 때 연속 타격이 더 자주 발생했다. 펌프 소리는 그대로 유지했으며, 두 지지대 모두에서 천천히 벽면을 따라가는 행동이 계속됐다. 이 실험에서는 기류의 반복 변화를 비교하지 않았다."
+
+#: resources/cases/test_case_01.tres:40
+msgid "TEST EXPERIMENT 02"
+msgstr "테스트 실험 02"
+
+#: resources/cases/test_case_01.tres:41
+msgid "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged."
+msgstr "기류 비교 실험: 약한 기류를 일정하게 유지하는 조건과 기류를 반복해서 켜고 끄는 조건을 비교한다. 지지대와 펌프 소리는 유지한다."
+
+#: resources/cases/test_case_01.tres:42
+msgid "Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+msgstr "기류를 켜고 끌 때마다 송풍구를 향해 반복해서 방향을 되돌렸다. 약한 기류를 일정하게 유지하면 방향을 되돌리는 횟수가 줄었다. 두 조건 모두에서 벽면을 따라가는 행동은 계속됐다. 이 실험에서는 지지대의 기계적 분리를 비교하지 않았다."
+
+#: resources/cases/test_case_01.tres:47
+msgid "TEST EXPERIMENT 03"
+msgstr "테스트 실험 03"
+
+#: resources/cases/test_case_01.tres:48
+msgid "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent."
+msgstr "소리 비교 실험: 지지대 충격과 기류 변화가 없는 상태에서 스피커로 펌프 소리를 재생한다."
+
+#: resources/cases/test_case_01.tres:49
+msgid "The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+msgstr "대상은 잠시 스피커 쪽으로 방향을 돌렸지만, 펌프 가동 시점에 나타났던 연속 타격은 재현되지 않았다. 벽면을 따라가는 행동은 계속됐다. 공기를 통해 전달되는 소리만으로는 앞서 관찰한 타이밍의 연관성을 설명할 수 없다."
+
+#: resources/cases/test_case_01.tres:54
+msgid "TEST ROOM 01"
+msgstr "테스트 격리실 01"
+
+#: resources/cases/test_case_01.tres:55
+msgid "TEST configuration: acoustic partition; rigid metal support connected to the service structure; continuous low airflow."
+msgstr "테스트 구성: 방음 칸막이, 설비 구조물과 연결된 단단한 금속 지지대, 일정한 약한 기류."
+
+#: resources/cases/test_case_01.tres:60
+msgid "TEST ROOM 02"
+msgstr "테스트 격리실 02"
+
+#: resources/cases/test_case_01.tres:61
+msgid "TEST configuration: mechanically isolated padded support; continuous low airflow; ordinary task lighting."
+msgstr "테스트 구성: 기계적으로 분리된 완충 지지대, 일정한 약한 기류, 일반 작업 조명."
+
+#: resources/cases/test_case_01.tres:66
+msgid "TEST ROOM 03"
+msgstr "테스트 격리실 03"
+
+#: resources/cases/test_case_01.tres:67
+msgid "TEST configuration: mechanically isolated padded support; start/stop ventilation; reduced task lighting."
+msgstr "테스트 구성: 기계적으로 분리된 완충 지지대, 반복해서 켜고 끄는 환기, 낮춘 작업 조명."
+
+#: resources/cases/test_case_01.tres:72
+msgid "Temporary monitoring state 01-A."
+msgstr "임시 상태 관찰 01-A."
+
+#: resources/cases/test_case_01.tres:77
+msgid "Temporary monitoring state 01-B."
+msgstr "임시 상태 관찰 01-B."
+
+#: resources/cases/test_case_01.tres:82
+msgid "Temporary monitoring state 01-C."
+msgstr "임시 상태 관찰 01-C."
+
+#: resources/cases/test_case_01.tres:94
+msgid "Temporary monitoring state 02-A."
+msgstr "임시 상태 관찰 02-A."
+
+#: resources/cases/test_case_01.tres:99
+msgid "Temporary monitoring state 02-B."
+msgstr "임시 상태 관찰 02-B."
+
+#: resources/cases/test_case_01.tres:104
+msgid "Temporary monitoring state 02-C."
+msgstr "임시 상태 관찰 02-C."
+
+#: resources/cases/test_case_01.tres:116
+msgid "Temporary monitoring state 03-A."
+msgstr "임시 상태 관찰 03-A."
+
+#: resources/cases/test_case_01.tres:121
+msgid "Temporary monitoring state 03-B."
+msgstr "임시 상태 관찰 03-B."
+
+#: resources/cases/test_case_01.tres:126
+msgid "Temporary monitoring state 03-C."
+msgstr "임시 상태 관찰 03-C."
+
+#: resources/cases/test_case_01.tres:138
+msgid "TEST POWER INTERRUPTION"
+msgstr "테스트: 전원 중단"
+
+#: resources/cases/test_case_01.tres:139
+msgid "Temporary facility lighting interruption detected."
+msgstr "시설 조명이 일시적으로 중단됐다."
+
+#: resources/cases/test_case_01.tres:140
+msgid "LIGHT: NORMAL → OFF"
+msgstr "조명: 정상 → 꺼짐"
+
+#: resources/cases/test_case_01.tres:145
+msgid "TEST VENTILATION INSTABILITY"
+msgstr "테스트: 환기 불안정"
+
+#: resources/cases/test_case_01.tres:146
+msgid "Temporary facility airflow instability detected."
+msgstr "시설 기류가 일시적으로 불안정해졌다."
+
+#: resources/cases/test_case_01.tres:147
+msgid "AIRFLOW: STEADY → INTERMITTENT"
+msgstr "기류: 일정함 → 간헐적"
+
+#: resources/cases/test_case_01.tres:152
+msgid "TEST SERVICE-STRUCTURE INCIDENT"
+msgstr "테스트: 설비 구조물 이상"
+
+#: resources/cases/test_case_01.tres:153
+msgid "TEST observation: strikes cluster at service-panel mounts after pump starts. Vibration travels along the service structure as emergency lighting drops out. Airflow is currently steady; wall tracing continues between strikes."
+msgstr "테스트 관찰: 펌프 가동 후 설비 패널의 고정부에 타격이 집중된다. 비상 조명이 꺼지는 동안 설비 구조물을 따라 진동이 전달된다. 현재 기류는 일정하며, 타격 사이에는 벽면을 따라가는 행동이 계속된다."
+
+#: resources/cases/test_case_01.tres:160
+msgid "TEST VENTILATION INCIDENT"
+msgstr "테스트: 환기 이상"
+
+#: resources/cases/test_case_01.tres:161
+msgid "TEST observation: vent stop/start pulses are followed by sharp turn-backs toward the outlet. Wall tracing is repeatedly interrupted by crossings of the ventilation path. Airflow remains unstable after each service restart."
+msgstr "테스트 관찰: 환기가 멈췄다가 시작되면 송풍구를 향해 급격히 방향을 되돌린다. 환기 경로를 가로지르는 움직임이 반복되어 벽면을 따라가는 행동이 끊긴다. 설비가 다시 가동될 때마다 기류는 계속 불안정하다."
+
+#: resources/cases/test_case_01.tres:168
+msgid "Mechanically isolate the service mounts and keep airflow steady. Prioritizes transmitted impulses, but leaves movement near the access seam to be observed."
+msgstr "설비 고정부를 기계적으로 분리하고 기류를 일정하게 유지한다. 전달되는 충격을 우선 줄이되, 출입 틈새 주변의 움직임은 계속 관찰한다."
+
+#: resources/cases/test_case_01.tres:174
+msgid "Quiet airborne machinery noise while retaining rigid service connections and steady airflow. Preserves the connection, but transmitted impulses remain."
+msgstr "설비의 단단한 연결부와 일정한 기류를 유지하면서 공기를 통해 들리는 기계 소음을 줄인다. 연결 상태는 유지되지만 충격 전달도 남는다."
+
+#: resources/cases/test_case_01.tres:180
+msgid "Cycle ventilation to redirect movement away from service panels while keeping the supports connected. Repeated airflow transitions may draw attention to the outlet."
+msgstr "지지대 연결을 유지한 채 환기를 반복해서 켜고 꺼 설비 패널에서 멀어지도록 유도한다. 반복되는 기류 변화가 대상의 주의를 송풍구로 끌 수 있다."
+
+#: resources/cases/test_case_01.tres:186
+msgid "TEST RESPONSE: SERVICE VIBRATION"
+msgstr "테스트 대응: 설비 진동"
+
+#: resources/cases/test_case_01.tres:187
+msgid "Strikes track pump starts; the earlier sound-only trial did not reproduce them. Outlet turn-backs track airflow changes. Choose which cue to alter while the service panels vibrate. These temporary responses do not establish long-term containment."
+msgstr "타격은 펌프 가동 시점과 맞물리지만, 앞선 소리만 재생한 실험에서는 재현되지 않았다. 송풍구 쪽으로 방향을 되돌리는 행동은 기류 변화와 맞물린다. 설비 패널이 진동하는 동안 어떤 자극을 바꿀지 선택한다. 이 임시 대응으로 장기 격리가 입증되는 것은 아니다."
+
+#: resources/cases/test_case_01.tres:193
+msgid "Hold continuous low airflow with the present lighting and supports. Removes repeated airflow transitions, while other sources of stimulation remain untested."
+msgstr "현재 조명과 지지대를 유지하면서 약한 기류를 일정하게 유지한다. 반복되는 기류 변화는 없애지만 다른 자극원은 아직 검증되지 않았다."
+
+#: resources/cases/test_case_01.tres:199
+msgid "Reduce task lighting while retaining vent cycling and the present supports. Aims to reduce crossing movements, but does not remove airflow transitions."
+msgstr "환기의 반복 가동과 현재 지지대를 유지하면서 작업 조명을 낮춘다. 공간을 가로지르는 움직임을 줄이려는 조치지만, 기류 변화는 남는다."
+
+#: resources/cases/test_case_01.tres:205
+msgid "Add damping at the service mounts while retaining vent cycling. Prioritizes structural transmission, but leaves the repeating airflow cue in place."
+msgstr "환기의 반복 가동을 유지하면서 설비 고정부에 진동 완충을 추가한다. 구조물을 통한 전달을 우선 줄이되 반복되는 기류 자극은 남긴다."
+
+#: resources/cases/test_case_01.tres:211
+msgid "TEST RESPONSE: AIRFLOW CYCLING"
+msgstr "테스트 대응: 반복되는 기류 변화"
+
+#: resources/cases/test_case_01.tres:212
+msgid "Outlet turn-backs coincide with airflow transitions. Earlier lamp sweeps changed travel rather than strike timing; mechanical isolation addresses transmitted impacts. Choose a temporary response while wall tracing is interrupted by vent pulses."
+msgstr "송풍구 쪽으로 방향을 되돌리는 행동은 기류 변화와 동시에 나타난다. 앞선 조명 변화는 타격 시점보다 이동 경로에 영향을 줬으며, 기계적 분리는 전달되는 충격에 대응한다. 환기 변화로 벽면을 따라가는 행동이 끊기는 동안 임시 대응을 선택한다."
+
+#: resources/cases/test_case_01.tres:218
+msgid "TEST MECHANICAL ISOLATION OBSERVATION"
+msgstr "테스트: 기계적 분리 후 관찰"
+
+#: resources/cases/test_case_01.tres:219
+msgid "Service mounts were isolated and airflow held steady. Panel strikes became less frequent; wall tracing and brief approaches to the access seam continued. Transmitted impacts were reduced, but movement near the seam remains to be observed."
+msgstr "설비 고정부를 분리하고 기류를 일정하게 유지했다. 패널 타격은 줄었지만 벽면을 따라가는 행동과 출입 틈새에 잠시 접근하는 행동은 계속됐다. 전달되는 충격은 줄었으나 틈새 주변의 움직임은 계속 관찰해야 한다."
+
+#: resources/cases/test_case_01.tres:224
+msgid "TEST NOISE REDUCTION OBSERVATION"
+msgstr "테스트: 소음 감소 후 관찰"
+
+#: resources/cases/test_case_01.tres:225
+msgid "Airborne machinery noise was reduced while rigid connections remained. Brief orientations toward the speaker stopped, but strikes still clustered at pump starts. Steady airflow avoided added outlet turn-backs; structural transmission remains unresolved."
+msgstr "단단한 연결부를 유지하면서 공기를 통해 들리는 기계 소음을 줄였다. 잠시 스피커 쪽을 향하던 행동은 멈췄지만 타격은 여전히 펌프 가동 시점에 집중됐다. 일정한 기류로 송풍구 쪽 방향 전환이 추가로 생기지는 않았으나 구조물을 통한 전달 문제는 해결되지 않았다."
+
+#: resources/cases/test_case_01.tres:230
+msgid "TEST VENT CYCLING OBSERVATION"
+msgstr "테스트: 환기 반복 가동 후 관찰"
+
+#: resources/cases/test_case_01.tres:231
+msgid "Vent cycling initially drew movement away from the panel. Further restarts produced repeated outlet turn-backs; panel strikes continued after pump starts. The initial redirection did not remove transmitted impulses and added a repeating airflow cue."
+msgstr "처음에는 환기를 켜고 끄자 패널에서 멀어졌다. 이후 환기가 다시 가동될 때마다 송풍구 쪽으로 반복해서 방향을 되돌렸으며, 펌프 가동 후 패널 타격도 계속됐다. 처음의 이동 유도는 충격 전달을 없애지 못했고 반복되는 기류 자극을 추가했다."
+
+#: resources/cases/test_case_01.tres:236
+msgid "TEST STEADY AIRFLOW OBSERVATION"
+msgstr "테스트: 일정한 기류 유지 후 관찰"
+
+#: resources/cases/test_case_01.tres:237
+msgid "Continuous low airflow replaced the stop/start pulses. Outlet turn-backs became less frequent and wall tracing resumed over longer stretches. Approaches to service panels continued; the airflow cue was reduced without testing all structural stimuli."
+msgstr "기류를 켜고 끄는 대신 약한 기류를 일정하게 유지했다. 송풍구 쪽으로 방향을 되돌리는 행동은 줄고 벽면을 따라가는 행동이 더 오래 이어졌다. 설비 패널에 접근하는 행동은 계속됐다. 기류 자극은 줄었지만 모든 구조적 자극을 검증한 것은 아니다."
+
+#: resources/cases/test_case_01.tres:242
+msgid "TEST LIGHTING REDUCTION OBSERVATION"
+msgstr "테스트: 조명 감소 후 관찰"
+
+#: resources/cases/test_case_01.tres:243
+msgid "Reduced lighting produced fewer crossings and longer pauses between movements. Each vent restart still prompted outlet turn-backs. The change altered travel but left the repeated airflow cue and interrupted wall tracing unresolved."
+msgstr "조명을 낮추자 공간을 가로지르는 횟수가 줄고 움직임 사이의 멈춤이 길어졌다. 환기가 다시 가동될 때마다 송풍구 쪽으로 방향을 되돌리는 행동은 계속됐다. 이동 경로는 달라졌지만 반복되는 기류 자극과 끊기는 벽면 추적 문제는 해결되지 않았다."
+
+#: resources/cases/test_case_01.tres:248
+msgid "TEST SERVICE DAMPING OBSERVATION"
+msgstr "테스트: 설비 완충 추가 후 관찰"
+
+#: resources/cases/test_case_01.tres:249
+msgid "Added damping reduced pulse-linked vibration at service panels. Vent restarts still prompted outlet turn-backs and repeatedly interrupted wall tracing. Structural vibration was reduced, while the cycling airflow cue remained."
+msgstr "완충을 추가하자 충격과 연동된 설비 패널 진동이 줄었다. 환기가 다시 가동될 때마다 송풍구 쪽으로 방향을 되돌리고 벽면을 따라가는 행동이 끊기는 현상은 계속됐다. 구조적 진동은 줄었지만 기류의 반복 변화는 남았다."
+
+#: resources/cases/test_case_01.tres:256
+msgid "Intake record: support and machinery timing"
+msgstr "초기 기록: 지지대와 기계 작동 시점"
+
+#: resources/cases/test_case_01.tres:257
+msgid "Intake: strikes followed pump cycles on metal supports; no timing link to speech was recorded."
+msgstr "초기 기록: 금속 지지대에서 펌프 작동 후 타격이 발생했다. 말소리와 타이밍의 연관성은 기록되지 않았다."
+
+#: resources/cases/test_case_01.tres:264
+msgid "Camera 01: pump, airflow and lamp comparison"
+msgstr "카메라 01: 펌프·기류·조명 비교"
+
+#: resources/cases/test_case_01.tres:265
+msgid "Pump starts coincided with strikes; vent transitions with turn-backs. Lamp sweeps changed travel rather than strike timing; wall tracing persisted."
+msgstr "펌프 가동은 타격과, 환기 변화는 방향을 되돌리는 행동과 맞물렸다. 조명을 훑어 비추면 타격 시점보다 이동 경로가 달라졌다. 벽면을 따라가는 행동은 계속됐다."
+
+#: resources/cases/test_case_01.tres:272
+msgid "Experiment 01: support comparison"
+msgstr "실험 01: 지지대 비교"
+
+#: resources/cases/test_case_01.tres:273
+msgid "With sound and airflow held fixed, strike bursts followed metal-support impulses more often than padded-support impulses. Slow wall tracing continued on both; airflow cycles were not compared."
+msgstr "소리와 기류를 고정한 상태에서 완충 지지대보다 금속 지지대에 충격을 전달했을 때 연속 타격이 더 자주 발생했다. 두 지지대 모두에서 천천히 벽면을 따라가는 행동은 계속됐다. 기류의 반복 변화는 비교하지 않았다."
+
+#: resources/cases/test_case_01.tres:280
+msgid "Containment choice: room 02"
+msgstr "격리 선택: 격리실 02"
+
+#: resources/cases/test_case_01.tres:281
+msgid "Room 02 submission: mechanically isolated padded support; continuous low airflow; ordinary task lighting. This is the submitted configuration, not a result."
+msgstr "격리실 02 제출 구성: 기계적으로 분리된 완충 지지대, 일정한 약한 기류, 일반 작업 조명. 제출한 구성의 기록이며 결과를 뜻하지 않는다."
+
+#: resources/cases/test_case_01.tres:288
+msgid "Service incident: repeated panel impacts"
+msgstr "설비 이상: 반복되는 패널 타격"
+
+#: resources/cases/test_case_01.tres:289
+msgid "Pump-start strikes clustered at service-panel mounts. Vibration travelled along the service structure during emergency lighting interruptions; wall tracing continued between strikes and airflow was steady."
+msgstr "펌프 가동 후 타격이 설비 패널 고정부에 집중됐다. 비상 조명이 끊기는 동안 설비 구조물을 따라 진동이 전달됐다. 타격 사이에는 벽면을 따라가는 행동이 계속됐고 기류는 일정했다."
+
+#: resources/cases/test_case_01.tres:296
+msgid "Response decision: vibration, sound or airflow"
+msgstr "대응 결정: 진동·소리·기류"
+
+#: resources/cases/test_case_01.tres:297
+msgid "Panel impacts tracked pump starts, while the prior sound-only comparison did not reproduce them. Outlet turns tracked airflow changes. A temporary response was requested to alter mechanical transmission, airborne noise or airflow timing."
+msgstr "패널 타격은 펌프 가동 시점과 맞물렸으나 앞선 소리 비교 실험에서는 재현되지 않았다. 송풍구 쪽 방향 전환은 기류 변화와 맞물렸다. 기계적 전달, 공기를 통해 전달되는 소음, 기류 변화 시점 중 하나를 바꾸는 임시 대응이 요청됐다."
+
+#: resources/cases/test_case_01.tres:304
+msgid "Selected response: airborne noise reduction"
+msgstr "선택한 대응: 기계 소음 감소"
+
+#: resources/cases/test_case_01.tres:305
+msgid "Airborne machinery noise reduction was selected, retaining rigid service connections and steady airflow. Transmitted impulses were not addressed by this protocol."
+msgstr "단단한 설비 연결부와 일정한 기류를 유지하면서 공기를 통해 들리는 기계 소음을 줄이기로 했다. 이 대응은 전달되는 충격을 해결하지 않는다."
+
+#: resources/cases/test_case_01.tres:312
+msgid "Follow-up: quiet sound, persistent panel strikes"
+msgstr "후속 관찰: 소음은 줄었지만 패널 타격은 지속"
+
+#: resources/cases/test_case_01.tres:313
+msgid "After noise reduction, brief speaker orientations stopped but pump-start strikes persisted. Steady airflow avoided additional outlet turns; structural transmission remained unresolved."
+msgstr "소음을 줄인 뒤 잠시 스피커 쪽을 향하던 행동은 멈췄지만 펌프 가동 시점의 타격은 계속됐다. 일정한 기류로 송풍구 쪽 방향 전환이 추가되지는 않았으나 구조물을 통한 전달 문제는 해결되지 않았다."
+
+#: resources/cases/test_case_01.tres:320
+msgid "Experiment 02: airflow comparison"
+msgstr "실험 02: 기류 비교"
+
+#: resources/cases/test_case_01.tres:321
+msgid "With support and sound held fixed, continuous low airflow yielded fewer outlet-directed turn-backs than start/stop airflow. Wall tracing persisted; support isolation was not tested."
+msgstr "지지대와 소리를 고정한 상태에서 기류를 켜고 끌 때보다 약한 기류를 일정하게 유지할 때 송풍구 쪽 방향 전환이 줄었다. 벽면을 따라가는 행동은 계속됐다. 지지대의 기계적 분리는 검증하지 않았다."
+
+#: resources/cases/test_case_01.tres:328
+msgid "Experiment 03: sound-only comparison"
+msgstr "실험 03: 소리만 재생한 비교"
+
+#: resources/cases/test_case_01.tres:329
+msgid "Sound-only replay caused brief orientation but did not reproduce pump-start strike bursts; wall tracing persisted. Airborne sound alone did not explain the earlier timing link."
+msgstr "소리만 재생하면 잠시 소리 쪽으로 방향을 돌리지만 펌프 가동 시점의 연속 타격은 재현되지 않았다. 벽면을 따라가는 행동은 계속됐다. 공기를 통해 전달되는 소리만으로는 앞서 관찰한 타이밍의 연관성을 설명할 수 없다."
+
+#: resources/cases/test_case_01.tres:336
+msgid "Containment choice: room 01"
+msgstr "격리 선택: 격리실 01"
+
+#: resources/cases/test_case_01.tres:337
+msgid "Room 01 submission: acoustic partition; rigid metal support connected to the service structure; continuous low airflow. This is the submitted configuration, not a result."
+msgstr "격리실 01 제출 구성: 방음 칸막이, 설비 구조물과 연결된 단단한 금속 지지대, 일정한 약한 기류. 제출한 구성의 기록이며 결과를 뜻하지 않는다."
+
+#: resources/cases/test_case_01.tres:344
+msgid "Containment choice: room 03"
+msgstr "격리 선택: 격리실 03"
+
+#: resources/cases/test_case_01.tres:345
+msgid "Room 03 submission: mechanically isolated padded support; start/stop ventilation; reduced task lighting. This is the submitted configuration, not a result."
+msgstr "격리실 03 제출 구성: 기계적으로 분리된 완충 지지대, 반복해서 켜고 끄는 환기, 낮춘 작업 조명. 제출한 구성의 기록이며 결과를 뜻하지 않는다."
+
+#: resources/cases/test_case_01.tres:352
+msgid "Ventilation incident: repeated outlet turns"
+msgstr "환기 이상: 반복되는 송풍구 쪽 방향 전환"
+
+#: resources/cases/test_case_01.tres:353
+msgid "Vent stop/start pulses were followed by outlet-directed turn-backs and crossings of the ventilation path. Wall tracing was repeatedly interrupted, and airflow remained unstable after service restarts."
+msgstr "환기가 멈췄다가 시작되면 송풍구 쪽으로 방향을 되돌리고 환기 경로를 가로질렀다. 벽면을 따라가는 행동이 반복해서 끊겼으며 설비 재가동 후에도 기류는 불안정했다."
+
+#: resources/cases/test_case_01.tres:360
+msgid "Response decision: airflow, lighting or damping"
+msgstr "대응 결정: 기류·조명·완충"
+
+#: resources/cases/test_case_01.tres:361
+msgid "Outlet turns coincided with airflow transitions. Prior lamp sweeps altered travel rather than strike timing; mechanical isolation targeted transmitted impulses. A temporary airflow, lighting or damping response was requested."
+msgstr "송풍구 쪽 방향 전환은 기류 변화와 맞물렸다. 앞선 조명 변화는 타격 시점보다 이동 경로에 영향을 줬고, 기계적 분리는 전달되는 충격에 대응했다. 기류·조명·완충 중 하나에 대한 임시 대응이 요청됐다."
+
+#: resources/cases/test_case_01.tres:368
+msgid "Selected response: service-mount isolation"
+msgstr "선택한 대응: 설비 고정부 분리"
+
+#: resources/cases/test_case_01.tres:369
+msgid "Mechanical isolation of service mounts with steady airflow was selected. The protocol targeted transmitted impulses while leaving access-seam movements for observation."
+msgstr "기류를 일정하게 유지하면서 설비 고정부를 기계적으로 분리하기로 했다. 전달되는 충격에 대응하는 조치이며 출입 틈새 주변의 움직임은 계속 관찰한다."
+
+#: resources/cases/test_case_01.tres:376
+msgid "Selected response: vent-driven redirection"
+msgstr "선택한 대응: 환기를 이용한 이동 유도"
+
+#: resources/cases/test_case_01.tres:377
+msgid "Vent cycling was selected to redirect movement away from service panels. Supports remained connected and repeated airflow transitions were introduced."
+msgstr "설비 패널에서 멀어지도록 환기를 반복해서 켜고 끄기로 했다. 지지대 연결은 유지했고 반복되는 기류 변화를 추가했다."
+
+#: resources/cases/test_case_01.tres:384
+msgid "Selected response: continuous low airflow"
+msgstr "선택한 대응: 일정한 약한 기류"
+
+#: resources/cases/test_case_01.tres:385
+msgid "Continuous low airflow was selected while retaining present lighting and supports. Other sources of stimulation were left untested."
+msgstr "현재 조명과 지지대를 유지하면서 약한 기류를 일정하게 유지하기로 했다. 다른 자극원은 검증하지 않았다."
+
+#: resources/cases/test_case_01.tres:392
+msgid "Selected response: reduced task lighting"
+msgstr "선택한 대응: 작업 조명 감소"
+
+#: resources/cases/test_case_01.tres:393
+msgid "Reduced task lighting was selected to limit crossings, retaining vent cycling and the present support arrangement. Airflow transitions were left in place."
+msgstr "환기의 반복 가동과 현재 지지대 구성을 유지하면서 작업 조명을 낮춰 공간을 가로지르는 움직임을 줄이기로 했다. 기류 변화는 그대로 남았다."
+
+#: resources/cases/test_case_01.tres:400
+msgid "Selected response: extra service-mount damping"
+msgstr "선택한 대응: 설비 고정부 완충 추가"
+
+#: resources/cases/test_case_01.tres:401
+msgid "Additional service-mount damping was selected to reduce structural transmission. Vent cycling and its repeated airflow cue remained."
+msgstr "구조물을 통한 전달을 줄이기 위해 설비 고정부에 완충을 추가하기로 했다. 환기의 반복 가동과 그에 따른 기류 자극은 남았다."
+
+#: resources/cases/test_case_01.tres:408
+msgid "Follow-up: fewer impacts, continued seam approaches"
+msgstr "후속 관찰: 타격은 줄었지만 틈새 접근은 지속"
+
+#: resources/cases/test_case_01.tres:409
+msgid "After mount isolation with steady airflow, panel strikes became less frequent. Wall tracing and brief access-seam approaches continued; movement near the seam still required observation."
+msgstr "고정부를 분리하고 기류를 일정하게 유지한 뒤 패널 타격은 줄었다. 벽면을 따라가는 행동과 출입 틈새에 잠시 접근하는 행동은 계속됐다. 틈새 주변의 움직임은 계속 관찰해야 한다."
+
+#: resources/cases/test_case_01.tres:416
+msgid "Follow-up: initial redirection, repeated outlet turns"
+msgstr "후속 관찰: 초기 이동 유도 후 반복되는 방향 전환"
+
+#: resources/cases/test_case_01.tres:417
+msgid "Vent cycling first drew movement away from the panel, then produced repeated outlet turn-backs. Pump-start strikes continued; transmitted impulses remained and the repeating airflow cue was added."
+msgstr "처음에는 환기를 켜고 끄자 패널에서 멀어졌지만 이후 송풍구 쪽으로 반복해서 방향을 되돌렸다. 펌프 가동 시점의 타격은 계속됐다. 전달되는 충격은 남았고 반복되는 기류 자극이 추가됐다."
+
+#: resources/cases/test_case_01.tres:424
+msgid "Follow-up: fewer turns under steady airflow"
+msgstr "후속 관찰: 일정한 기류에서 방향 전환 감소"
+
+#: resources/cases/test_case_01.tres:425
+msgid "Continuous low airflow reduced outlet turn-backs and allowed longer stretches of wall tracing. Service-panel approaches continued; not all structural stimuli were tested."
+msgstr "약한 기류를 일정하게 유지하자 송풍구 쪽 방향 전환이 줄고 벽면을 따라가는 행동이 더 오래 이어졌다. 설비 패널에 접근하는 행동은 계속됐다. 모든 구조적 자극을 검증한 것은 아니다."
+
+#: resources/cases/test_case_01.tres:432
+msgid "Follow-up: fewer crossings, continued restart turns"
+msgstr "후속 관찰: 이동은 줄었지만 환기 재가동에 반응"
+
+#: resources/cases/test_case_01.tres:433
+msgid "Reduced lighting lowered crossing frequency and lengthened pauses. Vent restarts still prompted outlet turns and interrupted wall tracing; the repeated airflow cue remained unresolved."
+msgstr "조명을 낮추자 공간을 가로지르는 횟수가 줄고 멈춤이 길어졌다. 환기가 다시 가동되면 송풍구 쪽으로 방향을 돌려 벽면을 따라가는 행동이 끊겼다. 반복되는 기류 자극은 해결되지 않았다."
+
+#: resources/cases/test_case_01.tres:440
+msgid "Follow-up: less vibration, continued vent turns"
+msgstr "후속 관찰: 진동은 줄었지만 환기에 따른 방향 전환 지속"
+
+#: resources/cases/test_case_01.tres:441
+msgid "Extra damping reduced pulse-linked service-panel vibration. Vent restarts continued to prompt outlet turns and interrupt wall tracing; cycling airflow remained."
+msgstr "완충을 추가하자 충격과 연동된 설비 패널 진동이 줄었다. 환기가 다시 가동되면 송풍구 쪽으로 방향을 돌리고 벽면을 따라가는 행동이 끊기는 현상은 계속됐다. 기류의 반복 변화는 남았다."
+
+#: resources/cases/test_case_01.tres:446
+msgid "TEST CASE 01"
+msgstr "테스트 사례 01"
+
+#: resources/cases/test_case_02.tres:23
+msgid "TEST SUBJECT CASE 02"
+msgstr "사례 02 대상"
+
+#: resources/cases/test_case_02.tres:24
+msgid "TEST CLASSIFICATION CASE 02"
+msgstr "임시 분류 · 사례 02"
+
+#: resources/cases/test_case_02.tres:25
+msgid "TEST: wall-contact loss precedes searching; no damage recorded."
+msgstr "테스트 기록: 벽면 접촉이 끊기면 탐색 행동이 시작된다. 손상은 기록되지 않았다."
+
+#: resources/cases/test_case_02.tres:30
+msgid "TEST: ribbed-wall tracing resumes after vent turns. Smooth patches prompt repeated sideways searches toward the service grille; vent cycling restarts those searches. No new damage appears."
+msgstr "테스트 관찰: 환기에 반응해 방향을 돌린 뒤 다시 골이 있는 벽면을 따라간다. 매끈한 구간에서는 설비 그릴 쪽으로 반복해서 옆걸음 탐색을 하며, 환기가 켜지고 꺼질 때 탐색이 다시 시작된다. 새로운 손상은 없다."
+
+#: resources/cases/test_case_02.tres:35
+msgid "TEST CASE 02 EXPERIMENT 01"
+msgstr "사례 02 · 테스트 실험 01"
+
+#: resources/cases/test_case_02.tres:36
+msgid "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged."
+msgstr "자극 비교 실험: 고정된 노즐에서 짧은 바람을 분사한 다음 팬 소리만 재생한다. 벽면과 조명은 유지한다."
+
+#: resources/cases/test_case_02.tres:37
+msgid "Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+msgstr "바람을 분사하면 반복해서 노즐 쪽으로 방향을 돌린 뒤 벽면을 따라가는 행동을 재개했다. 팬 소리만으로는 일관된 방향 전환이 나타나지 않았다. 벽면 질감이 탐색에 영향을 주는지는 이 실험으로 확인되지 않았다."
+
+#: resources/cases/test_case_02.tres:42
+msgid "TEST CASE 02 EXPERIMENT 02"
+msgstr "사례 02 · 테스트 실험 02"
+
+#: resources/cases/test_case_02.tres:43
+msgid "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure."
+msgstr "벽면 비교 실험: 같은 기류와 조명 아래에서 얕은 골이 있는 벽판과 매끈한 벽판을 나란히 제시한다. 발자국과 접촉 압력을 기록한다."
+
+#: resources/cases/test_case_02.tres:44
+msgid "Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+msgstr "반복해서 지나갈 때 발자국은 얕은 골을 따라 같은 벽면 경로로 돌아왔다. 매끈한 벽판에서는 옆걸음 탐색이 반복해서 설비 그릴에 도달했다. 어느 벽판에서도 접촉 압력은 증가하지 않았다. 일정한 기류와 반복해서 켜고 끄는 기류는 비교하지 않았다."
+
+#: resources/cases/test_case_02.tres:49
+msgid "TEST CASE 02 ROOM 01"
+msgstr "사례 02 · 테스트 격리실 01"
+
+#: resources/cases/test_case_02.tres:50
+msgid "TEST configuration: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting."
+msgstr "테스트 구성: 일정한 약한 기류, 날카로운 모서리 없이 얕은 골이 있는 벽판, 일반 작업 조명."
+
+#: resources/cases/test_case_02.tres:55
+msgid "TEST CASE 02 ROOM 02"
+msgstr "사례 02 · 테스트 격리실 02"
+
+#: resources/cases/test_case_02.tres:56
+msgid "TEST configuration: start/stop airflow; smooth wall panels without purchase points; reduced task lighting."
+msgstr "테스트 구성: 반복해서 켜고 끄는 기류, 발을 걸 지점이 없는 매끈한 벽판, 낮춘 작업 조명."
+
+#: resources/cases/test_case_02.tres:63
+msgid "Case 02 intake: wall contact and searching"
+msgstr "사례 02 초기 기록: 벽면 접촉과 탐색"
+
+#: resources/cases/test_case_02.tres:64
+msgid "Intake associates loss of wall contact with searching; no damage is documented."
+msgstr "초기 기록에는 벽면 접촉 상실과 탐색의 연관성이 있다. 손상은 기록되지 않았다."
+
+#: resources/cases/test_case_02.tres:71
+msgid "Case 02 experiment 01: airflow and sound cues"
+msgstr "사례 02 실험 01: 기류와 소리 자극"
+
+#: resources/cases/test_case_02.tres:72
+msgid "Air pulses caused nozzle-directed pivots followed by wall tracing; fan sound alone produced no consistent pivot. Wall texture's effect on searching remains untested here."
+msgstr "바람을 분사하면 노즐 쪽으로 방향을 돌린 뒤 벽면을 따라갔다. 팬 소리만으로는 일관된 방향 전환이 나타나지 않았다. 벽면 질감이 탐색에 미치는 영향은 이 실험에서 검증하지 않았다."
+
+#: resources/cases/test_case_02.tres:79
+msgid "Test Case 02 room 01 submission"
+msgstr "사례 02 · 격리실 01 제출 기록"
+
+#: resources/cases/test_case_02.tres:80
+msgid "Room 01 submission: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting. Its containment result remains pending."
+msgstr "격리실 01 제출 구성: 일정한 약한 기류, 날카로운 모서리 없이 얕은 골이 있는 벽판, 일반 작업 조명. 격리 결과는 아직 대기 중이다."
+
+#: resources/cases/test_case_02.tres:86
+msgid "Unplanned Observation: TEST LIGHTING INTERRUPTION"
+msgstr "예상 밖 관찰: 테스트 조명 중단"
+
+#: resources/cases/test_case_02.tres:87
+msgid "When the lights cut out, the subject pauses its crossing for eight seconds with one paw still on a ribbed panel. It then resumes wall tracing; the pause does not break wall contact."
+msgstr "조명이 꺼지자 대상은 한쪽 발을 골이 있는 벽판에 댄 채 8초 동안 이동을 멈췄다. 이후 다시 벽면을 따라갔다. 멈춰 있는 동안에도 벽면 접촉은 유지됐다."
+
+#: resources/cases/test_case_02.tres:93
+msgid "Unplanned Observation: TEST AIRFLOW INTERRUPTION"
+msgstr "예상 밖 관찰: 테스트 기류 중단"
+
+#: resources/cases/test_case_02.tres:94
+msgid "At the first unexpected vent stop, the subject turns toward the outlet and makes two short sideways searches. Wall contact continues and pressure marks do not deepen. This is a single transition observation."
+msgstr "예상치 못한 첫 환기 중단 때 대상은 송풍구 쪽으로 방향을 돌린 뒤 짧은 옆걸음 탐색을 두 번 했다. 벽면 접촉은 계속됐고 압력 자국은 깊어지지 않았다. 한 번의 변화에 대한 관찰이다."
+
+#: resources/cases/test_case_02.tres:101
+msgid "Unplanned Observation: test lighting interruption"
+msgstr "예상 밖 관찰: 테스트 조명 중단"
+
+#: resources/cases/test_case_02.tres:102
+msgid "Without lighting: an eight-second crossing pause with a paw on a ribbed panel, then renewed wall tracing. Contact was maintained through the pause."
+msgstr "조명이 없는 상태에서 발을 골이 있는 벽판에 댄 채 8초 동안 이동을 멈춘 뒤 다시 벽면을 따라갔다. 멈춰 있는 동안에도 접촉은 유지됐다."
+
+#: resources/cases/test_case_02.tres:109
+msgid "TEST CCTV OBSERVATION - LIGHTING INTERRUPTION"
+msgstr "테스트 관찰 영상: 조명 중단"
+
+#: resources/cases/test_case_02.tres:110
+msgid "TEST follow-up over two minutes without lighting: fewer room crossings occur, but tracing still follows the shallow ribs. Vent start/stop still prompts turns toward the outlet. The initial pause is not a lasting loss of these responses."
+msgstr "조명 없이 2분 동안 추가 관찰했다. 공간을 가로지르는 횟수는 줄었지만 얕은 골을 따라가는 행동은 계속됐다. 환기가 켜지고 꺼질 때 송풍구 쪽으로 방향을 돌리는 행동도 계속됐다. 처음의 멈춤이 이러한 반응의 지속적인 상실로 이어지지는 않았다."
+
+#: resources/cases/test_case_02.tres:117
+msgid "Test CCTV follow-up: lighting interruption"
+msgstr "후속 영상 관찰: 조명 중단"
+
+#: resources/cases/test_case_02.tres:118
+msgid "Without lighting over two minutes: fewer crossings, yet rib tracing and turns at vent transitions continued. The initial pause did not persist as a loss of those responses."
+msgstr "조명 없이 2분 동안 관찰했다. 공간을 가로지르는 횟수는 줄었지만 골을 따라가는 행동과 환기 변화 때의 방향 전환은 계속됐다. 처음의 멈춤이 지속적인 반응 상실로 이어지지는 않았다."
+
+#: resources/cases/test_case_02.tres:125
+msgid "TEST EXPERIMENT OBSERVATION - LIGHTING INTERRUPTION"
+msgstr "테스트 실험 관찰: 조명 중단"
+
+#: resources/cases/test_case_02.tres:126
+msgid "TEST supporting result without lighting: the same air pulse still prompts a pivot toward the nozzle, but the first step starts later than in the lit trial. Wall tracing resumes. The delay alone does not explain wall searching."
+msgstr "조명이 없는 상태의 보조 실험 결과: 같은 바람을 분사하면 여전히 노즐 쪽으로 방향을 돌리지만, 조명이 켜진 실험보다 첫걸음을 늦게 뗀다. 이후 벽면을 따라가는 행동을 재개한다. 이 지연만으로 벽면 탐색을 설명할 수는 없다."
+
+#: resources/cases/test_case_02.tres:133
+msgid "Condition Observation: test experiment 01 under lighting interruption"
+msgstr "조건별 관찰: 조명 중단 상태의 테스트 실험 01"
+
+#: resources/cases/test_case_02.tres:134
+msgid "Without lighting, an air pulse still caused a nozzle-directed pivot with a later first step than the lit reference. Wall tracing resumed; onset delay alone did not explain wall searching."
+msgstr "조명이 없어도 바람을 분사하면 노즐 쪽으로 방향을 돌렸지만 조명이 켜진 기준 실험보다 첫걸음을 늦게 뗐다. 벽면을 따라가는 행동은 재개됐다. 반응 시작의 지연만으로 벽면 탐색을 설명할 수는 없다."
+
+#: resources/cases/test_case_02.tres:139
+msgid "TEST playback: wall tracing follows the available ribs under steady airflow."
+msgstr "테스트 재생 기록: 일정한 기류 아래에서 벽면의 골을 따라간다."
+
+#: resources/cases/test_case_02.tres:144
+msgid "TEST playback: repeated passes return to the same wall path; grille-directed searching is infrequent."
+msgstr "테스트 재생 기록: 반복해서 같은 벽면 경로로 돌아온다. 그릴을 향한 탐색은 드물다."
+
+#: resources/cases/test_case_02.tres:149
+msgid "TEST playback: contact pressure remains unchanged; the service air-line stays steady during this sample."
+msgstr "테스트 재생 기록: 접촉 압력은 변하지 않는다. 이 관찰 구간에서는 설비 공기 배관이 안정적으로 유지된다."
+
+#: resources/cases/test_case_02.tres:160
+msgid "TEST playback: sideways searching repeatedly reaches the service grille."
+msgstr "테스트 재생 기록: 옆걸음 탐색이 반복해서 설비 그릴에 도달한다."
+
+#: resources/cases/test_case_02.tres:165
+msgid "TEST playback: vent transitions repeatedly redirect the search toward the grille; wall tracing does not settle."
+msgstr "테스트 재생 기록: 환기 변화가 반복해서 탐색 방향을 그릴 쪽으로 돌린다. 벽면을 따라가는 행동이 안정되지 않는다."
+
+#: resources/cases/test_case_02.tres:170
+msgid "TEST playback: grille contact coincides with short discharges from the service air-line; no damage is recorded."
+msgstr "테스트 재생 기록: 그릴 접촉과 함께 설비 공기 배관에서 짧게 바람이 분출된다. 손상은 기록되지 않았다."
+
+#: resources/cases/test_case_02.tres:182
+msgid "TEST SERVICE AIR-LINE PULSES"
+msgstr "테스트: 설비 공기 배관의 간헐 분사"
+
+#: resources/cases/test_case_02.tres:183
+msgid "Short air jets are discharging from the facility service line. Main ventilation continues at its previous setting."
+msgstr "시설의 설비 공기 배관에서 짧은 바람이 분출되고 있다. 주 환기는 기존 설정을 유지한다."
+
+#: resources/cases/test_case_02.tres:184
+msgid "SERVICE AIR-LINE: STEADY -> INTERMITTENT LOCAL JETS"
+msgstr "설비 공기 배관: 일정한 상태 → 간헐적인 국소 분사"
+
+#: resources/cases/test_case_02.tres:189
+msgid "TEST SERVICE-GRILLE SEARCH INCIDENT"
+msgstr "테스트: 설비 그릴 탐색 이상"
+
+#: resources/cases/test_case_02.tres:190
+msgid "TEST observation: repeated sideways searches reach the service grille. Contact there coincides with short service air-line discharges, which redirect the next search toward the outlet. Contact pressure remains unchanged; wall tracing has not settled into a repeated path."
+msgstr "테스트 관찰: 반복되는 옆걸음 탐색이 설비 그릴에 도달한다. 그릴 접촉과 함께 설비 공기 배관에서 짧게 바람이 분출되어 다음 탐색 방향이 송풍구 쪽으로 바뀐다. 접촉 압력은 변하지 않으며 벽면을 따라가는 행동은 일정한 경로로 안정되지 않았다."
+
+#: resources/cases/test_case_02.tres:197
+msgid "TEST CONTINUOUS-GUIDE OBSERVATION"
+msgstr "테스트: 연속 안내면 적용 후 관찰"
+
+#: resources/cases/test_case_02.tres:198
+msgid "A temporary shallow-ribbed guide restores a repeated tracing path. Grille-directed searches become less frequent, but each remaining service air jet still prompts an outlet-directed turn. The air-line cue remains unresolved."
+msgstr "얕은 골이 있는 임시 안내면을 설치하자 반복해서 따라가는 경로가 회복됐다. 그릴을 향한 탐색은 줄었지만 남아 있는 설비의 바람 분사 때마다 송풍구 쪽으로 방향을 돌린다. 공기 배관 자극은 해결되지 않았다."
+
+#: resources/cases/test_case_02.tres:203
+msgid "TEST SERVICE-LINE ISOLATION OBSERVATION"
+msgstr "테스트: 설비 공기 배관 분리 후 관찰"
+
+#: resources/cases/test_case_02.tres:204
+msgid "Local service air jets stop after isolating that line; the associated outlet turns cease. Sideways wall searches continue to reach the grille. Airflow redirection was removed, but a repeatable contact guide is still absent."
+msgstr "설비 공기 배관을 분리하자 국소 분사와 그에 따른 송풍구 쪽 방향 전환이 멈췄다. 옆걸음 벽면 탐색은 계속해서 그릴에 도달한다. 바람에 의한 방향 유도는 제거됐지만 반복해서 접촉할 안내면은 여전히 없다."
+
+#: resources/cases/test_case_02.tres:209
+msgid "TEST SOUND-REDUCTION OBSERVATION"
+msgstr "테스트: 팬 소음 감소 후 관찰"
+
+#: resources/cases/test_case_02.tres:210
+msgid "Fan sound is reduced while the wall surface and service line remain unchanged. Sideways searches and turns following local air jets continue. Quieter machinery does not restore a repeated wall path or remove the air cue."
+msgstr "벽면과 설비 공기 배관을 유지하면서 팬 소음을 줄였다. 옆걸음 탐색과 국소 바람 분사에 따른 방향 전환은 계속된다. 기계가 조용해져도 반복되는 벽면 경로가 회복되거나 기류 자극이 사라지지는 않는다."
+
+#: resources/cases/test_case_02.tres:215
+msgid "Add a temporary continuous shallow-ribbed contact guide. Prioritizes the repeated tracing path seen in the surface trial, but leaves service air jets active."
+msgstr "얕은 골이 끊기지 않는 임시 접촉 안내면을 추가한다. 벽면 비교 실험에서 관찰한 반복 경로를 우선 회복하되, 설비의 바람 분사는 유지한다."
+
+#: resources/cases/test_case_02.tres:221
+msgid "Isolate the pulsing service air-line while keeping main ventilation and wall surface unchanged. Removes the directional air cue, but leaves sideways contact searching unresolved."
+msgstr "주 환기와 벽면을 유지하면서 간헐적으로 분사되는 설비 공기 배관을 분리한다. 방향을 유도하는 기류 자극은 없애지만 옆걸음 접촉 탐색은 해결되지 않는다."
+
+#: resources/cases/test_case_02.tres:227
+msgid "Reduce airborne fan sound while retaining the wall surface and service air-line. Limits sound exposure, although the sound-only trial showed no consistent pivot and actual air jets remain."
+msgstr "벽면과 설비 공기 배관을 유지하면서 공기를 통해 들리는 팬 소음을 줄인다. 소리 노출은 줄이지만 소리만 재생한 실험에서는 일관된 방향 전환이 없었으며 실제 바람 분사는 남는다."
+
+#: resources/cases/test_case_02.tres:233
+msgid "TEST RESPONSE: WALL SEARCH AND SERVICE AIR"
+msgstr "테스트 대응: 벽면 탐색과 설비 기류"
+
+#: resources/cases/test_case_02.tres:234
+msgid "The surface trial linked ribs with a repeated wall path and smooth panels with grille-directed searches. Air pulses prompted pivots; fan sound alone did not. Choose a temporary response to the current search and air-line cues. These observations do not establish a long-term containment solution."
+msgstr "벽면 비교 실험에서는 골이 있는 면에서 같은 경로를 반복하고 매끈한 면에서 그릴을 향해 탐색했다. 바람을 분사하면 방향을 돌렸지만 팬 소리만으로는 그러지 않았다. 현재의 탐색과 공기 배관 자극에 대한 임시 대응을 선택한다. 이 관찰로 장기 격리 해법이 입증되는 것은 아니다."
+
+#: resources/cases/test_case_02.tres:242
+msgid "Test Case 02: tracing paths and service-grille searches"
+msgstr "테스트 사례 02: 벽면 경로와 설비 그릴 탐색"
+
+#: resources/cases/test_case_02.tres:243
+msgid "Rib tracing resumed after vent turns. Smooth patches prompted repeated sideways searches toward the service grille; vent cycling restarted those searches. No new damage was observed."
+msgstr "환기에 반응해 방향을 돌린 뒤 다시 벽면의 골을 따라갔다. 매끈한 구간에서는 설비 그릴을 향한 옆걸음 탐색이 반복됐으며 환기가 켜지고 꺼질 때 탐색이 다시 시작됐다. 새로운 손상은 관찰되지 않았다."
+
+#: resources/cases/test_case_02.tres:250
+msgid "Test Case 02 experiment 02: repeated surface passes"
+msgstr "사례 02 실험 02: 벽면 반복 통과"
+
+#: resources/cases/test_case_02.tres:251
+msgid "Under matched airflow and lighting, rib tracks returned to the same path while smooth-panel searches repeatedly reached the service grille. Pressure did not increase. Continuous versus cycling airflow was not compared."
+msgstr "같은 기류와 조명 조건에서 골을 따라간 발자국은 같은 경로로 돌아왔지만, 매끈한 벽판에서는 탐색이 반복해서 그릴에 도달했다. 접촉 압력은 증가하지 않았다. 일정한 기류와 반복해서 켜고 끄는 기류는 비교하지 않았다."
+
+#: resources/cases/test_case_02.tres:258
+msgid "Test Case 02 room 02 submission"
+msgstr "사례 02 · 격리실 02 제출 기록"
+
+#: resources/cases/test_case_02.tres:259
+msgid "Submitted configuration: start/stop airflow, smooth panels without purchase points and reduced task lighting. This record describes the submission and does not report its outcome."
+msgstr "제출 구성: 반복해서 켜고 끄는 기류, 발을 걸 지점이 없는 매끈한 벽판, 낮춘 작업 조명. 제출한 구성의 기록이며 결과를 뜻하지 않는다."
+
+#: resources/cases/test_case_02.tres:266
+msgid "Test service-grille search incident"
+msgstr "테스트: 설비 그릴 탐색 이상"
+
+#: resources/cases/test_case_02.tres:267
+msgid "Sideways searches repeatedly reached the service grille. Contact coincided with short service air-line discharges and outlet-directed turns. Pressure stayed unchanged; tracing had not settled."
+msgstr "옆걸음 탐색이 반복해서 설비 그릴에 도달했다. 그릴 접촉과 함께 설비 공기 배관에서 짧게 바람이 분출되고 송풍구 쪽으로 방향을 돌렸다. 접촉 압력은 변하지 않았으며 벽면을 따라가는 행동은 안정되지 않았다."
+
+#: resources/cases/test_case_02.tres:274
+msgid "Test emergency response: contact guide or air cue"
+msgstr "테스트 비상 대응: 접촉 안내면 또는 기류 자극"
+
+#: resources/cases/test_case_02.tres:275
+msgid "Temporary responses compare a repeated contact path, isolation of local service air jets and airborne fan-sound reduction. Surface and air-versus-sound trials provide the relevant observations; no long-term solution is established."
+msgstr "임시 대응은 반복되는 접촉 경로, 국소 바람 분사의 분리, 팬 소음 감소를 비교한다. 벽면 비교 및 바람·소리 비교 실험의 관찰이 근거다. 장기 해법은 아직 입증되지 않았다."
+
+#: resources/cases/test_case_02.tres:282
+msgid "Test response recorded: temporary contact guide"
+msgstr "테스트 대응 기록: 임시 접촉 안내면"
+
+#: resources/cases/test_case_02.tres:283
+msgid "Added a continuous shallow-ribbed guide to support a repeated tracing path. Service air jets were left active, so the airflow cue remained to be observed."
+msgstr "반복해서 따라갈 수 있도록 얕은 골이 끊기지 않는 안내면을 추가했다. 설비의 바람 분사는 유지했으므로 기류 자극은 계속 관찰해야 한다."
+
+#: resources/cases/test_case_02.tres:290
+msgid "Test response recorded: service-line isolation"
+msgstr "테스트 대응 기록: 설비 공기 배관 분리"
+
+#: resources/cases/test_case_02.tres:291
+msgid "Isolated the pulsing service air-line without changing main ventilation or wall surface. This targeted air-directed turns rather than the repeated contact search."
+msgstr "주 환기와 벽면을 바꾸지 않고 간헐 분사가 발생하는 설비 공기 배관을 분리했다. 반복되는 접촉 탐색보다 바람에 따른 방향 전환에 대응하는 조치다."
+
+#: resources/cases/test_case_02.tres:298
+msgid "Test response recorded: fan-sound reduction"
+msgstr "테스트 대응 기록: 팬 소음 감소"
+
+#: resources/cases/test_case_02.tres:299
+msgid "Reduced airborne fan sound while retaining surface and service air cues. The earlier sound-only trial had not produced a consistent pivot."
+msgstr "벽면과 설비 기류 자극을 유지하면서 공기를 통해 들리는 팬 소음을 줄였다. 앞선 소리만 재생한 실험에서는 일관된 방향 전환이 나타나지 않았다."
+
+#: resources/cases/test_case_02.tres:306
+msgid "Test guide response: repeated tracing with remaining air turns"
+msgstr "테스트 안내면 대응: 경로 회복 후에도 기류 반응 지속"
+
+#: resources/cases/test_case_02.tres:307
+msgid "Tracing followed the temporary guide and grille searches decreased. Remaining air jets still prompted outlet turns; the air-line cue remained unresolved."
+msgstr "임시 안내면을 따라가며 그릴 탐색은 줄었다. 남아 있는 바람 분사 때에는 여전히 송풍구 쪽으로 방향을 돌린다. 공기 배관 자극은 해결되지 않았다."
+
+#: resources/cases/test_case_02.tres:314
+msgid "Test isolation response: air turns stop, wall searching remains"
+msgstr "테스트 배관 분리 대응: 기류 반응은 멈췄지만 벽면 탐색 지속"
+
+#: resources/cases/test_case_02.tres:315
+msgid "Service jets and their associated outlet turns ceased. Sideways wall searches still reached the grille, leaving the absent repeated contact guide unresolved."
+msgstr "설비의 바람 분사와 그에 따른 송풍구 쪽 방향 전환은 멈췄다. 옆걸음 벽면 탐색은 계속해서 그릴에 도달했다. 반복해서 접촉할 안내면이 없는 문제는 해결되지 않았다."
+
+#: resources/cases/test_case_02.tres:322
+msgid "Test sound response: searching and air turns persist"
+msgstr "테스트 소음 감소 대응: 탐색과 기류 반응 지속"
+
+#: resources/cases/test_case_02.tres:323
+msgid "Lower fan sound did not stop sideways searches or air-jet turns. Neither the repeated wall path nor the air cue was changed."
+msgstr "팬 소음을 낮춰도 옆걸음 탐색과 바람 분사에 따른 방향 전환은 멈추지 않았다. 반복되는 벽면 경로와 기류 자극 모두 바뀌지 않았다."
+
+#: resources/cases/test_case_02.tres:328
+msgid "TEST CASE 02"
+msgstr "테스트 사례 02"
+
+#: resources/cases/test_case_03.tres:14
+msgid "TEST SUBJECT CASE 03"
+msgstr "사례 03 대상"
+
+#: resources/cases/test_case_03.tres:15
+msgid "TEST CLASSIFICATION CASE 03"
+msgstr "임시 분류 · 사례 03"
+
+#: resources/cases/test_case_03.tres:16
+msgid "TEST: follows contrasting floor strips; short pauses occur at gaps."
+msgstr "테스트 기록: 바닥과 대비되는 띠를 따라간다. 띠가 끊긴 곳에서는 잠시 멈춘다."
+
+#: resources/cases/test_case_03.tres:21
+msgid "TEST: travel follows a contrasting floor strip. At a gap the subject pauses and turns, then returns to the visible strip. Lighting and airflow are steady in this sample."
+msgstr "테스트 관찰: 바닥과 대비되는 띠를 따라 이동한다. 띠가 끊긴 곳에서는 멈추고 방향을 바꾼 뒤 다시 보이는 띠로 돌아간다. 이 관찰 구간에서는 조명과 기류가 일정하다."
+
+#: resources/cases/test_case_03.tres:26
+msgid "TEST CASE 03 CONTRAST COMPARISON"
+msgstr "사례 03 · 바닥 띠 대비 비교"
+
+#: resources/cases/test_case_03.tres:27
+msgid "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged."
+msgstr "테스트 실험: 같은 평평한 바닥에서 대비가 높은 띠와 낮은 띠를 비교한다. 조명과 기류는 유지한다."
+
+#: resources/cases/test_case_03.tres:28
+msgid "Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+msgstr "대비가 높은 띠에서는 각 이동 구간의 더 많은 부분을 띠를 따라갔다. 대비가 낮은 띠에서는 짧은 멈춤과 방향 전환이 반복됐다. 이 관찰로 장기 격리가 입증되는 것은 아니다."
+
+#: resources/cases/test_case_03.tres:33
+msgid "TEST CASE 03 GAP COMPARISON"
+msgstr "사례 03 · 바닥 띠 단절 비교"
+
+#: resources/cases/test_case_03.tres:34
+msgid "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged."
+msgstr "테스트 실험: 바닥 질감·조명·기류를 유지하면서 대비가 높은 띠가 이어진 조건과 끊긴 조건을 비교한다."
+
+#: resources/cases/test_case_03.tres:35
+msgid "Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+msgstr "띠가 이어져 있으면 멈추지 않고 더 오래 이동했다. 띠가 끊긴 곳에서는 멈추거나 짧게 방향을 바꾸다가 다음에 보이는 띠를 찾았다. 조명 변화에 대한 반응은 아직 검증하지 않았다."
+
+#: resources/cases/test_case_03.tres:40
+msgid "TEST CASE 03 ROOM 01"
+msgstr "사례 03 · 테스트 격리실 01"
+
+#: resources/cases/test_case_03.tres:41
+msgid "TEST configuration: continuous contrasting floor strip, ordinary task lighting and steady airflow."
+msgstr "테스트 구성: 끊기지 않고 바닥과 대비되는 띠, 일반 작업 조명, 일정한 기류."
+
+#: resources/cases/test_case_03.tres:46
+msgid "TEST CASE 03 ROOM 02"
+msgstr "사례 03 · 테스트 격리실 02"
+
+#: resources/cases/test_case_03.tres:47
+msgid "TEST configuration: interrupted floor strips, reduced task lighting and steady airflow."
+msgstr "테스트 구성: 끊긴 바닥 띠, 낮춘 작업 조명, 일정한 기류."
+
+#: resources/cases/test_case_03.tres:53
+msgid "TEST CASE 03 OBSERVATION - LOCAL AIR JETS"
+msgstr "사례 03 테스트 관찰: 국소 바람 분사"
+
+#: resources/cases/test_case_03.tres:54
+msgid "TEST: a short service air jet prompts a turn away from the floor strip. The subject then returns to the visible strip; pauses at existing gaps continue."
+msgstr "테스트 관찰: 설비에서 짧게 바람이 분사되면 바닥 띠에서 벗어나도록 방향을 돌린다. 이후 다시 보이는 띠로 돌아온다. 기존에 띠가 끊긴 곳에서 멈추는 행동은 계속된다."
+
+#: resources/cases/test_case_03.tres:61
+msgid "Test Case 03 intake: contrasting floor strips"
+msgstr "사례 03 초기 기록: 바닥과 대비되는 띠"
+
+#: resources/cases/test_case_03.tres:62
+msgid "Intake records strip following and pauses at gaps. Responses to lighting changes have not been compared."
+msgstr "초기 기록에는 띠를 따라가는 행동과 끊긴 구간에서의 멈춤이 있다. 조명 변화에 대한 반응은 비교하지 않았다."
+
+#: resources/cases/test_case_03.tres:69
+msgid "Test Case 03 camera: following and returning to a strip"
+msgstr "사례 03 영상 기록: 띠를 따라가고 되돌아오는 행동"
+
+#: resources/cases/test_case_03.tres:70
+msgid "Under steady lighting and airflow, travel followed the contrasting strip. Gaps prompted pauses and turns before returning to a visible strip."
+msgstr "조명과 기류가 일정한 상태에서 바닥과 대비되는 띠를 따라갔다. 띠가 끊긴 곳에서 멈추고 방향을 바꾼 뒤 다시 보이는 띠로 돌아왔다."
+
+#: resources/cases/test_case_03.tres:77
+msgid "Test Case 03 experiment: floor-strip contrast"
+msgstr "사례 03 실험: 바닥 띠의 대비"
+
+#: resources/cases/test_case_03.tres:78
+msgid "With texture, lighting and airflow held unchanged, contrasting strips were followed for more of each pass. Low-contrast strips prompted recurring pauses and turns. Long-term containment was not tested."
+msgstr "질감·조명·기류를 유지한 상태에서 대비가 높은 띠를 각 이동 구간의 더 많은 부분에서 따라갔다. 대비가 낮은 띠에서는 멈춤과 방향 전환이 반복됐다. 장기 격리는 검증하지 않았다."
+
+#: resources/cases/test_case_03.tres:85
+msgid "Test Case 03 experiment: floor-strip gaps"
+msgstr "사례 03 실험: 바닥 띠의 단절"
+
+#: resources/cases/test_case_03.tres:86
+msgid "Continuous strips supported longer uninterrupted passes. Gaps prompted pauses and turns before another visible strip was found. Responses to lighting changes were not compared."
+msgstr "띠가 이어져 있으면 멈추지 않고 더 오래 이동했다. 띠가 끊긴 곳에서는 멈추고 방향을 바꾸다가 다시 보이는 띠를 찾았다. 조명 변화에 대한 반응은 비교하지 않았다."
+
+#: resources/cases/test_case_03.tres:93
+msgid "Test Case 03 room 01 submission"
+msgstr "사례 03 · 격리실 01 제출 기록"
+
+#: resources/cases/test_case_03.tres:94
+msgid "Recorded a continuous contrasting floor strip with ordinary lighting and steady airflow. This record reports no outcome."
+msgstr "일반 조명과 일정한 기류 아래에서 바닥과 대비되는 띠가 끊기지 않는 구성을 기록했다. 이 기록은 결과를 보고하지 않는다."
+
+#: resources/cases/test_case_03.tres:101
+msgid "Test Case 03 room 02 submission"
+msgstr "사례 03 · 격리실 02 제출 기록"
+
+#: resources/cases/test_case_03.tres:102
+msgid "Recorded interrupted floor strips with reduced lighting and steady airflow. This record reports no outcome."
+msgstr "낮춘 조명과 일정한 기류 아래에서 바닥 띠가 끊긴 구성을 기록했다. 이 기록은 결과를 보고하지 않는다."
+
+#: resources/cases/test_case_03.tres:109
+msgid "Test Case 03 observation: local service air jet"
+msgstr "사례 03 관찰: 설비의 국소 바람 분사"
+
+#: resources/cases/test_case_03.tres:110
+msgid "A short local jet prompted a turn away from the floor strip, followed by a return to it. Pauses at existing gaps continued. This is a current-subject observation, separate from the source incident."
+msgstr "짧은 국소 바람 분사에 반응해 바닥 띠에서 벗어나도록 방향을 돌린 뒤 다시 띠로 돌아왔다. 기존에 띠가 끊긴 곳에서 멈추는 행동은 계속됐다. 현재 대상의 관찰이며, 원인이 된 사건과는 구분한다."
+
+#: resources/cases/test_case_03.tres:115
+msgid "TEST CASE 03"
+msgstr "테스트 사례 03"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:16
+msgid "TEMP: SUPPORT CONTROL INTERRUPTION"
+msgstr "임시 사건: 지지대 제어 중단"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:17
+msgid "Maintenance control fault: a service bypass is transmitting pump impulses into the supports of TEST SUBJECT (TEST_CASE_01). Strikes coincide with pump starts; airflow is steady. Staff await an immediate broadcast instruction. Review the earlier research records to distinguish support, sound and airflow cues."
+msgstr "정비 제어 이상으로 우회 배관을 통해 테스트 대상(사례 01)의 지지대에 펌프 충격이 전달되고 있다. 타격은 펌프 가동 시점과 맞물리며 기류는 일정하다. 직원들은 즉시 방송할 지시를 기다린다. 이전 연구 기록을 검토해 지지대·소리·기류 자극을 구분한다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:23
+msgid "Disconnect the maintenance bypass and restore mechanical isolation of the supports. Keep low airflow continuous and retain task lighting."
+msgstr "정비 우회 연결을 끊고 지지대의 기계적 분리를 복구한다. 약한 기류를 일정하게 유지하고 작업 조명은 그대로 둔다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:29
+msgid "Reduce airborne pump noise with the acoustic partition. Keep the bypass connected, low airflow continuous and task lighting unchanged."
+msgstr "방음 칸막이로 공기를 통해 들리는 펌프 소음을 줄인다. 우회 연결을 유지하고 약한 기류를 일정하게 유지하며 작업 조명은 바꾸지 않는다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:35
+msgid "Cycle ventilation to draw movement away from the service panel. Keep the bypass connected and task lighting unchanged."
+msgstr "환기를 반복해서 켜고 꺼 설비 패널에서 멀어지도록 유도한다. 우회 연결과 작업 조명은 유지한다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:41
+msgid "Reduce task lighting to limit crossings near the panel. Keep the bypass connected and low airflow continuous."
+msgstr "작업 조명을 낮춰 패널 주변을 가로지르는 움직임을 줄인다. 우회 연결과 일정한 약한 기류는 유지한다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:47
+msgid "TEMP: IMMEDIATE SUPPORT RESPONSE"
+msgstr "임시 대응: 지지대 이상에 즉시 조치"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:48
+msgid "Which instruction should staff follow while pump-start strikes continue? Address the current support fault using the earlier observations. This instruction is a temporary response, not a new containment decision."
+msgstr "펌프 가동 시점의 타격이 계속되는 동안 직원들은 어떤 지시를 따라야 하는가? 이전 관찰을 근거로 현재의 지지대 이상에 대응한다. 이 지시는 임시 대응이며 새로운 격리 결정이 아니다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:54
+msgid "TEMP: SUPPORT TRANSMISSION CONTROLLED"
+msgstr "임시 결과: 지지대를 통한 전달 제어"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:55
+msgid "The bypass was disconnected and support isolation restored. Pump-start strikes became less frequent; wall tracing continues under steady airflow. Staff hold this protocol while maintenance checks the fault. The immediate support disturbance is controlled; long-term containment is not reassessed here."
+msgstr "우회 연결을 끊고 지지대 분리를 복구했다. 펌프 가동 시점의 타격은 줄었고 일정한 기류 아래에서 벽면을 따라가는 행동은 계속됐다. 정비팀이 이상을 점검하는 동안 이 조치를 유지한다. 당장의 지지대 이상은 제어됐지만 여기서 장기 격리를 재평가하지는 않는다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:60
+msgid "TEMP: QUIETER SOUND, PERSISTENT STRIKES"
+msgstr "임시 결과: 소음은 줄었지만 타격은 지속"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:61
+msgid "Airborne pump noise was reduced, but the bypass still transmits impulses. Strikes remain clustered at pump starts. Staff withdraw the noise-only instruction and request support isolation; steady airflow is retained. The selected instruction did not address the current fault."
+msgstr "공기를 통해 들리는 펌프 소음은 줄었지만 우회 연결을 통해 충격이 계속 전달된다. 타격은 여전히 펌프 가동 시점에 집중된다. 직원들은 소음만 줄이는 지시를 철회하고 지지대 분리를 요청했다. 일정한 기류는 유지한다. 선택한 지시는 현재 이상에 대응하지 못했다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:66
+msgid "TEMP: ADDED OUTLET TURN-BACKS"
+msgstr "임시 결과: 송풍구 쪽 방향 전환 추가"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:67
+msgid "Vent cycling prompted repeated turn-backs toward the outlet while pump-start strikes continued. Staff cancel the cycling instruction, restore steady airflow and request support isolation. The selected instruction added an airflow cue without removing transmitted impulses."
+msgstr "환기를 반복해서 켜고 끄자 펌프 가동 시점의 타격이 계속되는 동안 송풍구 쪽으로 반복해서 방향을 되돌렸다. 직원들은 환기 반복 지시를 취소하고 일정한 기류를 복구한 뒤 지지대 분리를 요청했다. 선택한 지시는 충격 전달을 없애지 못하고 기류 자극을 추가했다."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:72
+msgid "TEMP: FEWER CROSSINGS, UNRESOLVED SUPPORT FAULT"
+msgstr "임시 결과: 이동은 줄었지만 지지대 이상은 지속"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:73
+msgid "Reduced lighting changed crossing movements, but pump-start strikes persisted through the connected bypass. Staff restore task lighting and request support isolation. The selected instruction changed travel without addressing the support fault."
+msgstr "조명을 낮추자 공간을 가로지르는 움직임은 바뀌었지만 우회 연결을 통한 펌프 가동 시점의 타격은 계속됐다. 직원들은 작업 조명을 복구하고 지지대 분리를 요청했다. 선택한 지시는 지지대 이상을 해결하지 못하고 이동 경로만 바꿨다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:16
+msgid "[TEMP STORY CONTENT] ROUTE PROJECTOR RESET"
+msgstr "[임시 콘텐츠] 경로 안내 투사기의 반복 재시작"
+
+#: resources/incidents/temp_midcase_incident_01.tres:17
+msgid "[TEMP STORY CONTENT] The facility guidance projector beside CASE03's work area is repeatedly resetting. Its projected floor strip now has dark gaps. The maintenance panel reports stable task lighting and ventilation; a continuous passive backup strip is available. CASE03's intake records following contrasting floor strips with pauses at gaps. Its initial CCTV shows pauses and turns at a gap, then a return to the visible strip under steady lighting and airflow. Staff need an immediate instruction for the guidance equipment fault before routine experiments continue. This equipment fault is independent of any containment decision."
+msgstr "[임시 콘텐츠] 사례 03 작업 구역 옆의 경로 안내 투사기가 반복해서 재시작되고 있다. 바닥에 투사되는 띠에 어두운 단절 구간이 생겼다. 정비 패널은 작업 조명과 환기가 안정적이라고 보고하며, 끊기지 않는 고정형 예비 띠를 사용할 수 있다. 사례 03의 초기 기록에는 바닥과 대비되는 띠를 따라가다가 끊긴 곳에서 멈추는 행동이 있다. 최초 관찰 영상에서도 일정한 조명과 기류 아래에서 끊긴 곳에 멈추고 방향을 바꾼 뒤 다시 보이는 띠로 돌아왔다. 일상 실험을 계속하기 전에 안내 장비 이상에 대한 즉시 지시가 필요하다. 이 장비 이상은 격리 결정과 무관하다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:23
+msgid "[TEMP STORY CONTENT] Isolate the resetting projector and use the continuous contrasting backup strip. Keep task lighting and airflow steady."
+msgstr "[임시 콘텐츠] 재시작되는 투사기를 분리하고 끊기지 않으며 바닥과 대비되는 예비 띠를 사용한다. 작업 조명과 기류는 일정하게 유지한다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:29
+msgid "[TEMP STORY CONTENT] Repeat audible route instructions. Leave the resetting projector and its interrupted strip active, with lighting and airflow unchanged."
+msgstr "[임시 콘텐츠] 경로 안내를 음성으로 반복한다. 재시작되는 투사기와 끊긴 띠를 그대로 사용하고 조명과 기류는 유지한다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:35
+msgid "[TEMP STORY CONTENT] Turn off task lighting to conceal the strip gaps. Leave the resetting projector active and airflow steady."
+msgstr "[임시 콘텐츠] 작업 조명을 꺼 띠의 단절 구간을 가린다. 재시작되는 투사기는 계속 사용하고 기류는 일정하게 유지한다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:41
+msgid "[TEMP STORY CONTENT] Pulse ventilation to redirect movement across the gaps. Leave the resetting projector active and task lighting unchanged."
+msgstr "[임시 콘텐츠] 환기를 반복해서 켜고 꺼 단절 구간을 지나도록 이동을 유도한다. 재시작되는 투사기는 계속 사용하고 작업 조명은 유지한다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:47
+msgid "[TEMP STORY CONTENT] GUIDANCE EQUIPMENT RESPONSE"
+msgstr "[임시 콘텐츠] 안내 장비 이상 대응"
+
+#: resources/incidents/temp_midcase_incident_01.tres:48
+msgid "[TEMP STORY CONTENT] Which instruction addresses the resetting floor-guidance equipment using CASE03's intake, initial CCTV and the maintenance report above? No experiment result is required. Preserve the observed steady lighting and airflow while addressing the interrupted visual route."
+msgstr "[임시 콘텐츠] 사례 03의 초기 기록·최초 관찰 영상·위 정비 보고를 근거로, 반복해서 재시작되는 바닥 안내 장비에 대응할 지시는 무엇인가? 실험 결과는 필요하지 않다. 관찰 당시의 일정한 조명과 기류를 유지하면서 끊긴 시각적 경로에 대응한다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:54
+msgid "[TEMP STORY CONTENT] CONTINUOUS BACKUP ROUTE"
+msgstr "[임시 콘텐츠] 끊기지 않는 예비 경로"
+
+#: resources/incidents/temp_midcase_incident_01.tres:55
+msgid "[TEMP STORY CONTENT] Staff isolated the resetting projector and installed the continuous contrasting backup strip. The equipment no longer introduces dark gaps; task lighting and airflow remain steady. This addresses the reported guidance fault using the strip-following observations. It does not establish long-term containment or complete an experiment. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[임시 콘텐츠] 직원들은 반복해서 재시작되는 투사기를 분리하고 끊기지 않으며 바닥과 대비되는 예비 띠를 설치했다. 장비 때문에 생기던 어두운 단절 구간은 사라졌고 작업 조명과 기류는 일정하게 유지된다. 띠를 따라가는 관찰을 근거로 보고된 안내 장비 이상에 대응했다. 장기 격리를 입증하거나 실험을 완료한 것은 아니다. 업무 복귀를 선택하면 같은 사례 03 실험 화면으로 돌아간다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:60
+msgid "[TEMP STORY CONTENT] ANNOUNCEMENT, GAPS REMAIN"
+msgstr "[임시 콘텐츠] 음성 안내 후에도 단절 구간 지속"
+
+#: resources/incidents/temp_midcase_incident_01.tres:61
+msgid "[TEMP STORY CONTENT] Staff repeated the audible instruction, but the projector continued resetting and the visual route still had gaps. The supplied observations support strip following, not following spoken directions. Staff withdrew the announcement-only response and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[임시 콘텐츠] 직원들은 음성 안내를 반복했지만 투사기는 계속 재시작됐고 시각적 경로의 단절 구간도 남았다. 제공된 관찰은 말소리를 따르는 행동이 아니라 띠를 따라가는 행동을 뒷받침한다. 직원들은 음성 안내만 하는 대응을 철회하고 수동 정비를 위해 투사기를 분리했다. 사례 판정이나 실험 결과는 부여하지 않는다. 업무 복귀를 선택하면 같은 사례 03 실험 화면으로 돌아간다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:66
+msgid "[TEMP STORY CONTENT] VISIBILITY LOST, RESET UNRESOLVED"
+msgstr "[임시 콘텐츠] 시야 상실, 재시작 문제 지속"
+
+#: resources/incidents/temp_midcase_incident_01.tres:67
+msgid "[TEMP STORY CONTENT] Staff switched off task lighting. This removed the steady lighting used in the initial observation and made the contrasting route harder to inspect; it did not stop the projector resets. No supplied observation established a benefit from darkness. Staff restored task lighting and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[임시 콘텐츠] 직원들은 작업 조명을 껐다. 최초 관찰에서 유지했던 조명이 사라져 대비되는 경로를 확인하기 어려워졌지만 투사기의 재시작은 멈추지 않았다. 어둠이 도움이 된다는 관찰 근거는 없었다. 직원들은 작업 조명을 복구하고 수동 정비를 위해 투사기를 분리했다. 사례 판정이나 실험 결과는 부여하지 않는다. 업무 복귀를 선택하면 같은 사례 03 실험 화면으로 돌아간다."
+
+#: resources/incidents/temp_midcase_incident_01.tres:72
+msgid "[TEMP STORY CONTENT] AIRFLOW CHANGED, GAPS REMAIN"
+msgstr "[임시 콘텐츠] 기류 변화 후에도 단절 구간 지속"
+
+#: resources/incidents/temp_midcase_incident_01.tres:73
+msgid "[TEMP STORY CONTENT] Staff pulsed ventilation, but the projector kept resetting and the visual gaps remained. This changed a previously steady condition without addressing the equipment fault; the supplied intake and initial CCTV did not establish airflow as a route instruction. Staff restored steady airflow and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[임시 콘텐츠] 직원들은 환기를 반복해서 켜고 껐지만 투사기는 계속 재시작됐고 시각적 단절 구간도 남았다. 장비 이상을 해결하지 못한 채 안정적이던 조건만 바꾼 것이다. 초기 기록과 최초 관찰 영상에는 기류가 경로 안내로 작용한다는 근거가 없었다. 직원들은 일정한 기류를 복구하고 수동 정비를 위해 투사기를 분리했다. 사례 판정이나 실험 결과는 부여하지 않는다. 업무 복귀를 선택하면 같은 사례 03 실험 화면으로 돌아간다."
+
+#: scenes/main/main.tscn:78
+msgid "FACILITY / OPERATIONS"
+msgstr "시설 운영실"
+
+#: scenes/main/main.tscn:134 scenes/views/profile_view.tscn:39
+msgid "PROFILE"
+msgstr "대상 정보"
+
+msgid "Profile"
+msgstr "대상 정보"
+
+#: scenes/main/main.tscn:140 scenes/views/cctv_view.tscn:41
+msgid "CCTV"
+msgstr "관찰 영상"
+
+#: scenes/main/main.tscn:146 scenes/views/experiment_view.tscn:41
+msgid "EXPERIMENT"
+msgstr "실험"
+
+msgid "Experiment"
+msgstr "실험"
+
+#: scenes/main/main.tscn:152 scenes/views/containment_view.tscn:41
+msgid "CONTAINMENT"
+msgstr "격리"
+
+msgid "Containment"
+msgstr "격리"
+
+#: scenes/main/main.tscn:158
+msgid "STAGE INDEX\nProgress follows work actions."
+msgstr "업무 단계\n업무 진행에 따라\n다음 단계가\n열립니다."
+
+#: scenes/main/main.tscn:197
+msgid "R"
+msgstr "연구"
+
+#: scenes/main/main.tscn:204
+msgid "A"
+msgstr "보관"
+
+#: scenes/main/main.tscn:211
+msgid "N"
+msgstr "메모"
+
+#: scenes/main/main.tscn:198 scenes/views/broadcast_view.tscn:147 scenes/views/cctv_view.tscn:158 scenes/views/containment_view.tscn:108 scenes/views/experiment_view.tscn:175 scenes/views/incident_result_view.tscn:139 scenes/views/incident_view.tscn:144 scenes/views/monitoring_view.tscn:88 scenes/views/profile_view.tscn:171 scenes/views/research_archive_detail_view.tscn:187 scenes/views/research_archive_list_view.tscn:140 scenes/views/research_log_view.tscn:39 scenes/views/result_view.tscn:139
+msgid "RESEARCH LOG"
+msgstr "연구 기록"
+
+msgid "RESEARCH_LOG"
+msgstr "연구 기록"
+
+#: scenes/main/main.tscn:205 scenes/views/research_archive_detail_view.tscn:39 scenes/views/research_archive_list_view.tscn:39 scenes/views/research_archive_list_view.tscn:119
+msgid "RESEARCH ARCHIVE"
+msgstr "기록 보관함"
+
+msgid "RESEARCH ARCHIVE LIST"
+msgstr "기록 목록"
+
+msgid "RESEARCH ARCHIVE DETAIL"
+msgstr "기록 상세"
+
+#: scenes/main/main.tscn:212
+msgid "WORKING HYPOTHESIS"
+msgstr "연구 메모"
+
+#: scenes/main/main.tscn:254
+msgid "SESSION MEMORY / NO PERSISTENT SAVE"
+msgstr "현재 세션에만 기록됩니다 · 저장 기능 없음"
+
+msgid "SESSION MEMORY"
+msgstr "현재 세션 기록"
+
+msgid "NO PERSISTENT SAVE"
+msgstr "저장 기능 없음"
+
+msgid "CONTAINMENT DECISION RECORDED"
+msgstr "격리 결정 기록됨"
+
+#: scenes/ui/confirmation_modal.tscn:80
+msgid "Confirmation records this decision. The order cannot be changed."
+msgstr "확정하면 결정이 기록됩니다. 확정한 지시는 바꿀 수 없습니다."
+
+#: scenes/ui/confirmation_modal.tscn:94
+msgid "CANCEL"
+msgstr "취소"
+
+msgid "Cancel"
+msgstr "취소"
+
+#: scenes/ui/confirmation_modal.tscn:106 scenes/views/containment_view.tscn:120
+msgid "AUTHORIZE"
+msgstr "확정"
+
+msgid "AUTHORIZE CONTAINMENT"
+msgstr "격리 결정 확정"
+
+#: scenes/views/broadcast_view.tscn:39
+msgid "BROADCAST"
+msgstr "비상 방송"
+
+msgid "Broadcast"
+msgstr "비상 방송"
+
+#: scenes/views/broadcast_view.tscn:118
+msgid "SELECT RESPONSE ORDER"
+msgstr "대응 지시를 선택하세요"
+
+#: scenes/views/broadcast_view.tscn:159
+msgid "CONFIRM ORDERS"
+msgstr "지시 확정"
+
+#: scenes/views/broadcast_view.tscn:166
+msgid "REVIEW RESPONSE"
+msgstr "대응 결과 확인"
+
+#: scenes/views/cctv_view.tscn:73
+msgid "CAMERA 01"
+msgstr "카메라 01"
+
+msgid "CAMERA 01 / UPDATED"
+msgstr "카메라 01 · 추가 관찰 있음"
+
+#: scenes/views/cctv_view.tscn:86
+msgid "LIVE OBSERVATION\nTEMP CAMERA PLACEHOLDER"
+msgstr "실시간 관찰\n임시 영상 영역"
+
+#: scenes/views/cctv_view.tscn:106
+msgid "OBSERVATION RECORD"
+msgstr "관찰 기록"
+
+#: scenes/views/cctv_view.tscn:170 scenes/views/containment_view.tscn:127 scenes/views/experiment_view.tscn:187 scenes/views/monitoring_view.tscn:100
+msgid "CONTINUE"
+msgstr "계속"
+
+#: scenes/views/containment_view.tscn:89
+msgid "SELECT A ROOM"
+msgstr "격리실을 선택하세요"
+
+#: scenes/views/containment_view.tscn:97 scenes/views/experiment_view.tscn:164
+msgid "RECHECK CCTV"
+msgstr "관찰 영상 다시 보기"
+
+#: scenes/views/environmental_disturbance_notice.tscn:87
+msgid "UNPLANNED OBSERVATION"
+msgstr "예상 밖 관찰"
+
+#: scenes/views/environmental_disturbance_notice.tscn:103
+msgid "ACKNOWLEDGE"
+msgstr "확인"
+
+#: scenes/views/environment_conditions_view.tscn:13
+msgid "ACTIVE FACILITY CONDITION"
+msgstr "현재 시설 조건"
+
+#: scenes/views/experiment_view.tscn:109
+msgid "SELECT AN EXPERIMENT"
+msgstr "실험을 선택하세요"
+
+#: scenes/views/experiment_view.tscn:140
+msgid "EXECUTION RECORD"
+msgstr "실험 결과 기록"
+
+#: scenes/views/experiment_view.tscn:195
+msgid "EXECUTE"
+msgstr "실험 실행"
+
+#: scenes/views/incident_result_view.tscn:39
+msgid "INCIDENT RESULT"
+msgstr "대응 결과"
+
+msgid "INCIDENT_RESULT"
+msgstr "대응 결과"
+
+msgid "Incident Result"
+msgstr "대응 결과"
+
+#: scenes/views/incident_result_view.tscn:126 scenes/views/incident_view.tscn:131
+msgid "Review recorded evidence before issuing orders."
+msgstr "지시를 내리기 전에 기록된 근거를 확인하세요."
+
+#: scenes/views/incident_result_view.tscn:151
+msgid "RESUME WORK"
+msgstr "업무 복귀"
+
+#: scenes/views/incident_view.tscn:39
+msgid "INCIDENT"
+msgstr "사건"
+
+msgid "Incident"
+msgstr "사건"
+
+#: scenes/views/incident_view.tscn:68
+msgid "FACILITY EVENT / TEMP IMAGE PLACEHOLDER"
+msgstr "시설 사건 · 임시 이미지 영역"
+
+#: scenes/views/incident_view.tscn:156
+msgid "EMERGENCY RESPONSE"
+msgstr "비상 대응"
+
+#: scenes/views/monitoring_view.tscn:39
+msgid "MONITORING"
+msgstr "상태 관찰"
+
+#: scenes/views/profile_view.tscn:69
+msgid "SUBJECT RECORD\nTEMP IMAGE PLACEHOLDER"
+msgstr "대상 기록\n임시 이미지 영역"
+
+#: scenes/views/profile_view.tscn:130
+msgid "RESEARCH RECORD"
+msgstr "연구 기록 문서"
+
+#: scenes/views/profile_view.tscn:183
+msgid "OPEN CCTV"
+msgstr "관찰 영상 보기"
+
+#: scenes/views/research_archive_detail_view.tscn:95
+msgid "No research recorded."
+msgstr "기록된 연구가 없습니다."
+
+#: scenes/views/research_archive_detail_view.tscn:119
+msgid "No notes recorded."
+msgstr "기록된 메모가 없습니다."
+
+#: scenes/views/research_archive_detail_view.tscn:167 scenes/views/research_log_view.tscn:108
+msgid "SELECT A RECORDED ENTRY"
+msgstr "열람할 기록을 선택하세요"
+
+#: scenes/views/research_archive_detail_view.tscn:199
+msgid "BACK"
+msgstr "돌아가기"
+
+#: scenes/views/research_archive_list_view.tscn:63
+msgid "No recorded Cases."
+msgstr "보관된 사례가 없습니다."
+
+#: scenes/views/research_archive_list_view.tscn:95
+msgid "RECORDED ENTRIES"
+msgstr "보관된 기록"
+
+#: scenes/views/research_archive_list_view.tscn:103
+msgid "Select a recorded Case."
+msgstr "열람할 사례를 선택하세요."
+
+#: scenes/views/research_archive_list_view.tscn:127
+msgid "Read-only session records."
+msgstr "이번 세션의 기록을 읽기 전용으로 열람합니다."
+
+#: scenes/views/research_archive_list_view.tscn:152
+msgid "BACK TO WORK"
+msgstr "업무로 돌아가기"
+
+#: scenes/views/research_log_view.tscn:131
+msgid "Player notes. No evaluation."
+msgstr "직접 작성하는 메모입니다. 게임의 판정에는 사용되지 않습니다."
+
+#: scenes/views/research_log_view.tscn:141
+msgid "Write your own working hypothesis."
+msgstr "관찰을 바탕으로 추론과 메모를 작성하세요."
+
+#: scenes/views/research_log_view.tscn:150
+msgid "ADD NOTE"
+msgstr "메모 추가"
+
+#: scenes/views/research_log_view.tscn:156
+msgid "CANCEL EDIT"
+msgstr "수정 취소"
+
+#: scenes/views/research_log_view.tscn:170
+msgid "No working hypotheses recorded."
+msgstr "작성한 연구 메모가 없습니다."
+
+#: scenes/views/research_log_view.tscn:194
+msgid "OPEN RESEARCH ARCHIVE"
+msgstr "기록 보관함 열기"
+
+#: scenes/views/research_log_view.tscn:200
+msgid "CLOSE"
+msgstr "닫기"
+
+#: scenes/views/result_view.tscn:39
+msgid "RESULT"
+msgstr "결과"
+
+#: scenes/views/result_view.tscn:151
+msgid "RESTART"
+msgstr "다시 시작"
+
+msgid "Window: %d × %d"
+msgstr "창 크기: %d × %d"
+
+msgid "Back: %s"
+msgstr "복귀: %s"
+
+msgid "SOURCE ARCHIVE"
+msgstr "사건 출처 기록"
+
+msgid "SCRIPTED CAMPAIGN INCIDENT"
+msgstr "예정된 시설 사건"
+
+msgid "MAJOR CONTAINMENT INCIDENT"
+msgstr "주요 격리 사건"
+
+msgid "CONTINUE CAMPAIGN"
+msgstr "다음 업무로"
+
+msgid "TRANSMITTED ORDERS\n%s"
+msgstr "전달한 지시\n%s"
+
+msgid "TRANSMIT EMERGENCY ORDERS"
+msgstr "비상 지시 전달"
+
+msgid "TRANSMIT"
+msgstr "지시 전달"
+
+msgid "FACILITY EVENT"
+msgstr "시설 사건"
+
+msgid "CAMPAIGN EVENT"
+msgstr "예정된 사건"
+
+msgid "CURRENT"
+msgstr "현재 화면"
+
+msgid "REVIEW"
+msgstr "다시 보기"
+
+msgid "UNLOCKED"
+msgstr "열람 가능"
+
+msgid "AVAILABLE"
+msgstr "진행 가능"
+
+msgid "LOCKED"
+msgstr "잠김"
+
+msgid "WORK"
+msgstr "현재 업무"
+
+msgid "PAUSED"
+msgstr "중단된 업무"
+
+msgid "UTILITY / ARCHIVE"
+msgstr "기록 도구 · 보관함"
+
+msgid "NO ACTIVE RUN"
+msgstr "진행 중인 업무 없음"
+
+msgid "Next: CASE"
+msgstr "다음 사례로"
+
+msgid "Next: SCRIPTED INCIDENT"
+msgstr "필수 사건 대응"
+
+msgid "No next test case configured"
+msgstr "테스트 시퀀스 끝"
+
+msgid "No next Campaign entry configured"
+msgstr "다음 업무가 없습니다"
+
+msgid "[Unavailable]"
+msgstr "[확인 불가]"
+
+msgid "[Unavailable Research Entry]"
+msgstr "[연구 기록 확인 불가]"
+
+msgid "[Unavailable experiment ID]"
+msgstr "[실험 식별자 확인 불가]"
+
+msgid "[Missing display_name]"
+msgstr "[표시 이름 없음]"
+
+msgid "[Missing observation_text]"
+msgstr "[관찰 내용 없음]"
+
+msgid "No experiments available"
+msgstr "실행할 실험이 없습니다"
+
+msgid "Available experiments: %d"
+msgstr "실험 목록: %d개"
+
+msgid "Experiments Remaining: %d / %d"
+msgstr "남은 실험 횟수: %d / %d"
+
+msgid "No experiment has been executed."
+msgstr "아직 실행한 실험이 없습니다."
+
+msgid "No result selected. Review executed experiments in Research Log."
+msgstr "선택한 결과가 없습니다. 실행한 실험은 연구 기록에서 확인하세요."
+
+msgid "%s [Executed]"
+msgstr "%s [실행 완료]"
+
+msgid "%s [Confirmed]"
+msgstr "%s [확정]"
+
+msgid "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s"
+msgstr "조건별 추가 관찰\n실행 당시 조건: %s\n%s\n%s\n%s"
+
+msgid "No containment rooms available"
+msgstr "선택할 격리실이 없습니다"
+
+msgid "Available containment rooms: %d"
+msgstr "격리실 목록: %d개"
+
+msgid "Decision recorded."
+msgstr "격리 결정이 기록됐습니다."
+
+msgid "CCTV data unavailable"
+msgstr "관찰 정보를 불러올 수 없습니다"
+
+msgid "No CCTVData was provided to this View."
+msgstr "이 화면에 관찰 정보가 전달되지 않았습니다."
+
+msgid "Profile data unavailable"
+msgstr "대상 정보를 불러올 수 없습니다"
+
+msgid "No ProfileData was provided to this View."
+msgstr "이 화면에 대상 정보가 전달되지 않았습니다."
+
+msgid "Incident data unavailable"
+msgstr "사건 정보를 불러올 수 없습니다"
+
+msgid "No IncidentData was provided to this View."
+msgstr "이 화면에 사건 정보가 전달되지 않았습니다."
+
+msgid "IncidentData has no valid incident_id."
+msgstr "사건의 식별자가 올바르지 않습니다."
+
+msgid "Broadcast data unavailable"
+msgstr "방송 정보를 불러올 수 없습니다"
+
+msgid "No EmergencyBroadcastData was provided to this View."
+msgstr "이 화면에 비상 방송 정보가 전달되지 않았습니다."
+
+msgid "EmergencyBroadcastData has no valid broadcast_id."
+msgstr "방송의 식별자가 올바르지 않습니다."
+
+msgid "Incident result data unavailable"
+msgstr "대응 결과를 불러올 수 없습니다"
+
+msgid "No IncidentResultData was provided to this View."
+msgstr "이 화면에 대응 결과가 전달되지 않았습니다."
+
+msgid "IncidentResultData has no valid result_id."
+msgstr "대응 결과의 식별자가 올바르지 않습니다."
+
+msgid "Monitoring data unavailable"
+msgstr "상태 관찰 정보를 불러올 수 없습니다"
+
+msgid "ROOM: unavailable"
+msgstr "격리실: 확인 불가"
+
+msgid "ROOM: [Missing room_id]"
+msgstr "격리실: [식별자 없음]"
+
+msgid "ROOM: %s"
+msgstr "격리실: %s"
+
+msgid "Monitoring stages: %d"
+msgstr "상태 관찰 기록: %d단계"
+
+msgid "Monitoring sequence complete"
+msgstr "상태 관찰이 완료됐습니다"
+
+msgid "Monitoring Result: SUCCESS"
+msgstr "상태 관찰 결과: 성공"
+
+msgid "Monitoring Result: FAILURE"
+msgstr "상태 관찰 결과: 실패"
+
+msgid "Monitoring Result: UNDEFINED"
+msgstr "상태 관찰 결과: 미확정"
+
+msgid "[%ds]"
+msgstr "[%d초]"
+
+msgid "Case: [Unavailable]"
+msgstr "사례: [확인 불가]"
+
+msgid "%s\nResearch: %d / Notes: %d"
+msgstr "%s\n연구 기록: %d개 / 메모: %d개"
+
+msgid "Open"
+msgstr "열기"
+
+msgid "Unavailable"
+msgstr "확인 불가"
+
+msgid "ALL RECORDED CATEGORIES"
+msgstr "전체 기록"
+
+msgid "OBSERVATION"
+msgstr "관찰"
+
+msgid "CONDITION OBSERVATION"
+msgstr "조건별 관찰"
+
+msgid "WORKING NOTE"
+msgstr "연구 메모"
+
+msgid "Edit"
+msgstr "수정"
+
+msgid "Delete"
+msgstr "삭제"
+
+msgid "Add Hypothesis"
+msgstr "메모 추가"
+
+msgid "Update Hypothesis"
+msgstr "메모 수정"
+
+msgid "%d / %d characters (trimmed)."
+msgstr "%d / %d자 · 앞뒤 공백 제외"
+
+msgid "%d / %d characters (trimmed). Too long; note will not be saved."
+msgstr "%d / %d자 · 입력 제한을 넘으면 메모를 저장할 수 없습니다."
+
+msgid "Note was not saved. Check input or reopen the notebook."
+msgstr "메모를 저장하지 못했습니다. 입력을 확인하거나 메모 도구를 다시 여세요."
+
+msgid "CAMPAIGN EVENT\nRESUME WORK\n%s - %s"
+msgstr "예정된 사건\n업무 복귀\n%s · %s"
+
+msgid "FACILITY EVENT / CAMPAIGN EVENT\nCONTINUE CAMPAIGN after response acknowledgement"
+msgstr "시설 사건 · 예정된 업무\n대응 결과를 확인한 뒤 다음 업무로 진행합니다"
+
+msgid "SOURCE CASE\n%s\n%s\n%s - %s"
+msgstr "사건 출처 사례\n%s\n%s\n%s · %s"
+
+msgid "CURRENT WORK INTERRUPTED"
+msgstr "현재 업무 중단"
+
+msgid "Final Result: [Unavailable]"
+msgstr "최종 결과: [확인 불가]"
+
+msgid "Containment: None"
+msgstr "격리 결정: 없음"
+
+msgid "Experiment Usage: 0 / 0"
+msgstr "실험 사용 횟수: 0 / 0"
+
+msgid "Incident: [Unavailable]"
+msgstr "사건: [확인 불가]"
+
+msgid "Emergency Broadcast: [Unavailable]"
+msgstr "비상 방송: [확인 불가]"
+
+msgid "Selected Response: [Unavailable]"
+msgstr "선택한 대응: [확인 불가]"
+
+msgid "Incident Result: [Unavailable]"
+msgstr "대응 결과: [확인 불가]"
+
+msgid "Final Result: SUCCESS"
+msgstr "최종 결과: 성공"
+
+msgid "Final Result: FAILURE"
+msgstr "최종 결과: 실패"
+
+msgid "Incident: None (not occurred)"
+msgstr "사건: 없음 · 발생하지 않음"
+
+msgid "Emergency Broadcast: Not applicable"
+msgstr "비상 방송: 해당 없음"
+
+msgid "Selected Response: Not applicable"
+msgstr "선택한 대응: 해당 없음"
+
+msgid "Incident Result: Not applicable"
+msgstr "대응 결과: 해당 없음"
+
+msgid "Containment: %s [Unavailable]"
+msgstr "격리 결정: %s [확인 불가]"
+
+msgid "Experiment Usage: %d / %d"
+msgstr "실험 사용 횟수: %d / %d"
+
+msgid "Case: %s (%s)"
+msgstr "사례: %s (%s)"
+
+msgid "Containment: %s (%s)"
+msgstr "격리 결정: %s (%s)"
+
+msgid "Incident: %s (%s)"
+msgstr "사건: %s (%s)"
+
+msgid "Emergency Broadcast: %s (%s)"
+msgstr "비상 방송: %s (%s)"
+
+msgid "Selected Response: %s (%s)"
+msgstr "선택한 대응: %s (%s)"
+
+msgid "Incident Result: %s (%s)"
+msgstr "대응 결과: %s (%s)"
+
+msgid "%s [Unavailable]"
+msgstr "%s [확인 불가]"
+
+msgid "%s [Missing display name/text]"
+msgstr "%s [표시 문구 없음]"
+
+msgid "Case"
+msgstr "사례"
+
+msgid "CCTV Observation"
+msgstr "영상 관찰"
+
+msgid "Executed Experiment"
+msgstr "실행한 실험"
+
+msgid "Confirmed Containment"
+msgstr "확정한 격리 결정"
+
+msgid "Monitoring Observations"
+msgstr "상태 관찰 기록"
+
+msgid "Emergency Broadcast"
+msgstr "비상 방송"
+
+msgid "Selected Response"
+msgstr "선택한 대응"
+
+msgid "Broadcast Option"
+msgstr "방송 지시"
+
+msgid "SUCCESS"
+msgstr "성공"
+
+msgid "FAILURE"
+msgstr "실패"
+
+msgid "UNDEFINED"
+msgstr "미확정"
+
+msgid "ID: %s"
+msgstr "식별자: %s"
+
+msgid "Monitoring Result: %s"
+msgstr "상태 관찰 결과: %s"
+
+msgid "Case: %s"
+msgstr "사례: %s"
+
+msgid "Containment: %s"
+msgstr "격리: %s"
+
+msgid "Incident: %s"
+msgstr "사건: %s"
+
+msgid "Emergency Broadcast: %s"
+msgstr "비상 방송: %s"
+
+msgid "Selected Response: %s"
+msgstr "선택한 지시: %s"
+
+msgid "Incident Result: %s"
+msgstr "대응 결과: %s"
+
+msgid "Case: %s [Missing display name/text]"
+msgstr "사례: %s [표시 문구 없음]"
+
+msgid "Containment: %s [Missing display name/text]"
+msgstr "격리: %s [표시 문구 없음]"
+
+msgid "Incident: %s [Missing display name/text]"
+msgstr "사건: %s [표시 문구 없음]"
+
+msgid "Emergency Broadcast: %s [Missing display name/text]"
+msgstr "비상 방송: %s [표시 문구 없음]"
+
+msgid "Selected Response: %s [Missing display name/text]"
+msgstr "선택한 지시: %s [표시 문구 없음]"
+
+msgid "Incident Result: %s [Missing display name/text]"
+msgstr "대응 결과: %s [표시 문구 없음]"
+
+msgid "Classification: TEST CLASSIFICATION\nTEST: metal-support pump cycles preceded strikes; no talk link."
+msgstr "분류: 임시 분류\n테스트 기록: 금속 지지대에서 펌프가 작동한 뒤 타격이 발생했다. 말소리와의 연관성은 확인되지 않았다."
+
+msgid "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged.\nResult: Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+msgstr "지지대 비교 실험: 금속 지지대와 완충 지지대에 같은 크기의 작은 충격을 전달한다. 공기를 통해 들리는 펌프 소리와 기류는 유지한다.\n결과: 완충 지지대보다 금속 지지대에 충격을 전달했을 때 연속 타격이 더 자주 발생했다. 펌프 소리는 그대로 유지했으며, 두 지지대 모두에서 천천히 벽면을 따라가는 행동이 계속됐다. 이 실험에서는 기류의 반복 변화를 비교하지 않았다."
+
+msgid "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged.\nResult: Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+msgstr "기류 비교 실험: 약한 기류를 일정하게 유지하는 조건과 기류를 반복해서 켜고 끄는 조건을 비교한다. 지지대와 펌프 소리는 유지한다.\n결과: 기류를 켜고 끌 때마다 송풍구를 향해 반복해서 방향을 되돌렸다. 약한 기류를 일정하게 유지하면 방향을 되돌리는 횟수가 줄었다. 두 조건 모두에서 벽면을 따라가는 행동은 계속됐다. 이 실험에서는 지지대의 기계적 분리를 비교하지 않았다."
+
+msgid "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent.\nResult: The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+msgstr "소리 비교 실험: 지지대 충격과 기류 변화가 없는 상태에서 스피커로 펌프 소리를 재생한다.\n결과: 대상은 잠시 스피커 쪽으로 방향을 돌렸지만, 펌프 가동 시점에 나타났던 연속 타격은 재현되지 않았다. 벽면을 따라가는 행동은 계속됐다. 공기를 통해 전달되는 소리만으로는 앞서 관찰한 타이밍의 연관성을 설명할 수 없다."
+
+msgid "Classification: TEST CLASSIFICATION CASE 02\nTEST: wall-contact loss precedes searching; no damage recorded."
+msgstr "분류: 임시 분류 · 사례 02\n테스트 기록: 벽면 접촉이 끊기면 탐색 행동이 시작된다. 손상은 기록되지 않았다."
+
+msgid "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged.\nResult: Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+msgstr "자극 비교 실험: 고정된 노즐에서 짧은 바람을 분사한 다음 팬 소리만 재생한다. 벽면과 조명은 유지한다.\n결과: 바람을 분사하면 반복해서 노즐 쪽으로 방향을 돌린 뒤 벽면을 따라가는 행동을 재개했다. 팬 소리만으로는 일관된 방향 전환이 나타나지 않았다. 벽면 질감이 탐색에 영향을 주는지는 이 실험으로 확인되지 않았다."
+
+msgid "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure.\nResult: Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+msgstr "벽면 비교 실험: 같은 기류와 조명 아래에서 얕은 골이 있는 벽판과 매끈한 벽판을 나란히 제시한다. 발자국과 접촉 압력을 기록한다.\n결과: 반복해서 지나갈 때 발자국은 얕은 골을 따라 같은 벽면 경로로 돌아왔다. 매끈한 벽판에서는 옆걸음 탐색이 반복해서 설비 그릴에 도달했다. 어느 벽판에서도 접촉 압력은 증가하지 않았다. 일정한 기류와 반복해서 켜고 끄는 기류는 비교하지 않았다."
+
+msgid "Classification: TEST CLASSIFICATION CASE 03\nTEST: follows contrasting floor strips; short pauses occur at gaps."
+msgstr "분류: 임시 분류 · 사례 03\n테스트 기록: 바닥과 대비되는 띠를 따라간다. 띠가 끊긴 곳에서는 잠시 멈춘다."
+
+msgid "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged.\nResult: Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+msgstr "테스트 실험: 같은 평평한 바닥에서 대비가 높은 띠와 낮은 띠를 비교한다. 조명과 기류는 유지한다.\n결과: 대비가 높은 띠에서는 각 이동 구간의 더 많은 부분을 띠를 따라갔다. 대비가 낮은 띠에서는 짧은 멈춤과 방향 전환이 반복됐다. 이 관찰로 장기 격리가 입증되는 것은 아니다."
+
+msgid "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged.\nResult: Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+msgstr "테스트 실험: 바닥 질감·조명·기류를 유지하면서 대비가 높은 띠가 이어진 조건과 끊긴 조건을 비교한다.\n결과: 띠가 이어져 있으면 멈추지 않고 더 오래 이동했다. 띠가 끊긴 곳에서는 멈추거나 짧게 방향을 바꾸다가 다음에 보이는 띠를 찾았다. 조명 변화에 대한 반응은 아직 검증하지 않았다."
+
+msgid "WORK PROFILE"
+msgstr "현재 업무: 대상 정보"
+
+msgid "PAUSED PROFILE"
+msgstr "중단된 업무: 대상 정보"
+
+msgid "WORK CCTV"
+msgstr "현재 업무: 관찰 영상"
+
+msgid "PAUSED CCTV"
+msgstr "중단된 업무: 관찰 영상"
+
+msgid "WORK EXPERIMENT"
+msgstr "현재 업무: 실험"
+
+msgid "PAUSED EXPERIMENT"
+msgstr "중단된 업무: 실험"
+
+msgid "WORK CONTAINMENT"
+msgstr "현재 업무: 격리"
+
+msgid "PAUSED CONTAINMENT"
+msgstr "중단된 업무: 격리"
+
+msgid "Monitoring [0s]"
+msgstr "상태 관찰 [0초]"
+
+msgid "Monitoring [10s]"
+msgstr "상태 관찰 [10초]"
+
+msgid "Monitoring [20s]"
+msgstr "상태 관찰 [20초]"
+
+msgid "Monitoring stage 1"
+msgstr "상태 관찰 1단계"
+
+msgid "Monitoring stage 2"
+msgstr "상태 관찰 2단계"
+
+msgid "Monitoring stage 3"
+msgstr "상태 관찰 3단계"
+
+msgid "[Missing subject_name]"
+msgstr "[대상 이름 없음]"
+
+msgid "[Missing classification]"
+msgstr "[분류 없음]"
+
+msgid "[Missing basic_description]"
+msgstr "[기본 설명 없음]"
+
+msgid "[Missing camera_id]"
+msgstr "[카메라 식별자 없음]"
+
+msgid "[Missing description]"
+msgstr "[설명 없음]"
+
+msgid "[Missing result_text]"
+msgstr "[결과 내용 없음]"
+
+msgid "[Missing display_text]"
+msgstr "[지시 내용 없음]"
+
+msgid "[Missing prompt_text]"
+msgstr "[방송 안내 없음]"
+
+msgid "[Missing incident_id]"
+msgstr "[사건 식별자 없음]"
+
+msgid "[Missing broadcast_id]"
+msgstr "[방송 식별자 없음]"
+
+msgid "[Missing result_id]"
+msgstr "[결과 식별자 없음]"
+
+msgid "ID: [Missing incident_id]"
+msgstr "식별자: [사건 식별자 없음]"
+
+msgid "ID: [Missing broadcast_id]"
+msgstr "식별자: [방송 식별자 없음]"
+
+msgid "ID: [Missing result_id]"
+msgstr "식별자: [결과 식별자 없음]"

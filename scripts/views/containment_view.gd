@@ -51,10 +51,10 @@ func _display_rooms() -> void:
 	_update_confirmation_ui()
 	if _rooms.is_empty():
 		push_warning("ContainmentView.setup(): available_containment_rooms is empty.")
-		description_label.text = "No containment rooms available"
+		GameText.set_text(description_label, "No containment rooms available")
 		return
 
-	description_label.text = "Available containment rooms: %d" % _rooms.size()
+	GameText.set_text(description_label, "Available containment rooms: %d", [_rooms.size()])
 	for index in range(_rooms.size()):
 		var room: ContainmentData = _rooms[index]
 		if room == null:
@@ -145,12 +145,15 @@ func _update_confirmation_ui() -> void:
 		var room: ContainmentData = _rooms[index] if index < _rooms.size() else null
 		button.disabled = confirmed or room == null or room.room_id.strip_edges().is_empty()
 		if room != null:
-			button.text = room.display_name if not room.display_name.strip_edges().is_empty() else "[Missing display_name]"
+			var name_text: String = room.display_name if not room.display_name.strip_edges().is_empty() else "[Missing display_name]"
+			GameText.set_text(button, "%s [Confirmed]" if confirmed and room.room_id == _confirmed_room_id else "%s", [name_text])
 			if confirmed and room.room_id == _confirmed_room_id:
-				button.text += " [Confirmed]"
 				button.set_pressed_no_signal(true)
 	var selected_room: ContainmentData = _get_selected_room()
-	%RoomDetail.text = selected_room.display_name + "\n" + selected_room.description if selected_room != null else "Decision recorded." if confirmed else "SELECT A ROOM"
+	if selected_room != null:
+		GameText.set_text(%RoomDetail, "%s\n%s", [selected_room.display_name, selected_room.description])
+	else:
+		GameText.set_text(%RoomDetail, "Decision recorded." if confirmed else "SELECT A ROOM")
 	confirm_button.disabled = confirmed or selected_room == null or selected_room.room_id.strip_edges().is_empty()
 	next_button.text = _next_action_text
 	confirm_button.visible = not confirmed

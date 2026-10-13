@@ -195,6 +195,7 @@ theme_override_constants/separation = 16
 unique_name_in_owner = true
 layout_mode = 2
 text = "R"
+theme_override_font_sizes/font_size = 16
 tooltip_text = "RESEARCH LOG"
 custom_minimum_size = Vector2(24, 56)
 
@@ -202,6 +203,7 @@ custom_minimum_size = Vector2(24, 56)
 unique_name_in_owner = true
 layout_mode = 2
 text = "A"
+theme_override_font_sizes/font_size = 16
 tooltip_text = "RESEARCH ARCHIVE"
 custom_minimum_size = Vector2(24, 56)
 
@@ -209,6 +211,7 @@ custom_minimum_size = Vector2(24, 56)
 unique_name_in_owner = true
 layout_mode = 2
 text = "N"
+theme_override_font_sizes/font_size = 16
 tooltip_text = "WORKING HYPOTHESIS"
 custom_minimum_size = Vector2(24, 56)
 

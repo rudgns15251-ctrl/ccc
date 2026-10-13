@@ -43,18 +43,18 @@ func _display_broadcast() -> void:
 	option_scroll.scroll_vertical = 0
 	if _broadcast_data == null:
 		push_warning("BroadcastView.setup(): EmergencyBroadcastData is missing.")
-		broadcast_id_label.text = ""
+		GameText.set_text(broadcast_id_label, "")
 		display_name_label.text = "Broadcast data unavailable"
 		prompt_label.text = "No EmergencyBroadcastData was provided to this View."
 		return
 	if _broadcast_data.broadcast_id.strip_edges().is_empty():
 		push_warning("BroadcastView: broadcast_id is empty.")
-		broadcast_id_label.text = "ID: [Missing broadcast_id]"
+		GameText.set_text(broadcast_id_label, "ID: [Missing broadcast_id]")
 		display_name_label.text = "Broadcast data unavailable"
 		prompt_label.text = "EmergencyBroadcastData has no valid broadcast_id."
 		return
 
-	broadcast_id_label.text = "ID: " + _broadcast_data.broadcast_id
+	GameText.set_text(broadcast_id_label, "ID: %s", [_broadcast_data.broadcast_id])
 	display_name_label.text = _text_or_placeholder(_broadcast_data.display_name, "display_name")
 	prompt_label.text = _text_or_placeholder(_broadcast_data.prompt_text, "prompt_text")
 	if _broadcast_data.options.is_empty():
@@ -193,10 +193,10 @@ func _update_confirmation_ui() -> void:
 			confirmed_shown = true
 		button.disabled = has_snapshot or not valid
 		button.set_pressed_no_signal(is_confirmed if has_snapshot else valid and index == _selected_option_index)
-		text_label.text = text_label.text.trim_suffix(" [Confirmed]")
-		if is_confirmed:
-			text_label.text += " [Confirmed]"
-		button.text = text_label.text
+		var display_text: String = option.display_text if valid else "[Unavailable]"
+		var pattern: String = "%s [Confirmed]" if is_confirmed else "%s"
+		GameText.set_text(text_label, pattern, [display_text])
+		GameText.set_text(button, pattern, [display_text])
 	confirm_button.disabled = has_snapshot or _broadcast_data == null or _broadcast_data.broadcast_id.strip_edges().is_empty() or _selected_option_index == -1
 	confirm_button.visible = not confirmed
 	next_button.visible = confirmed

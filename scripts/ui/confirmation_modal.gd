@@ -16,7 +16,7 @@ func setup(title: String, message: String, action: String, dimensions: Vector2) 
 
 func _ready() -> void:
 	%Title.text = _title
-	%Message.text = _message
+	GameText.set_text(%Message, "%s", [_message])
 	%Confirm.text = _action
 	%Panel.custom_minimum_size = _dimensions
 	%Confirm.pressed.connect(_confirm)

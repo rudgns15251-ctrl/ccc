@@ -41,7 +41,7 @@ func _display_conditions() -> void:
 	visible = not _entries.is_empty()
 	for entry: Condition in _entries:
 		var label := Label.new()
-		label.text = "%s\n%s" % [entry.display_name, entry.condition_change_text]
+		GameText.set_text(label, "%s\n%s", [entry.display_name, entry.condition_change_text])
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(label)

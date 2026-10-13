@@ -249,8 +249,12 @@ bg_color = Color(0.572549, 0.580392, 0.529412, 1)
 content_margin_top = 1.0
 content_margin_bottom = 1.0
 
+[sub_resource type="SystemFont" id="font_multilingual"]
+font_names = PackedStringArray("Malgun Gothic", "Noto Sans CJK KR", "sans-serif")
+
 [resource]
 
+default_font = SubResource("font_multilingual")
 default_font_size = 22
 
 Label/colors/font_color = Color(0.87,0.90,0.85,1)

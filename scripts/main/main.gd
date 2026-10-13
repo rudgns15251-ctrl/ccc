@@ -119,6 +119,11 @@ var _developer_recipient_id: int = 0
 var _developer_terminal: Dictionary = {"mode": TerminalMode.NONE, "boundary_type": "", "source_case_id": "", "incident_id": "", "receipt": {}}
 
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		GameText.refresh_tree(self)
+
+
 func _ready() -> void:
 	game_shell.navigation_requested.connect(_on_work_navigation_requested)
 	get_viewport().gui_focus_changed.connect(_on_work_focus_changed)
@@ -172,7 +177,7 @@ func _exit_tree() -> void:
 
 func _update_window_size() -> void:
 	var window_size: Vector2i = get_window().size
-	window_size_label.text = "Window: %d × %d" % [window_size.x, window_size.y]
+	GameText.set_text(window_size_label, "Window: %d × %d", [window_size.x, window_size.y])
 
 
 func _show_view(stage: int, discover_displayed_source: bool = true, restoring_work: bool = false, presentation_only: bool = false) -> void:
@@ -213,7 +218,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		var cctv_view: CCTVView = _current_view as CCTVView
 		cctv_view.setup(current_case.cctv_data if current_case != null else null)
 		if _cctv_review_return_stage >= 0:
-			cctv_view.get_node("%NextButton").text = "Back: " + Stage.keys()[_cctv_review_return_stage]
+			GameText.set_text(cctv_view.get_node("%NextButton"), "Back: %s", [Stage.keys()[_cctv_review_return_stage]])
 		displayed_source = current_case.cctv_data if current_case != null else null
 	elif stage == Stage.EXPERIMENT:
 		var experiment_view: ExperimentView = _current_view as ExperimentView
@@ -312,7 +317,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		elif stage == Stage.INCIDENT_RESULT:
 			_current_view.next_button.text = "CONTINUE CAMPAIGN" if _is_scripted_response() else "RESUME WORK"
 			var orders: BroadcastOptionData = _get_current_confirmed_broadcast_option()
-			_current_view.get_node("%SelectedOrders").text = "TRANSMITTED ORDERS\n" + orders.display_text if orders != null else ""
+			GameText.set_text(_current_view.get_node("%SelectedOrders"), "TRANSMITTED ORDERS\n%s", [orders.display_text]) if orders != null else GameText.set_text(_current_view.get_node("%SelectedOrders"), "")
 		if context.is_empty():
 			_current_view.next_button.disabled = true
 		if stage == Stage.BROADCAST:

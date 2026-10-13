@@ -1,0 +1,1809 @@
+# CAP game text. English msgid values preserve the original prototype.
+# Source strings are shared; add another PO file for another locale.
+msgid ""
+msgstr ""
+"Project-Id-Version: CAP\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: resources/campaigns/test_campaign_01.tres:51
+msgid "TEST CAMPAIGN 01 — Prototype Case Sequence"
+msgstr "TEST CAMPAIGN 01 — Prototype Case Sequence"
+
+#: resources/cases/test_case_01.tres:21
+msgid "TEST SUBJECT"
+msgstr "TEST SUBJECT"
+
+#: resources/cases/test_case_01.tres:22
+msgid "TEST CLASSIFICATION"
+msgstr "TEST CLASSIFICATION"
+
+#: resources/cases/test_case_01.tres:23
+msgid "TEST: metal-support pump cycles preceded strikes; no talk link."
+msgstr "TEST: metal-support pump cycles preceded strikes; no talk link."
+
+#: resources/cases/test_case_01.tres:28
+msgid "TEST: strikes cluster at pump starts; vent cycling prompts turn-backs. Lamp sweeps alter travel, not strike timing. Wall tracing continues."
+msgstr "TEST: strikes cluster at pump starts; vent cycling prompts turn-backs. Lamp sweeps alter travel, not strike timing. Wall tracing continues."
+
+#: resources/cases/test_case_01.tres:33
+msgid "TEST EXPERIMENT 01"
+msgstr "TEST EXPERIMENT 01"
+
+#: resources/cases/test_case_01.tres:34
+msgid "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged."
+msgstr "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged."
+
+#: resources/cases/test_case_01.tres:35
+msgid "Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+msgstr "Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+
+#: resources/cases/test_case_01.tres:40
+msgid "TEST EXPERIMENT 02"
+msgstr "TEST EXPERIMENT 02"
+
+#: resources/cases/test_case_01.tres:41
+msgid "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged."
+msgstr "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged."
+
+#: resources/cases/test_case_01.tres:42
+msgid "Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+msgstr "Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+
+#: resources/cases/test_case_01.tres:47
+msgid "TEST EXPERIMENT 03"
+msgstr "TEST EXPERIMENT 03"
+
+#: resources/cases/test_case_01.tres:48
+msgid "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent."
+msgstr "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent."
+
+#: resources/cases/test_case_01.tres:49
+msgid "The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+msgstr "The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+
+#: resources/cases/test_case_01.tres:54
+msgid "TEST ROOM 01"
+msgstr "TEST ROOM 01"
+
+#: resources/cases/test_case_01.tres:55
+msgid "TEST configuration: acoustic partition; rigid metal support connected to the service structure; continuous low airflow."
+msgstr "TEST configuration: acoustic partition; rigid metal support connected to the service structure; continuous low airflow."
+
+#: resources/cases/test_case_01.tres:60
+msgid "TEST ROOM 02"
+msgstr "TEST ROOM 02"
+
+#: resources/cases/test_case_01.tres:61
+msgid "TEST configuration: mechanically isolated padded support; continuous low airflow; ordinary task lighting."
+msgstr "TEST configuration: mechanically isolated padded support; continuous low airflow; ordinary task lighting."
+
+#: resources/cases/test_case_01.tres:66
+msgid "TEST ROOM 03"
+msgstr "TEST ROOM 03"
+
+#: resources/cases/test_case_01.tres:67
+msgid "TEST configuration: mechanically isolated padded support; start/stop ventilation; reduced task lighting."
+msgstr "TEST configuration: mechanically isolated padded support; start/stop ventilation; reduced task lighting."
+
+#: resources/cases/test_case_01.tres:72
+msgid "Temporary monitoring state 01-A."
+msgstr "Temporary monitoring state 01-A."
+
+#: resources/cases/test_case_01.tres:77
+msgid "Temporary monitoring state 01-B."
+msgstr "Temporary monitoring state 01-B."
+
+#: resources/cases/test_case_01.tres:82
+msgid "Temporary monitoring state 01-C."
+msgstr "Temporary monitoring state 01-C."
+
+#: resources/cases/test_case_01.tres:94
+msgid "Temporary monitoring state 02-A."
+msgstr "Temporary monitoring state 02-A."
+
+#: resources/cases/test_case_01.tres:99
+msgid "Temporary monitoring state 02-B."
+msgstr "Temporary monitoring state 02-B."
+
+#: resources/cases/test_case_01.tres:104
+msgid "Temporary monitoring state 02-C."
+msgstr "Temporary monitoring state 02-C."
+
+#: resources/cases/test_case_01.tres:116
+msgid "Temporary monitoring state 03-A."
+msgstr "Temporary monitoring state 03-A."
+
+#: resources/cases/test_case_01.tres:121
+msgid "Temporary monitoring state 03-B."
+msgstr "Temporary monitoring state 03-B."
+
+#: resources/cases/test_case_01.tres:126
+msgid "Temporary monitoring state 03-C."
+msgstr "Temporary monitoring state 03-C."
+
+#: resources/cases/test_case_01.tres:138
+msgid "TEST POWER INTERRUPTION"
+msgstr "TEST POWER INTERRUPTION"
+
+#: resources/cases/test_case_01.tres:139
+msgid "Temporary facility lighting interruption detected."
+msgstr "Temporary facility lighting interruption detected."
+
+#: resources/cases/test_case_01.tres:140
+msgid "LIGHT: NORMAL → OFF"
+msgstr "LIGHT: NORMAL → OFF"
+
+#: resources/cases/test_case_01.tres:145
+msgid "TEST VENTILATION INSTABILITY"
+msgstr "TEST VENTILATION INSTABILITY"
+
+#: resources/cases/test_case_01.tres:146
+msgid "Temporary facility airflow instability detected."
+msgstr "Temporary facility airflow instability detected."
+
+#: resources/cases/test_case_01.tres:147
+msgid "AIRFLOW: STEADY → INTERMITTENT"
+msgstr "AIRFLOW: STEADY → INTERMITTENT"
+
+#: resources/cases/test_case_01.tres:152
+msgid "TEST SERVICE-STRUCTURE INCIDENT"
+msgstr "TEST SERVICE-STRUCTURE INCIDENT"
+
+#: resources/cases/test_case_01.tres:153
+msgid "TEST observation: strikes cluster at service-panel mounts after pump starts. Vibration travels along the service structure as emergency lighting drops out. Airflow is currently steady; wall tracing continues between strikes."
+msgstr "TEST observation: strikes cluster at service-panel mounts after pump starts. Vibration travels along the service structure as emergency lighting drops out. Airflow is currently steady; wall tracing continues between strikes."
+
+#: resources/cases/test_case_01.tres:160
+msgid "TEST VENTILATION INCIDENT"
+msgstr "TEST VENTILATION INCIDENT"
+
+#: resources/cases/test_case_01.tres:161
+msgid "TEST observation: vent stop/start pulses are followed by sharp turn-backs toward the outlet. Wall tracing is repeatedly interrupted by crossings of the ventilation path. Airflow remains unstable after each service restart."
+msgstr "TEST observation: vent stop/start pulses are followed by sharp turn-backs toward the outlet. Wall tracing is repeatedly interrupted by crossings of the ventilation path. Airflow remains unstable after each service restart."
+
+#: resources/cases/test_case_01.tres:168
+msgid "Mechanically isolate the service mounts and keep airflow steady. Prioritizes transmitted impulses, but leaves movement near the access seam to be observed."
+msgstr "Mechanically isolate the service mounts and keep airflow steady. Prioritizes transmitted impulses, but leaves movement near the access seam to be observed."
+
+#: resources/cases/test_case_01.tres:174
+msgid "Quiet airborne machinery noise while retaining rigid service connections and steady airflow. Preserves the connection, but transmitted impulses remain."
+msgstr "Quiet airborne machinery noise while retaining rigid service connections and steady airflow. Preserves the connection, but transmitted impulses remain."
+
+#: resources/cases/test_case_01.tres:180
+msgid "Cycle ventilation to redirect movement away from service panels while keeping the supports connected. Repeated airflow transitions may draw attention to the outlet."
+msgstr "Cycle ventilation to redirect movement away from service panels while keeping the supports connected. Repeated airflow transitions may draw attention to the outlet."
+
+#: resources/cases/test_case_01.tres:186
+msgid "TEST RESPONSE: SERVICE VIBRATION"
+msgstr "TEST RESPONSE: SERVICE VIBRATION"
+
+#: resources/cases/test_case_01.tres:187
+msgid "Strikes track pump starts; the earlier sound-only trial did not reproduce them. Outlet turn-backs track airflow changes. Choose which cue to alter while the service panels vibrate. These temporary responses do not establish long-term containment."
+msgstr "Strikes track pump starts; the earlier sound-only trial did not reproduce them. Outlet turn-backs track airflow changes. Choose which cue to alter while the service panels vibrate. These temporary responses do not establish long-term containment."
+
+#: resources/cases/test_case_01.tres:193
+msgid "Hold continuous low airflow with the present lighting and supports. Removes repeated airflow transitions, while other sources of stimulation remain untested."
+msgstr "Hold continuous low airflow with the present lighting and supports. Removes repeated airflow transitions, while other sources of stimulation remain untested."
+
+#: resources/cases/test_case_01.tres:199
+msgid "Reduce task lighting while retaining vent cycling and the present supports. Aims to reduce crossing movements, but does not remove airflow transitions."
+msgstr "Reduce task lighting while retaining vent cycling and the present supports. Aims to reduce crossing movements, but does not remove airflow transitions."
+
+#: resources/cases/test_case_01.tres:205
+msgid "Add damping at the service mounts while retaining vent cycling. Prioritizes structural transmission, but leaves the repeating airflow cue in place."
+msgstr "Add damping at the service mounts while retaining vent cycling. Prioritizes structural transmission, but leaves the repeating airflow cue in place."
+
+#: resources/cases/test_case_01.tres:211
+msgid "TEST RESPONSE: AIRFLOW CYCLING"
+msgstr "TEST RESPONSE: AIRFLOW CYCLING"
+
+#: resources/cases/test_case_01.tres:212
+msgid "Outlet turn-backs coincide with airflow transitions. Earlier lamp sweeps changed travel rather than strike timing; mechanical isolation addresses transmitted impacts. Choose a temporary response while wall tracing is interrupted by vent pulses."
+msgstr "Outlet turn-backs coincide with airflow transitions. Earlier lamp sweeps changed travel rather than strike timing; mechanical isolation addresses transmitted impacts. Choose a temporary response while wall tracing is interrupted by vent pulses."
+
+#: resources/cases/test_case_01.tres:218
+msgid "TEST MECHANICAL ISOLATION OBSERVATION"
+msgstr "TEST MECHANICAL ISOLATION OBSERVATION"
+
+#: resources/cases/test_case_01.tres:219
+msgid "Service mounts were isolated and airflow held steady. Panel strikes became less frequent; wall tracing and brief approaches to the access seam continued. Transmitted impacts were reduced, but movement near the seam remains to be observed."
+msgstr "Service mounts were isolated and airflow held steady. Panel strikes became less frequent; wall tracing and brief approaches to the access seam continued. Transmitted impacts were reduced, but movement near the seam remains to be observed."
+
+#: resources/cases/test_case_01.tres:224
+msgid "TEST NOISE REDUCTION OBSERVATION"
+msgstr "TEST NOISE REDUCTION OBSERVATION"
+
+#: resources/cases/test_case_01.tres:225
+msgid "Airborne machinery noise was reduced while rigid connections remained. Brief orientations toward the speaker stopped, but strikes still clustered at pump starts. Steady airflow avoided added outlet turn-backs; structural transmission remains unresolved."
+msgstr "Airborne machinery noise was reduced while rigid connections remained. Brief orientations toward the speaker stopped, but strikes still clustered at pump starts. Steady airflow avoided added outlet turn-backs; structural transmission remains unresolved."
+
+#: resources/cases/test_case_01.tres:230
+msgid "TEST VENT CYCLING OBSERVATION"
+msgstr "TEST VENT CYCLING OBSERVATION"
+
+#: resources/cases/test_case_01.tres:231
+msgid "Vent cycling initially drew movement away from the panel. Further restarts produced repeated outlet turn-backs; panel strikes continued after pump starts. The initial redirection did not remove transmitted impulses and added a repeating airflow cue."
+msgstr "Vent cycling initially drew movement away from the panel. Further restarts produced repeated outlet turn-backs; panel strikes continued after pump starts. The initial redirection did not remove transmitted impulses and added a repeating airflow cue."
+
+#: resources/cases/test_case_01.tres:236
+msgid "TEST STEADY AIRFLOW OBSERVATION"
+msgstr "TEST STEADY AIRFLOW OBSERVATION"
+
+#: resources/cases/test_case_01.tres:237
+msgid "Continuous low airflow replaced the stop/start pulses. Outlet turn-backs became less frequent and wall tracing resumed over longer stretches. Approaches to service panels continued; the airflow cue was reduced without testing all structural stimuli."
+msgstr "Continuous low airflow replaced the stop/start pulses. Outlet turn-backs became less frequent and wall tracing resumed over longer stretches. Approaches to service panels continued; the airflow cue was reduced without testing all structural stimuli."
+
+#: resources/cases/test_case_01.tres:242
+msgid "TEST LIGHTING REDUCTION OBSERVATION"
+msgstr "TEST LIGHTING REDUCTION OBSERVATION"
+
+#: resources/cases/test_case_01.tres:243
+msgid "Reduced lighting produced fewer crossings and longer pauses between movements. Each vent restart still prompted outlet turn-backs. The change altered travel but left the repeated airflow cue and interrupted wall tracing unresolved."
+msgstr "Reduced lighting produced fewer crossings and longer pauses between movements. Each vent restart still prompted outlet turn-backs. The change altered travel but left the repeated airflow cue and interrupted wall tracing unresolved."
+
+#: resources/cases/test_case_01.tres:248
+msgid "TEST SERVICE DAMPING OBSERVATION"
+msgstr "TEST SERVICE DAMPING OBSERVATION"
+
+#: resources/cases/test_case_01.tres:249
+msgid "Added damping reduced pulse-linked vibration at service panels. Vent restarts still prompted outlet turn-backs and repeatedly interrupted wall tracing. Structural vibration was reduced, while the cycling airflow cue remained."
+msgstr "Added damping reduced pulse-linked vibration at service panels. Vent restarts still prompted outlet turn-backs and repeatedly interrupted wall tracing. Structural vibration was reduced, while the cycling airflow cue remained."
+
+#: resources/cases/test_case_01.tres:256
+msgid "Intake record: support and machinery timing"
+msgstr "Intake record: support and machinery timing"
+
+#: resources/cases/test_case_01.tres:257
+msgid "Intake: strikes followed pump cycles on metal supports; no timing link to speech was recorded."
+msgstr "Intake: strikes followed pump cycles on metal supports; no timing link to speech was recorded."
+
+#: resources/cases/test_case_01.tres:264
+msgid "Camera 01: pump, airflow and lamp comparison"
+msgstr "Camera 01: pump, airflow and lamp comparison"
+
+#: resources/cases/test_case_01.tres:265
+msgid "Pump starts coincided with strikes; vent transitions with turn-backs. Lamp sweeps changed travel rather than strike timing; wall tracing persisted."
+msgstr "Pump starts coincided with strikes; vent transitions with turn-backs. Lamp sweeps changed travel rather than strike timing; wall tracing persisted."
+
+#: resources/cases/test_case_01.tres:272
+msgid "Experiment 01: support comparison"
+msgstr "Experiment 01: support comparison"
+
+#: resources/cases/test_case_01.tres:273
+msgid "With sound and airflow held fixed, strike bursts followed metal-support impulses more often than padded-support impulses. Slow wall tracing continued on both; airflow cycles were not compared."
+msgstr "With sound and airflow held fixed, strike bursts followed metal-support impulses more often than padded-support impulses. Slow wall tracing continued on both; airflow cycles were not compared."
+
+#: resources/cases/test_case_01.tres:280
+msgid "Containment choice: room 02"
+msgstr "Containment choice: room 02"
+
+#: resources/cases/test_case_01.tres:281
+msgid "Room 02 submission: mechanically isolated padded support; continuous low airflow; ordinary task lighting. This is the submitted configuration, not a result."
+msgstr "Room 02 submission: mechanically isolated padded support; continuous low airflow; ordinary task lighting. This is the submitted configuration, not a result."
+
+#: resources/cases/test_case_01.tres:288
+msgid "Service incident: repeated panel impacts"
+msgstr "Service incident: repeated panel impacts"
+
+#: resources/cases/test_case_01.tres:289
+msgid "Pump-start strikes clustered at service-panel mounts. Vibration travelled along the service structure during emergency lighting interruptions; wall tracing continued between strikes and airflow was steady."
+msgstr "Pump-start strikes clustered at service-panel mounts. Vibration travelled along the service structure during emergency lighting interruptions; wall tracing continued between strikes and airflow was steady."
+
+#: resources/cases/test_case_01.tres:296
+msgid "Response decision: vibration, sound or airflow"
+msgstr "Response decision: vibration, sound or airflow"
+
+#: resources/cases/test_case_01.tres:297
+msgid "Panel impacts tracked pump starts, while the prior sound-only comparison did not reproduce them. Outlet turns tracked airflow changes. A temporary response was requested to alter mechanical transmission, airborne noise or airflow timing."
+msgstr "Panel impacts tracked pump starts, while the prior sound-only comparison did not reproduce them. Outlet turns tracked airflow changes. A temporary response was requested to alter mechanical transmission, airborne noise or airflow timing."
+
+#: resources/cases/test_case_01.tres:304
+msgid "Selected response: airborne noise reduction"
+msgstr "Selected response: airborne noise reduction"
+
+#: resources/cases/test_case_01.tres:305
+msgid "Airborne machinery noise reduction was selected, retaining rigid service connections and steady airflow. Transmitted impulses were not addressed by this protocol."
+msgstr "Airborne machinery noise reduction was selected, retaining rigid service connections and steady airflow. Transmitted impulses were not addressed by this protocol."
+
+#: resources/cases/test_case_01.tres:312
+msgid "Follow-up: quiet sound, persistent panel strikes"
+msgstr "Follow-up: quiet sound, persistent panel strikes"
+
+#: resources/cases/test_case_01.tres:313
+msgid "After noise reduction, brief speaker orientations stopped but pump-start strikes persisted. Steady airflow avoided additional outlet turns; structural transmission remained unresolved."
+msgstr "After noise reduction, brief speaker orientations stopped but pump-start strikes persisted. Steady airflow avoided additional outlet turns; structural transmission remained unresolved."
+
+#: resources/cases/test_case_01.tres:320
+msgid "Experiment 02: airflow comparison"
+msgstr "Experiment 02: airflow comparison"
+
+#: resources/cases/test_case_01.tres:321
+msgid "With support and sound held fixed, continuous low airflow yielded fewer outlet-directed turn-backs than start/stop airflow. Wall tracing persisted; support isolation was not tested."
+msgstr "With support and sound held fixed, continuous low airflow yielded fewer outlet-directed turn-backs than start/stop airflow. Wall tracing persisted; support isolation was not tested."
+
+#: resources/cases/test_case_01.tres:328
+msgid "Experiment 03: sound-only comparison"
+msgstr "Experiment 03: sound-only comparison"
+
+#: resources/cases/test_case_01.tres:329
+msgid "Sound-only replay caused brief orientation but did not reproduce pump-start strike bursts; wall tracing persisted. Airborne sound alone did not explain the earlier timing link."
+msgstr "Sound-only replay caused brief orientation but did not reproduce pump-start strike bursts; wall tracing persisted. Airborne sound alone did not explain the earlier timing link."
+
+#: resources/cases/test_case_01.tres:336
+msgid "Containment choice: room 01"
+msgstr "Containment choice: room 01"
+
+#: resources/cases/test_case_01.tres:337
+msgid "Room 01 submission: acoustic partition; rigid metal support connected to the service structure; continuous low airflow. This is the submitted configuration, not a result."
+msgstr "Room 01 submission: acoustic partition; rigid metal support connected to the service structure; continuous low airflow. This is the submitted configuration, not a result."
+
+#: resources/cases/test_case_01.tres:344
+msgid "Containment choice: room 03"
+msgstr "Containment choice: room 03"
+
+#: resources/cases/test_case_01.tres:345
+msgid "Room 03 submission: mechanically isolated padded support; start/stop ventilation; reduced task lighting. This is the submitted configuration, not a result."
+msgstr "Room 03 submission: mechanically isolated padded support; start/stop ventilation; reduced task lighting. This is the submitted configuration, not a result."
+
+#: resources/cases/test_case_01.tres:352
+msgid "Ventilation incident: repeated outlet turns"
+msgstr "Ventilation incident: repeated outlet turns"
+
+#: resources/cases/test_case_01.tres:353
+msgid "Vent stop/start pulses were followed by outlet-directed turn-backs and crossings of the ventilation path. Wall tracing was repeatedly interrupted, and airflow remained unstable after service restarts."
+msgstr "Vent stop/start pulses were followed by outlet-directed turn-backs and crossings of the ventilation path. Wall tracing was repeatedly interrupted, and airflow remained unstable after service restarts."
+
+#: resources/cases/test_case_01.tres:360
+msgid "Response decision: airflow, lighting or damping"
+msgstr "Response decision: airflow, lighting or damping"
+
+#: resources/cases/test_case_01.tres:361
+msgid "Outlet turns coincided with airflow transitions. Prior lamp sweeps altered travel rather than strike timing; mechanical isolation targeted transmitted impulses. A temporary airflow, lighting or damping response was requested."
+msgstr "Outlet turns coincided with airflow transitions. Prior lamp sweeps altered travel rather than strike timing; mechanical isolation targeted transmitted impulses. A temporary airflow, lighting or damping response was requested."
+
+#: resources/cases/test_case_01.tres:368
+msgid "Selected response: service-mount isolation"
+msgstr "Selected response: service-mount isolation"
+
+#: resources/cases/test_case_01.tres:369
+msgid "Mechanical isolation of service mounts with steady airflow was selected. The protocol targeted transmitted impulses while leaving access-seam movements for observation."
+msgstr "Mechanical isolation of service mounts with steady airflow was selected. The protocol targeted transmitted impulses while leaving access-seam movements for observation."
+
+#: resources/cases/test_case_01.tres:376
+msgid "Selected response: vent-driven redirection"
+msgstr "Selected response: vent-driven redirection"
+
+#: resources/cases/test_case_01.tres:377
+msgid "Vent cycling was selected to redirect movement away from service panels. Supports remained connected and repeated airflow transitions were introduced."
+msgstr "Vent cycling was selected to redirect movement away from service panels. Supports remained connected and repeated airflow transitions were introduced."
+
+#: resources/cases/test_case_01.tres:384
+msgid "Selected response: continuous low airflow"
+msgstr "Selected response: continuous low airflow"
+
+#: resources/cases/test_case_01.tres:385
+msgid "Continuous low airflow was selected while retaining present lighting and supports. Other sources of stimulation were left untested."
+msgstr "Continuous low airflow was selected while retaining present lighting and supports. Other sources of stimulation were left untested."
+
+#: resources/cases/test_case_01.tres:392
+msgid "Selected response: reduced task lighting"
+msgstr "Selected response: reduced task lighting"
+
+#: resources/cases/test_case_01.tres:393
+msgid "Reduced task lighting was selected to limit crossings, retaining vent cycling and the present support arrangement. Airflow transitions were left in place."
+msgstr "Reduced task lighting was selected to limit crossings, retaining vent cycling and the present support arrangement. Airflow transitions were left in place."
+
+#: resources/cases/test_case_01.tres:400
+msgid "Selected response: extra service-mount damping"
+msgstr "Selected response: extra service-mount damping"
+
+#: resources/cases/test_case_01.tres:401
+msgid "Additional service-mount damping was selected to reduce structural transmission. Vent cycling and its repeated airflow cue remained."
+msgstr "Additional service-mount damping was selected to reduce structural transmission. Vent cycling and its repeated airflow cue remained."
+
+#: resources/cases/test_case_01.tres:408
+msgid "Follow-up: fewer impacts, continued seam approaches"
+msgstr "Follow-up: fewer impacts, continued seam approaches"
+
+#: resources/cases/test_case_01.tres:409
+msgid "After mount isolation with steady airflow, panel strikes became less frequent. Wall tracing and brief access-seam approaches continued; movement near the seam still required observation."
+msgstr "After mount isolation with steady airflow, panel strikes became less frequent. Wall tracing and brief access-seam approaches continued; movement near the seam still required observation."
+
+#: resources/cases/test_case_01.tres:416
+msgid "Follow-up: initial redirection, repeated outlet turns"
+msgstr "Follow-up: initial redirection, repeated outlet turns"
+
+#: resources/cases/test_case_01.tres:417
+msgid "Vent cycling first drew movement away from the panel, then produced repeated outlet turn-backs. Pump-start strikes continued; transmitted impulses remained and the repeating airflow cue was added."
+msgstr "Vent cycling first drew movement away from the panel, then produced repeated outlet turn-backs. Pump-start strikes continued; transmitted impulses remained and the repeating airflow cue was added."
+
+#: resources/cases/test_case_01.tres:424
+msgid "Follow-up: fewer turns under steady airflow"
+msgstr "Follow-up: fewer turns under steady airflow"
+
+#: resources/cases/test_case_01.tres:425
+msgid "Continuous low airflow reduced outlet turn-backs and allowed longer stretches of wall tracing. Service-panel approaches continued; not all structural stimuli were tested."
+msgstr "Continuous low airflow reduced outlet turn-backs and allowed longer stretches of wall tracing. Service-panel approaches continued; not all structural stimuli were tested."
+
+#: resources/cases/test_case_01.tres:432
+msgid "Follow-up: fewer crossings, continued restart turns"
+msgstr "Follow-up: fewer crossings, continued restart turns"
+
+#: resources/cases/test_case_01.tres:433
+msgid "Reduced lighting lowered crossing frequency and lengthened pauses. Vent restarts still prompted outlet turns and interrupted wall tracing; the repeated airflow cue remained unresolved."
+msgstr "Reduced lighting lowered crossing frequency and lengthened pauses. Vent restarts still prompted outlet turns and interrupted wall tracing; the repeated airflow cue remained unresolved."
+
+#: resources/cases/test_case_01.tres:440
+msgid "Follow-up: less vibration, continued vent turns"
+msgstr "Follow-up: less vibration, continued vent turns"
+
+#: resources/cases/test_case_01.tres:441
+msgid "Extra damping reduced pulse-linked service-panel vibration. Vent restarts continued to prompt outlet turns and interrupt wall tracing; cycling airflow remained."
+msgstr "Extra damping reduced pulse-linked service-panel vibration. Vent restarts continued to prompt outlet turns and interrupt wall tracing; cycling airflow remained."
+
+#: resources/cases/test_case_01.tres:446
+msgid "TEST CASE 01"
+msgstr "TEST CASE 01"
+
+#: resources/cases/test_case_02.tres:23
+msgid "TEST SUBJECT CASE 02"
+msgstr "TEST SUBJECT CASE 02"
+
+#: resources/cases/test_case_02.tres:24
+msgid "TEST CLASSIFICATION CASE 02"
+msgstr "TEST CLASSIFICATION CASE 02"
+
+#: resources/cases/test_case_02.tres:25
+msgid "TEST: wall-contact loss precedes searching; no damage recorded."
+msgstr "TEST: wall-contact loss precedes searching; no damage recorded."
+
+#: resources/cases/test_case_02.tres:30
+msgid "TEST: ribbed-wall tracing resumes after vent turns. Smooth patches prompt repeated sideways searches toward the service grille; vent cycling restarts those searches. No new damage appears."
+msgstr "TEST: ribbed-wall tracing resumes after vent turns. Smooth patches prompt repeated sideways searches toward the service grille; vent cycling restarts those searches. No new damage appears."
+
+#: resources/cases/test_case_02.tres:35
+msgid "TEST CASE 02 EXPERIMENT 01"
+msgstr "TEST CASE 02 EXPERIMENT 01"
+
+#: resources/cases/test_case_02.tres:36
+msgid "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged."
+msgstr "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged."
+
+#: resources/cases/test_case_02.tres:37
+msgid "Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+msgstr "Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+
+#: resources/cases/test_case_02.tres:42
+msgid "TEST CASE 02 EXPERIMENT 02"
+msgstr "TEST CASE 02 EXPERIMENT 02"
+
+#: resources/cases/test_case_02.tres:43
+msgid "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure."
+msgstr "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure."
+
+#: resources/cases/test_case_02.tres:44
+msgid "Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+msgstr "Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+
+#: resources/cases/test_case_02.tres:49
+msgid "TEST CASE 02 ROOM 01"
+msgstr "TEST CASE 02 ROOM 01"
+
+#: resources/cases/test_case_02.tres:50
+msgid "TEST configuration: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting."
+msgstr "TEST configuration: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting."
+
+#: resources/cases/test_case_02.tres:55
+msgid "TEST CASE 02 ROOM 02"
+msgstr "TEST CASE 02 ROOM 02"
+
+#: resources/cases/test_case_02.tres:56
+msgid "TEST configuration: start/stop airflow; smooth wall panels without purchase points; reduced task lighting."
+msgstr "TEST configuration: start/stop airflow; smooth wall panels without purchase points; reduced task lighting."
+
+#: resources/cases/test_case_02.tres:63
+msgid "Case 02 intake: wall contact and searching"
+msgstr "Case 02 intake: wall contact and searching"
+
+#: resources/cases/test_case_02.tres:64
+msgid "Intake associates loss of wall contact with searching; no damage is documented."
+msgstr "Intake associates loss of wall contact with searching; no damage is documented."
+
+#: resources/cases/test_case_02.tres:71
+msgid "Case 02 experiment 01: airflow and sound cues"
+msgstr "Case 02 experiment 01: airflow and sound cues"
+
+#: resources/cases/test_case_02.tres:72
+msgid "Air pulses caused nozzle-directed pivots followed by wall tracing; fan sound alone produced no consistent pivot. Wall texture's effect on searching remains untested here."
+msgstr "Air pulses caused nozzle-directed pivots followed by wall tracing; fan sound alone produced no consistent pivot. Wall texture's effect on searching remains untested here."
+
+#: resources/cases/test_case_02.tres:79
+msgid "Test Case 02 room 01 submission"
+msgstr "Test Case 02 room 01 submission"
+
+#: resources/cases/test_case_02.tres:80
+msgid "Room 01 submission: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting. Its containment result remains pending."
+msgstr "Room 01 submission: continuous low airflow; shallow-ribbed wall panels without sharp edges; ordinary task lighting. Its containment result remains pending."
+
+#: resources/cases/test_case_02.tres:86
+msgid "Unplanned Observation: TEST LIGHTING INTERRUPTION"
+msgstr "Unplanned Observation: TEST LIGHTING INTERRUPTION"
+
+#: resources/cases/test_case_02.tres:87
+msgid "When the lights cut out, the subject pauses its crossing for eight seconds with one paw still on a ribbed panel. It then resumes wall tracing; the pause does not break wall contact."
+msgstr "When the lights cut out, the subject pauses its crossing for eight seconds with one paw still on a ribbed panel. It then resumes wall tracing; the pause does not break wall contact."
+
+#: resources/cases/test_case_02.tres:93
+msgid "Unplanned Observation: TEST AIRFLOW INTERRUPTION"
+msgstr "Unplanned Observation: TEST AIRFLOW INTERRUPTION"
+
+#: resources/cases/test_case_02.tres:94
+msgid "At the first unexpected vent stop, the subject turns toward the outlet and makes two short sideways searches. Wall contact continues and pressure marks do not deepen. This is a single transition observation."
+msgstr "At the first unexpected vent stop, the subject turns toward the outlet and makes two short sideways searches. Wall contact continues and pressure marks do not deepen. This is a single transition observation."
+
+#: resources/cases/test_case_02.tres:101
+msgid "Unplanned Observation: test lighting interruption"
+msgstr "Unplanned Observation: test lighting interruption"
+
+#: resources/cases/test_case_02.tres:102
+msgid "Without lighting: an eight-second crossing pause with a paw on a ribbed panel, then renewed wall tracing. Contact was maintained through the pause."
+msgstr "Without lighting: an eight-second crossing pause with a paw on a ribbed panel, then renewed wall tracing. Contact was maintained through the pause."
+
+#: resources/cases/test_case_02.tres:109
+msgid "TEST CCTV OBSERVATION - LIGHTING INTERRUPTION"
+msgstr "TEST CCTV OBSERVATION - LIGHTING INTERRUPTION"
+
+#: resources/cases/test_case_02.tres:110
+msgid "TEST follow-up over two minutes without lighting: fewer room crossings occur, but tracing still follows the shallow ribs. Vent start/stop still prompts turns toward the outlet. The initial pause is not a lasting loss of these responses."
+msgstr "TEST follow-up over two minutes without lighting: fewer room crossings occur, but tracing still follows the shallow ribs. Vent start/stop still prompts turns toward the outlet. The initial pause is not a lasting loss of these responses."
+
+#: resources/cases/test_case_02.tres:117
+msgid "Test CCTV follow-up: lighting interruption"
+msgstr "Test CCTV follow-up: lighting interruption"
+
+#: resources/cases/test_case_02.tres:118
+msgid "Without lighting over two minutes: fewer crossings, yet rib tracing and turns at vent transitions continued. The initial pause did not persist as a loss of those responses."
+msgstr "Without lighting over two minutes: fewer crossings, yet rib tracing and turns at vent transitions continued. The initial pause did not persist as a loss of those responses."
+
+#: resources/cases/test_case_02.tres:125
+msgid "TEST EXPERIMENT OBSERVATION - LIGHTING INTERRUPTION"
+msgstr "TEST EXPERIMENT OBSERVATION - LIGHTING INTERRUPTION"
+
+#: resources/cases/test_case_02.tres:126
+msgid "TEST supporting result without lighting: the same air pulse still prompts a pivot toward the nozzle, but the first step starts later than in the lit trial. Wall tracing resumes. The delay alone does not explain wall searching."
+msgstr "TEST supporting result without lighting: the same air pulse still prompts a pivot toward the nozzle, but the first step starts later than in the lit trial. Wall tracing resumes. The delay alone does not explain wall searching."
+
+#: resources/cases/test_case_02.tres:133
+msgid "Condition Observation: test experiment 01 under lighting interruption"
+msgstr "Condition Observation: test experiment 01 under lighting interruption"
+
+#: resources/cases/test_case_02.tres:134
+msgid "Without lighting, an air pulse still caused a nozzle-directed pivot with a later first step than the lit reference. Wall tracing resumed; onset delay alone did not explain wall searching."
+msgstr "Without lighting, an air pulse still caused a nozzle-directed pivot with a later first step than the lit reference. Wall tracing resumed; onset delay alone did not explain wall searching."
+
+#: resources/cases/test_case_02.tres:139
+msgid "TEST playback: wall tracing follows the available ribs under steady airflow."
+msgstr "TEST playback: wall tracing follows the available ribs under steady airflow."
+
+#: resources/cases/test_case_02.tres:144
+msgid "TEST playback: repeated passes return to the same wall path; grille-directed searching is infrequent."
+msgstr "TEST playback: repeated passes return to the same wall path; grille-directed searching is infrequent."
+
+#: resources/cases/test_case_02.tres:149
+msgid "TEST playback: contact pressure remains unchanged; the service air-line stays steady during this sample."
+msgstr "TEST playback: contact pressure remains unchanged; the service air-line stays steady during this sample."
+
+#: resources/cases/test_case_02.tres:160
+msgid "TEST playback: sideways searching repeatedly reaches the service grille."
+msgstr "TEST playback: sideways searching repeatedly reaches the service grille."
+
+#: resources/cases/test_case_02.tres:165
+msgid "TEST playback: vent transitions repeatedly redirect the search toward the grille; wall tracing does not settle."
+msgstr "TEST playback: vent transitions repeatedly redirect the search toward the grille; wall tracing does not settle."
+
+#: resources/cases/test_case_02.tres:170
+msgid "TEST playback: grille contact coincides with short discharges from the service air-line; no damage is recorded."
+msgstr "TEST playback: grille contact coincides with short discharges from the service air-line; no damage is recorded."
+
+#: resources/cases/test_case_02.tres:182
+msgid "TEST SERVICE AIR-LINE PULSES"
+msgstr "TEST SERVICE AIR-LINE PULSES"
+
+#: resources/cases/test_case_02.tres:183
+msgid "Short air jets are discharging from the facility service line. Main ventilation continues at its previous setting."
+msgstr "Short air jets are discharging from the facility service line. Main ventilation continues at its previous setting."
+
+#: resources/cases/test_case_02.tres:184
+msgid "SERVICE AIR-LINE: STEADY -> INTERMITTENT LOCAL JETS"
+msgstr "SERVICE AIR-LINE: STEADY -> INTERMITTENT LOCAL JETS"
+
+#: resources/cases/test_case_02.tres:189
+msgid "TEST SERVICE-GRILLE SEARCH INCIDENT"
+msgstr "TEST SERVICE-GRILLE SEARCH INCIDENT"
+
+#: resources/cases/test_case_02.tres:190
+msgid "TEST observation: repeated sideways searches reach the service grille. Contact there coincides with short service air-line discharges, which redirect the next search toward the outlet. Contact pressure remains unchanged; wall tracing has not settled into a repeated path."
+msgstr "TEST observation: repeated sideways searches reach the service grille. Contact there coincides with short service air-line discharges, which redirect the next search toward the outlet. Contact pressure remains unchanged; wall tracing has not settled into a repeated path."
+
+#: resources/cases/test_case_02.tres:197
+msgid "TEST CONTINUOUS-GUIDE OBSERVATION"
+msgstr "TEST CONTINUOUS-GUIDE OBSERVATION"
+
+#: resources/cases/test_case_02.tres:198
+msgid "A temporary shallow-ribbed guide restores a repeated tracing path. Grille-directed searches become less frequent, but each remaining service air jet still prompts an outlet-directed turn. The air-line cue remains unresolved."
+msgstr "A temporary shallow-ribbed guide restores a repeated tracing path. Grille-directed searches become less frequent, but each remaining service air jet still prompts an outlet-directed turn. The air-line cue remains unresolved."
+
+#: resources/cases/test_case_02.tres:203
+msgid "TEST SERVICE-LINE ISOLATION OBSERVATION"
+msgstr "TEST SERVICE-LINE ISOLATION OBSERVATION"
+
+#: resources/cases/test_case_02.tres:204
+msgid "Local service air jets stop after isolating that line; the associated outlet turns cease. Sideways wall searches continue to reach the grille. Airflow redirection was removed, but a repeatable contact guide is still absent."
+msgstr "Local service air jets stop after isolating that line; the associated outlet turns cease. Sideways wall searches continue to reach the grille. Airflow redirection was removed, but a repeatable contact guide is still absent."
+
+#: resources/cases/test_case_02.tres:209
+msgid "TEST SOUND-REDUCTION OBSERVATION"
+msgstr "TEST SOUND-REDUCTION OBSERVATION"
+
+#: resources/cases/test_case_02.tres:210
+msgid "Fan sound is reduced while the wall surface and service line remain unchanged. Sideways searches and turns following local air jets continue. Quieter machinery does not restore a repeated wall path or remove the air cue."
+msgstr "Fan sound is reduced while the wall surface and service line remain unchanged. Sideways searches and turns following local air jets continue. Quieter machinery does not restore a repeated wall path or remove the air cue."
+
+#: resources/cases/test_case_02.tres:215
+msgid "Add a temporary continuous shallow-ribbed contact guide. Prioritizes the repeated tracing path seen in the surface trial, but leaves service air jets active."
+msgstr "Add a temporary continuous shallow-ribbed contact guide. Prioritizes the repeated tracing path seen in the surface trial, but leaves service air jets active."
+
+#: resources/cases/test_case_02.tres:221
+msgid "Isolate the pulsing service air-line while keeping main ventilation and wall surface unchanged. Removes the directional air cue, but leaves sideways contact searching unresolved."
+msgstr "Isolate the pulsing service air-line while keeping main ventilation and wall surface unchanged. Removes the directional air cue, but leaves sideways contact searching unresolved."
+
+#: resources/cases/test_case_02.tres:227
+msgid "Reduce airborne fan sound while retaining the wall surface and service air-line. Limits sound exposure, although the sound-only trial showed no consistent pivot and actual air jets remain."
+msgstr "Reduce airborne fan sound while retaining the wall surface and service air-line. Limits sound exposure, although the sound-only trial showed no consistent pivot and actual air jets remain."
+
+#: resources/cases/test_case_02.tres:233
+msgid "TEST RESPONSE: WALL SEARCH AND SERVICE AIR"
+msgstr "TEST RESPONSE: WALL SEARCH AND SERVICE AIR"
+
+#: resources/cases/test_case_02.tres:234
+msgid "The surface trial linked ribs with a repeated wall path and smooth panels with grille-directed searches. Air pulses prompted pivots; fan sound alone did not. Choose a temporary response to the current search and air-line cues. These observations do not establish a long-term containment solution."
+msgstr "The surface trial linked ribs with a repeated wall path and smooth panels with grille-directed searches. Air pulses prompted pivots; fan sound alone did not. Choose a temporary response to the current search and air-line cues. These observations do not establish a long-term containment solution."
+
+#: resources/cases/test_case_02.tres:242
+msgid "Test Case 02: tracing paths and service-grille searches"
+msgstr "Test Case 02: tracing paths and service-grille searches"
+
+#: resources/cases/test_case_02.tres:243
+msgid "Rib tracing resumed after vent turns. Smooth patches prompted repeated sideways searches toward the service grille; vent cycling restarted those searches. No new damage was observed."
+msgstr "Rib tracing resumed after vent turns. Smooth patches prompted repeated sideways searches toward the service grille; vent cycling restarted those searches. No new damage was observed."
+
+#: resources/cases/test_case_02.tres:250
+msgid "Test Case 02 experiment 02: repeated surface passes"
+msgstr "Test Case 02 experiment 02: repeated surface passes"
+
+#: resources/cases/test_case_02.tres:251
+msgid "Under matched airflow and lighting, rib tracks returned to the same path while smooth-panel searches repeatedly reached the service grille. Pressure did not increase. Continuous versus cycling airflow was not compared."
+msgstr "Under matched airflow and lighting, rib tracks returned to the same path while smooth-panel searches repeatedly reached the service grille. Pressure did not increase. Continuous versus cycling airflow was not compared."
+
+#: resources/cases/test_case_02.tres:258
+msgid "Test Case 02 room 02 submission"
+msgstr "Test Case 02 room 02 submission"
+
+#: resources/cases/test_case_02.tres:259
+msgid "Submitted configuration: start/stop airflow, smooth panels without purchase points and reduced task lighting. This record describes the submission and does not report its outcome."
+msgstr "Submitted configuration: start/stop airflow, smooth panels without purchase points and reduced task lighting. This record describes the submission and does not report its outcome."
+
+#: resources/cases/test_case_02.tres:266
+msgid "Test service-grille search incident"
+msgstr "Test service-grille search incident"
+
+#: resources/cases/test_case_02.tres:267
+msgid "Sideways searches repeatedly reached the service grille. Contact coincided with short service air-line discharges and outlet-directed turns. Pressure stayed unchanged; tracing had not settled."
+msgstr "Sideways searches repeatedly reached the service grille. Contact coincided with short service air-line discharges and outlet-directed turns. Pressure stayed unchanged; tracing had not settled."
+
+#: resources/cases/test_case_02.tres:274
+msgid "Test emergency response: contact guide or air cue"
+msgstr "Test emergency response: contact guide or air cue"
+
+#: resources/cases/test_case_02.tres:275
+msgid "Temporary responses compare a repeated contact path, isolation of local service air jets and airborne fan-sound reduction. Surface and air-versus-sound trials provide the relevant observations; no long-term solution is established."
+msgstr "Temporary responses compare a repeated contact path, isolation of local service air jets and airborne fan-sound reduction. Surface and air-versus-sound trials provide the relevant observations; no long-term solution is established."
+
+#: resources/cases/test_case_02.tres:282
+msgid "Test response recorded: temporary contact guide"
+msgstr "Test response recorded: temporary contact guide"
+
+#: resources/cases/test_case_02.tres:283
+msgid "Added a continuous shallow-ribbed guide to support a repeated tracing path. Service air jets were left active, so the airflow cue remained to be observed."
+msgstr "Added a continuous shallow-ribbed guide to support a repeated tracing path. Service air jets were left active, so the airflow cue remained to be observed."
+
+#: resources/cases/test_case_02.tres:290
+msgid "Test response recorded: service-line isolation"
+msgstr "Test response recorded: service-line isolation"
+
+#: resources/cases/test_case_02.tres:291
+msgid "Isolated the pulsing service air-line without changing main ventilation or wall surface. This targeted air-directed turns rather than the repeated contact search."
+msgstr "Isolated the pulsing service air-line without changing main ventilation or wall surface. This targeted air-directed turns rather than the repeated contact search."
+
+#: resources/cases/test_case_02.tres:298
+msgid "Test response recorded: fan-sound reduction"
+msgstr "Test response recorded: fan-sound reduction"
+
+#: resources/cases/test_case_02.tres:299
+msgid "Reduced airborne fan sound while retaining surface and service air cues. The earlier sound-only trial had not produced a consistent pivot."
+msgstr "Reduced airborne fan sound while retaining surface and service air cues. The earlier sound-only trial had not produced a consistent pivot."
+
+#: resources/cases/test_case_02.tres:306
+msgid "Test guide response: repeated tracing with remaining air turns"
+msgstr "Test guide response: repeated tracing with remaining air turns"
+
+#: resources/cases/test_case_02.tres:307
+msgid "Tracing followed the temporary guide and grille searches decreased. Remaining air jets still prompted outlet turns; the air-line cue remained unresolved."
+msgstr "Tracing followed the temporary guide and grille searches decreased. Remaining air jets still prompted outlet turns; the air-line cue remained unresolved."
+
+#: resources/cases/test_case_02.tres:314
+msgid "Test isolation response: air turns stop, wall searching remains"
+msgstr "Test isolation response: air turns stop, wall searching remains"
+
+#: resources/cases/test_case_02.tres:315
+msgid "Service jets and their associated outlet turns ceased. Sideways wall searches still reached the grille, leaving the absent repeated contact guide unresolved."
+msgstr "Service jets and their associated outlet turns ceased. Sideways wall searches still reached the grille, leaving the absent repeated contact guide unresolved."
+
+#: resources/cases/test_case_02.tres:322
+msgid "Test sound response: searching and air turns persist"
+msgstr "Test sound response: searching and air turns persist"
+
+#: resources/cases/test_case_02.tres:323
+msgid "Lower fan sound did not stop sideways searches or air-jet turns. Neither the repeated wall path nor the air cue was changed."
+msgstr "Lower fan sound did not stop sideways searches or air-jet turns. Neither the repeated wall path nor the air cue was changed."
+
+#: resources/cases/test_case_02.tres:328
+msgid "TEST CASE 02"
+msgstr "TEST CASE 02"
+
+#: resources/cases/test_case_03.tres:14
+msgid "TEST SUBJECT CASE 03"
+msgstr "TEST SUBJECT CASE 03"
+
+#: resources/cases/test_case_03.tres:15
+msgid "TEST CLASSIFICATION CASE 03"
+msgstr "TEST CLASSIFICATION CASE 03"
+
+#: resources/cases/test_case_03.tres:16
+msgid "TEST: follows contrasting floor strips; short pauses occur at gaps."
+msgstr "TEST: follows contrasting floor strips; short pauses occur at gaps."
+
+#: resources/cases/test_case_03.tres:21
+msgid "TEST: travel follows a contrasting floor strip. At a gap the subject pauses and turns, then returns to the visible strip. Lighting and airflow are steady in this sample."
+msgstr "TEST: travel follows a contrasting floor strip. At a gap the subject pauses and turns, then returns to the visible strip. Lighting and airflow are steady in this sample."
+
+#: resources/cases/test_case_03.tres:26
+msgid "TEST CASE 03 CONTRAST COMPARISON"
+msgstr "TEST CASE 03 CONTRAST COMPARISON"
+
+#: resources/cases/test_case_03.tres:27
+msgid "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged."
+msgstr "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged."
+
+#: resources/cases/test_case_03.tres:28
+msgid "Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+msgstr "Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+
+#: resources/cases/test_case_03.tres:33
+msgid "TEST CASE 03 GAP COMPARISON"
+msgstr "TEST CASE 03 GAP COMPARISON"
+
+#: resources/cases/test_case_03.tres:34
+msgid "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged."
+msgstr "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged."
+
+#: resources/cases/test_case_03.tres:35
+msgid "Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+msgstr "Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+
+#: resources/cases/test_case_03.tres:40
+msgid "TEST CASE 03 ROOM 01"
+msgstr "TEST CASE 03 ROOM 01"
+
+#: resources/cases/test_case_03.tres:41
+msgid "TEST configuration: continuous contrasting floor strip, ordinary task lighting and steady airflow."
+msgstr "TEST configuration: continuous contrasting floor strip, ordinary task lighting and steady airflow."
+
+#: resources/cases/test_case_03.tres:46
+msgid "TEST CASE 03 ROOM 02"
+msgstr "TEST CASE 03 ROOM 02"
+
+#: resources/cases/test_case_03.tres:47
+msgid "TEST configuration: interrupted floor strips, reduced task lighting and steady airflow."
+msgstr "TEST configuration: interrupted floor strips, reduced task lighting and steady airflow."
+
+#: resources/cases/test_case_03.tres:53
+msgid "TEST CASE 03 OBSERVATION - LOCAL AIR JETS"
+msgstr "TEST CASE 03 OBSERVATION - LOCAL AIR JETS"
+
+#: resources/cases/test_case_03.tres:54
+msgid "TEST: a short service air jet prompts a turn away from the floor strip. The subject then returns to the visible strip; pauses at existing gaps continue."
+msgstr "TEST: a short service air jet prompts a turn away from the floor strip. The subject then returns to the visible strip; pauses at existing gaps continue."
+
+#: resources/cases/test_case_03.tres:61
+msgid "Test Case 03 intake: contrasting floor strips"
+msgstr "Test Case 03 intake: contrasting floor strips"
+
+#: resources/cases/test_case_03.tres:62
+msgid "Intake records strip following and pauses at gaps. Responses to lighting changes have not been compared."
+msgstr "Intake records strip following and pauses at gaps. Responses to lighting changes have not been compared."
+
+#: resources/cases/test_case_03.tres:69
+msgid "Test Case 03 camera: following and returning to a strip"
+msgstr "Test Case 03 camera: following and returning to a strip"
+
+#: resources/cases/test_case_03.tres:70
+msgid "Under steady lighting and airflow, travel followed the contrasting strip. Gaps prompted pauses and turns before returning to a visible strip."
+msgstr "Under steady lighting and airflow, travel followed the contrasting strip. Gaps prompted pauses and turns before returning to a visible strip."
+
+#: resources/cases/test_case_03.tres:77
+msgid "Test Case 03 experiment: floor-strip contrast"
+msgstr "Test Case 03 experiment: floor-strip contrast"
+
+#: resources/cases/test_case_03.tres:78
+msgid "With texture, lighting and airflow held unchanged, contrasting strips were followed for more of each pass. Low-contrast strips prompted recurring pauses and turns. Long-term containment was not tested."
+msgstr "With texture, lighting and airflow held unchanged, contrasting strips were followed for more of each pass. Low-contrast strips prompted recurring pauses and turns. Long-term containment was not tested."
+
+#: resources/cases/test_case_03.tres:85
+msgid "Test Case 03 experiment: floor-strip gaps"
+msgstr "Test Case 03 experiment: floor-strip gaps"
+
+#: resources/cases/test_case_03.tres:86
+msgid "Continuous strips supported longer uninterrupted passes. Gaps prompted pauses and turns before another visible strip was found. Responses to lighting changes were not compared."
+msgstr "Continuous strips supported longer uninterrupted passes. Gaps prompted pauses and turns before another visible strip was found. Responses to lighting changes were not compared."
+
+#: resources/cases/test_case_03.tres:93
+msgid "Test Case 03 room 01 submission"
+msgstr "Test Case 03 room 01 submission"
+
+#: resources/cases/test_case_03.tres:94
+msgid "Recorded a continuous contrasting floor strip with ordinary lighting and steady airflow. This record reports no outcome."
+msgstr "Recorded a continuous contrasting floor strip with ordinary lighting and steady airflow. This record reports no outcome."
+
+#: resources/cases/test_case_03.tres:101
+msgid "Test Case 03 room 02 submission"
+msgstr "Test Case 03 room 02 submission"
+
+#: resources/cases/test_case_03.tres:102
+msgid "Recorded interrupted floor strips with reduced lighting and steady airflow. This record reports no outcome."
+msgstr "Recorded interrupted floor strips with reduced lighting and steady airflow. This record reports no outcome."
+
+#: resources/cases/test_case_03.tres:109
+msgid "Test Case 03 observation: local service air jet"
+msgstr "Test Case 03 observation: local service air jet"
+
+#: resources/cases/test_case_03.tres:110
+msgid "A short local jet prompted a turn away from the floor strip, followed by a return to it. Pauses at existing gaps continued. This is a current-subject observation, separate from the source incident."
+msgstr "A short local jet prompted a turn away from the floor strip, followed by a return to it. Pauses at existing gaps continued. This is a current-subject observation, separate from the source incident."
+
+#: resources/cases/test_case_03.tres:115
+msgid "TEST CASE 03"
+msgstr "TEST CASE 03"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:16
+msgid "TEMP: SUPPORT CONTROL INTERRUPTION"
+msgstr "TEMP: SUPPORT CONTROL INTERRUPTION"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:17
+msgid "Maintenance control fault: a service bypass is transmitting pump impulses into the supports of TEST SUBJECT (TEST_CASE_01). Strikes coincide with pump starts; airflow is steady. Staff await an immediate broadcast instruction. Review the earlier research records to distinguish support, sound and airflow cues."
+msgstr "Maintenance control fault: a service bypass is transmitting pump impulses into the supports of TEST SUBJECT (TEST_CASE_01). Strikes coincide with pump starts; airflow is steady. Staff await an immediate broadcast instruction. Review the earlier research records to distinguish support, sound and airflow cues."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:23
+msgid "Disconnect the maintenance bypass and restore mechanical isolation of the supports. Keep low airflow continuous and retain task lighting."
+msgstr "Disconnect the maintenance bypass and restore mechanical isolation of the supports. Keep low airflow continuous and retain task lighting."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:29
+msgid "Reduce airborne pump noise with the acoustic partition. Keep the bypass connected, low airflow continuous and task lighting unchanged."
+msgstr "Reduce airborne pump noise with the acoustic partition. Keep the bypass connected, low airflow continuous and task lighting unchanged."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:35
+msgid "Cycle ventilation to draw movement away from the service panel. Keep the bypass connected and task lighting unchanged."
+msgstr "Cycle ventilation to draw movement away from the service panel. Keep the bypass connected and task lighting unchanged."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:41
+msgid "Reduce task lighting to limit crossings near the panel. Keep the bypass connected and low airflow continuous."
+msgstr "Reduce task lighting to limit crossings near the panel. Keep the bypass connected and low airflow continuous."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:47
+msgid "TEMP: IMMEDIATE SUPPORT RESPONSE"
+msgstr "TEMP: IMMEDIATE SUPPORT RESPONSE"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:48
+msgid "Which instruction should staff follow while pump-start strikes continue? Address the current support fault using the earlier observations. This instruction is a temporary response, not a new containment decision."
+msgstr "Which instruction should staff follow while pump-start strikes continue? Address the current support fault using the earlier observations. This instruction is a temporary response, not a new containment decision."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:54
+msgid "TEMP: SUPPORT TRANSMISSION CONTROLLED"
+msgstr "TEMP: SUPPORT TRANSMISSION CONTROLLED"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:55
+msgid "The bypass was disconnected and support isolation restored. Pump-start strikes became less frequent; wall tracing continues under steady airflow. Staff hold this protocol while maintenance checks the fault. The immediate support disturbance is controlled; long-term containment is not reassessed here."
+msgstr "The bypass was disconnected and support isolation restored. Pump-start strikes became less frequent; wall tracing continues under steady airflow. Staff hold this protocol while maintenance checks the fault. The immediate support disturbance is controlled; long-term containment is not reassessed here."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:60
+msgid "TEMP: QUIETER SOUND, PERSISTENT STRIKES"
+msgstr "TEMP: QUIETER SOUND, PERSISTENT STRIKES"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:61
+msgid "Airborne pump noise was reduced, but the bypass still transmits impulses. Strikes remain clustered at pump starts. Staff withdraw the noise-only instruction and request support isolation; steady airflow is retained. The selected instruction did not address the current fault."
+msgstr "Airborne pump noise was reduced, but the bypass still transmits impulses. Strikes remain clustered at pump starts. Staff withdraw the noise-only instruction and request support isolation; steady airflow is retained. The selected instruction did not address the current fault."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:66
+msgid "TEMP: ADDED OUTLET TURN-BACKS"
+msgstr "TEMP: ADDED OUTLET TURN-BACKS"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:67
+msgid "Vent cycling prompted repeated turn-backs toward the outlet while pump-start strikes continued. Staff cancel the cycling instruction, restore steady airflow and request support isolation. The selected instruction added an airflow cue without removing transmitted impulses."
+msgstr "Vent cycling prompted repeated turn-backs toward the outlet while pump-start strikes continued. Staff cancel the cycling instruction, restore steady airflow and request support isolation. The selected instruction added an airflow cue without removing transmitted impulses."
+
+#: resources/incidents/temp_mandatory_incident_01.tres:72
+msgid "TEMP: FEWER CROSSINGS, UNRESOLVED SUPPORT FAULT"
+msgstr "TEMP: FEWER CROSSINGS, UNRESOLVED SUPPORT FAULT"
+
+#: resources/incidents/temp_mandatory_incident_01.tres:73
+msgid "Reduced lighting changed crossing movements, but pump-start strikes persisted through the connected bypass. Staff restore task lighting and request support isolation. The selected instruction changed travel without addressing the support fault."
+msgstr "Reduced lighting changed crossing movements, but pump-start strikes persisted through the connected bypass. Staff restore task lighting and request support isolation. The selected instruction changed travel without addressing the support fault."
+
+#: resources/incidents/temp_midcase_incident_01.tres:16
+msgid "[TEMP STORY CONTENT] ROUTE PROJECTOR RESET"
+msgstr "[TEMP STORY CONTENT] ROUTE PROJECTOR RESET"
+
+#: resources/incidents/temp_midcase_incident_01.tres:17
+msgid "[TEMP STORY CONTENT] The facility guidance projector beside CASE03's work area is repeatedly resetting. Its projected floor strip now has dark gaps. The maintenance panel reports stable task lighting and ventilation; a continuous passive backup strip is available. CASE03's intake records following contrasting floor strips with pauses at gaps. Its initial CCTV shows pauses and turns at a gap, then a return to the visible strip under steady lighting and airflow. Staff need an immediate instruction for the guidance equipment fault before routine experiments continue. This equipment fault is independent of any containment decision."
+msgstr "[TEMP STORY CONTENT] The facility guidance projector beside CASE03's work area is repeatedly resetting. Its projected floor strip now has dark gaps. The maintenance panel reports stable task lighting and ventilation; a continuous passive backup strip is available. CASE03's intake records following contrasting floor strips with pauses at gaps. Its initial CCTV shows pauses and turns at a gap, then a return to the visible strip under steady lighting and airflow. Staff need an immediate instruction for the guidance equipment fault before routine experiments continue. This equipment fault is independent of any containment decision."
+
+#: resources/incidents/temp_midcase_incident_01.tres:23
+msgid "[TEMP STORY CONTENT] Isolate the resetting projector and use the continuous contrasting backup strip. Keep task lighting and airflow steady."
+msgstr "[TEMP STORY CONTENT] Isolate the resetting projector and use the continuous contrasting backup strip. Keep task lighting and airflow steady."
+
+#: resources/incidents/temp_midcase_incident_01.tres:29
+msgid "[TEMP STORY CONTENT] Repeat audible route instructions. Leave the resetting projector and its interrupted strip active, with lighting and airflow unchanged."
+msgstr "[TEMP STORY CONTENT] Repeat audible route instructions. Leave the resetting projector and its interrupted strip active, with lighting and airflow unchanged."
+
+#: resources/incidents/temp_midcase_incident_01.tres:35
+msgid "[TEMP STORY CONTENT] Turn off task lighting to conceal the strip gaps. Leave the resetting projector active and airflow steady."
+msgstr "[TEMP STORY CONTENT] Turn off task lighting to conceal the strip gaps. Leave the resetting projector active and airflow steady."
+
+#: resources/incidents/temp_midcase_incident_01.tres:41
+msgid "[TEMP STORY CONTENT] Pulse ventilation to redirect movement across the gaps. Leave the resetting projector active and task lighting unchanged."
+msgstr "[TEMP STORY CONTENT] Pulse ventilation to redirect movement across the gaps. Leave the resetting projector active and task lighting unchanged."
+
+#: resources/incidents/temp_midcase_incident_01.tres:47
+msgid "[TEMP STORY CONTENT] GUIDANCE EQUIPMENT RESPONSE"
+msgstr "[TEMP STORY CONTENT] GUIDANCE EQUIPMENT RESPONSE"
+
+#: resources/incidents/temp_midcase_incident_01.tres:48
+msgid "[TEMP STORY CONTENT] Which instruction addresses the resetting floor-guidance equipment using CASE03's intake, initial CCTV and the maintenance report above? No experiment result is required. Preserve the observed steady lighting and airflow while addressing the interrupted visual route."
+msgstr "[TEMP STORY CONTENT] Which instruction addresses the resetting floor-guidance equipment using CASE03's intake, initial CCTV and the maintenance report above? No experiment result is required. Preserve the observed steady lighting and airflow while addressing the interrupted visual route."
+
+#: resources/incidents/temp_midcase_incident_01.tres:54
+msgid "[TEMP STORY CONTENT] CONTINUOUS BACKUP ROUTE"
+msgstr "[TEMP STORY CONTENT] CONTINUOUS BACKUP ROUTE"
+
+#: resources/incidents/temp_midcase_incident_01.tres:55
+msgid "[TEMP STORY CONTENT] Staff isolated the resetting projector and installed the continuous contrasting backup strip. The equipment no longer introduces dark gaps; task lighting and airflow remain steady. This addresses the reported guidance fault using the strip-following observations. It does not establish long-term containment or complete an experiment. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[TEMP STORY CONTENT] Staff isolated the resetting projector and installed the continuous contrasting backup strip. The equipment no longer introduces dark gaps; task lighting and airflow remain steady. This addresses the reported guidance fault using the strip-following observations. It does not establish long-term containment or complete an experiment. RESUME WORK returns to the same CASE03 experiment screen."
+
+#: resources/incidents/temp_midcase_incident_01.tres:60
+msgid "[TEMP STORY CONTENT] ANNOUNCEMENT, GAPS REMAIN"
+msgstr "[TEMP STORY CONTENT] ANNOUNCEMENT, GAPS REMAIN"
+
+#: resources/incidents/temp_midcase_incident_01.tres:61
+msgid "[TEMP STORY CONTENT] Staff repeated the audible instruction, but the projector continued resetting and the visual route still had gaps. The supplied observations support strip following, not following spoken directions. Staff withdrew the announcement-only response and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[TEMP STORY CONTENT] Staff repeated the audible instruction, but the projector continued resetting and the visual route still had gaps. The supplied observations support strip following, not following spoken directions. Staff withdrew the announcement-only response and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+#: resources/incidents/temp_midcase_incident_01.tres:66
+msgid "[TEMP STORY CONTENT] VISIBILITY LOST, RESET UNRESOLVED"
+msgstr "[TEMP STORY CONTENT] VISIBILITY LOST, RESET UNRESOLVED"
+
+#: resources/incidents/temp_midcase_incident_01.tres:67
+msgid "[TEMP STORY CONTENT] Staff switched off task lighting. This removed the steady lighting used in the initial observation and made the contrasting route harder to inspect; it did not stop the projector resets. No supplied observation established a benefit from darkness. Staff restored task lighting and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[TEMP STORY CONTENT] Staff switched off task lighting. This removed the steady lighting used in the initial observation and made the contrasting route harder to inspect; it did not stop the projector resets. No supplied observation established a benefit from darkness. Staff restored task lighting and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+#: resources/incidents/temp_midcase_incident_01.tres:72
+msgid "[TEMP STORY CONTENT] AIRFLOW CHANGED, GAPS REMAIN"
+msgstr "[TEMP STORY CONTENT] AIRFLOW CHANGED, GAPS REMAIN"
+
+#: resources/incidents/temp_midcase_incident_01.tres:73
+msgid "[TEMP STORY CONTENT] Staff pulsed ventilation, but the projector kept resetting and the visual gaps remained. This changed a previously steady condition without addressing the equipment fault; the supplied intake and initial CCTV did not establish airflow as a route instruction. Staff restored steady airflow and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+msgstr "[TEMP STORY CONTENT] Staff pulsed ventilation, but the projector kept resetting and the visual gaps remained. This changed a previously steady condition without addressing the equipment fault; the supplied intake and initial CCTV did not establish airflow as a route instruction. Staff restored steady airflow and isolated the projector for manual maintenance. No Case verdict or experiment result is assigned. RESUME WORK returns to the same CASE03 experiment screen."
+
+#: scenes/main/main.tscn:78
+msgid "FACILITY / OPERATIONS"
+msgstr "FACILITY / OPERATIONS"
+
+#: scenes/main/main.tscn:134 scenes/views/profile_view.tscn:39
+msgid "PROFILE"
+msgstr "PROFILE"
+
+msgid "Profile"
+msgstr "Profile"
+
+#: scenes/main/main.tscn:140 scenes/views/cctv_view.tscn:41
+msgid "CCTV"
+msgstr "CCTV"
+
+#: scenes/main/main.tscn:146 scenes/views/experiment_view.tscn:41
+msgid "EXPERIMENT"
+msgstr "EXPERIMENT"
+
+msgid "Experiment"
+msgstr "Experiment"
+
+#: scenes/main/main.tscn:152 scenes/views/containment_view.tscn:41
+msgid "CONTAINMENT"
+msgstr "CONTAINMENT"
+
+msgid "Containment"
+msgstr "Containment"
+
+#: scenes/main/main.tscn:158
+msgid "STAGE INDEX\nProgress follows work actions."
+msgstr "STAGE INDEX\nProgress follows work actions."
+
+#: scenes/main/main.tscn:197
+msgid "R"
+msgstr "R"
+
+#: scenes/main/main.tscn:204
+msgid "A"
+msgstr "A"
+
+#: scenes/main/main.tscn:211
+msgid "N"
+msgstr "N"
+
+#: scenes/main/main.tscn:198 scenes/views/broadcast_view.tscn:147 scenes/views/cctv_view.tscn:158 scenes/views/containment_view.tscn:108 scenes/views/experiment_view.tscn:175 scenes/views/incident_result_view.tscn:139 scenes/views/incident_view.tscn:144 scenes/views/monitoring_view.tscn:88 scenes/views/profile_view.tscn:171 scenes/views/research_archive_detail_view.tscn:187 scenes/views/research_archive_list_view.tscn:140 scenes/views/research_log_view.tscn:39 scenes/views/result_view.tscn:139
+msgid "RESEARCH LOG"
+msgstr "RESEARCH LOG"
+
+msgid "RESEARCH_LOG"
+msgstr "RESEARCH_LOG"
+
+#: scenes/main/main.tscn:205 scenes/views/research_archive_detail_view.tscn:39 scenes/views/research_archive_list_view.tscn:39 scenes/views/research_archive_list_view.tscn:119
+msgid "RESEARCH ARCHIVE"
+msgstr "RESEARCH ARCHIVE"
+
+msgid "RESEARCH ARCHIVE LIST"
+msgstr "RESEARCH ARCHIVE LIST"
+
+msgid "RESEARCH ARCHIVE DETAIL"
+msgstr "RESEARCH ARCHIVE DETAIL"
+
+#: scenes/main/main.tscn:212
+msgid "WORKING HYPOTHESIS"
+msgstr "WORKING HYPOTHESIS"
+
+#: scenes/main/main.tscn:254
+msgid "SESSION MEMORY / NO PERSISTENT SAVE"
+msgstr "SESSION MEMORY / NO PERSISTENT SAVE"
+
+msgid "SESSION MEMORY"
+msgstr "SESSION MEMORY"
+
+msgid "NO PERSISTENT SAVE"
+msgstr "NO PERSISTENT SAVE"
+
+msgid "CONTAINMENT DECISION RECORDED"
+msgstr "CONTAINMENT DECISION RECORDED"
+
+#: scenes/ui/confirmation_modal.tscn:80
+msgid "Confirmation records this decision. The order cannot be changed."
+msgstr "Confirmation records this decision. The order cannot be changed."
+
+#: scenes/ui/confirmation_modal.tscn:94
+msgid "CANCEL"
+msgstr "CANCEL"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+#: scenes/ui/confirmation_modal.tscn:106 scenes/views/containment_view.tscn:120
+msgid "AUTHORIZE"
+msgstr "AUTHORIZE"
+
+msgid "AUTHORIZE CONTAINMENT"
+msgstr "AUTHORIZE CONTAINMENT"
+
+#: scenes/views/broadcast_view.tscn:39
+msgid "BROADCAST"
+msgstr "BROADCAST"
+
+msgid "Broadcast"
+msgstr "Broadcast"
+
+#: scenes/views/broadcast_view.tscn:118
+msgid "SELECT RESPONSE ORDER"
+msgstr "SELECT RESPONSE ORDER"
+
+#: scenes/views/broadcast_view.tscn:159
+msgid "CONFIRM ORDERS"
+msgstr "CONFIRM ORDERS"
+
+#: scenes/views/broadcast_view.tscn:166
+msgid "REVIEW RESPONSE"
+msgstr "REVIEW RESPONSE"
+
+#: scenes/views/cctv_view.tscn:73
+msgid "CAMERA 01"
+msgstr "CAMERA 01"
+
+msgid "CAMERA 01 / UPDATED"
+msgstr "CAMERA 01 / UPDATED"
+
+#: scenes/views/cctv_view.tscn:86
+msgid "LIVE OBSERVATION\nTEMP CAMERA PLACEHOLDER"
+msgstr "LIVE OBSERVATION\nTEMP CAMERA PLACEHOLDER"
+
+#: scenes/views/cctv_view.tscn:106
+msgid "OBSERVATION RECORD"
+msgstr "OBSERVATION RECORD"
+
+#: scenes/views/cctv_view.tscn:170 scenes/views/containment_view.tscn:127 scenes/views/experiment_view.tscn:187 scenes/views/monitoring_view.tscn:100
+msgid "CONTINUE"
+msgstr "CONTINUE"
+
+#: scenes/views/containment_view.tscn:89
+msgid "SELECT A ROOM"
+msgstr "SELECT A ROOM"
+
+#: scenes/views/containment_view.tscn:97 scenes/views/experiment_view.tscn:164
+msgid "RECHECK CCTV"
+msgstr "RECHECK CCTV"
+
+#: scenes/views/environmental_disturbance_notice.tscn:87
+msgid "UNPLANNED OBSERVATION"
+msgstr "UNPLANNED OBSERVATION"
+
+#: scenes/views/environmental_disturbance_notice.tscn:103
+msgid "ACKNOWLEDGE"
+msgstr "ACKNOWLEDGE"
+
+#: scenes/views/environment_conditions_view.tscn:13
+msgid "ACTIVE FACILITY CONDITION"
+msgstr "ACTIVE FACILITY CONDITION"
+
+#: scenes/views/experiment_view.tscn:109
+msgid "SELECT AN EXPERIMENT"
+msgstr "SELECT AN EXPERIMENT"
+
+#: scenes/views/experiment_view.tscn:140
+msgid "EXECUTION RECORD"
+msgstr "EXECUTION RECORD"
+
+#: scenes/views/experiment_view.tscn:195
+msgid "EXECUTE"
+msgstr "EXECUTE"
+
+#: scenes/views/incident_result_view.tscn:39
+msgid "INCIDENT RESULT"
+msgstr "INCIDENT RESULT"
+
+msgid "INCIDENT_RESULT"
+msgstr "INCIDENT_RESULT"
+
+msgid "Incident Result"
+msgstr "Incident Result"
+
+#: scenes/views/incident_result_view.tscn:126 scenes/views/incident_view.tscn:131
+msgid "Review recorded evidence before issuing orders."
+msgstr "Review recorded evidence before issuing orders."
+
+#: scenes/views/incident_result_view.tscn:151
+msgid "RESUME WORK"
+msgstr "RESUME WORK"
+
+#: scenes/views/incident_view.tscn:39
+msgid "INCIDENT"
+msgstr "INCIDENT"
+
+msgid "Incident"
+msgstr "Incident"
+
+#: scenes/views/incident_view.tscn:68
+msgid "FACILITY EVENT / TEMP IMAGE PLACEHOLDER"
+msgstr "FACILITY EVENT / TEMP IMAGE PLACEHOLDER"
+
+#: scenes/views/incident_view.tscn:156
+msgid "EMERGENCY RESPONSE"
+msgstr "EMERGENCY RESPONSE"
+
+#: scenes/views/monitoring_view.tscn:39
+msgid "MONITORING"
+msgstr "MONITORING"
+
+#: scenes/views/profile_view.tscn:69
+msgid "SUBJECT RECORD\nTEMP IMAGE PLACEHOLDER"
+msgstr "SUBJECT RECORD\nTEMP IMAGE PLACEHOLDER"
+
+#: scenes/views/profile_view.tscn:130
+msgid "RESEARCH RECORD"
+msgstr "RESEARCH RECORD"
+
+#: scenes/views/profile_view.tscn:183
+msgid "OPEN CCTV"
+msgstr "OPEN CCTV"
+
+#: scenes/views/research_archive_detail_view.tscn:95
+msgid "No research recorded."
+msgstr "No research recorded."
+
+#: scenes/views/research_archive_detail_view.tscn:119
+msgid "No notes recorded."
+msgstr "No notes recorded."
+
+#: scenes/views/research_archive_detail_view.tscn:167 scenes/views/research_log_view.tscn:108
+msgid "SELECT A RECORDED ENTRY"
+msgstr "SELECT A RECORDED ENTRY"
+
+#: scenes/views/research_archive_detail_view.tscn:199
+msgid "BACK"
+msgstr "BACK"
+
+#: scenes/views/research_archive_list_view.tscn:63
+msgid "No recorded Cases."
+msgstr "No recorded Cases."
+
+#: scenes/views/research_archive_list_view.tscn:95
+msgid "RECORDED ENTRIES"
+msgstr "RECORDED ENTRIES"
+
+#: scenes/views/research_archive_list_view.tscn:103
+msgid "Select a recorded Case."
+msgstr "Select a recorded Case."
+
+#: scenes/views/research_archive_list_view.tscn:127
+msgid "Read-only session records."
+msgstr "Read-only session records."
+
+#: scenes/views/research_archive_list_view.tscn:152
+msgid "BACK TO WORK"
+msgstr "BACK TO WORK"
+
+#: scenes/views/research_log_view.tscn:131
+msgid "Player notes. No evaluation."
+msgstr "Player notes. No evaluation."
+
+#: scenes/views/research_log_view.tscn:141
+msgid "Write your own working hypothesis."
+msgstr "Write your own working hypothesis."
+
+#: scenes/views/research_log_view.tscn:150
+msgid "ADD NOTE"
+msgstr "ADD NOTE"
+
+#: scenes/views/research_log_view.tscn:156
+msgid "CANCEL EDIT"
+msgstr "CANCEL EDIT"
+
+#: scenes/views/research_log_view.tscn:170
+msgid "No working hypotheses recorded."
+msgstr "No working hypotheses recorded."
+
+#: scenes/views/research_log_view.tscn:194
+msgid "OPEN RESEARCH ARCHIVE"
+msgstr "OPEN RESEARCH ARCHIVE"
+
+#: scenes/views/research_log_view.tscn:200
+msgid "CLOSE"
+msgstr "CLOSE"
+
+#: scenes/views/result_view.tscn:39
+msgid "RESULT"
+msgstr "RESULT"
+
+#: scenes/views/result_view.tscn:151
+msgid "RESTART"
+msgstr "RESTART"
+
+msgid "Window: %d × %d"
+msgstr "Window: %d × %d"
+
+msgid "Back: %s"
+msgstr "Back: %s"
+
+msgid "SOURCE ARCHIVE"
+msgstr "SOURCE ARCHIVE"
+
+msgid "SCRIPTED CAMPAIGN INCIDENT"
+msgstr "SCRIPTED CAMPAIGN INCIDENT"
+
+msgid "MAJOR CONTAINMENT INCIDENT"
+msgstr "MAJOR CONTAINMENT INCIDENT"
+
+msgid "CONTINUE CAMPAIGN"
+msgstr "CONTINUE CAMPAIGN"
+
+msgid "TRANSMITTED ORDERS\n%s"
+msgstr "TRANSMITTED ORDERS\n%s"
+
+msgid "TRANSMIT EMERGENCY ORDERS"
+msgstr "TRANSMIT EMERGENCY ORDERS"
+
+msgid "TRANSMIT"
+msgstr "TRANSMIT"
+
+msgid "FACILITY EVENT"
+msgstr "FACILITY EVENT"
+
+msgid "CAMPAIGN EVENT"
+msgstr "CAMPAIGN EVENT"
+
+msgid "CURRENT"
+msgstr "CURRENT"
+
+msgid "REVIEW"
+msgstr "REVIEW"
+
+msgid "UNLOCKED"
+msgstr "UNLOCKED"
+
+msgid "AVAILABLE"
+msgstr "AVAILABLE"
+
+msgid "LOCKED"
+msgstr "LOCKED"
+
+msgid "WORK"
+msgstr "WORK"
+
+msgid "PAUSED"
+msgstr "PAUSED"
+
+msgid "UTILITY / ARCHIVE"
+msgstr "UTILITY / ARCHIVE"
+
+msgid "NO ACTIVE RUN"
+msgstr "NO ACTIVE RUN"
+
+msgid "Next: CASE"
+msgstr "Next: CASE"
+
+msgid "Next: SCRIPTED INCIDENT"
+msgstr "Next: SCRIPTED INCIDENT"
+
+msgid "No next test case configured"
+msgstr "No next test case configured"
+
+msgid "No next Campaign entry configured"
+msgstr "No next Campaign entry configured"
+
+msgid "[Unavailable]"
+msgstr "[Unavailable]"
+
+msgid "[Unavailable Research Entry]"
+msgstr "[Unavailable Research Entry]"
+
+msgid "[Unavailable experiment ID]"
+msgstr "[Unavailable experiment ID]"
+
+msgid "[Missing display_name]"
+msgstr "[Missing display_name]"
+
+msgid "[Missing observation_text]"
+msgstr "[Missing observation_text]"
+
+msgid "No experiments available"
+msgstr "No experiments available"
+
+msgid "Available experiments: %d"
+msgstr "Available experiments: %d"
+
+msgid "Experiments Remaining: %d / %d"
+msgstr "Experiments Remaining: %d / %d"
+
+msgid "No experiment has been executed."
+msgstr "No experiment has been executed."
+
+msgid "No result selected. Review executed experiments in Research Log."
+msgstr "No result selected. Review executed experiments in Research Log."
+
+msgid "%s [Executed]"
+msgstr "%s [Executed]"
+
+msgid "%s [Confirmed]"
+msgstr "%s [Confirmed]"
+
+msgid "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s"
+msgstr "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s"
+
+msgid "No containment rooms available"
+msgstr "No containment rooms available"
+
+msgid "Available containment rooms: %d"
+msgstr "Available containment rooms: %d"
+
+msgid "Decision recorded."
+msgstr "Decision recorded."
+
+msgid "CCTV data unavailable"
+msgstr "CCTV data unavailable"
+
+msgid "No CCTVData was provided to this View."
+msgstr "No CCTVData was provided to this View."
+
+msgid "Profile data unavailable"
+msgstr "Profile data unavailable"
+
+msgid "No ProfileData was provided to this View."
+msgstr "No ProfileData was provided to this View."
+
+msgid "Incident data unavailable"
+msgstr "Incident data unavailable"
+
+msgid "No IncidentData was provided to this View."
+msgstr "No IncidentData was provided to this View."
+
+msgid "IncidentData has no valid incident_id."
+msgstr "IncidentData has no valid incident_id."
+
+msgid "Broadcast data unavailable"
+msgstr "Broadcast data unavailable"
+
+msgid "No EmergencyBroadcastData was provided to this View."
+msgstr "No EmergencyBroadcastData was provided to this View."
+
+msgid "EmergencyBroadcastData has no valid broadcast_id."
+msgstr "EmergencyBroadcastData has no valid broadcast_id."
+
+msgid "Incident result data unavailable"
+msgstr "Incident result data unavailable"
+
+msgid "No IncidentResultData was provided to this View."
+msgstr "No IncidentResultData was provided to this View."
+
+msgid "IncidentResultData has no valid result_id."
+msgstr "IncidentResultData has no valid result_id."
+
+msgid "Monitoring data unavailable"
+msgstr "Monitoring data unavailable"
+
+msgid "ROOM: unavailable"
+msgstr "ROOM: unavailable"
+
+msgid "ROOM: [Missing room_id]"
+msgstr "ROOM: [Missing room_id]"
+
+msgid "ROOM: %s"
+msgstr "ROOM: %s"
+
+msgid "Monitoring stages: %d"
+msgstr "Monitoring stages: %d"
+
+msgid "Monitoring sequence complete"
+msgstr "Monitoring sequence complete"
+
+msgid "Monitoring Result: SUCCESS"
+msgstr "Monitoring Result: SUCCESS"
+
+msgid "Monitoring Result: FAILURE"
+msgstr "Monitoring Result: FAILURE"
+
+msgid "Monitoring Result: UNDEFINED"
+msgstr "Monitoring Result: UNDEFINED"
+
+msgid "[%ds]"
+msgstr "[%ds]"
+
+msgid "Case: [Unavailable]"
+msgstr "Case: [Unavailable]"
+
+msgid "%s\nResearch: %d / Notes: %d"
+msgstr "%s\nResearch: %d / Notes: %d"
+
+msgid "Open"
+msgstr "Open"
+
+msgid "Unavailable"
+msgstr "Unavailable"
+
+msgid "ALL RECORDED CATEGORIES"
+msgstr "ALL RECORDED CATEGORIES"
+
+msgid "OBSERVATION"
+msgstr "OBSERVATION"
+
+msgid "CONDITION OBSERVATION"
+msgstr "CONDITION OBSERVATION"
+
+msgid "WORKING NOTE"
+msgstr "WORKING NOTE"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "Add Hypothesis"
+msgstr "Add Hypothesis"
+
+msgid "Update Hypothesis"
+msgstr "Update Hypothesis"
+
+msgid "%d / %d characters (trimmed)."
+msgstr "%d / %d characters (trimmed)."
+
+msgid "%d / %d characters (trimmed). Too long; note will not be saved."
+msgstr "%d / %d characters (trimmed). Too long; note will not be saved."
+
+msgid "Note was not saved. Check input or reopen the notebook."
+msgstr "Note was not saved. Check input or reopen the notebook."
+
+msgid "CAMPAIGN EVENT\nRESUME WORK\n%s - %s"
+msgstr "CAMPAIGN EVENT\nRESUME WORK\n%s - %s"
+
+msgid "FACILITY EVENT / CAMPAIGN EVENT\nCONTINUE CAMPAIGN after response acknowledgement"
+msgstr "FACILITY EVENT / CAMPAIGN EVENT\nCONTINUE CAMPAIGN after response acknowledgement"
+
+msgid "SOURCE CASE\n%s\n%s\n%s - %s"
+msgstr "SOURCE CASE\n%s\n%s\n%s - %s"
+
+msgid "CURRENT WORK INTERRUPTED"
+msgstr "CURRENT WORK INTERRUPTED"
+
+msgid "Final Result: [Unavailable]"
+msgstr "Final Result: [Unavailable]"
+
+msgid "Containment: None"
+msgstr "Containment: None"
+
+msgid "Experiment Usage: 0 / 0"
+msgstr "Experiment Usage: 0 / 0"
+
+msgid "Incident: [Unavailable]"
+msgstr "Incident: [Unavailable]"
+
+msgid "Emergency Broadcast: [Unavailable]"
+msgstr "Emergency Broadcast: [Unavailable]"
+
+msgid "Selected Response: [Unavailable]"
+msgstr "Selected Response: [Unavailable]"
+
+msgid "Incident Result: [Unavailable]"
+msgstr "Incident Result: [Unavailable]"
+
+msgid "Final Result: SUCCESS"
+msgstr "Final Result: SUCCESS"
+
+msgid "Final Result: FAILURE"
+msgstr "Final Result: FAILURE"
+
+msgid "Incident: None (not occurred)"
+msgstr "Incident: None (not occurred)"
+
+msgid "Emergency Broadcast: Not applicable"
+msgstr "Emergency Broadcast: Not applicable"
+
+msgid "Selected Response: Not applicable"
+msgstr "Selected Response: Not applicable"
+
+msgid "Incident Result: Not applicable"
+msgstr "Incident Result: Not applicable"
+
+msgid "Containment: %s [Unavailable]"
+msgstr "Containment: %s [Unavailable]"
+
+msgid "Experiment Usage: %d / %d"
+msgstr "Experiment Usage: %d / %d"
+
+msgid "Case: %s (%s)"
+msgstr "Case: %s (%s)"
+
+msgid "Containment: %s (%s)"
+msgstr "Containment: %s (%s)"
+
+msgid "Incident: %s (%s)"
+msgstr "Incident: %s (%s)"
+
+msgid "Emergency Broadcast: %s (%s)"
+msgstr "Emergency Broadcast: %s (%s)"
+
+msgid "Selected Response: %s (%s)"
+msgstr "Selected Response: %s (%s)"
+
+msgid "Incident Result: %s (%s)"
+msgstr "Incident Result: %s (%s)"
+
+msgid "%s [Unavailable]"
+msgstr "%s [Unavailable]"
+
+msgid "%s [Missing display name/text]"
+msgstr "%s [Missing display name/text]"
+
+msgid "Case"
+msgstr "Case"
+
+msgid "CCTV Observation"
+msgstr "CCTV Observation"
+
+msgid "Executed Experiment"
+msgstr "Executed Experiment"
+
+msgid "Confirmed Containment"
+msgstr "Confirmed Containment"
+
+msgid "Monitoring Observations"
+msgstr "Monitoring Observations"
+
+msgid "Emergency Broadcast"
+msgstr "Emergency Broadcast"
+
+msgid "Selected Response"
+msgstr "Selected Response"
+
+msgid "Broadcast Option"
+msgstr "Broadcast Option"
+
+msgid "SUCCESS"
+msgstr "SUCCESS"
+
+msgid "FAILURE"
+msgstr "FAILURE"
+
+msgid "UNDEFINED"
+msgstr "UNDEFINED"
+
+msgid "ID: %s"
+msgstr "ID: %s"
+
+msgid "Monitoring Result: %s"
+msgstr "Monitoring Result: %s"
+
+msgid "Case: %s"
+msgstr "Case: %s"
+
+msgid "Containment: %s"
+msgstr "Containment: %s"
+
+msgid "Incident: %s"
+msgstr "Incident: %s"
+
+msgid "Emergency Broadcast: %s"
+msgstr "Emergency Broadcast: %s"
+
+msgid "Selected Response: %s"
+msgstr "Selected Response: %s"
+
+msgid "Incident Result: %s"
+msgstr "Incident Result: %s"
+
+msgid "Case: %s [Missing display name/text]"
+msgstr "Case: %s [Missing display name/text]"
+
+msgid "Containment: %s [Missing display name/text]"
+msgstr "Containment: %s [Missing display name/text]"
+
+msgid "Incident: %s [Missing display name/text]"
+msgstr "Incident: %s [Missing display name/text]"
+
+msgid "Emergency Broadcast: %s [Missing display name/text]"
+msgstr "Emergency Broadcast: %s [Missing display name/text]"
+
+msgid "Selected Response: %s [Missing display name/text]"
+msgstr "Selected Response: %s [Missing display name/text]"
+
+msgid "Incident Result: %s [Missing display name/text]"
+msgstr "Incident Result: %s [Missing display name/text]"
+
+msgid "Classification: TEST CLASSIFICATION\nTEST: metal-support pump cycles preceded strikes; no talk link."
+msgstr "Classification: TEST CLASSIFICATION\nTEST: metal-support pump cycles preceded strikes; no talk link."
+
+msgid "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged.\nResult: Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+msgstr "TEST support comparison: apply equal small impulses through metal and padded supports; keep airborne pump sound and airflow unchanged.\nResult: Strike bursts follow metal-support impulses more often than padded-support impulses. Airborne pump sound is unchanged; slow wall tracing persists on both supports. This test does not compare airflow cycles."
+
+msgid "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged.\nResult: Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+msgstr "TEST airflow comparison: compare continuous low airflow with repeated start/stop pulses; keep support and pump sound unchanged.\nResult: Start/stop airflow prompts repeated turn-backs toward the outlet; continuous low airflow produces fewer turn-backs. Wall tracing persists in both trials. This test does not compare support isolation."
+
+msgid "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent.\nResult: The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+msgstr "TEST sound comparison: replay pump sound through a speaker while support impulses and airflow changes are absent.\nResult: The subject briefly orients toward the speaker, but the replay does not reproduce the pump-start strike bursts. Wall tracing continues. Airborne sound alone does not explain the earlier timing link."
+
+msgid "Classification: TEST CLASSIFICATION CASE 02\nTEST: wall-contact loss precedes searching; no damage recorded."
+msgstr "Classification: TEST CLASSIFICATION CASE 02\nTEST: wall-contact loss precedes searching; no damage recorded."
+
+msgid "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged.\nResult: Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+msgstr "TEST cue comparison: deliver short air pulses from a fixed nozzle, then replay fan sound alone. Keep wall surface and lighting unchanged.\nResult: Air pulses repeatedly prompt a pivot toward the nozzle and then wall tracing resumes. Fan sound alone produces no consistent pivot. This test does not establish whether wall texture affects searching."
+
+msgid "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure.\nResult: Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+msgstr "TEST surface comparison: present adjacent shallow-ribbed and smooth wall panels under the same airflow and lighting; record paw tracks and contact pressure.\nResult: Across repeated passes, paw tracks follow shallow ribs and return to the same wall path. On the smooth panel, sideways searches repeatedly reach the service grille. Contact pressure does not increase on either panel. This test does not compare continuous and start/stop airflow."
+
+msgid "Classification: TEST CLASSIFICATION CASE 03\nTEST: follows contrasting floor strips; short pauses occur at gaps."
+msgstr "Classification: TEST CLASSIFICATION CASE 03\nTEST: follows contrasting floor strips; short pauses occur at gaps."
+
+msgid "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged.\nResult: Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+msgstr "TEST: compare contrasting and low-contrast strips on the same flat floor with lighting and airflow unchanged.\nResult: Travel tracks the contrasting strip for more of each pass. On the low-contrast strip, short pauses and turns recur. This observation does not establish long-term containment."
+
+msgid "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged.\nResult: Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+msgstr "TEST: compare continuous and interrupted contrasting strips while keeping floor texture, lighting and airflow unchanged.\nResult: Continuous strips support longer uninterrupted passes. Gaps prompt pauses and short turns before the subject finds the next visible strip. Responses to changes in lighting remain untested."
+
+msgid "WORK PROFILE"
+msgstr "WORK PROFILE"
+
+msgid "PAUSED PROFILE"
+msgstr "PAUSED PROFILE"
+
+msgid "WORK CCTV"
+msgstr "WORK CCTV"
+
+msgid "PAUSED CCTV"
+msgstr "PAUSED CCTV"
+
+msgid "WORK EXPERIMENT"
+msgstr "WORK EXPERIMENT"
+
+msgid "PAUSED EXPERIMENT"
+msgstr "PAUSED EXPERIMENT"
+
+msgid "WORK CONTAINMENT"
+msgstr "WORK CONTAINMENT"
+
+msgid "PAUSED CONTAINMENT"
+msgstr "PAUSED CONTAINMENT"
+
+msgid "Monitoring [0s]"
+msgstr "Monitoring [0s]"
+
+msgid "Monitoring [10s]"
+msgstr "Monitoring [10s]"
+
+msgid "Monitoring [20s]"
+msgstr "Monitoring [20s]"
+
+msgid "Monitoring stage 1"
+msgstr "Monitoring stage 1"
+
+msgid "Monitoring stage 2"
+msgstr "Monitoring stage 2"
+
+msgid "Monitoring stage 3"
+msgstr "Monitoring stage 3"
+
+msgid "[Missing subject_name]"
+msgstr "[Missing subject_name]"
+
+msgid "[Missing classification]"
+msgstr "[Missing classification]"
+
+msgid "[Missing basic_description]"
+msgstr "[Missing basic_description]"
+
+msgid "[Missing camera_id]"
+msgstr "[Missing camera_id]"
+
+msgid "[Missing description]"
+msgstr "[Missing description]"
+
+msgid "[Missing result_text]"
+msgstr "[Missing result_text]"
+
+msgid "[Missing display_text]"
+msgstr "[Missing display_text]"
+
+msgid "[Missing prompt_text]"
+msgstr "[Missing prompt_text]"
+
+msgid "[Missing incident_id]"
+msgstr "[Missing incident_id]"
+
+msgid "[Missing broadcast_id]"
+msgstr "[Missing broadcast_id]"
+
+msgid "[Missing result_id]"
+msgstr "[Missing result_id]"
+
+msgid "ID: [Missing incident_id]"
+msgstr "ID: [Missing incident_id]"
+
+msgid "ID: [Missing broadcast_id]"
+msgstr "ID: [Missing broadcast_id]"
+
+msgid "ID: [Missing result_id]"
+msgstr "ID: [Missing result_id]"

@@ -40,7 +40,7 @@ func _display_snapshot() -> void:
 		var row := VBoxContainer.new()
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var label := Label.new()
-		label.text = "%s\nResearch: %d / Notes: %d" % [item.display_name, item.research_count, item.hypothesis_count]
+		GameText.set_text(label, "%s\nResearch: %d / Notes: %d", [item.display_name, item.research_count, item.hypothesis_count])
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(label)
 		var button := Button.new()

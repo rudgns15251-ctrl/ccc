@@ -49,27 +49,27 @@ func _display_summary() -> void:
 		experiment_list.remove_child(item)
 		item.queue_free()
 	experiment_empty_label.visible = true
-	case_label.text = "Case: [Unavailable]"
-	final_result_label.text = "Final Result: [Unavailable]"
-	containment_label.text = "Containment: None"
-	usage_label.text = "Experiment Usage: 0 / 0"
-	incident_label.text = "Incident: [Unavailable]"
-	broadcast_label.text = "Emergency Broadcast: [Unavailable]"
-	option_label.text = "Selected Response: [Unavailable]"
-	incident_result_label.text = "Incident Result: [Unavailable]"
+	GameText.set_text(case_label, "Case: [Unavailable]")
+	GameText.set_text(final_result_label, "Final Result: [Unavailable]")
+	GameText.set_text(containment_label, "Containment: None")
+	GameText.set_text(usage_label, "Experiment Usage: 0 / 0")
+	GameText.set_text(incident_label, "Incident: [Unavailable]")
+	GameText.set_text(broadcast_label, "Emergency Broadcast: [Unavailable]")
+	GameText.set_text(option_label, "Selected Response: [Unavailable]")
+	GameText.set_text(incident_result_label, "Incident Result: [Unavailable]")
 	if _summary == null:
 		push_warning("ResultView.setup(): summary is missing.")
 		return
 
-	case_label.text = "Case: " + _entry_text(_summary.case_id, _summary.case_display_name, "Case")
+	_set_entry_label(case_label, "Case: ", _summary.case_id, _summary.case_display_name, "Case")
 	if _summary.monitoring_result == MonitoringOutcomeData.Result.SUCCESS:
-		final_result_label.text = "Final Result: SUCCESS"
-		incident_label.text = "Incident: None (not occurred)"
-		broadcast_label.text = "Emergency Broadcast: Not applicable"
-		option_label.text = "Selected Response: Not applicable"
-		incident_result_label.text = "Incident Result: Not applicable"
+		GameText.set_text(final_result_label, "Final Result: SUCCESS")
+		GameText.set_text(incident_label, "Incident: None (not occurred)")
+		GameText.set_text(broadcast_label, "Emergency Broadcast: Not applicable")
+		GameText.set_text(option_label, "Selected Response: Not applicable")
+		GameText.set_text(incident_result_label, "Incident Result: Not applicable")
 	elif _summary.monitoring_result == MonitoringOutcomeData.Result.FAILURE:
-		final_result_label.text = "Final Result: FAILURE"
+		GameText.set_text(final_result_label, "Final Result: FAILURE")
 		_display_failure_details()
 	else:
 		push_warning("ResultView: monitoring result is undefined or unsupported.")
@@ -78,13 +78,13 @@ func _display_summary() -> void:
 		push_warning("ResultView: confirmed containment room ID is missing.")
 	elif _summary.room == null or _summary.room.room_id != _summary.room_id:
 		push_warning("ResultView: ContainmentData is unavailable for room %s." % _summary.room_id)
-		containment_label.text = "Containment: %s [Unavailable]" % _summary.room_id
+		GameText.set_text(containment_label, "Containment: %s [Unavailable]", [_summary.room_id])
 	else:
-		containment_label.text = "Containment: " + _entry_text(_summary.room_id, _summary.room.display_name, "Containment")
+		_set_entry_label(containment_label, "Containment: ", _summary.room_id, _summary.room.display_name, "Containment")
 
 	if _summary.experiment_limit < 0:
 		push_warning("ResultView: experiment_limit is negative; displaying zero.")
-	usage_label.text = "Experiment Usage: %d / %d" % [_summary.experiment_ids.size(), maxi(_summary.experiment_limit, 0)]
+	GameText.set_text(usage_label, "Experiment Usage: %d / %d", [_summary.experiment_ids.size(), maxi(_summary.experiment_limit, 0)])
 	experiment_empty_label.visible = _summary.experiment_ids.is_empty()
 	for index in range(_summary.experiment_ids.size()):
 		var id: String = _summary.experiment_ids[index]
@@ -97,9 +97,9 @@ func _display_summary() -> void:
 			item.text = "[Unavailable experiment ID]"
 		elif experiment == null or experiment.experiment_id != id:
 			push_warning("ResultView: ExperimentData is unavailable for executed ID %s." % id)
-			item.text = id + " [Unavailable]"
+			GameText.set_text(item, "%s [Unavailable]", [id])
 		else:
-			item.text = _entry_text(id, experiment.display_name, "Experiment")
+			_set_entry_label(item, "", id, experiment.display_name, "Experiment")
 		experiment_list.add_child(item)
 
 	next_button.disabled = _summary.monitoring_result != MonitoringOutcomeData.Result.SUCCESS and _summary.monitoring_result != MonitoringOutcomeData.Result.FAILURE
@@ -112,24 +112,34 @@ func _display_failure_details() -> void:
 	if _summary.incident == null:
 		push_warning("ResultView: FAILURE IncidentData is unavailable.")
 	else:
-		incident_label.text = "Incident: " + _entry_text(_summary.incident.incident_id, _summary.incident.display_name, "Incident")
+		_set_entry_label(incident_label, "Incident: ", _summary.incident.incident_id, _summary.incident.display_name, "Incident")
 	if _summary.broadcast == null:
 		push_warning("ResultView: FAILURE EmergencyBroadcastData is unavailable.")
 	else:
-		broadcast_label.text = "Emergency Broadcast: " + _entry_text(_summary.broadcast.broadcast_id, _summary.broadcast.display_name, "Broadcast")
+		_set_entry_label(broadcast_label, "Emergency Broadcast: ", _summary.broadcast.broadcast_id, _summary.broadcast.display_name, "Broadcast")
 	if _summary.option == null:
 		push_warning("ResultView: FAILURE confirmed BroadcastOptionData is unavailable.")
 	else:
-		option_label.text = "Selected Response: " + _entry_text(_summary.option.option_id, _summary.option.display_text, "Broadcast Option")
+		_set_entry_label(option_label, "Selected Response: ", _summary.option.option_id, _summary.option.display_text, "Broadcast Option")
 	if _summary.incident_result == null:
 		push_warning("ResultView: FAILURE IncidentResultData is unavailable.")
 	else:
-		incident_result_label.text = "Incident Result: " + _entry_text(_summary.incident_result.result_id, _summary.incident_result.display_name, "Incident Result")
+		_set_entry_label(incident_result_label, "Incident Result: ", _summary.incident_result.result_id, _summary.incident_result.display_name, "Incident Result")
 
 
 func _on_next_button_pressed() -> void:
 	if not next_button.disabled:
 		super._on_next_button_pressed()
+
+
+func _set_entry_label(label: Label, prefix: String, id: String, display_name: String, field_name: String) -> void:
+	var fallback: String = _entry_text(id, display_name, field_name)
+	if not id.strip_edges().is_empty() and not display_name.strip_edges().is_empty():
+		GameText.set_text(label, prefix + "%s (%s)", [display_name, id])
+	elif not id.strip_edges().is_empty():
+		GameText.set_text(label, prefix + "%s [Missing display name/text]", [id])
+	else:
+		GameText.set_text(label, prefix + "%s", [fallback])
 
 
 func _entry_text(id: String, display_name: String, field_name: String) -> String:

@@ -118,7 +118,7 @@ func _render_entries() -> void:
 		if entry == null or not category.is_empty() and entry.category != category: continue
 		var button := Button.new()
 		button.name = "Entry%d" % index
-		button.text = entry.category + " / " + entry.title
+		GameText.set_text(button, "%s / %s", [entry.category, entry.title])
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.custom_minimum_size.y = 48
@@ -131,7 +131,7 @@ func _select_entry(index: int) -> void:
 	_selected_entry = index
 	var entry: Entry = _snapshot.entries[index]
 	%EntryTitle.text = entry.title
-	%EntryBody.text = entry.body_text
+	GameText.set_text(%EntryBody, "%s", [entry.body_text])
 	%EntryDetailScroll.scroll_vertical = 0
 
 func capture_drawer_state() -> Dictionary:
@@ -152,9 +152,10 @@ func restore_drawer_state(state: Dictionary) -> void:
 	_restore_drawer_presentation.call_deferred(state.duplicate(true))
 
 
-func _append_label(item: VBoxContainer, text: String, _font_size: int) -> void:
+func _append_label(item: VBoxContainer, text: String, _font_size: int, translate: bool = true) -> void:
 	var label := Label.new()
 	label.text = text
+	if not translate: label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	item.add_child(label)
@@ -174,7 +175,7 @@ func _display_hypotheses() -> void:
 		item.name = record.hypothesis_id
 		item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_append_label(item, "WORKING NOTE", 18)
-		_append_label(item, record.text, 18)
+		_append_label(item, record.text, 18, false)
 		var actions := HBoxContainer.new()
 		actions.name = "Actions"
 		for action: String in ["Edit", "Delete"]:
@@ -199,9 +200,7 @@ func _update_hypothesis_input() -> void:
 	%SaveHypothesisButton.disabled = not %HypothesisInput.editable or text.is_empty() or text.length() > _hypothesis_max_length
 	%SaveHypothesisButton.text = "Add Hypothesis" if _editing_hypothesis_id.is_empty() else "Update Hypothesis"
 	%CancelHypothesisButton.visible = not _editing_hypothesis_id.is_empty()
-	%HypothesisStatus.text = "%d / %d characters (trimmed)." % [text.length(), _hypothesis_max_length]
-	if text.length() > _hypothesis_max_length:
-		%HypothesisStatus.text += " Too long; note will not be saved."
+	GameText.set_text(%HypothesisStatus, "%d / %d characters (trimmed). Too long; note will not be saved." if text.length() > _hypothesis_max_length else "%d / %d characters (trimmed).", [text.length(), _hypothesis_max_length])
 	_refresh_drawer_focus.call_deferred()
 
 
@@ -237,7 +236,7 @@ func _cancel_hypothesis_edit() -> void:
 
 func show_hypothesis_request_result(approved: bool, records: Array[Dictionary], removed_id: String = "") -> void:
 	if not approved:
-		%HypothesisStatus.text = "Note was not saved. Check input or reopen the notebook."
+		GameText.set_text(%HypothesisStatus, "Note was not saved. Check input or reopen the notebook.")
 		return
 	_hypothesis_records = records.duplicate(true)
 	if removed_id.is_empty() or removed_id == _editing_hypothesis_id:

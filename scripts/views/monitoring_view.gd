@@ -55,18 +55,18 @@ func _display_outcome() -> void:
 	stage_scroll.scroll_vertical = 0
 	if _outcome == null:
 		push_warning("MonitoringView.setup(): MonitoringOutcomeData is missing.")
-		room_id_label.text = "ROOM: unavailable"
-		description_label.text = "Monitoring data unavailable"
+		GameText.set_text(room_id_label, "ROOM: unavailable")
+		GameText.set_text(description_label, "Monitoring data unavailable")
 		return
 	if _outcome.room_id.strip_edges().is_empty():
 		push_warning("MonitoringView: room_id is empty.")
-		room_id_label.text = "ROOM: [Missing room_id]"
+		GameText.set_text(room_id_label, "ROOM: [Missing room_id]")
 	else:
-		room_id_label.text = "ROOM: " + _outcome.room_id
-	description_label.text = "Monitoring stages: %d" % _outcome.stages.size()
+		GameText.set_text(room_id_label, "ROOM: %s", [_outcome.room_id])
+	GameText.set_text(description_label, "Monitoring stages: %d", [_outcome.stages.size()])
 	if _outcome.stages.is_empty():
 		push_warning("MonitoringView: stages is empty.")
-		description_label.text = "Monitoring data unavailable"
+		GameText.set_text(description_label, "Monitoring data unavailable")
 		return
 	var has_valid_stage: bool = false
 	for stage: MonitoringStageData in _outcome.stages:
@@ -76,7 +76,7 @@ func _display_outcome() -> void:
 	if not has_valid_stage:
 		for index in range(_outcome.stages.size()):
 			push_warning("MonitoringView: MonitoringStageData at index %d is missing." % index)
-		description_label.text = "Monitoring data unavailable"
+		GameText.set_text(description_label, "Monitoring data unavailable")
 		return
 	if is_inside_tree():
 		_playback_active = true
@@ -104,7 +104,7 @@ func _schedule_next_stage() -> void:
 		playback_timer.stop()
 		_playback_active = false
 		_playback_completed = true
-		description_label.text = "Monitoring sequence complete"
+		GameText.set_text(description_label, "Monitoring sequence complete")
 		if _finalized_result != MonitoringOutcomeData.Result.UNDEFINED:
 			apply_monitoring_result(_finalized_result)
 		else:
@@ -123,7 +123,7 @@ func apply_monitoring_result(result: MonitoringOutcomeData.Result) -> void:
 	if _finalized_result != MonitoringOutcomeData.Result.UNDEFINED and _finalized_result != result:
 		return
 	_finalized_result = result
-	description_label.text = "Monitoring Result: " + ("SUCCESS" if result == MonitoringOutcomeData.Result.SUCCESS else "FAILURE")
+	GameText.set_text(description_label, "Monitoring Result: %s", ["SUCCESS" if result == MonitoringOutcomeData.Result.SUCCESS else "FAILURE"])
 	next_button.disabled = false
 	next_button.grab_focus()
 
@@ -141,7 +141,7 @@ func _reveal_current_stage() -> void:
 	if observation.strip_edges().is_empty():
 		push_warning("MonitoringView: observation_text at index %d is empty." % _current_stage_index)
 		observation = "[Missing observation_text]"
-	_append_item("[%ds]" % stage.time_offset, observation)
+	_append_item(stage.time_offset, observation)
 	_previous_time_offset = stage.time_offset
 	_current_stage_index += 1
 
@@ -151,11 +151,11 @@ func _on_next_button_pressed() -> void:
 		super._on_next_button_pressed()
 
 
-func _append_item(time_text: String, observation: String) -> void:
+func _append_item(seconds: int, observation: String) -> void:
 	var item := VBoxContainer.new()
 	item.add_theme_constant_override("separation", 2)
 	var time_label := Label.new()
-	time_label.text = time_text
+	GameText.set_text(time_label, "[%ds]", [seconds])
 	item.add_child(time_label)
 	var observation_label := Label.new()
 	observation_label.text = observation

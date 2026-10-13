@@ -19,10 +19,10 @@ func _ready() -> void:
 		if not %Hypothesis.disabled: hypothesis_requested.emit())
 
 func display(subject: String, stage: String, environment: String, work_stage: int, tools: bool, archive: bool, hypothesis: bool, status: String, runtime_id: int) -> void:
-	%Subject.text = subject
-	%Stage.text = stage
-	%Environment.text = environment
-	%SystemStatus.text = status
+	GameText.set_text(%Subject, "%s", [subject])
+	GameText.set_text(%Stage, "%s", [stage])
+	GameText.set_text(%Environment, "%s", [environment])
+	GameText.set_text(%SystemStatus, "%s", [status])
 	%Research.disabled = not tools
 	%Archive.disabled = not archive
 	%Hypothesis.disabled = not hypothesis
@@ -51,4 +51,4 @@ func display_navigation(presented: int, canonical: int, unlocked: Array, enabled
 		button.disabled = not allowed
 		button.theme_type_variation = "CurrentNavButton" if index == presented else "NavButton"
 		var status: String = "CURRENT" if index == presented else "REVIEW" if known and index != canonical else "UNLOCKED" if known else "AVAILABLE" if allowed else "LOCKED"
-		button.text = stages[index] + "\n" + status
+		GameText.set_text(button, "%s\n%s", [stages[index], status])

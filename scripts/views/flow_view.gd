@@ -15,6 +15,16 @@ var _response_context: Dictionary = {}
 var _input_guard: Callable
 
 
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_TRANSLATION_CHANGED, NOTIFICATION_ENTER_TREE]:
+		_refresh_game_text.call_deferred()
+
+
+func _refresh_game_text() -> void:
+	if is_inside_tree() and not is_queued_for_deletion():
+		GameText.refresh_tree(self)
+
+
 func set_input_guard(guard: Callable) -> void:
 	_input_guard = guard
 
@@ -53,22 +63,22 @@ func _display_response_context() -> void:
 	if label == null:
 		return
 	label.visible = false
-	label.text = ""
+	GameText.set_text(label, "")
 	if _response_context.get("origin_kind", -1) == IncidentSource.OriginKind.CAMPAIGN_INTERRUPT:
 		if _response_context.get("source_occurrence_id", "").is_empty() or _response_context.get("event_id", "").is_empty(): return
-		label.text = "CAMPAIGN EVENT\nRESUME WORK\n%s - %s" % [_response_context.get("interrupted_case_display_name", ""), _response_context.get("return_stage", "")]
+		GameText.set_text(label, "CAMPAIGN EVENT\nRESUME WORK\n%s - %s", [_response_context.get("interrupted_case_display_name", ""), _response_context.get("return_stage", "")])
 		label.visible = true
 		return
 	if _response_context.get("origin_kind", -1) == IncidentSource.OriginKind.CAMPAIGN_ENTRY:
 		if _response_context.get("source_entry_id", "").is_empty() or _response_context.get("event_id", "").is_empty(): return
-		label.text = "FACILITY EVENT / CAMPAIGN EVENT\nCONTINUE CAMPAIGN after response acknowledgement"
+		GameText.set_text(label, "FACILITY EVENT / CAMPAIGN EVENT\nCONTINUE CAMPAIGN after response acknowledgement")
 		label.visible = true
 		return
 	for key: String in ["source_case_id", "source_case_display_name", "interrupted_case_id", "interrupted_case_display_name", "return_stage"]:
 		if not _response_context.get(key, "") is String or _response_context.get(key, "").strip_edges().is_empty():
 			return
 	var heading: String = "RESUME WORK" if _response_context.get("resume", false) else "CURRENT WORK INTERRUPTED"
-	label.text = "SOURCE CASE\n%s\n%s\n%s - %s" % [_response_context.source_case_display_name, heading, _response_context.interrupted_case_display_name, _response_context.return_stage]
+	GameText.set_text(label, "SOURCE CASE\n%s\n%s\n%s - %s", [_response_context.source_case_display_name, heading, _response_context.interrupted_case_display_name, _response_context.return_stage])
 	label.visible = true
 
 

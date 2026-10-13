@@ -48,13 +48,14 @@ func _display_snapshot() -> void:
 		if entry == null:
 			continue
 		var button := Button.new()
-		button.text = entry.category + " / " + entry.title
+		GameText.set_text(button, "%s / %s", [entry.category, entry.title])
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.custom_minimum_size.y = 48
 		button.pressed.connect(func() -> void:
 			if _allows_local_input():
 				%EntryTitle.text = entry.title
-				%EntryBody.text = entry.body_text
+				%EntryBody.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_INHERIT
+				GameText.set_text(%EntryBody, "%s", [entry.body_text])
 				%DetailScroll.scroll_vertical = 0)
 		%ResearchList.add_child(button)
 	for record: Dictionary in _snapshot.hypotheses:
@@ -64,6 +65,8 @@ func _display_snapshot() -> void:
 		button.pressed.connect(func() -> void:
 			if _allows_local_input():
 				%EntryTitle.text = "WORKING NOTE"
+				if %EntryBody.has_meta(GameText.BINDING_META): %EntryBody.remove_meta(GameText.BINDING_META)
+				%EntryBody.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 				%EntryBody.text = record.text)
 		%HypothesisList.add_child(button)
 

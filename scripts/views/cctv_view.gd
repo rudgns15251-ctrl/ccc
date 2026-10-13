@@ -79,7 +79,7 @@ func _display_condition_observations() -> void:
 	%CameraTab.text = "CAMERA 01 / UPDATED" if not _condition_observations.is_empty() else "CAMERA 01"
 	for entry: ConditionObservation in _condition_observations:
 		var label := Label.new()
-		label.text = "%s\n%s" % [entry.display_name, entry.observation_text]
+		GameText.set_text(label, "%s\n%s", [entry.display_name, entry.observation_text])
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		list.add_child(label)

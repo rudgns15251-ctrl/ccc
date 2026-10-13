@@ -71,10 +71,10 @@ func _display_experiments() -> void:
 	_update_execution_ui()
 	if _experiments.is_empty():
 		push_warning("ExperimentView.setup(): available_experiments is empty.")
-		description_label.text = "No experiments available"
+		GameText.set_text(description_label, "No experiments available")
 		return
 
-	description_label.text = "Available experiments: %d" % _experiments.size()
+	GameText.set_text(description_label, "Available experiments: %d", [_experiments.size()])
 	for index in range(_experiments.size()):
 		var experiment: ExperimentData = _experiments[index]
 		if experiment == null:
@@ -167,7 +167,7 @@ func show_execution_result(experiment_id: String, approved: bool, conditions: Co
 		if conditions != null:
 			for entry: ConditionObservation in conditions.entries:
 				var label := Label.new()
-				label.text = "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s" % [entry.condition_name, entry.condition_change_text, entry.display_name, entry.observation_text]
+				GameText.set_text(label, "CONDITION OBSERVATION\nActive condition at execution: %s\n%s\n%s\n%s", [entry.condition_name, entry.condition_change_text, entry.display_name, entry.observation_text])
 				label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 				%ConditionObservationList.add_child(label)
@@ -206,15 +206,14 @@ func _can_select_experiment(index: int) -> bool:
 
 
 func _update_execution_ui() -> void:
-	remaining_label.text = "Experiments Remaining: %d / %d" % [_remaining_count, _experiment_limit]
+	GameText.set_text(remaining_label, "Experiments Remaining: %d / %d", [_remaining_count, _experiment_limit])
 	for index in range(experiment_list.get_child_count()):
 		var button: CheckBox = experiment_list.get_child(index).get_child(0) as CheckBox
 		var experiment: ExperimentData = _experiments[index]
 		button.disabled = _review_only or not _can_select_experiment(index)
 		if experiment != null:
-			button.text = experiment.display_name if not experiment.display_name.strip_edges().is_empty() else "[Missing display_name]"
-			if _executed_ids.has(experiment.experiment_id):
-				button.text += " [Executed]"
+			var name_text: String = experiment.display_name if not experiment.display_name.strip_edges().is_empty() else "[Missing display_name]"
+			GameText.set_text(button, "%s [Executed]" if _executed_ids.has(experiment.experiment_id) else "%s", [name_text])
 	if not _can_select_experiment(_selected_experiment_index):
 		_selected_experiment_index = -1
 		var selected_button: BaseButton = _selection_group.get_pressed_button()

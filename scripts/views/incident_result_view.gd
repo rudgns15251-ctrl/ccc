@@ -22,18 +22,18 @@ func _display_incident_result() -> void:
 	next_button.disabled = true
 	if _incident_result_data == null:
 		push_warning("IncidentResultView.setup(): IncidentResultData is missing.")
-		result_id_label.text = ""
+		GameText.set_text(result_id_label, "")
 		display_name_label.text = "Incident result data unavailable"
 		description_label.text = "No IncidentResultData was provided to this View."
 		return
 	if _incident_result_data.result_id.strip_edges().is_empty():
 		push_warning("IncidentResultView: result_id is empty.")
-		result_id_label.text = "ID: [Missing result_id]"
+		GameText.set_text(result_id_label, "ID: [Missing result_id]")
 		display_name_label.text = "Incident result data unavailable"
 		description_label.text = "IncidentResultData has no valid result_id."
 		return
 
-	result_id_label.text = "ID: " + _incident_result_data.result_id
+	GameText.set_text(result_id_label, "ID: %s", [_incident_result_data.result_id])
 	display_name_label.text = _text_or_placeholder(_incident_result_data.display_name, "display_name")
 	description_label.text = _text_or_placeholder(_incident_result_data.description, "description")
 	next_button.disabled = false
