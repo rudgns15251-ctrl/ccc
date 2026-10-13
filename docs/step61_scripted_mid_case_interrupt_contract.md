@@ -1,5 +1,7 @@
 # Step61 — Scripted Mid-Case Incident Interrupt Contract Design
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **DESIGN ONLY — 제품 Gameplay / Scene / Resource / State 변경 없음.**
 
 [확정] Mandatory Incident 01은 CASE02 완료 → 순차형 Scripted Incident → CASE03이다. 후속 Mandatory Incident 1~2개는 특정 Case 업무를 중단하고 같은 Case Runtime/이전 업무 위치로 복귀한다. Failure/Resolution/Candidate/Case를 위조하지 않는다. [미정] 실제 사건 내용, Case 번호, Stage, Action, 문구, 선택지, Result는 아직 정하지 않는다.
@@ -10,7 +12,7 @@
 
 현재 비생성 파일146개, 제품 GDScript49개, Scene15개, authored .tres4개, 제품 경로 파일120개. Main2253행/123함수. 실제 구조는 scripts/data, runtime, read_models, main, views와 scenes/main, scenes/views, resources/cases, resources/campaigns, assets, docs다. project.godot은 Godot4.7/GL Compatibility, Main Scene,1920×1080 viewport/1280×720 window/canvas_items, Autoload0이다. 새 프로젝트가 아니다.
 
-HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 이전 Step55~60의 tracked 수정7/untracked19가 남아 있다. 적용 AGENTS.md는 저장소/상위 경로에서 발견하지 않았다. 기존 파일/README/보고서/UID/검증 증거를 보호한다.
+HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 이전 Step55~60의 tracked 수정7/untracked19가 남아 있다. 기존 파일/README/보고서/UID/검증 증거를 보호한다.
 
 | 조사된 사실 | 현재 코드 근거 | 설계에 주는 제약 |
 |---|---|---|
@@ -20,11 +22,11 @@ HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `orig
 | Progress만 sequence cursor/완료 IDs/전환 intent 소유 | scripts/runtime/campaign_progress_state.gd | Case 중단을 cursor 이동으로 모델링하면 안 됨 |
 | IncidentSource origin은 CASE/CAMPAIGN_ENTRY뿐 | scripts/runtime/incident_source.gd | side occurrence는 현재 표현하지 못함 |
 | Response key는 origin/entry/incident, ACTIVE1/COMPLETED | scripts/runtime/incident_response_state.gd | one-active/once 기반은 재사용 가능 |
-| Sequential은 current Case/Runtime=null, Result ack 뒤 advance/dispatch | [main._dispatch_campaign_entry](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2221), [main._advance_response](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1727) | 유지한 채 새로운 return branch 필요 |
-| Failure Major는 실제 Failure Resolution/Candidate/credit 요구 | [main._try_start_major_incident](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1633) | Scripted 시작 API로 그대로 호출 불가 |
-| 현재 resume Stage는 CCTV/EXPERIMENT/CONTAINMENT뿐 | [main._has_interrupt_context](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1604) | PROFILE 신규 지원과 정확한 transient 복원이 필요 |
-| Case 업무 View를 매번 제거/queue_free/재생성 | [main._show_view](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:144) | same Runtime/Stage만으로 동일 draft/result/scroll 보장 못함 |
-| Step60 fact adapter는 entry 기반 owner 조회 | [queries._response_context](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/read_models/campaign_fact_queries.gd:267) | side ID를 현 entry API에 넣으면 INVALID_ENTRY_ID |
+| Sequential은 current Case/Runtime=null, Result ack 뒤 advance/dispatch | [main._dispatch_campaign_entry](../scripts/main/main.gd), [main._advance_response](../scripts/main/main.gd) | 유지한 채 새로운 return branch 필요 |
+| Failure Major는 실제 Failure Resolution/Candidate/credit 요구 | [main._try_start_major_incident](../scripts/main/main.gd) | Scripted 시작 API로 그대로 호출 불가 |
+| 현재 resume Stage는 CCTV/EXPERIMENT/CONTAINMENT뿐 | [main._has_interrupt_context](../scripts/main/main.gd) | PROFILE 신규 지원과 정확한 transient 복원이 필요 |
+| Case 업무 View를 매번 제거/queue_free/재생성 | [main._show_view](../scripts/main/main.gd) | same Runtime/Stage만으로 동일 draft/result/scroll 보장 못함 |
+| Step60 fact adapter는 entry 기반 owner 조회 | [queries._response_context](../scripts/read_models/campaign_fact_queries.gd) | side ID를 현 entry API에 넣으면 INVALID_ENTRY_ID |
 
 Step40/42 read/resume, Step54 cleanup, Step58 bounded/sequential, Step59 fact 설계, Step60 구현/보고서를 현재 코드와 대조했다. `.godot/verification/step61/`에 baseline/source inventory/함수 본문을 저장한다. **Step61 새 Godot/gameplay 실행0**. Step60 수치를 새 테스트 성과로 재사용하지 않는다.
 
@@ -183,13 +185,13 @@ Case/Resource binding 오류는 다른 Case로 fallback하지 않는다. preflig
 | EXPERIMENT | Runtime 실행 이력/남은 횟수는 유지. 현재 restore는 history[-1]만 재표시하며 결과 scroll=0/selection=-1 | 실제 displayed_result_id(빈 값 포함), unexecuted draft selection, Experiment/Result scroll을 capture. 이력/remaining/당시 observation IDs는 owner에서 재구성. 마지막 실행과 현재 표시를 동일시하지 않음 |
 | CONTAINMENT | confirmed Room/lock은 Runtime에서 복원. `_selected_room_index`는 setup/display에서 -1로 reset되어 미확정 draft 소실 | unconfirmed room_id를 UI memento로 보존/restore하되 Pending/Runtime 확정/Confirm signal0. confirmed 값이 있다면 canonical owner가 우선하고 conflict를 거절. Room scroll/focus 보존 |
 
-근거: [containment.setup](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/containment_view.gd:21), [containment._on_room_selected](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/containment_view.gd:93), [experiment.setup](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/experiment_view.gd:43), [experiment.restore_recorded_result](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/experiment_view.gd:142), [experiment.get_displayed_result_id](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/experiment_view.gd:179), [main._restore_interrupted_experiment_result](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1786). Containment에 현재 draft public getter/restore API는 없다. Experiment에도 정확한 unconfirmed selection/scroll의 public memento API는 없다. 미래 API를 존재한다고 가정하지 않는다.
+근거: [containment.setup](../scripts/views/containment_view.gd), [containment._on_room_selected](../scripts/views/containment_view.gd), [experiment.setup](../scripts/views/experiment_view.gd), [experiment.restore_recorded_result](../scripts/views/experiment_view.gd), [experiment.get_displayed_result_id](../scripts/views/experiment_view.gd), [main._restore_interrupted_experiment_result](../scripts/main/main.gd). Containment에 현재 draft public getter/restore API는 없다. Experiment에도 정확한 unconfirmed selection/scroll의 public memento API는 없다. 미래 API를 존재한다고 가정하지 않는다.
 
 [추천] 새 foundation의 Stage별 수용 기준은 동일 entry/Case/Runtime/Stage + executed IDs/remaining + displayed Result/condition observation + current environment + Research membership + confirmed/pending Room + unconfirmed draft + 필요한 scroll/Back 목적지다. Final UI 픽셀 디자인/폰트/효과는 범위 밖이다. 기존 Failure Major의 draft reset을 이번 DESIGN ONLY에서 고치지 않으며, 후속 공통 helper 도입 시 Failure route의 변경 범위와 regression을 명시해야 한다.
 
 ## 13. Failure Event Arbitration
 
-현재 Step58 bounded arbitration은 **CASE→sequential Scripted 전환 intent**에서 old Failure presentation offer를 최대1회 소비한 후 다음 업무 Next에 handoff한다. [main._on_advance_requested](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:864)가 Progress.bind_transition/consume_failure_offer를 쓴다. Mid-Case 사건은 advance가 없으므로 이 intent/budget을 그대로 쓰면 사건 완료와 Case 완료를 혼동한다. 기존 oldest Failure selector/credit gate를 side event용 priority framework로 바꾸지 않는다.
+현재 Step58 bounded arbitration은 **CASE→sequential Scripted 전환 intent**에서 old Failure presentation offer를 최대1회 소비한 후 다음 업무 Next에 handoff한다. [main._on_advance_requested](../scripts/main/main.gd)가 Progress.bind_transition/consume_failure_offer를 쓴다. Mid-Case 사건은 advance가 없으므로 이 intent/budget을 그대로 쓰면 사건 완료와 Case 완료를 혼동한다. 기존 oldest Failure selector/credit gate를 side event용 priority framework로 바꾸지 않는다.
 
 [추천] 작은 결정적 규칙: **이미 활성화된 응답/notice는 끝까지, 새 checkpoint에서 Story due는 old Failure presentation보다 먼저, Resume 자체는 새 사건 checkpoint가 아님**.
 
@@ -204,7 +206,7 @@ Case/Resource binding 오류는 다른 Case로 fallback하지 않는다. preflig
 
 Story occurrence가 checkpoint에 latch되면 완료 전에는 해당 업무의 stage advance/Case handoff를 막는다. 기존 Response가 이미 active였다면 그것을 한 번 마치고 next user checkpoint에서 Story를 먼저 시작하므로 active old Failure queue의 반복에 굶지 않는다. 진행이 계속되는 동안 유한 delay이며 idle에 timer로 강제하지 않는다. Story 뒤의 old Failure는 그대로 남고 이후 기존 조건으로 다시 선택된다. 무한 drain loop/queue framework 없음.
 
-**업무 accounting과 event presentation을 구분한다.** accepted Experiment 실행/Containment 진입 등의 기존 opportunity accounting은 기존처럼 정확히1회 기록한다. 같은 Action에서 Story가 due이면 old-event *presentation*만 보류한다. 현재 [main._try_process_failure_event_opportunity](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1411)는 일부 Stage에서 counter advance와 presentation이 묶여 있으므로 후속 최소 hook/분리가 필요하다. Story check를 기존 함수 뒤에 붙이면 이미 notice/major가 표시될 수 있고, 앞에 early-return하면 정상 accounting을 누락할 수 있다. 기존 RNG/threshold/Counter/processed-key 의미를 바꾸지 않는 검증이 필요하다.
+**업무 accounting과 event presentation을 구분한다.** accepted Experiment 실행/Containment 진입 등의 기존 opportunity accounting은 기존처럼 정확히1회 기록한다. 같은 Action에서 Story가 due이면 old-event *presentation*만 보류한다. 현재 [main._try_process_failure_event_opportunity](../scripts/main/main.gd)는 일부 Stage에서 counter advance와 presentation이 묶여 있으므로 후속 최소 hook/분리가 필요하다. Story check를 기존 함수 뒤에 붙이면 이미 notice/major가 표시될 수 있고, 앞에 early-return하면 정상 accounting을 누락할 수 있다. 기존 RNG/threshold/Counter/processed-key 의미를 바꾸지 않는 검증이 필요하다.
 
 [추천] Scripted start/response/Archive/Resume 자체는 Failure counter/opportunity/RNG/Presentation credit를 요구·부여·소모하지 않는다. 기존 accepted 업무 read action이 부여한 token/credit는 그 Action의 정상 결과로서 그대로 보존한다. Story 때문에 별도의 token/credit를 만들거나 current flow의 credit=OPEN이 될 때까지 Mandatory를 무한 지연시키지 않는다. 이 정책은 future side schedule이 있는 checkpoint에만 적용하며 Sequential Step58 정책을 재작성하지 않는다.
 
@@ -212,7 +214,7 @@ Story occurrence가 checkpoint에 latch되면 완료 전에는 해당 업무의 
 
 [추천] Scripted Mid-Case의 기본 Source Archive는 **전체 Research Archive List**다. 사건의 source는 Event definition/side occurrence이고 interrupted Case는 업무 위치이므로 SOURCE CASE detail로 강제 연결하지 않는다. current Case의 Research Log를 열거나 Current discoveries를 Archive로 merge하지 않는다. empty Archive도 empty List로 표시할 수 있다.
 
-기존 Sequential List→Detail→List→response 복귀 경로와 Broadcast draft capture/restore를 공통화할 수 있다. 그러나 현재 `_is_scripted_response`/`_bound_scripted_entry`는 순차형 전용이며 [main._on_archive_list_back_requested](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:448), [main._on_archive_detail_back_requested](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:464), [main._on_source_archive_requested](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1768), [main._restore_response_broadcast_draft](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1620)의 binding은 새 origin/policy에 맞춰 검증해야 한다.
+기존 Sequential List→Detail→List→response 복귀 경로와 Broadcast draft capture/restore를 공통화할 수 있다. 그러나 현재 `_is_scripted_response`/`_bound_scripted_entry`는 순차형 전용이며 [main._on_archive_list_back_requested](../scripts/main/main.gd), [main._on_archive_detail_back_requested](../scripts/main/main.gd), [main._on_source_archive_requested](../scripts/main/main.gd), [main._restore_response_broadcast_draft](../scripts/main/main.gd)의 binding은 새 origin/policy에 맞춰 검증해야 한다.
 
 - response origin/occurrence/definition/incident/broadcast/phase가 동일해야 Back 복귀를 수락한다.
 - draft option_id는 View UI memento이며 State confirmed_option_id가 아니다. Archive 왕복에서 signal 없이 복원, Confirm 이후 canonical State가 우선하고 lock 유지.
@@ -223,7 +225,7 @@ Story occurrence가 checkpoint에 latch되면 완료 전에는 해당 업무의 
 
 ## 15. Stale Callback / Duplicate Guard
 
-현재 [main._is_active_view](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:860)는 current View 일치/inside-tree/not-queued/notice 없음/closure-busy 아님을 검사한다. `_accept_view_action()`는 terminal permission와 현재 Campaign entry metadata를 대조한다. Response try_begin/confirm/complete는 one-active/once 규칙이다. 이는 재사용할 수 있지만 side 사건 동안 entry ID가 변하지 않아 **entry metadata만으로 모든 응답 source를 구분할 수 없다**.
+현재 [main._is_active_view](../scripts/main/main.gd)는 current View 일치/inside-tree/not-queued/notice 없음/closure-busy 아님을 검사한다. `_accept_view_action()`는 terminal permission와 현재 Campaign entry metadata를 대조한다. Response try_begin/confirm/complete는 one-active/once 규칙이다. 이는 재사용할 수 있지만 side 사건 동안 entry ID가 변하지 않아 **entry metadata만으로 모든 응답 source를 구분할 수 없다**.
 
 [추천] 응답 callback은 active View identity + expected Stage + full source occurrence/definition/incident/broadcast binding + actual approved Result를 검사한다. Main callback은 현재 entry/Case/Runtime/context/policy도 대조한다. stale old Case/Response/Archive View는 새 work View와 다르므로 무시한다. queued-delete 전 retained callback, 같은 entry에서 연속 다른 side source, Archive draft foreign source, old Result ack를 필수 검증한다.
 
@@ -246,9 +248,9 @@ start 전에 capture/definition validation 완료, try_begin 성공 시 context/
 | verified cleanup 실제 시작 / partial reset 실패 | Step60 release-before-reset, SOURCE_RELEASED 유지. transient side intent/work/response/archive context도 clear하고 stale callback 차단 |
 | Main tree lifetime 종료 | Step60 exit-tree release 유지, 새 side runtime/context 참조도 해제 |
 
-현재 [main.developer_commit_run_disposition](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1068)는 `_is_scripted_response()`에서 active를 early block한다. future route를 추가하면서 helper를 sequential-only로 남겨두면 side active는 이 guard를 빠져나간다. [main.build_test_sequence_disposition_snapshot](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:957)는 scripted flag에서 unsupported를 설정해도 아래 `current_valid` branch가 boundary status를 다시 쓰는 구조다. Sequential은 current Case=null이라 문제가 드러나지 않는다. Case가 살아 있는 side는 **origin-aware unsupported 처리를 우선 확정/early return**해야 한다. 이것은 후속 통합의 P1 위험이며 현재 제품의 side 지원이 존재한다는 뜻이 아니다.
+현재 [main.developer_commit_run_disposition](../scripts/main/main.gd)는 `_is_scripted_response()`에서 active를 early block한다. future route를 추가하면서 helper를 sequential-only로 남겨두면 side active는 이 guard를 빠져나간다. [main.build_test_sequence_disposition_snapshot](../scripts/main/main.gd)는 scripted flag에서 unsupported를 설정해도 아래 `current_valid` branch가 boundary status를 다시 쓰는 구조다. Sequential은 current Case=null이라 문제가 드러나지 않는다. Case가 살아 있는 side는 **origin-aware unsupported 처리를 우선 확정/early return**해야 한다. 이것은 후속 통합의 P1 위험이며 현재 제품의 side 지원이 존재한다는 뜻이 아니다.
 
-`_developer_source_facts()`와 `_case_response_records()`는 여전히 Case-only다. [main._cleanup_verified_source](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1101)는 실제 verified commit 뒤만 source를 지운다. ACTIVE side를 강제로 CASE route로 disguise하거나 fake source_case_id를 넣어 기존 builder를 통과시키면 안 된다. 새 schema recipient projection은 별도 단계다. Step53 prepared-pending/Step54 multi-owner atomic rollback 한계도 그대로다.
+`_developer_source_facts()`와 `_case_response_records()`는 여전히 Case-only다. [main._cleanup_verified_source](../scripts/main/main.gd)는 실제 verified commit 뒤만 source를 지운다. ACTIVE side를 강제로 CASE route로 disguise하거나 fake source_case_id를 넣어 기존 builder를 통과시키면 안 된다. 새 schema recipient projection은 별도 단계다. Step53 prepared-pending/Step54 multi-owner atomic rollback 한계도 그대로다.
 
 ## 17. Save Identity Constraints
 
@@ -276,7 +278,7 @@ engine instance IDs/NodePath object/Resource pointer/Callable/Signal은 persiste
 | Mid-Case Scripted | Campaign Event definition + interrupt occurrence + interrupted Case/업무 Stage | RESUME WORK | 같은 CASE/Runtime/Stage; cursor 그대로 |
 | Failure Major | 실제 source Failure Case + interrupted Case/Stage | 기존 Resume action | actual Candidate 처리 후 업무 복귀 |
 
-현재 [flow._display_response_context](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/flow_view.gd:46)는 CAMPAIGN_ENTRY를 Continue로 표시하고 나머지는 Case source 필드를 요구한다. 새 side origin/return-policy 표시 branch가 필요하다. 같은 content definition 사용 여부와 return action은 별개다. event를 MAJOR CONTAINMENT INCIDENT 또는 SOURCE CASE라고 잘못 표시하지 않는다. Context/Last action 외 UI의 역할을 유지한다. 실제 사건 설명/Broadcast/Result 문구는 [미정]이고 이 문서에서 창작하지 않는다.
+현재 [flow._display_response_context](../scripts/views/flow_view.gd)는 CAMPAIGN_ENTRY를 Continue로 표시하고 나머지는 Case source 필드를 요구한다. 새 side origin/return-policy 표시 branch가 필요하다. 같은 content definition 사용 여부와 return action은 별개다. event를 MAJOR CONTAINMENT INCIDENT 또는 SOURCE CASE라고 잘못 표시하지 않는다. Context/Last action 외 UI의 역할을 유지한다. 실제 사건 설명/Broadcast/Result 문구는 [미정]이고 이 문서에서 창작하지 않는다.
 
 [추천] 최종 Action은 route-derived return policy를 사용한다. 지금 string `ADVANCE_CAMPAIGN_ENTRY`가 있으므로 sequential 의미를 유지하고 resume policy를 추가할 수 있다. mode/return_policy를 content Resource에 자유 조합으로 expose하지 않아 잘못된 advance/resume 조합을 만들지 않는다.
 

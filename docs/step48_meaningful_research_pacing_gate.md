@@ -1,5 +1,7 @@
 # Step48 — Meaningful Research / Read Boundary Pacing Gate
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 기존 Godot 프로젝트에 Step48만 구현했다. 새로운 연구 완료와 자발적인 읽기 경계 사이에서는 normal Environmental Disturbance/Major Incident를 연속 표시하지 않는다. readiness는 기존 opportunity 규칙대로 계속 진행한다.
 
 ## 조사와 변경 범위
@@ -128,9 +130,9 @@ controlled selector fixture는 후보/readiness 또는 OPEN을 명시적으로 �
 
 ## Git와 보존 검증
 
-HEAD 79955a147ece4398d59d76bc49e3f123423cdc17, master→origin/main은 그대로다. staged0, 삭제0, commit/push0. 시작 당시 비생성 파일114개 중 변경 범위는 두 Script와 README로 제한한다. 기존 검증 source/UID/JSON 9028개 SHA256도 모두 보존했다. project.godot/전체 Scene/Resource/State/Step46~47 문서/read_models는 baseline hash와 같고, Main의 Snapshot/handoff/hidden Resolution/response completion/Source Archive 함수는 본문 단위 비교가 동일하다. 최종 git diff --check와 diff/status 파일 목록을 확인했다.
+HEAD 79955a147ece4398d59d76bc49e3f123423cdc17, master→origin/main은 그대로다. staged0, 삭제0, 작성 당시 Git 기준선 유지. 시작 당시 비생성 파일114개 중 변경 범위는 두 Script와 README로 제한한다. 기존 검증 source/UID/JSON 9028개 SHA256도 모두 보존했다. project.godot/전체 Scene/Resource/State/Step46~47 문서/read_models는 baseline hash와 같고, Main의 Snapshot/handoff/hidden Resolution/response completion/Source Archive 함수는 본문 단위 비교가 동일하다. 최종 git diff --check와 diff/status 파일 목록을 확인했다.
 
-## 요청한 192개 종료 보고 항목
+## 구현·검증 체크리스트 (원래 192개 항목)
 
 ### 1. 작업 전 Git 상태
 
@@ -836,9 +838,9 @@ staged 파일은 0이다.
 
 기존 Step46/47 보고서·read_models·기존 README block과 Main Snapshot/handoff/hidden Resolution 구현을 보존했다. source-before/tests-before SHA256 대조 결과를 기록했다.
 
-### 177. commit/push 없음
+### 177. 작성 당시 index 변경 없음
 
-HEAD/remote/branch를 변경하지 않았다. git commit/push를 실행하지 않았다.
+HEAD/remote/branch를 변경하지 않았다. git 작성 당시 Git 기준선 유지.
 
 ### 178. P0
 

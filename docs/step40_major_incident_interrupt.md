@@ -1,12 +1,14 @@
 # Step40 — Delayed Major Incident Interrupt
 
-작업일: 2026-10-05. 기존 프로젝트의 정상 Case 진행에 지연 Major Incident 대응을 연결했다. 기존 Step39 미커밋 변경을 보존했다. 커밋·push하지 않는다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+작업일: 2026-10-05. 기존 프로젝트의 정상 Case 진행에 지연 Major Incident 대응을 연결했다. 기존 Step39 미커밋 변경을 보존했다.
 
 Case01의 실패는 handoff에서 내부 판정으로 남고, Case02의 안전한 Gameplay 기회가 환경 교란을 먼저 발생시킨다. 이후 별개의 유효한 기회에서 Case01의 INCIDENT → BROADCAST → INCIDENT_RESULT를 처리하고, 동일한 Case02 Resource/Runtime으로 중단했던 화면에 돌아온다. 정상 대응의 끝에 RESULT로 가지 않는다.
 
 ## 작업 전 실제 저장소
 
-HEAD `0e9ae101d792c4c91a5f1886673f574215ae6454` (`Audit core loop UX and correct prototype status labels`). `master`가 `origin/main`을 추적한다. 기존 변경은 README.md, 두 Case `.tres`, 새 `docs/step39_case_evidence.md`였다. 프로젝트/상위 경로에서 적용할 AGENTS.md는 발견하지 않았다.
+HEAD `0e9ae101d792c4c91a5f1886673f574215ae6454` (`Audit core loop UX and correct prototype status labels`). `master`가 `origin/main`을 추적한다. 기존 변경은 README.md, 두 Case `.tres`, 새 `docs/step39_case_evidence.md`였다.
 
 실제 소스 101개와 기존 검증 소스 2,539개의 SHA-256 기준선, 기존 diff, README 사본을 `.godot/verification/step40`에 저장했다. Main의 normal/debug route, 모든 기존 State/Resource/View 연결, Case01/02 콘텐츠와 Research 매핑, Step38/39 보고서, 기존 검증 자료를 조사했다. Step39의 두 Resource와 보고서는 이번 단계에서 변경하지 않았다.
 
@@ -104,7 +106,7 @@ Godot `4.7.1.stable.official.a13da4feb`, Windows, OpenGL Compatibility GPU를 �
 | Scope / diff | 기준선 101개 중 97개 SHA 동일, 허용된 4개만 수정; Step40 3개 추가, 삭제 0 |
 | 기존 작업 보존 | Step39 두 Resource/보고서 SHA 동일, README 기존 내용/줄끝 보존, 이전 검증 소스 2,539개 SHA 동일 |
 | 프로젝트 / Scene | project.godot과 기존 모든 Scene byte SHA 동일; Autoload/해상도/Stretch 추가 변경 없음 |
-| Git | git diff --check 통과, HEAD 그대로, commit/push 없음 |
+| Git | git diff --check 통과, HEAD 그대로, 작성 당시 index 변경 없음 |
 
 검증 준비 중 새 검사에 스크롤 helper가 없던 문제와 Vent fixture ID 오타를 수정했다. 기존 GPU flow 회귀 사본의 빈 `regression` 캡처 폴더가 누락되어 PNG 저장이 한 번 실패했고, 해당 폴더를 생성한 뒤 동일 입력 서명/로그 SHA가 확인된 성공 검사들을 재사용하여 남은 회귀를 완료했다. 원본 검증 코드를 수정하거나 assertion을 약화하지 않았다. 최종 제품 파싱/실행 오류는 없다.
 
@@ -113,11 +115,11 @@ GPU capture는 창 1920×1080 / 1280×720 / 1024×768에서 얻었다. 4:3 창�
 검증 소스/로그/이미지/기준선은 기존 정책에 따라 Git에서 제외된 `.godot/verification/step40`에 있다. 대표 실행 명령:
 
 ```powershell
-& 'C:\Users\newsj\Downloads\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' --headless --path . --editor --import --quit
+& $GodotPath --headless --path . --editor --import --quit
 & .godot/verification/step40/run_validation.ps1
 ```
 
-## 요청한 106개 종료 보고 항목
+## 구현·검증 체크리스트 (원래 106개 항목)
 
 | # | 항목 | 실제 구현/확인 |
 |---|---|---|

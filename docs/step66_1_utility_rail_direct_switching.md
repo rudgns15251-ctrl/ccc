@@ -1,10 +1,12 @@
 # Step66.1 — Utility Rail Direct Switching UX Fix
 
-검증 환경: Godot 4.7.1.stable.official.a13da4feb / Windows / GL Compatibility / AMD Radeon RX 6800. 이번 단계는 UI 탐색 수정이다. stage/commit/push는 하지 않았다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+검증 환경: Godot 4.7.1.stable.official.a13da4feb / Windows / GL Compatibility / AMD Radeon RX 6800. 이번 단계는 UI 탐색 수정이다.
 
 ## 1. 실제 문제 원인 / 사전 조사
 
-전체 파일 목록, 164개 기존 파일의 SHA-256·원본, Git 상태, Main Scene/Script, Shell, Drawer, Archive List/Detail, held-work와 canonical/presented Stage, Navigation/Response guard를 먼저 조사했다. 적용되는 AGENTS.md는 없었다.
+전체 파일 목록, 164개 기존 파일의 SHA-256·원본, Git 상태, Main Scene/Script, Shell, Drawer, Archive List/Detail, held-work와 canonical/presented Stage, Navigation/Response guard를 먼저 조사했다.
 
 `_refresh_shell()`의 `work`는 PROFILE~CONTAINMENT만 인정했다. Archive Stage에서는 일반 held-work가 있어도 R/N이 비활성화됐다. 또한 R/N Handler는 Archive를 정상 업무로 복원하는 연결이 없어서 버튼만 활성화해도 Drawer를 열 수 없었다. Drawer 내부만 순환하던 Tab 연결도 Rail 접근을 막았다.
 
@@ -106,7 +108,7 @@ Controlled fixtures는 복제한 Campaign/Case의 긴 목록·본문·메모, Si
 
 `metrics_summary.json`, 각 환경 JSON, raw log, native PNG, Step66 baseline 대비 `delta_*.patch`, `change_audit.json`에 기록했다. 기존 검증 파일 **62,362개**는 최종 SHA-256 재검사에서 모두 동일하며 수정/삭제 0이다(새 preparation helper 1개를 포함한 hash ledger는 62,363개). 제품/문서 baseline은 별도로 비교한다.
 
-최종 HEAD/branch/upstream 유지, staged 0, commit/push 0. `git diff --check` 통과. README 기존 byte prefix와 이전 Step66 보고서 및 Theme/Shell/Experiment 변경을 보존했다. 최종 git status의 modified 6개(이전 5개 + ResearchLogView), untracked 보고서 2개(이전 Step66 + 신규 Step66.1)는 기존 작업을 포함한 상태다. 삭제 0. CRLF/LF 정규화 안내는 Git text 정책이며 whitespace 오류가 아니다.
+최종 HEAD/branch/upstream 유지, staged 0, 작성 당시 index 변경 없음. `git diff --check` 통과. README 기존 byte prefix와 이전 Step66 보고서 및 Theme/Shell/Experiment 변경을 보존했다. 최종 git status의 modified 6개(이전 5개 + ResearchLogView), untracked 보고서 2개(이전 Step66 + 신규 Step66.1)는 기존 작업을 포함한 상태다. 삭제 0. CRLF/LF 정규화 안내는 Git text 정책이며 whitespace 오류가 아니다.
 
 ## 13. 남은 문제 / 다음 확인 지점
 

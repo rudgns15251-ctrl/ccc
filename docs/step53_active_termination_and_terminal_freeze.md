@@ -1,5 +1,7 @@
 # Step53 — Active Response Run-End Integration + Terminal Source Freeze
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 DEVELOPER RUN-END INTEGRATION ONLY
 
 NO PLAYER RUN END / NO SETTLEMENT / NO SOURCE CLEANUP
@@ -100,9 +102,9 @@ Step52 기존 Active-block expectations는 의도적으로 신규 의미로 대�
 
 ## Git 및 파일 보존 확인
 
-이번 baseline125개 중118개 byte 동일, 기존7개 수정, 새 보고서1개, 삭제0. 이전 검증 증거50890개 SHA-256 동일을 별도 확인했다. 기존 README prefix/Step39 편집/Step49~52 문서 및 Record/State/UID는 보존했다. git diff --check 통과, staged0, HEAD/branch/upstream 동일. 이번 단계만의 Main/builder diff는 `.godot/verification/step53/*-step53.diff`, 최종 파일 hash와 Git 상태는 `final-integrity.json`에 보관했다. HEAD 기준 diff에는 이전 단계 미커밋 변경도 포함되므로 baseline diff와 구별한다. stage/commit/push 하지 않았다.
+이번 baseline125개 중118개 byte 동일, 기존7개 수정, 새 보고서1개, 삭제0. 이전 검증 증거50890개 SHA-256 동일을 별도 확인했다. 기존 README prefix/Step39 편집/Step49~52 문서 및 Record/State/UID는 보존했다. git diff --check 통과, staged0, HEAD/branch/upstream 동일. 이번 단계만의 Main/builder diff는 `.godot/verification/step53/*-step53.diff`, 최종 파일 hash와 Git 상태는 `final-integrity.json`에 보관했다. HEAD 기준 diff에는 이전 단계 미커밋 변경도 포함되므로 baseline diff와 구별한다.
 
-## 요청한 종료 보고 230항목
+## 구현·검증 체크리스트 (원래 230개 항목)
 
 | 번호 | 항목 | 실제 결과 |
 | ---: | --- | --- |
@@ -333,6 +335,5 @@ Step52 기존 Active-block expectations는 의도적으로 신규 의미로 대�
 | 225 | report | 이 문서. 사용자 요청230항목과 상태/변경/검증/제한 포함. |
 | 226 | git diff --check | 최종 git diff --check 통과. untracked report/builder whitespace 별도 검사. |
 | 227 | staged | 0. |
-| 228 | commit/push | 하지 않음. HEAD/branch/upstream 보존. |
 | 229 | next Step readiness | verified receipt 기반 cleanup 설계를 시작할 수 있음. 실제 source cleanup/no-run/next-run 상태는 아직 없음. |
 | 230 | next Step recommendation | Step54는 receipt 검증→source cleanup/reset→no-run/next-run boundary만 좁게 구현. Settlement는 별도 단계 가능. |

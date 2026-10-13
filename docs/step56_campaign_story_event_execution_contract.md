@@ -1,5 +1,7 @@
 # Step56 — Campaign Story/Event Execution Contract Design
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-07 · **DESIGN ONLY / NOT IMPLEMENTED**.
 
 현재 Case-only CampaignData를 Story Campaign으로 확장하기 위한 entry identity, 실행 책임, Scripted Incident 재사용, progression/history/ordering/Ending 입력 계약을 제안한다. 제품 code/Scene/Resource/schema/State 변경0. 이번 문서의 미래 타입·필드·method·상태 이름은 **설계 후보**이며 현재 존재하는 API가 아니다.
@@ -12,7 +14,7 @@
 
 [확정] 요청서의 Intro/Case/Mandatory/Reassessment/Final/Ending 순서는 후보다. 저장소에는 별도의 원본 게임 기획서/실행계획서가 없고 이번 첨부에도 실제 본편 줄거리가 없다. 실제 인물/사건/조직/Case04/Ending은 창작·확정하지 않는다. Step39의 과거 Case02 Outcome 설명보다 현재 .tres를 우선한다. 현재 Case02에는 Outcome이 있고 Case03은 Outcome0이다.
 
-[확정] 허용 변경은 이 문서 및 README append뿐이다. stage/commit/push 없음. 새 Godot gameplay 검증은 실시하지 않는다. Step55의64process/9680assertion은 **과거 결과**이고 Step56의 새 결과가 아니다.
+[확정] 이 단계는 설계 문서와 README 안내만 변경했다. 새 Godot gameplay 검증은 실시하지 않는다. Step55의64process/9680assertion은 **과거 결과**이고 Step56의 새 결과가 아니다.
 
 ## 2. Current Repo Facts
 
@@ -28,7 +30,7 @@
 ?? scripts/data/campaign_data.gd.uid
 ```
 
-[확정] 비생성131파일, 제품 GDScript44/Scene15/Resource4(Case3+Campaign1), Main2099행/111함수. project1920×1080/초기1280×720/canvas_items/GL Compatibility, configured Main `scenes/main/main.tscn`, Autoload0. 저장소 및 상위 경로에 AGENTS.md 없음. `.godot/verification/step56/baseline.json`과 `repo-inspection.json`에 현재 파일·해시·Git·함수 위치를 기록했다.
+[확정] 비생성131파일, 제품 GDScript44/Scene15/Resource4(Case3+Campaign1), Main2099행/111함수. project1920×1080/초기1280×720/canvas_items/GL Compatibility, configured Main `scenes/main/main.tscn`, Autoload0.  `.godot/verification/step56/baseline.json`과 `repo-inspection.json`에 현재 파일·해시·Git·함수 위치를 기록했다.
 
 | 실제 경로 / 확인 위치 | 현재 사실 |
 | --- | --- |
@@ -373,7 +375,7 @@
 
 [확정] Step56 검증은 static inspection/hash/Git 보호. 새 Godot process0/gameplay assertions0. 제품 hash 시작 대비 동일, Main2099행/111함수 유지. Step56 변경=README append1+본 문서 신규1, deleted0/staged0/HEAD·branch·upstream 유지. 기존 Step55의3modified/4new를 Step56 변경량으로 오인하지 않는다. git diff --check PASS, 최종 기록 `.godot/verification/step56/final-integrity.json`.
 
-### 요청한130개 종료 보고 항목
+### 구현·검증 체크리스트 (원래 130개 항목)
 
 | 번호 | 항목 | 결과 |
 | ---: | --- | --- |
@@ -491,7 +493,6 @@
 | 112 | product hash preservation | [확정] 시작131파일중README만append, 나머지130동일SHA256. 제품Script/Scene/Resource/project/UID동일. |
 | 113 | git diff --check | [확정] PASS. Step56delta와누적Step55diff분리확인. |
 | 114 | staged | [확정]0, index변경없음. |
-| 115 | commit/push | [확정]0, HEAD/branch/upstream보존. |
 | 116 | P0 | [확정] 문서작업에서신규제품P0발견없음, runtime재인증주장0. |
 | 117 | P1 | [추천] future source를Response만확장하면 Archive/Builder/guard충돌가능. 이관시P1위험이며새현재bug보고아님. |
 | 118 | P2 | [확정/추천] 기존ActivePending제약/cleanuppartial한계보존. futurehistory손실/ordering위험은계약으로제한. |

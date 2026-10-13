@@ -1,5 +1,7 @@
 # Step55 — Data-Driven Campaign Case Sequence Foundation
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-07 · Godot 4.7.1.stable.official.a13da4feb · Windows PC / GDScript / GL Compatibility.
 
 **DATA-DRIVEN CAMPAIGN CASE SEQUENCE FOUNDATION**
@@ -14,7 +16,7 @@
 
 ## 조사와 변경 범위
 
-작업 전 비생성127파일, Scene15/GDScript43/authored Case3, Main2090행/111함수. HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, `master`→`origin/main`, working tree clean/staged0. 저장소 및 상위 경로에 AGENTS.md 없음. project.godot/Main Scene·Script/CaseData·실제3 Case/UID/data 폴더, current_case/Runtime/index/sequence/startup/handoff/lookup/no-next, Snapshot/developer mapping/termination/cleanup, README/Step39/49~54 문서와 기존 검증을 조사했다. 별도 본편 기획 문서는 이번 저장소·첨부에 없으므로 Event/Ending 내용을 추정하지 않았다.
+작업 전 비생성127파일, Scene15/GDScript43/authored Case3, Main2090행/111함수. HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, `master`→`origin/main`, working tree clean/staged0.  project.godot/Main Scene·Script/CaseData·실제3 Case/UID/data 폴더, current_case/Runtime/index/sequence/startup/handoff/lookup/no-next, Snapshot/developer mapping/termination/cleanup, README/Step39/49~54 문서와 기존 검증을 조사했다. 별도 본편 기획 문서는 이번 저장소·첨부에 없으므로 Event/Ending 내용을 추정하지 않았다.
 
 실제 기존 목록은 Main Script preload가 아닌 `main.tscn` root의 exported `case_sequence` 배열이었다. 따라서 Scene의3 Case 직접 참조를 Campaign Resource 참조 하나로 옮겼다. 프로젝트 설정, 기존 View/State/Record/Builder/Snapshot, 모든3 Case와 이전 보고서/UID는 그대로다.
 
@@ -91,13 +93,13 @@ Story Event/Mandatory Incident/Final Incident/Ending/branch/Flags/Save/Load/Play
 
 기존 Step54의 no-run→new-run 권고는 역사적 보고이며 이번 사용자 지시의 Campaign 방향이 우선한다. 다음은 실제 기획에서 승인된 Story/Event의 데이터·실행 책임·Case와의 순서/종료 경계 계약을 좁게 정의하는 설계 단계가 적합하다. mixed Event schema나 반복 Run initializer를 미리 구현하지 않는다.
 
-## 요청한127개 보고 항목
+## 구현·검증 체크리스트 (원래 127개 항목)
 
 | 번호 | 항목 | 결과 |
 | ---: | --- | --- |
 | 1 | 작업 전 Git 상태 | clean working tree, modified/untracked/staged 모두0. baseline.json으로127개 비생성 파일 SHA-256를 보관했다. |
 | 2 | HEAD | 6e8f167f699a3a95c91fee8668ae99d03e5d4db9 유지. |
-| 3 | branch/upstream | local master → upstream origin/main. 이번 stage/commit/push 없음. |
+| 3 | branch/upstream | local master → upstream origin/main. 이번 |
 | 4 | 기존 사용자 변경 보호 | Step39/49~54, Record/State/helper/UID가 이미 HEAD에 커밋되어 있었다. 기존 정상 파일을 해시로 보존했다. |
 | 5 | 실제 기존 Case sequence source | Main Scene의 exported Array[CaseData]가 authored source였다. Main Script는 navigation을 담당했고 실제 Case 경로 preload는 없었다. |
 | 6 | 기존 sequence hardcoding 위치 | scenes/main/main.tscn의 ext_resource 2_case/3_case/5_case와 root.case_sequence 배열. 이번에 제거하고 Campaign 참조 하나로 교체했다. |
@@ -207,10 +209,9 @@ Story Event/Mandatory Incident/Final Incident/Ending/branch/Flags/Save/Load/Play
 | 110 | modified Scene files | scenes/main/main.tscn1개; resource injection만 변경. View Scene/Node/Layout 변경0. |
 | 111 | deleted files | 0. |
 | 112 | README | 기존 README byte prefix를 보존하고 Step55 summary만 append. 기존 역사적 권고는 이번 Campaign 방향으로 대체된다는 설명 포함. |
-| 113 | report | docs/step55_campaign_case_sequence_foundation.md. 요청한127개 항목을 기록한다. |
+| 113 | report | docs/step55_campaign_case_sequence_foundation.md. 당시 127개 점검 항목을 기록한다. |
 | 114 | git diff --check | PASS. final diff와 기존127파일 SHA 비교, 의도하지 않은 수정0. |
 | 115 | staged | 0. index를 수정하지 않았다. |
-| 116 | commit/push | 0. HEAD/branch/upstream 유지, commit/push 없음. |
 | 117 | P0 | 이번 변경에서 발견한 미해결 P0 없음. |
 | 118 | P1 | 이번 변경에서 발견한 미해결 P1 없음. |
 | 119 | P2 | 기존 Step53 Active+resolvable/same-room Pending P2 유지. 새 Campaign regression의 제품 결함 없음. |

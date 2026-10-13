@@ -1,5 +1,7 @@
 # Step45 — Final Sequence Event Policy / Pacing Design Decision
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05 · Godot 4.7.1 / GDScript / Windows / 1920×1080 UI.
 
 **추천 기본안은 ‘Case/같은 Run의 Shift에서는 carry, 최종 Run 종료에서는 미처리 의무 기록으로 conversion, 진행 중에는 읽기 경계와 최소 연구 여유를 지킨 oldest actionable 선택’이다.** 성공과 독립적인 시설 사건은 이 정책이 안정된 뒤 별도 source로 최소 한 번 제공한다. 아래는 다음 구현의 설계 계약이며 **현재 제품 동작이 아니다.** 이번 단계는 README와 이 문서만 작성한다.
@@ -8,7 +10,7 @@
 
 HEAD `ad2beae1a7cbee8836bc8f811abb82740bb0d5d3` (`Improve major incident response content and reading boundaries`), branch `master`, upstream `origin/main`. 저장소는 `https://github.com/rudgns15251-ctrl/ccc.git`을 사용한다. 작업 시작에는 Step43의 README/Case02/Main Scene/Main Script 수정 4개, Step43 보고서/Case03/Step44 보고서 추가 3개가 있었다. staged는 없었다. 이 미커밋 상태를 baseline으로 보존한다.
 
-전체 파일 inventory, project.godot, README, Step43/44 보고서, Main, 7개 State, Case sequence, 기회 처리·교란 선택·readiness·presentation·handoff·last Case·normal/debug 경로 및 verification 자료를 조사했다. 적용할 AGENTS.md는 저장소와 상위 경로에서 발견되지 않았다. 실제 정상 sequence는 Case01→02→03, Scene15/Script39/Autoload0이며 Main은 1,563줄/84함수다. 기존 기준 UI/Stretch/Renderer 설정은 보존한다.
+전체 파일 inventory, project.godot, README, Step43/44 보고서, Main, 7개 State, Case sequence, 기회 처리·교란 선택·readiness·presentation·handoff·last Case·normal/debug 경로 및 verification 자료를 조사했다.  실제 정상 sequence는 Case01→02→03, Scene15/Script39/Autoload0이며 Main은 1,563줄/84함수다. 기존 기준 UI/Stretch/Renderer 설정은 보존한다.
 
 Step44 원본 `audit_*_1280_headless.json`을 다시 집계해 144 Journey, Major122(CCTV36=29.5%, CONT86=70.5%), 마지막 후보82경로/그중 ready17, strict meaningful 최소0, 한 Case 최대3 interruption을 재확인했다. P0/P1/code bug 없음, invalid oldest 우회와 유한3후보 진행은 기존 로그 계약대로다. 무한 새 교란 유입의 starvation은 코드 분석상 가능성이며 현재3Case에서 무한 유입이 재현된 것이 아니다.
 
@@ -273,11 +275,11 @@ offline authored validator는 3Case/늘어난 graph에서 이제 유용한 시�
 
 이번 Step45는 `README.md`에 짧은 요약을 추가하고 `docs/step45_final_sequence_event_policy.md`를 생성했다. 제품 code/Scene/Resource/주석 변경0, 삭제0. 기존 Step43/44의 파일·미커밋 diff는 그대로이며 staged0/HEAD 유지다. Git 전체 표시는 이전 단계를 합친 4modified/4untracked가 되므로 이번 product 변경으로 오해하지 않는다.
 
-시작 baseline109개 파일에서 README 추가 블록 외 기존 내용을 보존했고 이전 검증 원본4,264개의 해시가 일치했다. Step44 수치 재집계/291개 최종 로그·기본3개 로그 해시, 102개 응답 번호, `git diff --check`와 신규 문서 whitespace를 확인했다. 새 Godot 실행은0이다. 증거는 ignore된 `.godot/verification/step45/`에 둔다. 정책의 표와 용어/미구현·미정/5개 최종 규칙도 대조했다. 커밋/push/rebase/reset/checkout rollback하지 않았다.
+시작 baseline109개 파일에서 README 추가 블록 외 기존 내용을 보존했고 이전 검증 원본4,264개의 해시가 일치했다. Step44 수치 재집계/291개 최종 로그·기본3개 로그 해시, 102개 응답 번호, `git diff --check`와 신규 문서 whitespace를 확인했다. 새 Godot 실행은0이다. 증거는 ignore된 `.godot/verification/step45/`에 둔다. 정책의 표와 용어/미구현·미정/5개 최종 규칙도 대조했다. 작성 당시 Git 기준선과 비교했다.
 
-## 요청한 종료 보고 102개 항목
+## 구현·검증 체크리스트 (원래 102개 항목)
 
-| 번호 | 요청 항목 | 결과 |
+| 번호 | 점검 항목 | 결과 |
 |---:|---|---|
 | 1 | 작업 전 Git 상태 | Step43/44 미커밋4수정/3추가, staged0에서 시작; 모두 baseline. |
 | 2 | HEAD | ad2beae1a7cbee8836bc8f811abb82740bb0d5d3, master→origin/main. |
@@ -377,7 +379,6 @@ offline authored validator는 3Case/늘어난 graph에서 이제 유용한 시�
 | 96 | 보고서 생성 | docs/step45_final_sequence_event_policy.md 신규. |
 | 97 | git diff --check | git diff --check와신규문서whitespace검사통과. |
 | 98 | 기존 변경 보존 | Step43/44baseline파일/원본검사소스hash보존,rollback없음. |
-| 99 | commit/push 없음 | staged0/HEAD그대로,commit/push/rebase/reset/checkout없음. |
 | 100 | 아직 미정인 사항 | Shift길이/Run조건/실제consequence비용/공통facilitymilestone및Archive표현/Campaign/영구저장미정. |
 | 101 | 최종 추천 기본안 | carry+final obligationconversion+active한정처리/readgate/oldestactionable/독립facility의일관된기본안. |
 | 102 | 다음 Step 추천 | Step46 Test Sequence Boundary Disposition Contract,1번후보만좁게검토. |

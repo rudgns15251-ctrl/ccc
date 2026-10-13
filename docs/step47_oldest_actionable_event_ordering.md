@@ -1,14 +1,16 @@
 # Step47 — Oldest Actionable Event Ordering
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05 · Godot `4.7.1.stable.official.a13da4feb` · GDScript · Windows · GL Compatibility.
 
 **현재 경계에서 실제 표시 가능한 이벤트를 후보 등록 순서로 하나 선택하도록 변경했다.** Old Major/New Disturbance가 모두 actionable인 CCTV/Containment에서는 Old Major가 먼저다. invalid/unready/non-presentable 후보는 삭제·완료하지 않고 건너뛴다. 단일 후보 흐름, 실험 결과 읽기 경계, source/current/Archive/Runtime 분리와 Step46 Snapshot 계약은 유지한다.
 
 ## 조사와 범위
 
-작업 시작 `master` → `origin/main`, HEAD `79955a147ece4398d59d76bc49e3f123423cdc17` (`Extend three-case prototype and document event pacing policies`), remote `https://github.com/rudgns15251-ctrl/ccc.git`. 시작 미커밋은 Step46 README/Main 수정2개와 보고서/Snapshot/UID 추가3개다. commit/push/stage 없이 이 변경을 baseline으로 취급했다.
+작업 시작 `master` → `origin/main`, HEAD `79955a147ece4398d59d76bc49e3f123423cdc17` (`Extend three-case prototype and document event pacing policies`), remote `https://github.com/rudgns15251-ctrl/ccc.git`. 시작 미커밋은 Step46 README/Main 수정2개와 보고서/Snapshot/UID 추가3개다. 이 변경을 작성 당시의 baseline으로 취급했다.
 
-저장소 전체113파일, project.godot, Main Scene/Script, 15 Scenes/40 GDScripts/3 Case Resources, 7 State와 read model, UI/Signal/opportunity/response lookup, Step41~46 보고서 및 기존 검증을 조사했다. 적용할 AGENTS.md 없음. 기준1920×1080, 초기1280×720, canvas_items/keep/resizable, GL Compatibility와 Main 경로 불변. Autoload0.
+저장소 전체113파일, project.godot, Main Scene/Script, 15 Scenes/40 GDScripts/3 Case Resources, 7 State와 read model, UI/Signal/opportunity/response lookup, Step41~46 보고서 및 기존 검증을 조사했다.  기준1920×1080, 초기1280×720, canvas_items/keep/resizable, GL Compatibility와 Main 경로 불변. Autoload0.
 
 이번 제품 수정은 `scripts/main/main.gd`의 기회 처리 구간뿐이다. 기존 D validation/presentation을 작은 helper로 이동하고, 분리된 D/M 두 scan을 등록 순서 한 scan으로 바꿨다. Main1,616→1,629줄/85→87함수(+13줄/+2 private functions). `README.md`에는 Step47 block만 추가했다. 새 tracked 대상은 이 보고서1개다. State/Data/Resources/Views/Scenes/read model/project 변경0, 삭제0. 검증 사본·runner·로그·JSON·PNG는 ignored `.godot/verification/step47/` 아래다.
 
@@ -132,9 +134,9 @@ Step46의 Main은 HEAD Main에 현 Snapshot 함수를 삽입하면 시작 baseli
 
 다음 작업은 별도의 **Meaningful Research / Read Boundary Pacing Gate**가 적합하다. readiness counter 증가와 display permission을 분리하고, EXP 결과 실제 읽기 경계/새 source 연구의 승인 계약을 먼저 정의해야 한다. Dismiss/Resume/Archive/idle/recheck를 연구 credit으로 쓰거나, gate 거절에서 flag/key/RNG를 재소비하지 않도록 해야 한다. last boundary leftovers와 실제 source/current/Archive/Runtime도 재측정한다. 이번에는 gate/Run/Settlement/Save·Load/성공 독립 사건/Case04/Case03 Outcome/새 UI·Shader·Audio를 추가하지 않았다.
 
-## 요청한 종료 보고 144개 항목
+## 구현·검증 체크리스트 (원래 144개 항목)
 
-| 번호 | 요청 항목 | 결과/근거 |
+| 번호 | 점검 항목 | 결과/근거 |
 |---:|---|---|
 | 1 | 작업 전 Git 상태 | 시작 수정 README/Main 2개, untracked Step46 보고서/Snapshot/UID 3개. source-before113파일과 과거 검증8,737개 hash 기록. |
 | 2 | HEAD / branch / upstream | 79955a147ece4398d59d76bc49e3f123423cdc17; master → origin/main; remote rudgns15251-ctrl/ccc.git. 변경 없음. |
@@ -261,9 +263,7 @@ Step46의 Main은 HEAD Main에 현 Snapshot 함수를 삽입하면 시작 baseli
 | 123 | 생성 파일 | 이번 tracked 대상 생성 docs/step47_oldest_actionable_event_ordering.md 1개. 새 검사·사본·로그는 ignored .godot/verification/step47에만 생성. |
 | 124 | 삭제 파일 | 이번 삭제0. |
 | 125 | git diff --check | git diff --check 및 새 보고서 whitespace 검사 PASS. |
-| 126 | staged 여부 | staged0. git diff --cached empty. |
 | 127 | 기존 변경 보존 | 113 baseline 파일 중 허용 README/Main 외111 hash 동일; 기존 검증8,737 hash 동일. Step46 원본 Main 재구성 hash 일치 및 Snapshot 함수 불변. |
-| 128 | commit/push 없음 | HEAD/branch/upstream 유지; commit/push 미실행. |
 | 129 | 발견 CODE bug | 새 P0/P1 CODE bug 재현 없음. 기존 D-first age inversion은 이번 요청한 selection 정책 문제로 좁혀 수정. |
 | 130 | 발견 UX 변화 | 옛 source Major가 먼저 나타나고 source/current context·Archive는 유지. 인간의 자연스러움/공포/피로 향상은 검증하지 않음. |
 | 131 | 발견 GAME DESIGN 변화 | 마지막 safe slot 배분이 새 D에서 old M으로 바뀜. 미노출 새 전조/잔여 phase는 의도된 ordering 결과; 종료 보상/정산 규칙 없음. |

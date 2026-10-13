@@ -1,12 +1,14 @@
 # Step69 — First Authored Mid-Case Scripted Incident Integration
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 기존 제품 Campaign에 첫 authored Mid-Case 사건을 연결했다. 게임 코드는 수정하지 않았다. 신규 콘텐츠는 전부 `[TEMP STORY CONTENT]`이며 교체 가능한 시설 장비 이상이다. CASE01 → CASE02 → TEMP Mandatory Incident01 → CASE03 순서와 기존 UI/Runtime/terminal 계약을 유지한다.
 
 ## 1. Repository Baseline
 
-작업 전 비생성 파일 167개, 제품 GDScript 53개, Scene 17개, authored `.tres` 6개를 조사했다. 폴더는 `scripts/{data,runtime,read_models,main,ui,views}`, `scenes/{main,ui,views}`, `resources/{cases,campaigns,incidents,ui}`, `assets`, `docs`다. 적용되는 AGENTS.md는 없었다.
+작업 전 비생성 파일 167개, 제품 GDScript 53개, Scene 17개, authored `.tres` 6개를 조사했다. 폴더는 `scripts/{data,runtime,read_models,main,ui,views}`, `scenes/{main,ui,views}`, `resources/{cases,campaigns,incidents,ui}`, `assets`, `docs`다.
 
-HEAD `742d8e5fc971a6c7e81ac11bee14cabc4ac14d66`, branch `master`, upstream `origin/main`. 작업 전 staged/unstaged/untracked 변경은 없었다. 이전 Step66~68은 해당 HEAD에 커밋·푸시되어 있었다. 이번 요청의 stage/commit/push 금지를 따른다.
+HEAD `742d8e5fc971a6c7e81ac11bee14cabc4ac14d66`, branch `master`, upstream `origin/main`. 작업 전 staged/unstaged/untracked 변경은 없었다. 이전 Step66~68은 해당 HEAD에 커밋·푸시되어 있었다.
 
 실제 `project.godot` Main은 `res://scenes/main/main.tscn`, 1920×1080 논리 해상도, 1280×720 창 override, `canvas_items`, GL Compatibility다. Autoload는 없다. 설정과 기존 파일을 보존했다. baseline/원본 파일/이전 증거 해시는 `.godot/verification/step69/baseline.json`, `before/`, `old_evidence_hashes.json`에 저장했다.
 
@@ -188,7 +190,7 @@ Source Archive의 work Nav/R/N 우회는 기존 guard가 차단한다. Broadcast
 
 1920×1080와 1280×720 각 GPU 19 PNG를 기록했다. 각각 Side A/C/실패 경로의 Incident/Broadcast/Modal/Result/복귀 15개와 Source Archive 기존 경로 4개다. 고정 Shell geometry/CTA bounds/단일 주요 View 검사, 모달 Cancel/Tab/ShiftTab/Enter 및 Source Archive/직접 Utility 입력을 통과했다. 화면을 직접 열어 제목·본문·선택지 4개·모달·Result·RESUME WORK 및 2/2 실험 복귀를 시각 확인했다.
 
-대표 원본: [1920 Incident](../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_incident_1920.png), [1280 Broadcast](../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_broadcast_1280.png), [1280 Modal](../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_modal_1280.png), [1280 wrong Result C](../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_C_result_1280.png), [1280 resumed Experiment](../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_resumed_1280.png). PNG/검증 코드/실행 로그는 ignored `.godot/verification/step69/`에만 있다.
+대표 원본: `../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_incident_1920.png`, `../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_broadcast_1280.png`, `../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_modal_1280.png`, `../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_C_result_1280.png`, `../.godot/verification/step69/regression/ui_69_ACTUAL69_R10_A_resumed_1280.png`. PNG/검증 코드/실행 로그는 ignored `.godot/verification/step69/`에만 있다.
 
 ## 17. Invalid Resource Tests
 
@@ -240,7 +242,7 @@ Godot `4.7.1.stable.official.a13da4feb`로 새 cache가 없는 프로젝트 복�
 
 기존 modified2 / created2 / deleted0. 기존 167개 중 나머지 **165개 byte-for-byte 동일**, 전체 파일169개다. 기존 verification evidence **64,871개 변경0/삭제0**를 SHA-256으로 확인했다. README 기존 prefix도 동일하다. 새 검증 코드/fixtures/fresh import copy/log/PNG는 ignored `.godot/verification/step69/`에만 작성했다.
 
-최종 `git diff --check` 통과, staged0. HEAD는 작업 전 값과 동일하고 `master`/`origin/main`도 유지한다. git diff의 Campaign 변화는 schedule만이며 `entries` 한 줄과 기존 4 entry sub_resource는 그대로다. stage/commit/push하지 않았다.
+최종 `git diff --check` 통과, staged0. HEAD는 작업 전 값과 동일하고 `master`/`origin/main`도 유지한다. git diff의 Campaign 변화는 schedule만이며 `entries` 한 줄과 기존 4 entry sub_resource는 그대로다.
 
 ## 20. Known Gaps
 

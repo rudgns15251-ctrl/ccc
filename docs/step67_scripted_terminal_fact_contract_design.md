@@ -1,5 +1,7 @@
 # Step67 — Completed Scripted Incident Historical Fact Contract Design
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **DESIGN / SOURCE AUDIT ONLY.** 2026-10-11. “현재”는 최신 소스에서 확인한 동작이며 “Step68 제안”은 아직 미구현이다. 제품 GDScript/Scene/Resource/Theme 변경 0, Godot 실행·새 테스트 0. 게임은 단일 Story Campaign이다. 기존 Run 명칭은 개발자 종료 기록의 내부 세션 식별자이며 경제·할당량·정산·상점·로그라이트를 의미하지 않는다.
 
 ## 1. Repository Baseline
@@ -13,7 +15,6 @@
 | untracked | 2: Step66 보고서, Step66.1 보고서 |
 | 조사·hash 기준 파일 | Git/.godot 제외 실제 파일 165개 |
 | 제품 구성 | GDScript 53개, Scene 17개, Resource .tres 6개 |
-| AGENTS.md | 현재 경로와 상위 경로에서 발견되지 않음 |
 
 실제 project.godot는 Main=`res://scenes/main/main.tscn`, 1920×1080 viewport, 1280×720 기본 창, canvas_items, GL Compatibility다. Autoload 섹션은 없다. Main/Shell/View/runtime/data/read_models/resources를 실제 파일 목록에서 확인했다. 기존 Step66/66.1 변경을 HEAD로 되돌리지 않는다.
 
@@ -328,4 +329,4 @@ release 후 retained query 객체는 당시 값으로 남을 수 있지만 live 
 
 Step66.1 Navigation, Archive A/Esc/BACK·R/A/N, Drawer/draft/focus/scroll 및 Step62/63를 시작 byte hashes와 대조한다. StoryFlags/Manager/Singleton/EventBus/새 CampaignCursor/Save/Load/Ending/Mandatory02/03/Case/Event/UI/경제 시스템을 추가하지 않는다.
 
-최종 Git: HEAD `19be4ea998d6479f5c46c3527d540ff4a16f2322`, branch master, upstream origin/main, staged 0. 이번 modified README 1 / created 보고서 1 / deleted 0. 전체 modified 6 / untracked 3 (기존 변경 포함). git diff --check 통과. 제품 GDScript/Scene/Resource/Theme/project.godot 및 이전 문서는 시작 hash 동일, README prefix 유지. **stage/commit/push 없음. Godot 재실행 없음.**
+최종 Git: HEAD `19be4ea998d6479f5c46c3527d540ff4a16f2322`, branch master, upstream origin/main, staged 0. 이번 modified README 1 / created 보고서 1 / deleted 0. 전체 modified 6 / untracked 3 (기존 변경 포함). git diff --check 통과. 제품 GDScript/Scene/Resource/Theme/project.godot 및 이전 문서는 시작 hash 동일, README prefix 유지.  Godot 재실행 없음.**

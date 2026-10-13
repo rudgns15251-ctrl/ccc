@@ -1,6 +1,8 @@
 # Step65 — UI/UX Acceptance Validation + Structural Stabilization + Asset Swap Readiness
 
-작성일: 2026-10-09. 판단 기준은 요청 원문과 작업 시작 시점의 실제 저장소다. 이 문서는 Step65 delta를 기록하며 Step55~64의 기존 미커밋 변경을 이번 단계 변경으로 계산하지 않는다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+작성일: 2026-10-09. 작업 시작 시점의 실제 저장소를 기준으로 UI 수용 조건을 검증했다. 이 문서는 Step65 delta를 기록하며 Step55~64의 기존 미커밋 변경을 이번 단계 변경으로 계산하지 않는다.
 
 결론: 기존 제품 Campaign과 UI 경계를 유지하면서 재현된 입력·포커스 문제를 최소 보완했다. 정식 에셋 적용 전 구조 검증은 통과했다. 사용자 시각 취향, 인간의 3초 탐색 시간, 실제 정식 에셋의 라이선스·호환성은 확정하지 않았다. Save, Ending, Mandatory02/03과 기존 terminal OPEN을 해결했다는 의미가 아니다.
 
@@ -8,7 +10,7 @@
 
 ## 1. Repo Baseline
 
-작업 전 전체 비캐시 파일 162개, 제품 GDScript 53개, Scene 17개, `.tres` 6개를 조사했다. `project.godot`, 모든 Main/Shell/View/Modal/Drawer Scene·script·Theme, Step62 memento, 실제 Case/Campaign/TEMP Incident Resource, Git 상태, focus neighbour/mouse_filter/anchor/container/minimum size/scroll 소유 관계를 확인했다. 시작 파일 전부의 SHA-256과 사본을 보관했다. repo/상위 폴더의 적용할 AGENTS.md는 없었다.
+작업 전 전체 비캐시 파일 162개, 제품 GDScript 53개, Scene 17개, `.tres` 6개를 조사했다. `project.godot`, 모든 Main/Shell/View/Modal/Drawer Scene·script·Theme, Step62 memento, 실제 Case/Campaign/TEMP Incident Resource, Git 상태, focus neighbour/mouse_filter/anchor/container/minimum size/scroll 소유 관계를 확인했다. 시작 파일 전부의 SHA-256과 사본을 보관했다. repo/상위 폴더의
 
 HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged 0. 기존 Step55~64 변경과 미추적 파일은 시작 때부터 존재했다. 기준 Main은 실제 142함수/2600줄이었다. Step64 문서의 수치를 추정해 적용하지 않았다. 이전 verification 59,562개 해시도 확보했다.
 
@@ -215,27 +217,27 @@ Main/runtime/data/read_models에서 외부 패키지명·texture filename·새 f
 
 | Review state | 1920×1080 | 1280×720 |
 |---|---|---|
-|01_profile_shell|[ui_01_profile_shell_1920.png](../.godot/verification/step65/ui_01_profile_shell_1920.png)|[ui_01_profile_shell_1280.png](../.godot/verification/step65/ui_01_profile_shell_1280.png)|
-|02_cctv|[ui_02_cctv_1920.png](../.godot/verification/step65/ui_02_cctv_1920.png)|[ui_02_cctv_1280.png](../.godot/verification/step65/ui_02_cctv_1280.png)|
-|03_experiment_selection|[ui_03_experiment_selection_1920.png](../.godot/verification/step65/ui_03_experiment_selection_1920.png)|[ui_03_experiment_selection_1280.png](../.godot/verification/step65/ui_03_experiment_selection_1280.png)|
-|04_experiment_result|[ui_04_experiment_result_1920.png](../.godot/verification/step65/ui_04_experiment_result_1920.png)|[ui_04_experiment_result_1280.png](../.godot/verification/step65/ui_04_experiment_result_1280.png)|
-|05_containment_rooms|[ui_05_containment_rooms_1920.png](../.godot/verification/step65/ui_05_containment_rooms_1920.png)|[ui_05_containment_rooms_1280.png](../.godot/verification/step65/ui_05_containment_rooms_1280.png)|
-|06_containment_modal|[ui_06_containment_modal_1920.png](../.godot/verification/step65/ui_06_containment_modal_1920.png)|[ui_06_containment_modal_1280.png](../.godot/verification/step65/ui_06_containment_modal_1280.png)|
-|07_research_drawer|[ui_07_research_drawer_1920.png](../.godot/verification/step65/ui_07_research_drawer_1920.png)|[ui_07_research_drawer_1280.png](../.godot/verification/step65/ui_07_research_drawer_1280.png)|
-|08_research_archive|[ui_08_research_archive_1920.png](../.godot/verification/step65/ui_08_research_archive_1920.png)|[ui_08_research_archive_1280.png](../.godot/verification/step65/ui_08_research_archive_1280.png)|
-|09_hypothesis_drawer|[ui_09_hypothesis_drawer_1920.png](../.godot/verification/step65/ui_09_hypothesis_drawer_1920.png)|[ui_09_hypothesis_drawer_1280.png](../.godot/verification/step65/ui_09_hypothesis_drawer_1280.png)|
-|10_environmental_disturbance|[ui_10_environmental_disturbance_1920.png](../.godot/verification/step65/ui_10_environmental_disturbance_1920.png)|[ui_10_environmental_disturbance_1280.png](../.godot/verification/step65/ui_10_environmental_disturbance_1280.png)|
-|11_failure_incident|[ui_11_failure_incident_1920.png](../.godot/verification/step65/ui_11_failure_incident_1920.png)|[ui_11_failure_incident_1280.png](../.godot/verification/step65/ui_11_failure_incident_1280.png)|
-|12_temp_sequential_incident|[ui_12_temp_sequential_incident_1920.png](../.godot/verification/step65/ui_12_temp_sequential_incident_1920.png)|[ui_12_temp_sequential_incident_1280.png](../.godot/verification/step65/ui_12_temp_sequential_incident_1280.png)|
-|13_broadcast_four_options|[ui_13_broadcast_four_options_1920.png](../.godot/verification/step65/ui_13_broadcast_four_options_1920.png)|[ui_13_broadcast_four_options_1280.png](../.godot/verification/step65/ui_13_broadcast_four_options_1280.png)|
-|14_broadcast_modal|[ui_14_broadcast_modal_1920.png](../.godot/verification/step65/ui_14_broadcast_modal_1920.png)|[ui_14_broadcast_modal_1280.png](../.godot/verification/step65/ui_14_broadcast_modal_1280.png)|
-|15_sequential_result|[ui_15_sequential_result_1920.png](../.godot/verification/step65/ui_15_sequential_result_1920.png)|[ui_15_sequential_result_1280.png](../.godot/verification/step65/ui_15_sequential_result_1280.png)|
-|16_side_result|[ui_16_side_result_1920.png](../.godot/verification/step65/ui_16_side_result_1920.png)|[ui_16_side_result_1280.png](../.godot/verification/step65/ui_16_side_result_1280.png)|
-|17_experiment_resume|[ui_17_experiment_resume_1920.png](../.godot/verification/step65/ui_17_experiment_resume_1920.png)|[ui_17_experiment_resume_1280.png](../.godot/verification/step65/ui_17_experiment_resume_1280.png)|
-|18_containment_resume|[ui_18_containment_resume_1920.png](../.godot/verification/step65/ui_18_containment_resume_1920.png)|[ui_18_containment_resume_1280.png](../.godot/verification/step65/ui_18_containment_resume_1280.png)|
-|19_case03_profile|[ui_19_case03_profile_1920.png](../.godot/verification/step65/ui_19_case03_profile_1920.png)|[ui_19_case03_profile_1280.png](../.godot/verification/step65/ui_19_case03_profile_1280.png)|
+|01_profile_shell|`../.godot/verification/step65/ui_01_profile_shell_1920.png`|`../.godot/verification/step65/ui_01_profile_shell_1280.png`|
+|02_cctv|`../.godot/verification/step65/ui_02_cctv_1920.png`|`../.godot/verification/step65/ui_02_cctv_1280.png`|
+|03_experiment_selection|`../.godot/verification/step65/ui_03_experiment_selection_1920.png`|`../.godot/verification/step65/ui_03_experiment_selection_1280.png`|
+|04_experiment_result|`../.godot/verification/step65/ui_04_experiment_result_1920.png`|`../.godot/verification/step65/ui_04_experiment_result_1280.png`|
+|05_containment_rooms|`../.godot/verification/step65/ui_05_containment_rooms_1920.png`|`../.godot/verification/step65/ui_05_containment_rooms_1280.png`|
+|06_containment_modal|`../.godot/verification/step65/ui_06_containment_modal_1920.png`|`../.godot/verification/step65/ui_06_containment_modal_1280.png`|
+|07_research_drawer|`../.godot/verification/step65/ui_07_research_drawer_1920.png`|`../.godot/verification/step65/ui_07_research_drawer_1280.png`|
+|08_research_archive|`../.godot/verification/step65/ui_08_research_archive_1920.png`|`../.godot/verification/step65/ui_08_research_archive_1280.png`|
+|09_hypothesis_drawer|`../.godot/verification/step65/ui_09_hypothesis_drawer_1920.png`|`../.godot/verification/step65/ui_09_hypothesis_drawer_1280.png`|
+|10_environmental_disturbance|`../.godot/verification/step65/ui_10_environmental_disturbance_1920.png`|`../.godot/verification/step65/ui_10_environmental_disturbance_1280.png`|
+|11_failure_incident|`../.godot/verification/step65/ui_11_failure_incident_1920.png`|`../.godot/verification/step65/ui_11_failure_incident_1280.png`|
+|12_temp_sequential_incident|`../.godot/verification/step65/ui_12_temp_sequential_incident_1920.png`|`../.godot/verification/step65/ui_12_temp_sequential_incident_1280.png`|
+|13_broadcast_four_options|`../.godot/verification/step65/ui_13_broadcast_four_options_1920.png`|`../.godot/verification/step65/ui_13_broadcast_four_options_1280.png`|
+|14_broadcast_modal|`../.godot/verification/step65/ui_14_broadcast_modal_1920.png`|`../.godot/verification/step65/ui_14_broadcast_modal_1280.png`|
+|15_sequential_result|`../.godot/verification/step65/ui_15_sequential_result_1920.png`|`../.godot/verification/step65/ui_15_sequential_result_1280.png`|
+|16_side_result|`../.godot/verification/step65/ui_16_side_result_1920.png`|`../.godot/verification/step65/ui_16_side_result_1280.png`|
+|17_experiment_resume|`../.godot/verification/step65/ui_17_experiment_resume_1920.png`|`../.godot/verification/step65/ui_17_experiment_resume_1280.png`|
+|18_containment_resume|`../.godot/verification/step65/ui_18_containment_resume_1920.png`|`../.godot/verification/step65/ui_18_containment_resume_1280.png`|
+|19_case03_profile|`../.godot/verification/step65/ui_19_case03_profile_1920.png`|`../.godot/verification/step65/ui_19_case03_profile_1280.png`|
 
-[1920×1080 Contact sheet](../.godot/verification/step65/contact_sheet_1920.png) — mandatory19의 축소 배치. 원본39개(19×2+contact sheet)는 별도 QA 파일이며 long/1024는 추가 증거다.
+`../.godot/verification/step65/contact_sheet_1920.png` — mandatory19의 축소 배치. 원본39개(19×2+contact sheet)는 별도 QA 파일이며 long/1024는 추가 증거다.
 
 실제 contact sheet와 1280 Broadcast/Hypothesis 원본을 열어 layout·문구·CTA·활성 Rail 표시를 확인했다. crop된 것은 의도된 Drawer 뒤 작업 영역과 scroll viewport이며 CTA가 문서 밖으로 밀려 숨는 재현은 없었다. contact sheet 축소 썸네일로 폰트 가독성을 승인하지 않고 원본을 사용자 검토에 제공한다. 최종 checklist는 문서 마지막에 있다.
 
@@ -514,7 +516,6 @@ Step66에서 사용자가 승인한 static skin의 **라이선스와 원본 파�
 |164|new P3|새 미해결 P3 관찰0; 기존 Hypothesis getter P3 유지.|
 |165|git diff --check|git diff --check exit0; Git line-ending 변환 안내는 엔진 오류 아님.|
 |166|staged final|최종 staged0; index untouched.|
-|167|commit/push|stage/commit/push0; HEAD unchanged.|
 |168|Step66 asset integration readiness|정식 asset 원본/라이선스 확인 후 static Theme/Icon/Texture 교체 준비 완료; final skin 적용 아님.|
 |169|user visual decisions remaining|Header/비율/Drawer/옵션 밀도/CTA/색/폰트 등10 사용자 시각 결정 남김.|
 |170|final recommendation|사용자 시각 검토와 licensed static skin 교체 뒤 1280/1920·긴 문서·Modal·Step62/63 재검증 권장.|

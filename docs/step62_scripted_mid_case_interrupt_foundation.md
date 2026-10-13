@@ -1,18 +1,20 @@
 # Step62 — Scripted Mid-Case Interrupt Foundation + Exact Work Resume
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **SCRIPTED MID-CASE INTERRUPT FOUNDATION · CURSOR-PRESERVING SIDE OCCURRENCE · DETERMINISTIC CHECKPOINTS · SAME RUNTIME / STAGE RESUME · TRANSIENT WORK VIEW RESTORE · NO ACTUAL MANDATORY STORY CONTENT · NO ECONOMY / QUOTA / SETTLEMENT**
 
-기존 프로젝트에 구현했다. 제품 TEST_CAMPAIGN_01은 CASE01→CASE02→CASE03 그대로이며 side schedule은 default empty다. 신규 사건은 in-memory TEST fixture에서만 실행했다. stage/commit/push 하지 않았다.
+기존 프로젝트에 구현했다. 제품 TEST_CAMPAIGN_01은 CASE01→CASE02→CASE03 그대로이며 side schedule은 default empty다. 신규 사건은 in-memory TEST fixture에서만 실행했다.
 
 ## 1. Repo Baseline
 
-작업 전 실제 비생성 파일147개, 제품 GDScript49개, Scene15개, authored .tres4개, 제품 경로 파일120개. Main2253행/123함수. scripts/data, runtime, read_models, main, views / scenes/main, views / resources/cases, campaigns / assets / docs 구조를 실제 조사했다. project.godot, Scene, View transient/public API, Campaign definitions/Progress, runtime owners, Response source, closure/cleanup, Step60/61 계약을 대조했다. 적용 AGENTS.md 없음.
+작업 전 실제 비생성 파일147개, 제품 GDScript49개, Scene15개, authored .tres4개, 제품 경로 파일120개. Main2253행/123함수. scripts/data, runtime, read_models, main, views / scenes/main, views / resources/cases, campaigns / assets / docs 구조를 실제 조사했다. project.godot, Scene, View transient/public API, Campaign definitions/Progress, runtime owners, Response source, closure/cleanup, Step60/61 계약을 대조했다.
 
 HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 이전 Step55~61 누적 tracked 수정7/untracked20을 보호했다. Git HEAD diff와 이번 baseline diff는 서로 다르다. `.godot/verification/step62/baseline.json`, `before/`, `prior-evidence-hashes.json`에 기준을 저장했다. 이전 verification 파일55,661개를 보호 대상으로 해시했다.
 
 ## 2. Implemented Side Occurrence Data
 
-[scripts/data/scripted_interrupt_occurrence_data.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/data/scripted_interrupt_occurrence_data.gd:1)
+[scripts/data/scripted_interrupt_occurrence_data.gd](../scripts/data/scripted_interrupt_occurrence_data.gd)
 
 `ScriptedInterruptOccurrenceData extends Resource`: interrupt_id, target_entry_id, scripted_incident_data, checkpoint_kind, stage_id, action_id. CampaignData의 `scripted_interrupts: Array[ScriptedInterruptOccurrenceData]`는 flat side schedule이다. `entries`만 sequence authority이며 side는 cursor/완료 entry에 들어가지 않는다. occurrence Resource가 source descriptor를 생성하고 CampaignData가 ID/checkpoint lookup을 제공한다. Manager/새 owner/history/전역 registry 없음.
 
@@ -29,7 +31,7 @@ HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `orig
 
 ## 3. Campaign Validation
 
-[scripts/data/campaign_data.gd :: get_validation_error](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/data/campaign_data.gd:12)
+[scripts/data/campaign_data.gd :: get_validation_error](../scripts/data/campaign_data.gd)
 
 전체 schedule을 Gameplay owner 생성 전에 검증한다. null/blank/duplicate interrupt, sequence ID collision, null/blank/nonexistent/nonCASE target, missing/invalid Scripted bundle, unknown checkpoint kind, unsupported/blank Stage, Stage+Action mismatch, Stage kind의 불필요 Action, Action kind의 blank/unknown Action, duplicate target+checkpoint, Incident/Broadcast/Option/Result broken links를 거절한다. same Event definition 재사용은 허용하되 occurrence ID와 checkpoint는 달라야 한다. invalid 하나라도 있으면 partial startup0: Case/Runtime/Progress/Response/query/View 모두 생성하지 않는다.
 
@@ -37,7 +39,7 @@ HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `orig
 
 ## 4. Checkpoint Model
 
-[scripts/main/main.gd :: _side_checkpoint_at](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2336) / [scripts/main/main.gd :: _present_due_side_after_draw](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2358)
+[scripts/main/main.gd :: _side_checkpoint_at](../scripts/main/main.gd) / [scripts/main/main.gd :: _present_due_side_after_draw](../scripts/main/main.gd)
 
 | kind | Stage | Action | 실제 safe boundary | duplicate / 복귀 |
 |---|---|---|---|---|
@@ -60,7 +62,7 @@ Stage는 stable String이다. Main enum integer를 authored data에 저장하지
 
 ## 6. Incident Source Migration
 
-[scripts/runtime/incident_source.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/runtime/incident_source.gd:1)
+[scripts/runtime/incident_source.gd](../scripts/runtime/incident_source.gd)
 
 CASE0 / CAMPAIGN_ENTRY1은 유지하고 CAMPAIGN_INTERRUPT2를 append했다. internal storage/callback/draft identity는 `source_occurrence_id`로 일반화했다. CASE/SEQ의 기존 occurrence 값은 그대로다. descriptor의 `source_entry_id`는 getter-only derived alias이며 side에서 empty다. State getter의 CASE/SEQ projection에만 read alias를 붙인다. side projection에는 fake entry/source Case field가 없다.
 
@@ -68,7 +70,7 @@ old legacy-only CASE/SEQ dictionary는 from_record에서 canonical descriptor로
 
 ## 7. Response Identity
 
-[scripts/runtime/incident_response_state.gd :: _key](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/runtime/incident_response_state.gd:11)
+[scripts/runtime/incident_response_state.gd :: _key](../scripts/runtime/incident_response_state.gd)
 
 키는 JSON tuple `(origin_kind, source_occurrence_id, incident_id)`다. definition ID는 content binding validation이다. 기존 CASE/SEQ 숫자/값/serialized key bytes를 유지했다. ACTIVE1 / confirm-once / complete-once / duplicate begin reject를 재사용했다. 완료 여부는 해당 full source의 canonical COMPLETED record이며 별도 completed_interrupt_ids 없음.
 
@@ -76,7 +78,7 @@ old legacy-only CASE/SEQ dictionary는 from_record에서 canonical descriptor로
 
 ## 8. Interrupt Context
 
-[scripts/main/main.gd :: _try_present_side_interrupt](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2367) / [scripts/main/main.gd :: _bound_side_interrupt](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2391) / [scripts/main/main.gd :: _resume_side_work](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2405)
+[scripts/main/main.gd :: _try_present_side_interrupt](../scripts/main/main.gd) / [scripts/main/main.gd :: _bound_side_interrupt](../scripts/main/main.gd) / [scripts/main/main.gd :: _resume_side_work](../scripts/main/main.gd)
 
 context: full source origin/occurrence/definition, incident_id, interrupted_entry_id/interrupted_case_id, return_stage, runtime_instance_id/case_instance_id, derived return policy, primitive work_view_state, cctv_review_return_stage. Broadcast draft와 `_source_archive_return_stage`는 response overlay 복귀용으로 분리한다. old work Node/Resource/Callable/Signal을 memento에 보관하지 않는다.
 
@@ -98,7 +100,7 @@ CCTV Recheck return Stage는 context에서 보존하며 실제 Back label/destin
 
 ## 11. EXPERIMENT Resume
 
-[scripts/views/experiment_view.gd :: capture_work_state](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/experiment_view.gd:252)
+[scripts/views/experiment_view.gd :: capture_work_state](../scripts/views/experiment_view.gd)
 
 Runtime executed IDs/remaining/recorded condition IDs가 authority다. View가 unexecuted selection ID, actual displayed Result ID, ExperimentScroll/ResultScroll/focus를 capture한다. runtime history[-1]를 side 복귀 결과로 추정하지 않는다. 이미 두 실험을 실행하고 첫 결과를 표시한 상태, history가 있지만 blank Result인 상태, 새 unexecuted draft 선택 상태를 각각 복원했다. 의미 있는 scroll140/110와 generated selection focus도 검증했다.
 
@@ -106,7 +108,7 @@ Runtime executed IDs/remaining/recorded condition IDs가 authority다. View가 u
 
 ## 12. CONTAINMENT Resume
 
-[scripts/views/containment_view.gd :: capture_work_state](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/containment_view.gd:169)
+[scripts/views/containment_view.gd :: capture_work_state](../scripts/views/containment_view.gd)
 
 unconfirmed selected Room ID/RoomScroll/focus 및 confirmed ID의 read proof를 capture한다. Restore는 set_pressed_no_signal로 같은 draft checkbox를 표시하며 Runtime confirmation/Pending 생성/Confirm callback0이다. Room draft + scroll60 + 선택 focus를 GPU 화면에서도 확인했다.
 
@@ -121,7 +123,7 @@ canonical Runtime/Pending/Resolution이 우선이다. memento confirmed ID 또�
 
 ## 13. Failure Accounting / Presentation Arbitration
 
-[scripts/main/main.gd :: _try_process_failure_event_opportunity](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1459) / [scripts/main/main.gd :: _on_advance_requested](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:881)
+[scripts/main/main.gd :: _try_process_failure_event_opportunity](../scripts/main/main.gd) / [scripts/main/main.gd :: _on_advance_requested](../scripts/main/main.gd)
 
 기존 함수에 `present_event` parameter를 추가해 회계는 그대로 실행하고 presentation만 분리했다. processed key/major-first counter 순서/saturation/threshold/RNG/token/credit/oldest ordering 의미를 유지한다. CONT entry의 due Stage occurrence가 있으면 정상 회계를 정확히 한 번 수행한 뒤 old presentation을 보류하고 drawn Story를 먼저 표시한다. EXP Result Next는 기존 read credit/token을 그대로 한 번 부여한 뒤 side를 검사한다. Run opportunity는 원래 경계에서 이미 계산되며 read에 추가 counter를 만들지 않는다.
 
@@ -228,7 +230,7 @@ Main은 **2455행/133함수**, +202행/+10함수다. checkpoint lookup은 Campai
 
 project.godot, 모든 Scene15개, authored .tres4개, 기존 ScriptedIncidentData/CampaignEntryData/Progress/CaseRuntime/Failure/Pending/Resolution/Archive/Hypothesis, terminal schema/Builder/Snapshot class, 기존 UID와 docs는 이번 baseline에서 byte-identical이다. Godot가 새 script UID2개를 생성했다. UI asset/theme/font/Autoload 추가0. 1920×1080 reference/1280×720 window/canvas_items/GL Compatibility 유지.
 
-final-audit.json과 step62-baseline.diff는 이번 실제 범위를 기록한다. git diff --check exit0, staged0/HEAD/branch/upstream 동일. 기존 .gitattributes에 따른 LF/CRLF Git informational message는 engine warning과 구분한다. stage/commit/push0이다.
+final-audit.json과 step62-baseline.diff는 이번 실제 범위를 기록한다. git diff --check exit0, staged0/HEAD/branch/upstream 동일. 기존 .gitattributes에 따른 LF/CRLF Git informational message는 engine warning과 구분한다. 작성 당시 index 변경 없음이다.
 
 ## 21. Known Gaps
 
@@ -242,7 +244,7 @@ Step63은 실제 Mandatory Incident 자료가 준비되면 authored carrier/occu
 
 아래 항목은 사용자 요청의 종료 보고 번호1~262에 개별 대응한다. 상세 근거/표/제한은 위22개 섹션과 verification namespace에 있다.
 
-### 요청 항목 1–262 개별 답변
+### 점검 항목 1–262 개별 답변
 
 1. **작업 전 Git 상태** — tracked 수정7/untracked20의 Step55~61 누적 변경을 보존했다.
 
@@ -744,7 +746,6 @@ Step63은 실제 Mandatory Incident 자료가 준비되면 authored carrier/occu
 
 250. **staged final** — 최종 staged0.
 
-251. **commit/push** — stage/commit/push0, HEAD/branch/upstream 유지.
 
 252. **new P0** — 최종 검증에서 새 P0 발견0.
 

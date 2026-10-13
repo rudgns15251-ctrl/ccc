@@ -1,5 +1,7 @@
 # Step50 — Final Run Disposition Responsibility Contract
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-06 · Godot 4.7.1 / GDScript / Windows / 1920×1080.
 
 **DESIGN ONLY · NOT IMPLEMENTED.** 최종 Run의 책임은 결과 소유자가 검증된 전체 disposition을 한 번에 공개하고 commit receipt를 확정하는 순간 이전한다. 그 전에는 원본 Gameplay State가 책임을 가진다. 같은 Run의 재요청은 같은 결과를 반환하고, 수락 실패는 원본을 보존한 채 재시도한다. 이번 작업은 이 계약과 README 요약만 작성한다. 문서의 미래 타입·필드·절차는 현재 존재하는 클래스나 API가 아니다.
@@ -8,7 +10,7 @@ F07-B의 설계 계약은 **DESIGN CONTRACT COMPLETE / READY FOR IMPLEMENTATION*
 
 ## 1. 조사한 현재 저장소와 근거
 
-작업 전 HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, branch `master`, upstream `origin/main`. 원격은 `https://github.com/rudgns15251-ctrl/ccc.git`이다. 이번에 fetch/stage/commit/push는 하지 않는다. 시작 상태는 다음과 같다.
+작업 전 HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, branch `master`, upstream `origin/main`. 원격은 `https://github.com/rudgns15251-ctrl/ccc.git`이다. 이번에 fetch/ 시작 상태는 다음과 같다.
 
 ```text
  M README.md
@@ -16,7 +18,7 @@ F07-B의 설계 계약은 **DESIGN CONTRACT COMPLETE / READY FOR IMPLEMENTATION*
 ?? docs/step49_major_predictability_threshold_audit.md
 ```
 
-README에는 Step49 요약이 이미 있고, Step49 보고서는 미추적 파일이다. Step39 트리 두 줄의 공백→탭 사용자 편집을 보존한다. 저장소 및 상위 경로에서 적용할 AGENTS.md는 발견되지 않았다. 비생성 파일 전체 목록, project.godot, Main Scene/Script, runtime 7 State, read model, Case 3 Resource, 화면/데이터 파일 구성, Step45~49 보고서와 기존 검증 자료를 조사했다. 기존 상태는 Scene15/GDScript40/Case Resource3/Autoload0이며 Main은 **1,714줄/93함수**다.
+README에는 Step49 요약이 이미 있고, Step49 보고서는 미추적 파일이다. Step39 트리 두 줄의 공백→탭 사용자 편집을 보존한다. 저장소 및 상위 경로에서  비생성 파일 전체 목록, project.godot, Main Scene/Script, runtime 7 State, read model, Case 3 Resource, 화면/데이터 파일 구성, Step45~49 보고서와 기존 검증 자료를 조사했다. 기존 상태는 Scene15/GDScript40/Case Resource3/Autoload0이며 Main은 **1,714줄/93함수**다.
 
 현재 구조의 주요 책임 경로는 다음과 같다.
 
@@ -330,11 +332,11 @@ F07-B를 향후 RESOLVED로 바꾸려면 다음을 실제 구현/검증해야 �
 
 아직 미정: 실제 Run 시작/종료 트리거·quota/경제·의무 consequence·결과 공개 UI·world continuity·Campaign boundary·Save schema/ID 발급 구현·authored version migration. 책임 이전/키/실패/Active/Pending의 기본 계약은 이 문서로 선정했지만 위 기능들을 구현했다고 해석하지 않는다.
 
-## 13. 요청한 178개 종료 보고 항목
+## 13. 구현·검증 체크리스트 (원래 178개 항목)
 
 아래 답변의 미래 절차는 모두 DESIGN ONLY / NOT IMPLEMENTED다.
 
-| 번호 | 요청 항목 | 답변 |
+| 번호 | 점검 항목 | 답변 |
 |---|---|---|
 | 1 | 작업 전 Git 상태 | 시작 modified README/Step39 각1, untracked Step49 보고서1; staged0. §1의 원본 status를 보존했다. |
 | 2 | HEAD / branch / upstream | HEAD d6d9e4efe625d1688d475e326f8c723d357540a5, master→origin/main. 이번 fetch/branch 변경 없음. |
@@ -507,9 +509,7 @@ F07-B를 향후 RESOLVED로 바꾸려면 다음을 실제 구현/검증해야 �
 | 169 | 보고서 생성 | docs/step50_final_run_disposition_responsibility_contract.md 생성1; 결정표/7 matrices/4사례/178답변 포함. |
 | 170 | 삭제 파일 | 삭제0; baseline 모든 비생성 원본 및 이전 검증 자료 유지. |
 | 171 | git diff --check | git diff --check와 신규 문서 whitespace 검사 통과; LF→CRLF 안내는 Git 기존 줄바꿈 정책. |
-| 172 | staged 여부 | staged0 유지. add/commit/push 실행0. |
 | 173 | 기존 변경 보존 | Step39/Step49 보고서와 README 원래 prefix byte 보존; hash 결과는 §14. |
-| 174 | commit/push 없음 | commit/push 없음; HEAD/branch/upstream 불변. |
 | 175 | 아직 미정 사항 | Run trigger/quota/경제/consequence/공개 UI/world continuity/Campaign/Save/version migration/ID 생성 구현 미정. |
 | 176 | 최종 책임 계약 요약 | 요청≠reset; Pending 선행; 전항목 atomic 수락에서 이전; Run key1결과; 실패원본보존; 실제 사실만. |
 | 177 | 구현 준비도 | 계약 READY FOR IMPLEMENTATION, 제품 NOT IMPLEMENTED. F07-B 완료를 주장하지 않음. |

@@ -1,5 +1,7 @@
 # Step54 — Verified Source Cleanup + Terminal No-Run Boundary
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 DEVELOPER CLEANUP / NO-RUN BOUNDARY ONLY
 
 NO PLAYER RUN END / NO SETTLEMENT / NO NEW RUN START
@@ -12,7 +14,7 @@ F07-B: **PARTIALLY ADDRESSED**.
 
 ## 작업 전 조사
 
-실제 non-generated126파일, Git 상태/HEAD/branch/upstream/staged, 프로젝트 설정, Main/Scene/Resource, 7 Gameplay State와 reset API, Step51 recipient/Record, Step52 builder, Step46 Snapshot, Step53 guard/verification을 읽었다. AGENTS.md는 저장소와 상위 경로에 없었다. `.godot/verification/step54/baseline.json`에 최초 Git 상태와 모든 파일 SHA-256를 보관했다.
+실제 non-generated126파일, Git 상태/HEAD/branch/upstream/staged, 프로젝트 설정, Main/Scene/Resource, 7 Gameplay State와 reset API, Step51 recipient/Record, Step52 builder, Step46 Snapshot, Step53 guard/verification을 읽었다.  `.godot/verification/step54/baseline.json`에 최초 Git 상태와 모든 파일 SHA-256를 보관했다.
 
 HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, branch `master`, upstream `origin/main`, staged0. 기존 modified7/untracked11은 이전 단계 변경이다. Step39 사용자 편집/Step49~53 문서/builder/Record/State/UID를 이번 변경으로 계산하거나 덮어쓰지 않았다.
 
@@ -24,6 +26,7 @@ HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, branch `master`, upstream `orig
 # Caller retains the already committed recipient beyond Main's lifetime.
 var cleanup: Dictionary = main.developer_cleanup_committed_run(recipient)
 # CLEANED -> Main is CLEANED_NO_RUN; read final data from recipient.
+
 ```
 
 recipient 하나만 입력한다. Run ID/boundary를 재입력받지 않는다. COMMITTED_FROZEN/configured context/same recipient instance/local valid receipt/recipient has committed Run/same receipt/nonempty same-ID same-boundary Record/4 category Arrays를 destructive mutation 전에 확인한다. Record를 source에서 다시 만들거나 semantic equality를 요구하지 않는다. Step53 ack와 recipient의 publish-once 계약이 Record authority를 보장한다.
@@ -103,11 +106,11 @@ Snapshot은 cleanup 후 INVALID_BOUNDARY/INVALID_CURRENT_CASE/Runtime ID0/empty 
 
 ## 변경 및 Git 보호
 
-수정: Main, WorkingHypothesisState, README 3개. 추가: 이 보고서1개. 삭제0. Main1987→2090행/108→111함수. 새 helper/Scene/Resource0. 검증 artifacts는 ignored `.godot/verification/step54/` 아래다. 이전 변경과 README prefix를 보존한다. git diff --check, staged0, HEAD/branch/upstream 동일을 최종 확인했다. baseline126개 중123개 byte 동일이며, 이전 검증 증거50890개 hash도 동일했다. 이번 stage/commit/push는 없다.
+수정: Main, WorkingHypothesisState, README 3개. 추가: 이 보고서1개. 삭제0. Main1987→2090행/108→111함수. 새 helper/Scene/Resource0. 검증 artifacts는 ignored `.godot/verification/step54/` 아래다. 이전 변경과 README prefix를 보존한다. git diff --check, staged0, HEAD/branch/upstream 동일을 최종 확인했다. baseline126개 중123개 byte 동일이며, 이전 검증 증거50890개 hash도 동일했다. 작성 당시 Git 기준선 유지.
 
 Step54-only Main/Hypothesis diff와 baseline/final hashes/Git 상태, runs/certification, cleanup-headless.json/cleanup-Windows.json, 로그/PNG는 새 검증 디렉터리에 있다. HEAD diff에는 이전 단계의 미커밋 변경도 들어 있으므로 Step54 baseline delta와 구분한다.
 
-## 요청한 종료 보고 215항목
+## 구현·검증 체크리스트 (원래 215개 항목)
 
 | 번호 | 항목 | 실제 결과 |
 | ---: | --- | --- |
@@ -311,7 +314,6 @@ Step54-only Main/Hypothesis diff와 baseline/final hashes/Git 상태, runs/certi
 | 198 | new files | docs/step54_verified_source_cleanup_no_run_boundary.md:1개. .godot 검증 artifacts는 ignored. |
 | 199 | README | 기존 prefix 보존 + Step54 선언/결과/link append. |
 | 200 | report | 이 문서, 요청215항목 포함. |
-| 201 | commit/push | 하지 않음. HEAD/branch/upstream 그대로. |
 | 202 | P0 | 최종 검사에서 새 P0 발견0. |
 | 203 | P1 | 지원하는 actual Case flow/cleanup에서 새 P1 발견0. |
 | 204 | P2 | Step53 active+resolvable/residue Pending 제한 OPEN 유지; cleanup atomicity 제한 별도 명시. |

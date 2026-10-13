@@ -1,6 +1,8 @@
 # Step41 — Major Incident Pacing / Response UX Audit
 
-작업일: 2026-10-05. 기존 Step40 제품을 조사하고 정상 플레이·기존 debug 경로를 다시 실행한 감사다. 게임 규칙, threshold, Scene, Script, Resource, 프로젝트 설정을 변경하지 않았다. 커밋·push하지 않았다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+작업일: 2026-10-05. 기존 Step40 제품을 조사하고 정상 플레이·기존 debug 경로를 다시 실행한 감사다. 게임 규칙, threshold, Scene, Script, Resource, 프로젝트 설정을 변경하지 않았다.
 
 ## 결론
 
@@ -18,7 +20,7 @@ P0/P1 코드 결함은 재현되지 않았다. 아래 문제는 P2 UX/GAME DESIG
 
 작업 전 `git status --short --branch`는 `## master...origin/main`만 표시했다. staged/unstaged/untracked 변경은 없었다. HEAD는 `ac1605935a2bab92cb1c43b2709cdde0f5f36c81`, 제목은 `Refine case evidence and add delayed major incident responses`다. remote는 `https://github.com/rudgns15251-ctrl/ccc.git`, 로컬 master가 origin/main을 추적한다. Step41에서 Git 이력과 remote를 변경하지 않았다.
 
-실제 추적 파일 **104개**, 기존 검증 소스 **2,869개**의 SHA-256 기준선을 새 `.godot/verification/step41/`에 저장했다. 저장소·상위 경로에서 적용할 AGENTS.md는 발견하지 않았다. 다음을 실제 파일로 조사했다.
+실제 추적 파일 **104개**, 기존 검증 소스 **2,869개**의 SHA-256 기준선을 새 `.godot/verification/step41/`에 저장했다.  다음을 실제 파일로 조사했다.
 
 | 영역 | 실제 상태 / 조사 대상 |
 | --- | --- |
@@ -212,7 +214,7 @@ invalid source Case/Incident/Broadcast/Option/Result, duplicate/blank mapping은
 
 ## 실행 검증과 증거
 
-실제 엔진은 `4.7.1.stable.official.a13da4feb`, Windows Compatibility OpenGL/RX6800이다. 절대 엔진 경로는 `C:\Users\newsj\Downloads\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe`다. 새 폴더에 복사한 runner는 원 검증 소스/기대 warning 수를 유지하며 출력 경로만 Step41 아래로 변경했다. 기존 normal/debug fixture의 용도도 그대로 유지했다.
+실제 엔진은 `4.7.1.stable.official.a13da4feb`, Windows Compatibility OpenGL/RX6800이다. 실행 명령의 `$GodotPath`는 로컬 Godot console 실행 파일 위치를 뜻한다. 새 폴더에 복사한 runner는 원 검증 소스/기대 warning 수를 유지하며 출력 경로만 Step41 아래로 변경했다. 기존 normal/debug fixture의 용도도 그대로 유지했다.
 
 | 검사 묶음 | 최종 실행 수 | 검증 내용 |
 | --- | --- | --- |
@@ -269,7 +271,7 @@ Case03, Case02 Outcome/정답, Severity/MINOR/MODERATE, Forced/Scripted Incident
 
 Step42는 **기존 Major Incident의 authored response/content와 source·resume 안내 개선**을 좁은 범위로 진행하는 것이 적합하다. threshold/새 사건 규칙/Severity/대규모 Main 분리를 함께 묶지 말고, 필요한 데이터 공개 원칙과 EXP 읽기 정책을 먼저 정한다. 긴 sequence 확장은 그 이후 별도 단계가 적합하다.
 
-## 요청한 107개 항목 대응
+## 구현·검증 체크리스트 (원래 107개 항목)
 
 | 번호 | 항목 | 결과 |
 | --- | --- | --- |

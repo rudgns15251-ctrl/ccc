@@ -1,5 +1,7 @@
 # Step57 — Typed Campaign Entry Foundation + Existing 3-Case Migration
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-07 · **TYPED CAMPAIGN ENTRY FOUNDATION / CASE ENTRIES ONLY**.
 
 TEST_CAMPAIGN_01의 Case01→Case02→Case03을 stable `entry_id`를 가진 세 CASE entry로 이관했다. CampaignData.entries가 유일한 authored sequence이고, Main은 전체 검증 후 기존 gameplay용 Case 배열을 별도로 만든다. UI·판정·기존 Runtime State·developer 종료 계약은 유지했다. **NO STORY EVENT EXECUTION / NO ECONOMY / QUOTA / SETTLEMENT**.
@@ -8,7 +10,7 @@ TEST_CAMPAIGN_01의 Case01→Case02→Case03을 stable `entry_id`를 가진 세 
 
 현재 사용자 지시→기획/실행계획→실제 Repo→Step56 설계→Step55 구현→이전 보고 순으로 판단했다. 실제 Story와 Mandatory/Final/Ending 콘텐츠는 미확정이다. 이 리소스는 TEST Campaign이며 정식 스토리 확정본이 아니다. RunDisposition/developer_run은 기존 내부 lifecycle 이름으로 유지한다.
 
-시작 HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, local `master`→`origin/main`, staged0. 기존 변경은 README/Main/main.tscn의 modified3과 Step55 report·Step56 report·Campaign .tres·CampaignData/.uid의 untracked5였다. 비생성132파일, 제품 GDScript44/Scene15/Resource4를 조사했다. 저장소/상위 AGENTS.md는 없었다.
+시작 HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, local `master`→`origin/main`, staged0. 기존 변경은 README/Main/main.tscn의 modified3과 Step55 report·Step56 report·Campaign .tres·CampaignData/.uid의 untracked5였다. 비생성132파일, 제품 GDScript44/Scene15/Resource4를 조사했다. 저장소/상위
 
 기존 CampaignData는 `campaign_id`, `display_name`, `case_sequence: Array[CaseData]`와 read-only validator를 가졌다. Main은 검증 후 detached Case 배열을 생성했다. configured Main Scene에는 Campaign 하나만 연결되고 direct Case는 없었다. 기존 .tres subresource/typed Array convention에 맞춰 entry를 Campaign 안에 포함했다. 별도 entry .tres3개는 만들지 않았다.
 
@@ -116,7 +118,7 @@ Pilot invalid fixture에서 `Campaign.duplicate(true)`가 외부 Case 참조까�
 
 신규 미해결 제품 P0/P1/P2/P3는 발견하지 않았다. 기존 Step53 Active+resolvable/same-room residue Pending의 OPEN P2와 `ACTIVE_FORCE_REQUIRES_PREPARED_PENDING`/error freeze는 유지했다. 기존 Step54 cleanup은 cross-State transaction/general exception rollback이 아니며 partial reset 후 frozen same-recipient explicit retry 한계도 유지했다. 기존 Hypothesis key enumeration/getter seam 및 Main 규모의 P3를 해결하는 refactor는 하지 않았다.
 
-Git/hash 검사는 이번 delta와 누적 Step55·56 변경을 구분한다. 기존132파일 중 의도된 변경은 Main/CampaignData/Campaign .tres/README 네 개뿐이고 나머지128파일 hash는 동일하다. README의 기존434357바이트 prefix 동일. Step55·56 evidence592파일 동일. HEAD/branch/upstream/index 그대로, stage/commit/push0, deleted0, git diff --check PASS. 최종 증거는 final-integrity.json.
+Git/hash 검사는 이번 delta와 누적 Step55·56 변경을 구분한다. 기존132파일 중 의도된 변경은 Main/CampaignData/Campaign .tres/README 네 개뿐이고 나머지128파일 hash는 동일하다. README의 기존434357바이트 prefix 동일. Step55·56 evidence592파일 동일. HEAD/branch/upstream/index 그대로, 작성 당시 index 변경 없음, deleted0, git diff --check PASS. 최종 증거는 final-integrity.json.
 
 ## 8. 아직 없는 기능 / 다음 단계
 
@@ -126,7 +128,7 @@ entry_id와 case_id는 분리됐지만 Pending/Resolution/Candidate/Response/Arc
 
 Step58은 사용자 승인 범위에서 Scripted Incident의 source model·기존 Response/View/Archive 재사용·완료와 return policy·필요한 최소 progression authority를 구현하기 좋은 지점이다. mixed dispatch는 아직 없으므로 entry kind와 exactly-one payload validation을 그때 실제 새 kind에 맞춰 확장해야 한다. 현재 CASE foundation에는 실제 Story 대사/인물/Ending 자료가 필요하지 않았다. 실제 Mandatory/Final 콘텐츠 구현 전에는 Step56의 Story 목적·위치·사용 정보·판단·변화/Ending 자료가 필요하며 AI가 임의 확정하지 않는다.
 
-## 9. 요청된166개 종료 보고 항목
+## 9. 구현·검증 체크리스트 (원래 166개 항목)
 
 | 번호 | 항목 | 답변 |
 | ---: | --- | --- |
@@ -285,7 +287,6 @@ Step58은 사용자 승인 범위에서 Scripted Incident의 source model·기�
 | 153 | authored Resource property preservation | nested authored tree/instance identity 및 원본 product Campaign 불변 assertion 통과. 파일 hash 보호도 별도 통과. |
 | 154 | git diff --check | git diff --check PASS. Step57 시작 baseline과 누적 Git diff를 구분해 검사했다. |
 | 155 | staged | staged0. index 수정0. |
-| 156 | commit/push | stage/commit/push0. HEAD/branch/upstream 유지. |
 | 157 | P0 | 이번 구현/최종 회귀에서 발견한 새 미해결 P0 없음. |
 | 158 | P1 | 이번 구현/최종 회귀에서 발견한 새 미해결 P1 없음. |
 | 159 | P2 | 새 미해결 P2 없음. 기존 Step53 Pending/freeze 및 Step54 cleanup 제한 보존. |

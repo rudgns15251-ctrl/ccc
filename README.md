@@ -54,7 +54,6 @@ docs/        단계별 설계·구현·검증 보고서
 
 ## 개발 문서
 
-- [Profile 종이 문서 UI — Step70](docs/step70_profile_paper_document_ui_pilot.md)
-- [실제 Mid-Case 사건 연결 — Step69](docs/step69_first_authored_midcase_incident.md)
-- [완료한 사건의 이력 보존 — Step68](docs/step68_scripted_historical_fact_preservation.md)
-- [전체 설계·구현·검증 보고서](docs/)
+- [개발 문서 안내·개발 방식·이력](docs/README.md)
+- [코드 구조와 주요 흐름](docs/architecture.md)
+- [실행과 검증 방법](docs/verification.md)

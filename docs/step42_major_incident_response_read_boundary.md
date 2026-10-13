@@ -1,14 +1,16 @@
 # Step42 — Major Incident Response Content + Context + Read Boundary
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05, Godot 4.7.1 Standard / GDScript / Windows PC.
 
 기존 프로젝트에 Step42를 구현했다. Case01의 두 사건·여섯 대응에 관찰 근거와 서로 다른 임시 조치·결과를 작성하고, 정상 대응 화면에 출처와 중단된 업무를 표시했다. EXP 실행은 결과를 먼저 보여주고 Major 준비만 기록한다. 준비된 사건은 다음 정상 CCTV/Containment 진입 경계에서 표시한다. 정상 Broadcast의 미확정 선택은 직접 Source Archive 왕복 동안만 보존한다.
 
-점수·정답·새 gameplay consequence·Timer·추가 opportunity는 만들지 않았다. 임시 TEST 콘텐츠이며 최종 설정이나 장기 격리 해법을 확정하지 않는다. 커밋·push하지 않았다.
+점수·정답·새 gameplay consequence·Timer·추가 opportunity는 만들지 않았다. 임시 TEST 콘텐츠이며 최종 설정이나 장기 격리 해법을 확정하지 않는다.
 
 ## 조사와 기준 상태
 
-실제 저장소의 추적 파일, 폴더, Main/관련 View/State/Data/Resource와 이전 검증 자료를 조사했다. `AGENTS.md`는 저장소와 상위 경로에서 발견되지 않았다. 프로젝트에는 이미 정상 Case handoff, 실패 Candidate/환경 교란/Major Response, 세션 Archive/Hypothesis, 별도 debug Monitoring 흐름이 있었다. 새 프로젝트를 생성하지 않았다.
+실제 저장소의 추적 파일, 폴더, Main/관련 View/State/Data/Resource와 이전 검증 자료를 조사했다.  프로젝트에는 이미 정상 Case handoff, 실패 Candidate/환경 교란/Major Response, 세션 Archive/Hypothesis, 별도 debug Monitoring 흐름이 있었다. 새 프로젝트를 생성하지 않았다.
 
 - HEAD: `ac1605935a2bab92cb1c43b2709cdde0f5f36c81` — `Refine case evidence and add delayed major incident responses`.
 - branch: `master`, upstream: `origin/main`; 시작 시 remote와 동기화.
@@ -33,7 +35,7 @@ Step41의 F02~F06을 다시 실제 코드·Resource·실행으로 확인했다. 
 | `scenes/views/incident_result_view.tscn` | 같은 Label 1개 | 결과를 읽고 돌아갈 업무 안내 |
 | `resources/cases/test_case_01.tres` | response 16 Resource + Research 16 Resource의 텍스트만 | 기존 evidence에 연결된 임시 authored 대응 |
 | `README.md` | Step42 설명 블록 추가 | 현재 실행 정책 안내; 기존 내용 보존 |
-| `docs/step42_major_incident_response_read_boundary.md` | 새 보고서 | 요청한 105개 항목과 검증 결과 |
+| `docs/step42_major_incident_response_read_boundary.md` | 새 보고서 | 구현·검증 항목과 결과 |
 
 총 기존 파일 8개 수정, 문서 1개 생성이다. Git에는 이전 Step41 보고서도 untracked로 보인다. 그것은 이번에 생성한 파일이 아니다. 삭제 파일은 없다. 검사 Script/fixture/로그/PNG는 ignore된 `.godot/verification/step42/` 안에만 추가했다.
 
@@ -135,7 +137,7 @@ native 실제 입력 후 frame draw 증가와 동일 EXP View를 검사했다. �
 - Broadcast draft 선택은 보존하지만 스크롤 위치는 기존 정책대로 초기화된다. 현재 단계의 요청 범위는 미확정 Option 보존이다.
 - UI 텍스트가 길어진 만큼 Option/Archive/Condition은 스크롤한다. 최종 typography/디자인/접근성 튜닝과 사람 플레이테스트는 후속 과제다.
 
-## 요청한 105개 종료 항목
+## 구현·검증 체크리스트 (원래 105개 항목)
 
 | 번호 | 항목 | 결과 |
 |---|---|---|

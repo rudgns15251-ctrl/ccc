@@ -1,8 +1,10 @@
 # Step64 — Final UI/UX Structural Rebuild + Temporary Industrial Theme
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-08 · Godot 4.7.1 stable official a 13da 4feb · Windows/GDScript · 기준 1920×1080.
 
-공통 GameShell로 업무/사건 View를 재배치하고 Research/Hypothesis Drawer, 전체 Workspace Archive, 두 확정 Modal과 공통 TEMP Theme을 적용했다. 기존 판정·진행·기록 소유권을 유지한다. 최종 그래픽 완성은 아니며 stage/commit/push하지 않았다. 경로는 프로젝트 루트 기준이다. 증거는 `.godot/verification/step64/`의 baseline/before/scope_audit/validation_summary/invocations/attempts/실행별JSON/log/GPU PNG에 있다.
+공통 GameShell로 업무/사건 View를 재배치하고 Research/Hypothesis Drawer, 전체 Workspace Archive, 두 확정 Modal과 공통 TEMP Theme을 적용했다. 기존 판정·진행·기록 소유권을 유지한다. 최종 그래픽 완성은 아니며  경로는 프로젝트 루트 기준이다. 증거는 `.godot/verification/step64/`의 baseline/before/scope_audit/validation_summary/invocations/attempts/실행별JSON/log/GPU PNG에 있다.
 
 ## 1. Repo Baseline
 
@@ -294,7 +296,7 @@ Main method133→142; new9은Shellrefresh/rail/Drawer/normalArchiveheldView/Moda
 
 publicgameplaysetup/signal/capture/restore 계약유지. 새 Flowconfirmationhelpers/signal,Researchmode/cache,Archivedetailcase_requested/set_case_summaries 는표시 API. mementohelper 는 5focuspath 만. Protected 71bytehash 동일, 기존 verification 57,500hash 동일(old_evidence_preservation.json). environment_conditions_view.tscnoriginalbyte 보호.
 
-gitstatus/diff/diff--check/HEAD/upstream/staged 최종기록. diff--check 0,staged 0,HEAD/branch/upstream 동일. GitCRLF 변환통지는 Godotwarning 과별도. stage/commit/push 0.
+gitstatus/diff/diff--check/HEAD/upstream/staged 최종기록. diff--check 0,staged 0,HEAD/branch/upstream 동일. GitCRLF 변환통지는 Godotwarning 과별도.
 
 ## 30. Known Gaps
 
@@ -401,7 +403,7 @@ Recheck Center/Content/RecheckCCTVButton→Margin/Content/RecheckCCTVButton. 기
 
 사용자지정번호에일대일대응. assertion 호출/processslot/독립 journey 를구분한다.
 
-| # | 요청 항목 | 실제 결과/근거 |
+| # | 점검 항목 | 실제 결과/근거 |
 |---|---|---|
 | 1 | 작업 전 Git 상태 | 작업 전 modified 10/untracked 27줄; 기존 작업 보존, baseline.json git 전문 기록. |
 | 2 | HEAD | HEAD 6e 8f 167f 699a 3a 95c 91fee 8668ae 99d 03e 5d 4db 9. |
@@ -662,7 +664,6 @@ Recheck Center/Content/RecheckCCTVButton→Margin/Content/RecheckCCTVButton. 기
 | 257 | report | docs/step 64_ui_ux_structural_rebuild.md,31sections/all 263answers/matrices. |
 | 258 | git diff --check | git diff --check exit 0,final evidence 보관. |
 | 259 | final staged | staged 0. |
-| 260 | commit/push | stage/commit/push 0. |
 | 261 | Step65 readiness | Step 65는 actual UXreview/asset-onlyreplacement 부터가능; terminalgaps 별도. |
 | 262 | final Asset replacement readiness | commonTheme/Scene/icon/texture 교체준비,final licensedasset 적용 claim 0. |
 | 263 | final recommendation | 기존 gameplaybaseline 유지,실제사용 UX 확인후 licensedskin 교체와 Step62/63회귀권장. |

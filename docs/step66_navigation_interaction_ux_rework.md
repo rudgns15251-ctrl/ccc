@@ -1,6 +1,8 @@
 # Step66 — Direct Navigation + Archive Exit UX Rework
 
-작성일: 2026-10-11. 기준은 사용자 Step66 요청 원문과 실제 저장소다. Step64/65의 비활성 Navigation 정책은 이번 요청으로 변경하며 Gameplay 승인 조건은 유지한다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+작성일: 2026-10-11. 실제 저장소를 기준으로 직접 Navigation을 구현했다. Step64/65의 비활성 Navigation 정책은 이 단계에서 변경하며 Gameplay 승인 조건은 유지한다.
 
 결과: 왼쪽 업무 메뉴로 허용된 다음 단계에 진입하고 이미 접근한 화면을 재방문할 수 있다. Archive는 A 재클릭·Esc·BACK으로 원래 업무 또는 Response에 돌아간다. 탐색용 화면 표시와 승인된 Gameplay 진행을 구분했다. 기존 terminal OPEN의 해결이나 정식 에셋 완성을 의미하지 않는다.
 
@@ -8,7 +10,7 @@
 
 ## 1. Repo Baseline
 
-작업 전 비캐시 파일 163개 전체, 제품 GDScript 53개, Scene 17개, `.tres` 6개를 조사하고 SHA-256 및 사본을 보관했다. 실제 Main/Shell/View/Theme, CTA, Runtime/owner/read model, Archive held-work, Drawer, Modal, CCTV recheck, Step62 capture/restore, 실제 Campaign/Case/TEMP Resource 및 Git 상태를 확인했다. 적용할 AGENTS.md는 없었다.
+작업 전 비캐시 파일 163개 전체, 제품 GDScript 53개, Scene 17개, `.tres` 6개를 조사하고 SHA-256 및 사본을 보관했다. 실제 Main/Shell/View/Theme, CTA, Runtime/owner/read model, Archive held-work, Drawer, Modal, CCTV recheck, Step62 capture/restore, 실제 Campaign/Case/TEMP Resource 및 Git 상태를 확인했다.
 
 시작 HEAD `19be4ea998d6479f5c46c3527d540ff4a16f2322`, branch `master`, upstream `origin/main`, staged 0, working tree clean. 원격 `https://github.com/rudgns15251-ctrl/ccc.git`. Main 142함수/2601줄. 기존 검증 증거 60,896파일의 해시도 확보했다. 과거 요청의 경로·Node 이름을 그대로 가정하지 않았다.
 
@@ -135,7 +137,7 @@ CCTV recheck 중 parent 메뉴는 원래 BACK을 실행한다. 재확인 중 처
 | 09 Response Source Archive | `ui_66_09_response_source_archive` |
 | 10 Mid-Case exact resume | `ui_66_10_midcase_exact_resume` |
 
-[1920 contact sheet](../.godot/verification/step66/navigation_contact_1920.png), [1280 contact sheet](../.godot/verification/step66/navigation_contact_1280.png). 실제 GPU contact sheet와 별도 full-size review/Archive 화면을 열어 Header·Nav·Rail·Actions의 clipping과 배치를 확인했다. 모델의 시각 검토이며 최종 디자인 승인이 아니다.
+`../.godot/verification/step66/navigation_contact_1920.png`, `../.godot/verification/step66/navigation_contact_1280.png`. 실제 GPU contact sheet와 별도 full-size review/Archive 화면을 열어 Header·Nav·Rail·Actions의 clipping과 배치를 확인했다. 모델의 시각 검토이며 최종 디자인 승인이 아니다.
 
 ## 17. Negative / Stale / Duplicate Guards
 
@@ -189,7 +191,7 @@ Main **142→151함수, 2601→2767줄**. 추가 9함수는 `_clear_work_navigat
 
 최종 Scene 구조는 기존 Main(Control) → GameShell(Control, `main.tscn` 내 Node) → Frame(Header / Body / SystemBar), Body(PrimaryNavigation / Workspace·ViewHost / UtilityRail), DrawerLayer·ModalLayer 그대로다. ViewHost 주요 View는 하나이며 기존 utility/confirmation/notice overlay만 별도다. 새로운 game_shell.tscn을 만들거나 있다고 가정하지 않았다.
 
-Git: HEAD/branch/upstream 시작과 동일, staged 0, modified 5, created 1, deleted 0. `git diff --check` 통과. Git 상태·diff·numstat은 `git_audit.json`/`step66_delta.patch`에 보관했다. CRLF→LF 안내는 Git text 정규화 알림이며 공백 오류가 아니다. **stage/commit/push하지 않았다.**
+Git: HEAD/branch/upstream 시작과 동일, staged 0, modified 5, created 1, deleted 0. `git diff --check` 통과. Git 상태·diff·numstat은 `git_audit.json`/`step66_delta.patch`에 보관했다. CRLF→LF 안내는 Git text 정규화 알림이며 공백 오류가 아니다.
 
 ## 21. Known Gaps
 

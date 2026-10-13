@@ -1,5 +1,7 @@
 # Step52 — Developer Closure API + Live State Preparation + Idempotent Ownership Transfer
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **DEVELOPER CLOSURE API ONLY**
 
 **NO PLAYER RUN END / NO SETTLEMENT**
@@ -103,7 +105,7 @@ receipt가 final Record의 owner authority다. source copy는 유지되고 자�
 
 플레이어 종료 버튼·Settlement·Economy·Quota·CR·Save/Load·Campaign·RunManager/RunState/Singleton/Autoload·Case04·제품 Case03 Outcome·Audio/UX/threshold 변경 없음. Step53 후보는 Active 종료 정책과 노출 증거, commit 이후 developer source lifecycle/freeze/cleanup의 좁은 책임 설계다.
 
-## 요청한 종료 보고 210항목
+## 구현·검증 체크리스트 (원래 210개 항목)
 
 | 번호 | 항목 | 답변/근거 |
 |---:|---|---|
@@ -299,7 +301,6 @@ receipt가 final Record의 owner authority다. source copy는 유지되고 자�
 | 190 | git diff --check | git diff --check 통과. Git의 Windows LF→CRLF 안내는 runtime warning이 아님. |
 | 191 | staged | staged 0. |
 | 192 | 기존 변경 보존 | 122 baseline files 중 Main/README 외 120개 hash 동일. Step39/49/50/51 파일 및 설정/Scene/State 보존. |
-| 193 | commit/push | commit/push/stage 없음. HEAD 동일. |
 | 194 | P0 | 신규 P0 미발견. |
 | 195 | P1 | 신규 P1 미발견. |
 | 196 | P2 | P2 후속: 실제 Active 종료 정책과 freeze/cleanup lifecycle 미구현. F07-B의 기존 partial scope. |

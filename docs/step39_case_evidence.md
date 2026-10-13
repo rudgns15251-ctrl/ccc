@@ -1,6 +1,8 @@
 # Step39 — Case Evidence 콘텐츠 정비
 
-작업일: 2026-10-05. 기존 프로젝트의 Case01/02 텍스트를 정비했다. 새 Gameplay 기능, Scene, Script, State, Resource 필드는 추가하지 않았다. 커밋·push하지 않는다.
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
+작업일: 2026-10-05. 기존 프로젝트의 Case01/02 텍스트를 정비했다. 새 Gameplay 기능, Scene, Script, State, Resource 필드는 추가하지 않았다.
 
 기본 Profile·CCTV·실험 결과와 Room 설비의 차이를 연결했다. 환경 사건이 없어도 판단할 수 있으며, 환경 관찰은 기존 판단을 재검토하는 보조 자료다. 조건 실험이 뒤늦게 불가능해지는 기존 규칙은 유지하고, 그 정보에 필수 판단을 의존하지 않도록 했다.
 
@@ -10,7 +12,7 @@
 
 HEAD `0e9ae101d792c4c91a5f1886673f574215ae6454` (`Audit core loop UX and correct prototype status labels`). `master`는 `origin/main`을 추적하며 working tree는 깨끗했다. 원격은 `https://github.com/rudgns15251-ctrl/ccc.git`이다. 기존 미커밋 변경은 없었다.
 
-실제 tracked 파일 100개와 이전 검증 소스 2,346개의 SHA-256 기준선을 남겼다. 루트·상위 디렉터리에 적용할 AGENTS.md는 없었다. project.godot, Main Scene/Script, 전체 View/State/Resource, 두 Case의 ID 연결, Step38 보고서, 이전 검증 자료를 조사했다.
+실제 tracked 파일 100개와 이전 검증 소스 2,346개의 SHA-256 기준선을 남겼다. 루트·상위 디렉터리에  project.godot, Main Scene/Script, 전체 View/State/Resource, 두 Case의 ID 연결, Step38 보고서, 이전 검증 자료를 조사했다.
 
 | 실제 구조 | 확인 결과 |
 |---|---|
@@ -128,11 +130,11 @@ Research Profile/CCTV/실험/정전 반응/조건 본문은 원 관찰과 한계
 
 Journey B의 최종 Log 본문/ID/버튼/가설 제공 텍스트는 2,185자(이전 Step38 1,825자)다. 원문 복제 초안 2,336자에서 별도 기록 요약으로 151자를 줄였다. 화면 밖 스크롤 본문도 포함하고 Main 헤더는 제외한 측정이므로 한 화면에 동시에 보이는 글자 수가 아니다. 문구는 늘었고 읽기 비용은 남는다. 엔트리 수는 격리 확정 전 7개, 확정 후 8개로 그대로이며 새 중복 행을 추가하지 않았다. 의미 있는 비교를 제공하는 것과 정보 밀도를 낮추는 것은 별개로 후속 사람 플레이에서 평가해야 한다.
 
-## 요청한 70개 종료 항목
+## 구현·검증 체크리스트 (원래 70개 항목)
 
 | 번호 | 항목 | 결과 |
 |---|---|---|
-| 1 | 작업 전 Git | 위 HEAD, master→origin/main, clean. 커밋·push하지 않음 |
+| 1 | 작업 전 Git | 위 HEAD, master→origin/main, clean. 작성 당시 Git 기준선 유지 |
 | 2 | Step38 재확인 | F01 판단 연결 부족, F02 조건 실험 시점 의존, F03 환경 관찰 중복을 실제 코드/콘텐츠에서 확인 |
 | 3 | Case01 Evidence Map | 위 표: CORE 5 Source + Room 3 설비; 수신 환경 관찰 없음 |
 | 4 | Case02 Evidence Map | 위 표: CORE 4 Source + Room 2 + Guaranteed 3 관찰 + Opportunistic 1 |
@@ -199,7 +201,7 @@ Journey B의 최종 Log 본문/ID/버튼/가설 제공 텍스트는 2,185자(이
 | 65 | 파싱/실행 | 제품 GDScript 38개 check-only, editor import 오류/경고 0, headless/native 기본 Main 실행 PASS. F5 키 자체는 자동 조작하지 않음 |
 | 66 | 발견/해결 | 고정 Profile/CCTV의 긴 초안은 문구 압축. 기존 테스트의 짧은 본문/전체 행 한 화면 가정은 새 사본에서 실제 스크롤/도달 검사로 수정. 별도 Research 요약 기준은 콘텐츠로 보존. 개발용 helper 연결 오류 해결; 제품 코드 오류 없음 |
 | 67 | 실제 변경 | 두 Case .tres 텍스트, README 링크/요약 수정; 이 문서 1개 추가. 삭제 없음 |
-| 68 | 기존 미커밋 | 시작 clean; 이전 제품/검증 파일 보존 비교. 커밋·push하지 않음 |
+| 68 | 기존 미커밋 | 시작 clean; 이전 제품/검증 파일 보존 비교. 작성 당시 Git 기준선 유지 |
 | 69 | 남은 문제 | Case02 실제 Outcome 없음, 인간 추리 이해도 미검증, 작은 창 긴 본문 스크롤 비용, fallback Archive 제외, Recheck 정보 유무 안내 없음 |
 | 70 | 다음 단계 | 새 시스템보다 두 Case 첫 플레이 테스트: 선택 이유/잘못된 가설/단독 실험 이해/사건 없이 판단/읽기 비용 기록 후 콘텐츠 수정 여부 결정 |
 
@@ -245,7 +247,7 @@ Godot `4.7.1.stable.official.a13da4feb`, Windows PC, AMD Radeon RX 6800의 OpenG
 | 기존 파일 | 기준선 100개 중 **97개 SHA 동일**. README의 기존 이력은 삽입 구간을 제외하고 동일 |
 | 이전 검증 | 이전 GDScript/PowerShell/Scene 소스 **2,346개 SHA 동일** |
 | Git 범위 | README + Case01/02 수정, 이 문서 1개 추가, 삭제 0. `git diff --check` PASS, 의도하지 않은 변경 없음 |
-| Git 상태 | HEAD/브랜치 유지. 커밋·push하지 않음 |
+| Git 상태 | HEAD/브랜치 유지. 작성 당시 Git 기준선 유지 |
 
 두 `.tres`의 diff는 합계 **44개 기존 텍스트 행 교체**다(Case01 24, Case02 20). README는 Step39 요약/링크 12행 삽입이다. 모든 제품 `.gd`/`.tscn`/`.uid`와 설정·기존 Step38 보고서는 보존했다. 새 검증 코드와 캡처는 Git 제외 영역이며 제품 변경 파일 수에 포함하지 않았다.
 

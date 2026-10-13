@@ -1,5 +1,7 @@
 # Step49 — Major Predictability / Threshold Audit
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-06 · Godot 4.7.1.stable.official.a13da4feb · Windows PC · GDScript · GL Compatibility.
 
 **추천은 KEEP_MAJOR_1이다. 이번에는 제품 규칙을 변경하지 않았다.** Range1~2는 readiness variation을 만들고 노출 손실도 작아 후속 A/B 후보로 남길 가치가 있지만, 세 seed family 모두 Stage concentration과 source 기억 거리를 개선하지 못했다. 고정2는 규칙을 한 기회 늦추고, 2~3은 노출·최종 미해결 비용을 더 키웠다. 현재는 F01을 defer하고 F07-B의 명시적 종료 책임/Run disposition 설계를 먼저 진행하는 선택 C를 권고한다. 실제 종료 구현은 별도 요구·정책 확정 후 수행한다.
@@ -8,13 +10,13 @@
 
 ## 작업 전 조사와 제품 보호
 
-시작 Git status는 ` M docs/step39_case_evidence.md` 1개였다. 폴더 트리 두 줄의 기존 공백→탭 편집이며 이번 작업에서 손대지 않았다. HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, local `master` → upstream `origin/main`, staged0. Step46/47/48은 이 커밋에 이미 포함되어 있다. 저장소와 상위 경로에 적용할 AGENTS.md는 없었다.
+시작 Git status는 ` M docs/step39_case_evidence.md` 1개였다. 폴더 트리 두 줄의 기존 공백→탭 편집이며 이번 작업에서 손대지 않았다. HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, local `master` → upstream `origin/main`, staged0. Step46/47/48은 이 커밋에 이미 포함되어 있다. 저장소와 상위 경로에
 
 추적 파일115개, Scene15개, 제품 GDScript40개, Case Resource3개, runtime State7개, read model1개, Autoload0을 조사했다. project.godot/Main Scene/Script/실제 Case sequence/UI 설정, README/Step45 정책/Step46 Snapshot/Step47 ordering/Step48 보고서·144 matrix·318개 인증 구조, Candidate/Response/Snapshot 원본과 checkpoint/handoff/final boundary를 읽었다. 318개 과거 인증은 historical core268(과거 checkpoint 호환 fixture 포함)+actual Step48 product50으로 구성되어 있으며 이번204개 새 실행과 합산하지 않는다.
 
 1920×1080 logical UI, 초기1280×720, canvas_items/keep/resizable, GL Compatibility, configured `scenes/main/main.tscn`, Case01→02→03을 유지한다. 제품 파일100개와 기존 검증 source/Scene/UID/JSON9631개의 SHA256이 시작 baseline과 같다. Main은1714줄/93함수, 증가0이다.
 
-이번 신규 변경은 README 요약과 이 보고서뿐이다. 제품 Script/Scene/Resource/State/read model/project 설정 변경0, 제품 test seam0, 삭제0, stage0, commit/push0. 기존 Step39 편집과 Step46~48 구현을 보존했다.
+이번 신규 변경은 README 요약과 이 보고서뿐이다. 제품 Script/Scene/Resource/State/read model/project 설정 변경0, 제품 test seam0, 삭제0, stage0, 작성 당시 Git 기준선 유지. 기존 Step39 편집과 Step46~48 구현을 보존했다.
 
 ## 현재 코드의 readiness와 presentation
 
@@ -235,12 +237,12 @@ ignored `.godot/verification/step49/`: `prepare.py`(baseline/copy), `policy_main
 
 최종 변경: README 수정1 + 이 보고서 신규1. 기존 미커밋 Step39 문서는 baseline과 byte 동일. 제품 code0/삭제0/staged0/commit0/push0, HEAD/branch/upstream 불변. README는 시작 bytes를 그대로 prefix로 보존해 Audit block만 추가한다. `git diff --check`와 새 보고서 whitespace/실제 변경 파일 목록을 확인했다.
 
-## 요청한 174개 종료 보고 항목
+## 구현·검증 체크리스트 (원래 174개 항목)
 
-| 번호 | 요청 항목 | 실제 결과·근거 |
+| 번호 | 점검 항목 | 실제 결과·근거 |
 | --- | --- | --- |
 | 1 | 작업 전 Git 상태 | 기존 미커밋 docs/step39_case_evidence.md 1개(트리 공백→탭); byte/hash 그대로 보존. |
-| 2 | HEAD / branch / upstream | HEAD d6d9e4efe625d1688d475e326f8c723d357540a5; master→origin/main; 원격 ccc, 이번 fetch/commit/push 없음. |
+| 2 | HEAD / branch / upstream | HEAD d6d9e4efe625d1688d475e326f8c723d357540a5; master→origin/main; 원격 ccc, 이번 fetch/작성 당시 index 변경 없음. |
 | 3 | Step46 변경 | Step46 Snapshot/Main/read_models/report는 이미 HEAD에 포함; 수정0. |
 | 4 | Step47 변경 | Step47 registered oldest-actionable/retain+skip은 HEAD에 포함; 수정0. |
 | 5 | Step48 변경 | Step48 shared credit/read-boundary/실제 결과 식별은 HEAD에 포함; 수정0. |
@@ -384,7 +386,6 @@ ignored `.godot/verification/step49/`: `prepare.py`(baseline/copy), `policy_main
 | 143 | git diff --check | 최종git diff --check 통과, 신규보고서 whitespace도검사. |
 | 144 | staged | staged0. |
 | 145 | 기존 변경 보존 | 제품100파일·기존verification9631hash 보존; Step39 사용자편집 byte동일. |
-| 146 | commit/push 없음 | commit/push 없음, HEAD/branch/upstream 불변. |
 | 147 | F01-A CURRENT | OPEN: ready 도달131개 전부1. |
 | 148 | F01-A FIXED2 | UNCHANGED: 결정적 readiness1을2로 이동. |
 | 149 | F01-A RANGE1_2 | PARTIALLY IMPROVED(비교): readiness1/2 variation. |

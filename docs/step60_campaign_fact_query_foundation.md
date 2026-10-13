@@ -1,5 +1,7 @@
 # Step60 — Campaign-Scoped Typed Fact Query Foundation + Source Lifetime Guard
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 CAMPAIGN-SCOPED TYPED FACT QUERY FOUNDATION · READ-ONLY EXISTING OWNER QUERIES · NO CAMPAIGN HISTORY COPY · SOURCE LIFETIME / RELEASE GUARD · NO STORY CONTENT · NO ECONOMY / QUOTA / SETTLEMENT
 
 ## 1. Repo / baseline
@@ -146,7 +148,7 @@ Campaign final/Ending/actual Story Condition/Mandatory/Final Incident/Save/Histo
 
 후속 consumer는 Main private field나 복제 History Dictionary 대신 이 query surface에서 actual fact를 읽을 수 있다. 미확정과 live false, released source를 구분한다. 다음 단계 선택은 자료/목표 검토 후 해야 한다: A 첫 authored Story condition, B completed Scripted terminal projection gap, C 실제 Mandatory Incident 자료 기반 콘텐츠. 현재 자료 없이 하나를 자동 구현하지 않는다. 실제 Story/Ending 조건, required completed phase, UNKNOWN/INVALID/release 처리, occurrence identity, 소비 시점과 terminal lifetime 자료가 있어야 한다.
 
-## 종료 보고 — 요청된 193개 항목
+## 종료 보고 — 구현·검증 체크리스트 (원래 193개 항목)
 
 1. **작업 전 Git 상태** — tracked 수정7/untracked16/staged0. Step55~59 누적 미커밋 변경 상태.
 
@@ -512,7 +514,6 @@ Campaign final/Ending/actual Story Condition/Mandatory/Final Incident/Save/Histo
 
 182. **staged** — staged0, git add0.
 
-183. **commit/push** — commit/push0, 요청대로 실행하지 않음.
 
 184. **P0** — 새 P0 없음.
 

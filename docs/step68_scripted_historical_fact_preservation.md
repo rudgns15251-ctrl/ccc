@@ -1,5 +1,7 @@
 # Step68 — Completed Scripted Historical Fact Preservation Implementation
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **IMPLEMENTATION / VERIFIED.** 2026-10-11. Step67 권장안 B를 기존 제품 파일 4개에 구현했다. 완료된 Sequential/Mid-Case Scripted Response를 기존 `historical_facts`에 occurrence별 typed 행으로 보존한다. Case Failure 형식, six-field envelope, receipt, 독립 Recipient 소유권, 기존 cleanup 순서는 유지한다. Story Campaign의 메모리 종료 기록 확장이다.
 
 ## 1. Repository Baseline
@@ -15,7 +17,7 @@
 | project.godot | Main=`res://scenes/main/main.tscn`, 1920×1080 viewport, 1280×720 창, canvas_items / 기본 keep, GL Compatibility, Autoload 없음 |
 | authored Campaign | CASE01 → CASE02 → TEMP Mandatory01 → CASE03; authored side schedule는 비어 있음 |
 
-기존 변경을 HEAD로 되돌리지 않았다. Step67 보고서 및 현재 네 제품 파일, 모든 State/Data/Scene/Resource/UI/Theme를 읽고 실제 getter·호출 경로를 기준으로 구현했다. AGENTS.md는 현재 저장소와 상위 경로 조사에서 발견되지 않았다. 시작 상태는 `.godot/verification/step68/baseline.json`에 SHA-256과 Git 상태로 기록했다.
+기존 변경을 HEAD로 되돌리지 않았다. Step67 보고서 및 현재 네 제품 파일, 모든 State/Data/Scene/Resource/UI/Theme를 읽고 실제 getter·호출 경로를 기준으로 구현했다. 시작 상태는 `.godot/verification/step68/baseline.json`에 SHA-256과 Git 상태로 기록했다.
 
 ## 2. Existing Gap Reproduction
 
@@ -290,7 +292,7 @@ core slot은 fresh editor import1, 제품 GD check-only53, configured Main headl
 
 제품 수정은 지정된 네 파일만이다. Source owner API 변경/새 mutable ownership/새 UI flow는 없다. Main의 startup/render/player callback/Case handoff/response acknowledgement/cleanup 순서는 변경하지 않았다. 필요한 capture 및 terminal consistency만 추가했다. Git 전체 diff에는 기존 Step66/66.1 변경이 함께 있으므로 시작 SHA 기준 delta를 `.godot/verification/step68/delta_*.patch`로 따로 기록했다.
 
-SHA-256 보호: baseline166개 중 네 제품 파일+README만 이번 Step 변화이며 나머지161개 동일. project.godot, 모든 Case/Campaign/TEMP Resources, Scene, Theme, original source State/Query/Data/UID 및 Step66/66.1/67 보고서가 포함된다. 기존 verification evidence63,477개 changed0/deleted0. README 시작 byte prefix도 그대로다. 보고서1개 추가 후 총167개다. 최종 `git diff --check` 통과; HEAD/branch/upstream/staged는 그대로이며 stage/commit/push/reset/checkout을 실행하지 않았다.
+SHA-256 보호: baseline166개 중 네 제품 파일+README만 이번 Step 변화이며 나머지161개 동일. project.godot, 모든 Case/Campaign/TEMP Resources, Scene, Theme, original source State/Query/Data/UID 및 Step66/66.1/67 보고서가 포함된다. 기존 verification evidence63,477개 changed0/deleted0. README 시작 byte prefix도 그대로다. 보고서1개 추가 후 총167개다. 최종 `git diff --check` 통과; HEAD/branch/upstream/staged는 그대로이며 작성 당시의 기준선과 비교했다.
 
 ## 26. Existing OPEN
 

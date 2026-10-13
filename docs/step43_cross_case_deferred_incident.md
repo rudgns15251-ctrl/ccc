@@ -1,16 +1,18 @@
 # Step43 — Case02 Resolution + Case03 + Cross-Case Deferred Incident
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05. Godot 4.7.1 Standard / GDScript / Windows PC / GL Compatibility.
 
 기존 프로젝트를 **Case01 → Case02 → Case03**의 정상 연속 플레이로 확장했다. Case02의 기본 관찰을 최소 보완한 뒤 두 Room 모두에 Prototype Test Outcome을 작성했다. 늦어진 Case01 후보가 Case02 handoff를 넘어 Case03에서 사건을 시작하고 동일한 Case03 Runtime으로 복귀하는 것을 확인했다. 두 Failure 후보, Case02만 Failure, 모두 Success, 마지막 경계의 Deferred 유지도 검증했다.
 
-**Prototype Test Mapping이며 정식 Case 설정이 아니다.** Room01 Success/Room02 Failure는 아래에 설명한 제한된 테스트 관찰의 매핑이다. 장기 안전성·탈출 가능성·정식 Creature 세계관·최종 밸런스를 확정하지 않는다. threshold/RNG/event ordering을 바꾸지 않았고 커밋·push하지 않았다.
+**Prototype Test Mapping이며 정식 Case 설정이 아니다.** Room01 Success/Room02 Failure는 아래에 설명한 제한된 테스트 관찰의 매핑이다. 장기 안전성·탈출 가능성·정식 Creature 세계관·최종 밸런스를 확정하지 않는다. threshold/RNG/event ordering을 바꾸지 않았고
 
 ## 실제 저장소 조사
 
 시작 Git 상태는 깨끗했고 staged/untracked 변경도 없었다. HEAD는 `ad2beae1a7cbee8836bc8f811abb82740bb0d5d3`, 메시지는 `Improve major incident response content and reading boundaries`다. `master`는 `origin/main`을 추적하고 시작 시 같은 커밋이었다. remote는 `https://github.com/rudgns15251-ctrl/ccc.git`이다.
 
-실제 파일/폴더 inventory, project.godot, Main Scene/Script, 관련 View/Data/7개 State, Case01/02와 Research, Step39/40/41/42 보고서, 기존 검증 소스를 조사했다. 적용할 AGENTS.md는 저장소와 상위 디렉터리에서 발견되지 않았다. 106개 추적 파일과 이전 검증 파일 3,687개의 시작 SHA-256을 기록했다.
+실제 파일/폴더 inventory, project.godot, Main Scene/Script, 관련 View/Data/7개 State, Case01/02와 Research, Step39/40/41/42 보고서, 기존 검증 소스를 조사했다.  106개 추적 파일과 이전 검증 파일 3,687개의 시작 SHA-256을 기록했다.
 
 - 시작: Case 2개, Scene 15개, GDScript 39개, Autoload 0개.
 - Case01: 기존 Outcome/사건/교란/대응/Research가 있음. 이번 단계에서 수정하지 않았다.
@@ -188,7 +190,7 @@ GPU PNG를 실제 열어 Case01→Case03 CCTV context, Case02→Case03 CONT cont
 
 세 Case의 local IDs/Research source linkage와 Outcome/response 링크를 검사했다. 지금은 runtime guard와 좁은 테스트로 충분하지만 작성 graph가 커지면 **별도 offline 콘텐츠 검사**가 유용할 시점이다. 전체 validator framework는 이번 단계에 추가하지 않았다.
 
-## 요청한 145개 종료 항목
+## 구현·검증 체크리스트 (원래 145개 항목)
 
 | 번호 | 항목 | 결과 |
 |---|---|---|
@@ -333,7 +335,7 @@ GPU PNG를 실제 열어 Case01→Case03 CCTV context, Case02→Case03 CONT cont
 | 139 | 삭제 | 0개. |
 | 140 | 기존 변경 보존 | 시작 미커밋 없음, 기존 reports/Case01/검증 원본 보존. |
 | 141 | diff check | git diff --check 및 새 파일 whitespace 검사 통과. |
-| 142 | staged | 없음, HEAD 유지, commit/push 없음. |
+| 142 | staged | 없음, HEAD 유지, 작성 당시 index 변경 없음. |
 | 143 | 미구현 | rebalance/Severity/Forced/Scripted/Campaign/Economy/Save/Case04/Case03 Outcome/final UI·audio·animation·shader 없음. |
 | 144 | 우선순위 | 3-Case 사건 밀집/읽기/출처 이해를 사람 플레이와 UX 감사로 재측정. |
 | 145 | 다음 Step | Step44 — 3-Case Event Pacing / Cross-Case UX Audit 추천; threshold 결정은 별도 단계. |

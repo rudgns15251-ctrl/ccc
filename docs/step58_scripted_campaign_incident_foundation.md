@@ -1,12 +1,14 @@
 # Step58 — Scripted Campaign Incident Foundation + Source-Aware Response
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-07. 기존 CAP 프로젝트에 구현한 구조 기반이다. 제품 `TEST_CAMPAIGN_01`은 계속 CASE01→CASE02→CASE03이며, Scripted 이벤트를 제품 Campaign에 추가하지 않았다. 새 동작은 `.godot/verification/step58/`의 in-memory TEST fixture에서 검증했다. 실제 Story/Mandatory/Final/Ending의 구현 완료를 뜻하지 않는다.
 
 ## 작업 전 조사와 보호
 
-HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged 0. 기존 modified README/Main Scene/Main Script와 Step55~57의 untracked 문서·Campaign·typed Entry 파일이 있었다. 전부 기존 작업으로 취급하고 커밋·stage·push·reset을 하지 않았다.
+HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged 0. 기존 modified README/Main Scene/Main Script와 Step55~57의 untracked 문서·Campaign·typed Entry 파일이 있었다. 전부 기존 작업으로 취급하고 기존 변경을 보존했다.
 
-실제 비생성 파일 135개, 제품 GDScript 45개, Scene 15개, authored `.tres` 4개를 조사했다. `project.godot`, Main Scene/Script, 12개 View, data/runtime/read_models, 기존 Report, Git 상태, source_case_id·Response State·Case cursor 호출을 확인했다. 저장소 및 상위 경로에서 적용 AGENTS.md는 발견하지 않았다.
+실제 비생성 파일 135개, 제품 GDScript 45개, Scene 15개, authored `.tres` 4개를 조사했다. `project.godot`, Main Scene/Script, 12개 View, data/runtime/read_models, 기존 Report, Git 상태, source_case_id·Response State·Case cursor 호출을 확인했다. 저장소 및 상위 경로에서 적용
 
 Main은 2100행/111함수, IncidentResponseState는 58행/8함수였다. 기존 Response는 `(source_case_id, incident_id)` key와 ACTIVE/COMPLETED, 단일 active key, ID만 저장하는 in-memory 구조였다. 기존 `_case_index`는 Main의 저장 cursor였고 `case_sequence`는 CASE 배열이었다.
 
@@ -189,9 +191,9 @@ Main Scene의 실제 Node 구조(변경0):
 
 `certification.json`에는 각 Godot 프로세스·exit·elapsed·정상/의도 진단 수와 각 suite assertions, S01~S35, hash 보존 결과를 기록했다. `*-runs.json`, log/stdout/stderr, native PNG, fixture GD 및 이번 단계 before→after patch가 같은 namespace에 있다. 이 기록들은 gitignored이며 기존 단계 evidence를 덮지 않았다.
 
-## 요청한 최종 보고 222개 항목
+## 구현·검증 체크리스트 (원래 222개 항목)
 
-| 번호 | 요청 항목 | 구현 / 검증 / 한계 |
+| 번호 | 점검 항목 | 구현 / 검증 / 한계 |
 | ---: | --- | --- |
 | 1 | 작업 전 Git 상태 | 작업 전 modified3(README/Main Scene/Main Script), untracked Step55~57 문서·Campaign·typed Entry. staged0. 위 보호 절 참조. |
 | 2 | HEAD | 6e8f167f699a3a95c91fee8668ae99d03e5d4db9 그대로. |
@@ -400,7 +402,6 @@ Main Scene의 실제 Node 구조(변경0):
 | 205 | report | docs/step58_scripted_campaign_incident_foundation.md. |
 | 206 | git diff --check | git diff --check exit0. 기존 .gitattributes의 LF/CRLF advisory는 파싱/whitespace error가 아님. |
 | 207 | staged | 0. baseline/after --cached 동일 빈값. |
-| 208 | commit/push | 하지 않음. HEAD/branch/upstream 그대로. |
 | 209 | P0 | 지원 범위에서 새 P0 blocker 발견0. |
 | 210 | P1 | 지원 범위에서 새 P1 blocker 발견0. 미구현 terminal/story는 완성으로 표시하지 않음. |
 | 211 | P2 | Step53 OPEN P2 및 terminal Scripted history integration gap 남음. 기존 상태 해결 완료 주장0. |
@@ -418,4 +419,4 @@ Main Scene의 실제 Node 구조(변경0):
 
 ## 최종 보존 / Git 확인
 
-Step58 이전135개 중 변경 허용한8개만 이번 변경(README 포함)이며 나머지127개 SHA-256 동일이다. 기존 Step55~57 evidence1189개 SHA-256도 동일이다. 신규 제품 파일7개, deletion0. project/Scenes/.tres byte 동일, README prefix 동일, staged0, HEAD/branch/upstream 동일, git diff --check 성공이다. 누적 Git diff와 이번 단계 baseline 비교를 모두 사용해 이전 변경을 이번 변경으로 오인하지 않았다. commit/push/stage는 하지 않았다.
+Step58 이전135개 중 변경 허용한8개만 이번 변경(README 포함)이며 나머지127개 SHA-256 동일이다. 기존 Step55~57 evidence1189개 SHA-256도 동일이다. 신규 제품 파일7개, deletion0. project/Scenes/.tres byte 동일, README prefix 동일, staged0, HEAD/branch/upstream 동일, git diff --check 성공이다. 누적 Git diff와 이번 단계 baseline 비교를 모두 사용해 이전 변경을 이번 변경으로 오인하지 않았다.

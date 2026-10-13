@@ -1,20 +1,22 @@
 # Step63 — Temporary Mandatory Incident 01 Authored Campaign Integration
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **TEMPORARY MANDATORY INCIDENT 01 · FIRST PRODUCT AUTHORED SCRIPTED STORY ENTRY · CASE02 → TEMP INCIDENT → CASE03 · DATA-DRIVEN REPLACEABLE CONTENT · ALL-SUCCESS PLAYERS STILL EXPERIENCE BROADCAST · NO FINAL STORY CLAIM · NO ECONOMY / QUOTA / SETTLEMENT**
 
-기존 프로젝트에 actual authored TEMP 사건1개를 통합했다. 확정된 순차 구조와 임시 콘텐츠/미정 최종 Story를 구분한다. 새 Gameplay 시스템·Main/Scene/Script 수정0, stage/commit/push0.
+기존 프로젝트에 actual authored TEMP 사건1개를 통합했다. 확정된 순차 구조와 임시 콘텐츠/미정 최종 Story를 구분한다. 새 Gameplay 시스템·Main/Scene/Script 수정0.
 
 ## 1. Repo Baseline
 
-작업 전 실제 비생성 파일152개, 제품 GDScript51개, Scene15개, authored .tres4개. project.godot, 실제 Scene/Script/Resource 전체 목록, Campaign/Main/Response/Archive/FactQueries/terminal/side 경로, CASE01/02의 Profile·CCTV·전체 Experiment·Result·Research·Room·Outcome·Failure Incident를 조사했다. 적용 AGENTS.md 없음.
+작업 전 실제 비생성 파일152개, 제품 GDScript51개, Scene15개, authored .tres4개. project.godot, 실제 Scene/Script/Resource 전체 목록, Campaign/Main/Response/Archive/FactQueries/terminal/side 경로, CASE01/02의 Profile·CCTV·전체 Experiment·Result·Research·Room·Outcome·Failure Incident를 조사했다.
 
-HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 누적 tracked 수정10개/untracked25개는 Step55~62의 기존 변경이다. 이번 작업의 변경과 구분하며 rollback/stage/commit/push 하지 않았다. 이전 verification56,538개 파일을 해시 보호했다. baseline은 `.godot/verification/step63/baseline.json`, 원본 bytes는 `before/`, 이전 증거 해시는 `prior-evidence-hashes.json`에 보존했다.
+HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 누적 tracked 수정10개/untracked25개는 Step55~62의 기존 변경이다. 이번 작업의 변경과 구분했다. 이전 verification56,538개 파일을 해시 보호했다. baseline은 `.godot/verification/step63/baseline.json`, 원본 bytes는 `before/`, 이전 증거 해시는 `prior-evidence-hashes.json`에 보존했다.
 
 최종 폴더 구성: 기존 assets / resources/cases·campaigns / scenes/main·views / scripts/data·runtime·read_models·main·views / docs를 유지하고 `resources/incidents/`만 새로 추가했다. 새 Resource1개와 보고서1개, 수정 Campaign1개와 README append만 있다. 최종 비생성154개, GDScript51개, Scene15개, authored .tres5개. Main2455행/133함수 및 모든 Script·Scene·설정 bytes를 보존했다.
 
 ## 2. Actual Existing Case Evidence Audit
 
-[resources/cases/test_case_01.tres](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/resources/cases/test_case_01.tres:1) / [resources/cases/test_case_02.tres](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/resources/cases/test_case_02.tres:1)
+[resources/cases/test_case_01.tres](../resources/cases/test_case_01.tres) / [resources/cases/test_case_02.tres](../resources/cases/test_case_02.tres)
 
 | 조사 항목 | CASE01 실제 authored 정보 | CASE02 실제 authored 정보 |
 |---|---|---|
@@ -44,7 +46,7 @@ HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `orig
 
 ## 5. Campaign Entry Integration
 
-[resources/campaigns/test_campaign_01.tres](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/resources/campaigns/test_campaign_01.tres:1)
+[resources/campaigns/test_campaign_01.tres](../resources/campaigns/test_campaign_01.tres)
 
 | 순서 | Before | After | kind |
 |---|---|---|---|
@@ -57,7 +59,7 @@ HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `orig
 
 ## 6. Incident Resource
 
-[resources/incidents/temp_mandatory_incident_01.tres](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/resources/incidents/temp_mandatory_incident_01.tres:1)
+[resources/incidents/temp_mandatory_incident_01.tres](../resources/incidents/temp_mandatory_incident_01.tres)
 
 신규 파일의 subresource convention은 기존 Case bundle과 같다. ScriptedIncidentData event_id=`TEMP_EVENT_MANDATORY_01`, Incident ID=`TEMP_INCIDENT_MANDATORY_01`, Broadcast ID=`TEMP_BROADCAST_MANDATORY_01`. 파일명·ID·개발 comment의 `[TEMP STORY CONTENT]`·제목 `TEMP:`로 임시 콘텐츠임을 식별한다.
 
@@ -102,7 +104,7 @@ Containment Room은 가시 구성 비교의 보조 맥락이며 정답의 필요
 
 ## 10. Research Archive Use
 
-[scripts/main/main.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1825) / [scripts/views/research_archive_list_view.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/research_archive_list_view.gd:1) / [scripts/views/research_archive_detail_view.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/views/research_archive_detail_view.gd:1)
+[scripts/main/main.gd](../scripts/main/main.gd) / [scripts/views/research_archive_list_view.gd](../scripts/views/research_archive_list_view.gd) / [scripts/views/research_archive_detail_view.gd](../scripts/views/research_archive_detail_view.gd)
 
 순차 Scripted Incident/Broadcast/Result의 Open Source Archive는 전체 List로 간다. 실제 Case01→Detail에서 원래 ResearchEntry body와 동일한 Profile/CCTV 기록, 실행했을 때의 TEST_RESEARCH_EXP_01을 확인했다. Detail→List→Back은 원래 응답 stage/source로 복귀한다. draft와 Confirm lock 및 approved Result 유지.
 
@@ -127,7 +129,7 @@ Step58의 source/target intent·failure_offer_consumed 및 최대1회 정책 변
 
 ## 13. Sequential Completion / CASE03
 
-[scripts/main/main.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:1780) / [scripts/runtime/campaign_progress_state.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/runtime/campaign_progress_state.gd:61)
+[scripts/main/main.gd](../scripts/main/main.gd) / [scripts/runtime/campaign_progress_state.gd](../scripts/runtime/campaign_progress_state.gd)
 
 CASE02 handoff에서 completed=`[TEST_ENTRY_CASE_01, TEST_ENTRY_CASE_02]`, current=`TEMP_ENTRY_MANDATORY_01`, current_case/Runtime=null, Case ordinal=-1. response source는 CAMPAIGN_ENTRY / TEMP_ENTRY_MANDATORY_01 / TEMP_EVENT_MANDATORY_01이고 fake source_case_id 없음.
 
@@ -137,7 +139,7 @@ Case03 Outcome0·final no-next behavior 및 Ending 미구현 상태는 유지한
 
 ## 14. Fact Query Verification
 
-[scripts/read_models/campaign_fact_queries.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/read_models/campaign_fact_queries.gd:1)
+[scripts/read_models/campaign_fact_queries.gd](../scripts/read_models/campaign_fact_queries.gd)
 
 실제 product journey의 NOT_STARTED / ACTIVE draft / ACTIVE_CONFIRMED / COMPLETED에서 read-only typed queries를 각10회 호출했다. Case02 entry completion=true, TEMP entry completion은 ack 전 false/후 true, response completion도 전 false/후 true. option/result는 unconfirmed에서 UNKNOWN, Confirm 후 해당 TEMP Option/Result ID를 KNOWN으로 반환한다. 반환 객체를 수정해도 source state mutation0.
 
@@ -189,7 +191,7 @@ Main/GDScript 안에 Case02 ID나 TEMP ID hardcode를 추가하지 않았다. �
 | created | docs/step63_temporary_mandatory_incident_01.md | 필수22섹션·171항목 보고 |
 | deleted | 없음 | 보존 |
 
-Main 수정0. [scripts/main/main.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2289)와 [scripts/main/main.gd](C:/Users/newsj/OneDrive/문서/ChatGPT/cap/scripts/main/main.gd:2272)의 기존 data-driven 동작으로 충분했다. 모든 Scene/View/Script/project.godot/UID/기존 Case/기존 보고서 bytes 유지. 1920×1080 reference,1280×720 override,canvas_items stretch,GL Compatibility,Autoload0 그대로다.
+Main 수정0. [scripts/main/main.gd](../scripts/main/main.gd)와 [scripts/main/main.gd](../scripts/main/main.gd)의 기존 data-driven 동작으로 충분했다. 모든 Scene/View/Script/project.godot/UID/기존 Case/기존 보고서 bytes 유지. 1920×1080 reference,1280×720 override,canvas_items stretch,GL Compatibility,Autoload0 그대로다.
 
 최종 Git의 누적 수정은 기존 작업까지 포함한다. `git diff HEAD`만으로 Step63 크기를 판단하지 않는다. baseline diff(이전에 untracked였던 Campaign 포함), status, diff --check, HEAD/branch/upstream/staged 검사를 새 verification에 저장했다. Git의 기존 LF/CRLF 경고는 파일 오류나 Godot warning이 아니며 설정/줄바꿈을 임의 normalize하지 않았다.
 
@@ -237,7 +239,7 @@ Mandatory02/03·Final Incident·Ending·Save/Load·StoryFlag·generic Condition/
 
 표의 번호는 사용자 요청 번호와 같다. 상세 근거·검증 범위는 위 22개 섹션 및 verification JSON과 연결된다.
 
-| 번호 | 요청 항목 | 결과 / 근거 |
+| 번호 | 점검 항목 | 결과 / 근거 |
 |---:|---|---|
 | 1 | 작업 전 Git 상태 | tracked 수정10/untracked25, 이전 변경을 포함한 작업 전 상태. |
 | 2 | HEAD | 6e8f167f699a3a95c91fee8668ae99d03e5d4db9. |
@@ -399,7 +401,6 @@ Mandatory02/03·Final Incident·Ending·Save/Load·StoryFlag·generic Condition/
 | 158 | report | docs/step63_temporary_mandatory_incident_01.md, 22섹션/171항목. |
 | 159 | git diff --check | exit0; 기존 Git line-ending conversion 경고만 존재. |
 | 160 | staged final | 0. |
-| 161 | commit/push | 하지 않음. |
 | 162 | new P0 | 새 P0 발견0 (검증 범위 내). |
 | 163 | new P1 | 새 P1 발견0. |
 | 164 | new P2 | 새 P2 발견0; 기존 gaps 유지. |

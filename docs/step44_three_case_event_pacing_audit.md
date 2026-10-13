@@ -1,5 +1,7 @@
 # Step44 — 3-Case Event Pacing / Cross-Case UX Audit
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05 · Godot 4.7.1 Standard / GDScript / Windows / GL Compatibility.
 
 **다중 Case의 데이터·응답·복귀는 유지되지만, 사건 리듬이 충분히 여유롭거나 예측하기 어렵다고 판정할 수 없다.** 실제 버튼으로 144개의 threshold/실험량 조합을 측정했다. 사건 간 완료된 연구 행동은 최소 0개였다. 오래된 Major보다 새 교란이 먼저 보이는 정상 경로와, 마지막 경계에서 준비된 사건이 남는 경로를 분리해 확인했다. 명백한 제품 코드 버그는 재현되지 않아 gameplay 파일은 수정하지 않았다.
@@ -8,7 +10,7 @@
 
 시작 HEAD `ad2beae1a7cbee8836bc8f811abb82740bb0d5d3`, `Improve major incident response content and reading boundaries`; `master` → `origin/main`, 시작 시 같은 커밋. remote `https://github.com/rudgns15251-ctrl/ccc.git`.
 
-시작 미커밋은 Step43의 README/Case02/Main Scene/Main Script 수정 4개, Step43 보고서/Case03 Resource 추가 2개였다. 이 **기존 변경을 이번 baseline**으로 취급한다. 108개 저장소 파일과 기존 검증 원본 3,973개의 SHA-256을 기록했다. 저장소·상위 경로에서 적용할 AGENTS.md가 없었다.
+시작 미커밋은 Step43의 README/Case02/Main Scene/Main Script 수정 4개, Step43 보고서/Case03 Resource 추가 2개였다. 이 **기존 변경을 이번 baseline**으로 취급한다. 108개 저장소 파일과 기존 검증 원본 3,973개의 SHA-256을 기록했다.
 
 전체 파일 inventory, project.godot, 15개 Scene/39개 Script, Case01/02/03, Step41~43 보고서, 7개 State, 각 View/Signal, response graph와 기존 전체 검증 suite를 조사했다. Autoload 0, Main 1,563줄/84함수. 기준 UI1920×1080, 초기 창1280×720, canvas_items/keep/resizable와 GL Compatibility를 유지한다.
 
@@ -179,7 +181,7 @@ Windows native RX6800 GL Compatibility의 실제 draw/PNG를1920×1080,1280×720
 
 계측 Script/runner/JSON/로그/PNG/사본은 ignore된 `.godot/verification/step44/`에 있다. 재현: `run_validation.ps1`의24개 검사, `analyze.ps1`의144개 matrix 통계, regression43의기존 runner들. `metrics.json`, `safe-priority-bypasses.json`, `audit_*.json`과 `queue_*.json`이 원본 증거다. 최종 범위/로그 hash/132개 응답 번호/staged·HEAD·diff check를 `final_integrity.json`에 기록한다.
 
-threshold/range/cooldown/gate/priority enum/global FIFO/Severity/event pacing State/Forced/Scripted/Case04/Case03 Outcome/Campaign/Shift/Quota/Economy/Save/Load/final UI/audio/animation/shader/Manager/Singleton/EventBus는 추가하지 않았다. **커밋·push하지 않는다.**
+threshold/range/cooldown/gate/priority enum/global FIFO/Severity/event pacing State/Forced/Scripted/Case04/Case03 Outcome/Campaign/Shift/Quota/Economy/Save/Load/final UI/audio/animation/shader/Manager/Singleton/EventBus는 추가하지 않았다.
 
 ## Event Density — 대표 동일 실험량(2/2)
 
@@ -199,8 +201,8 @@ threshold/range/cooldown/gate/priority enum/global FIFO/Severity/event pacing St
 | FS_40_e22 | 11 | 11 | 1 | 1 | 1 | 2 | 0.182 | 1/2 |
 | SF_02_e22 | 11 | 11 | 1 | 1 | 1 | 2 | 0.182 | 1/1 |
 | SF_03_e22 | 11 | 11 | 1 | 1 | 1 | 2 | 0.182 | 0/0 |
-| SF_04_e22 | 11 | 11 | 1 | 0 | 0 | 1 | 0.091 |  |
-| SS_00_e22 | 11 | 11 | 0 | 0 | 0 | 0 | 0.000 |  |
+| SF_04_e22 | 11 | 11 | 1 | 0 | 0 | 1 | 0.091 | |
+| SS_00_e22 | 11 | 11 | 0 | 0 | 0 | 0 | 0.000 | |
 
 ## Threshold Matrix — 두 Failure, 실험2/2
 
@@ -257,7 +259,7 @@ Select/Next 등 비기회 action도 표시한다. a는 실제 버튼 입력 inde
 | 19 | C02 / CONTAINMENT | Next: CASE | False/False | C01=(4,1,0,0) → C01=(4,1,0,0);C02=(0,0,0,0) | — | — |
 | 20 | C03 / PROFILE | Next: CCTV | True/True | C01=(4,1,0,0);C02=(0,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | C01 MAJOR | 1 |
 | 21 | C03 / INCIDENT | Next: BROADCAST | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | — | — |
-| 22 | C03 / BROADCAST |  | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | — | — |
+| 22 | C03 / BROADCAST | | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | — | — |
 | 23 | C03 / BROADCAST | Confirm Broadcast | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | — | — |
 | 24 | C03 / BROADCAST | Next: INCIDENT RESULT | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C01=(4,1,1,1);C02=(1,0,0,0) | — | — |
 | 25 | C03 / INCIDENT_RESULT | Resume: CCTV | False/False | C01=(4,1,1,1);C02=(1,0,0,0) → C02=(1,0,0,0) | — | — |
@@ -269,16 +271,16 @@ Select/Next 등 비기회 action도 표시한다. a는 실제 버튼 입력 inde
 | 31 | C03 / EXPERIMENT | Run Experiment | True/True | C02=(2,1,0,0) → C02=(2,1,1,0) | — | — |
 | 32 | C03 / EXPERIMENT | Next: CONTAINMENT | True/False | C02=(2,1,1,0) → C02=(2,1,1,1) | C02 MAJOR | 1 |
 | 33 | C03 / INCIDENT | Next: BROADCAST | False/False | C02=(2,1,1,1) → C02=(2,1,1,1) | — | — |
-| 34 | C03 / BROADCAST |  | False/False | C02=(2,1,1,1) → C02=(2,1,1,1) | — | — |
+| 34 | C03 / BROADCAST | | False/False | C02=(2,1,1,1) → C02=(2,1,1,1) | — | — |
 | 35 | C03 / BROADCAST | Confirm Broadcast | False/False | C02=(2,1,1,1) → C02=(2,1,1,1) | — | — |
 | 36 | C03 / BROADCAST | Next: INCIDENT RESULT | False/False | C02=(2,1,1,1) → C02=(2,1,1,1) | — | — |
 | 37 | C03 / INCIDENT_RESULT | Resume: CONTAINMENT | False/False | C02=(2,1,1,1) → — | — | — |
 | 38 | C03 / CONTAINMENT | TEST CASE 03 ROOM 01 | False/False | — → — | — | — |
 | 39 | C03 / CONTAINMENT | Confirm Containment | False/True | — → — | — | — |
 
-## 요청한 종료 보고 132개 항목
+## 구현·검증 체크리스트 (원래 132개 항목)
 
-| 번호 | 요청 항목 | 결과 |
+| 번호 | 점검 항목 | 결과 |
 |---:|---|---|
 | 1 | 작업 전 Git 상태 | Step43 미커밋4수정/2추가, staged0에서 시작. |
 | 2 | HEAD / branch / upstream | HEAD ad2beae1a7cbee8836bc8f811abb82740bb0d5d3, master→origin/main, 동기 상태. |
@@ -405,7 +407,7 @@ Select/Next 등 비기회 action도 표시한다. a는 실제 버튼 입력 inde
 | 123 | 삭제 파일 | 삭제0. |
 | 124 | 기존 변경 보존 | 시작108개파일 중 README만추가블록,이전3973검사소스 hash보존. |
 | 125 | git diff --check | git diff --check/newreport whitespace 검사 및범위검사 통과. |
-| 126 | staged 없음 | staged0,HEADad2beae유지,commit/push 없음. |
+| 126 | staged 없음 | staged0,HEADad2beae유지,작성 당시 index 변경 없음. |
 | 127 | F01 최종 Audit 판정 | F01 OPEN P2;readiness정확화와122건presentation집중/0간격 측정. |
 | 128 | F07 최종 재분류 | F07-A RESOLVED/F07-B OPEN으로분해,전체완료로표현안함. |
 | 129 | 가장 중요한 pacing 문제 3개 | Aready1+0gap,Bpriority/sourcefairness,Cfinalevent정책부재. |

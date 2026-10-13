@@ -1,10 +1,12 @@
 # Step70 — Research Document Profile UI Pilot
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 기존 Profile의 오른쪽 설명 영역을 Godot-native 종이 연구기록 뷰어로 변경했다. 실제 이름·분류·본문만 표시하며 데이터 소유권, 발견 규칙, 업무 전환, 사건 처리는 기존 구현을 사용한다. TEMP UI 파일럿이며 최종 디자인 확정이 아니다.
 
 ## 1. Repository Baseline
 
-실제 저장소를 먼저 조사했다. 작업 시작 시 비생성 파일 169개, 제품 GDScript 53개, Scene 17개, authored Resource 7개가 있었다. `project.godot`, 실제 Main/Profile Scene·Script, GameShell, Theme, ProfileData, Case01/02/03, Campaign, Step62 memento, Step66 navigation snapshot 및 Git 상태를 확인했다. 적용되는 AGENTS.md는 없었다.
+실제 저장소를 먼저 조사했다. 작업 시작 시 비생성 파일 169개, 제품 GDScript 53개, Scene 17개, authored Resource 7개가 있었다. `project.godot`, 실제 Main/Profile Scene·Script, GameShell, Theme, ProfileData, Case01/02/03, Campaign, Step62 memento, Step66 navigation snapshot 및 Git 상태를 확인했다.
 
 HEAD는 `742d8e5fc971a6c7e81ac11bee14cabc4ac14d66`, branch는 `master`, upstream은 `origin/main`이었다. remote는 `https://github.com/rudgns15251-ctrl/ccc.git`이다. staged 파일은 없었다.
 
@@ -236,7 +238,7 @@ Step70 시작 상태와 비교한 변경은 아래 네 기존 파일과 새 보�
 
 최종 Git 상태는 modified 5개, untracked 3개, staged 0, deleted 0이다. 이것에는 기존 Step69 modified Campaign 및 두 untracked 파일이 포함된다. Campaign이 `git diff`에 보여도 Step70에서 변경한 것은 아니다. 총 저장소 비생성 파일은 170개가 된다.
 
-`git status --short`, `git diff`, `git diff --stat`, `git diff --check`, HEAD/branch/staged 및 작업 시작 해시 비교를 수행했다. `git diff --check` exit 0이다. Git의 기존 CRLF→LF 안내는 기록되며 실제 기존 파일을 일괄 줄바꿈 변환하지 않았다. 전체 diff는 `.godot/verification/step70/git_diff.txt`, 변경 whitelist 결과는 `final_audit.json`에 있다. Stage/commit/push는 하지 않았다.
+`git status --short`, `git diff`, `git diff --stat`, `git diff --check`, HEAD/branch/staged 및 작업 시작 해시 비교를 수행했다. `git diff --check` exit 0이다. Git의 기존 CRLF→LF 안내는 기록되며 실제 기존 파일을 일괄 줄바꿈 변환하지 않았다. 전체 diff는 `.godot/verification/step70/git_diff.txt`, 변경 whitelist 결과는 `final_audit.json`에 있다.
 
 ## 18. Known Gaps
 

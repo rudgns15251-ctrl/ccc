@@ -1,5 +1,7 @@
 # Step59 — Campaign Historical Facts + Story Condition Contract Design
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 **DESIGN ONLY · CAMPAIGN HISTORICAL FACT CONTRACT · NO STORY CONTENT · NO ECONOMY / QUOTA / SETTLEMENT · NO PRODUCT GAMEPLAY CODE CHANGE**
 
 2026-10-07. [추천] **대안 A: 기존 owner를 읽는 typed read-only query 계층**을 다음 구현 단계로 선택한다. 현재 Resolution/Response/Archive/Progress가 Campaign session 안에서 계속 살아 있으므로 같은 결과를 복사하는 CampaignHistoryState는 지금 필요하지 않다. Runtime 교체로 잃는 정보는 실제 Story 요구가 확인된 항목만 별도 보존한다. [추천] ACTIVE Scripted의 developer terminal block은 유지한다.
@@ -8,7 +10,7 @@
 
 ## 1. Current Repo Facts
 
-[확정] HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 시작 시 tracked modified7개, untracked15개가 있는 Step55~58 누적 작업이다. 실제 비생성142파일, GDScript48개, Scene15개, authored `.tres`4개. Main2239행/121함수, IncidentResponseState64행/9함수. 전체 파일 목록과 적용 지침을 조사했고 repository/상위 경로에 AGENTS.md는 발견하지 않았다.
+[확정] HEAD `6e8f167f699a3a95c91fee8668ae99d03e5d4db9`, branch `master`, upstream `origin/main`, staged0. 시작 시 tracked modified7개, untracked15개가 있는 Step55~58 누적 작업이다. 실제 비생성142파일, GDScript48개, Scene15개, authored `.tres`4개. Main2239행/121함수, IncidentResponseState64행/9함수. 전체 파일 목록과 적용 지침을 조사했고 repository/상위 경로에
 
 [확정] product TEST_CAMPAIGN_01은 typed CASE01→02→03, Scripted product entry0이다. 마지막 Case03은 Outcome0/confirmed Pending/No next이며 Ending은 없다. scripted bundle와 mixed Journey는 Step58의 ignored in-memory verification fixture이다. project.godot은1920×1080 reference,1280×720 window,canvas_items,GL Compatibility,configured Main을 유지한다. Autoload 없음.
 
@@ -431,9 +433,9 @@
 
 [확정] static baseline/inventory/hash-preservation/final-audit 및 README append diff만 ignored `.godot/verification/step59/`에 보관했다. 기존 evidence를 수정하거나 덮지 않았다. 이 generated 조사 자료는 제품 코드/문서의 Git 변경 수에 포함하지 않는다.
 
-## 25. 요청한 종료 보고 144개 항목
+## 25. 구현·검증 체크리스트 (원래 144개 항목)
 
-| 번호 | 요청 항목 | 확정 /추천 /미정 |
+| 번호 | 점검 항목 | 확정 /추천 /미정 |
 | ---: | --- | --- |
 | 1 | 작업 전 Git 상태 | [확정] 시작 시 tracked modified7/untracked15/staged0의 Step55~58 누적 변경. 위 Current Repo Facts와 기준 Git 목록 참조. |
 | 2 | HEAD | [확정] 6e8f167f699a3a95c91fee8668ae99d03e5d4db9 그대로. |
@@ -566,7 +568,6 @@
 | 129 | hash preservation | [확정] README 제외141파일,제품118파일,이전 evidence54987개 SHA-256 동일. README prefix 동일. |
 | 130 | git diff --check | [확정] git diff --check exit0. 누적 diff와 Step59 baseline 비교 둘 다 확인. |
 | 131 | staged | [확정] 0. 시작/종료 cached diff 동일. |
-| 132 | commit/push | [확정] 하지 않음. HEAD/branch/upstream 동일. |
 | 133 | P0 | [확정] 새 설계 blocker P0 발견0. 새 gameplay assertion으로 보장 주장0. |
 | 134 | P1 | [확정] 조사에서 새 확인된 product regression P1 발견0. 미래 premature cleanup 방지 필요. |
 | 135 | P2 | [확정] Step53 P2와 Scripted terminal/Campaign final 구현 gap OPEN. 이번은 설계 확정만. |
@@ -584,4 +585,4 @@
 
 [추천] 다음 최소 작업은 **기존 authoritative owners를 읽는 Campaign-scoped typed query와 source lifetime guard**다. 새 HistoryState는 현재 필요하지 않다. 실제 later Story가 사라지는 Runtime 정보를 요구하거나 owner retirement를 도입할 때만 필요한 최소 historical record를 보존한다. Scripted completed 선택은 source-aware Response State에서 entry occurrence로 읽고, terminal은 필요할 때 그 사실의 final projection을 받는다.
 
-[확정] 제품의 실제 Story/Mandatory/Final/Ending/Story flags/Save/경제는 이번에 추가되지 않았다. commit/push/stage도 하지 않았다. Scripted terminal gap은 설계 책임을 정의했으나 구현 OPEN이며, ACTIVE Scripted는 현재 block 유지 권고다.
+[확정] 제품의 실제 Story/Mandatory/Final/Ending/Story flags/Save/경제는 이번에 추가되지 않았다.  Scripted terminal gap은 설계 책임을 정의했으나 구현 OPEN이며, ACTIVE Scripted는 현재 block 유지 권고다.

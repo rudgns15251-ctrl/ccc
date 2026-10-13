@@ -1,5 +1,7 @@
 # Step46 — Test Sequence Boundary Disposition Snapshot
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-05 · Godot 4.7.1 Standard / GDScript / Windows PC / GL Compatibility.
 
 **제품 상태를 변경하지 않고 현재 Test Sequence의 제출·판정·미처리 사건·진행 중 응답·연구 보존 현황을 관찰하는 개발용 계약을 구현했다.** `Main.build_test_sequence_disposition_snapshot()`은 `TestSequenceDispositionSnapshot`을 반환하며 `to_dictionary()`로 분리된 복사본을 읽는다. Snapshot은 closure/settlement/reset/result가 아니며 `TEST_SEQUENCE_END`는 `RUN_END`가 아니다. 기존 마지막 Case03의 Next 비활성화와 Pending 보존 정책을 유지한다.
@@ -10,7 +12,7 @@
 - branch `master`, upstream `origin/main`; 작업 시작 Git status는 clean, staged 0이다.
 - remote `https://github.com/rudgns15251-ctrl/ccc.git`.
 - Step43~45는 직전 사용자 요청에 따라 이미 커밋·push되어 있다. 프롬프트의 ‘기존 미커밋 변경’ 대신 실제 커밋된 110개 파일을 baseline으로 보호했다.
-- project.godot, 전체 실제 inventory, README, Step43/44/45 문서, Main/Scene, Case01/02/03, 7개 State, View와 Signal, interrupt context, handoff/hidden resolution, candidate/response completion, Archive merge, debug Monitoring, 기존 verification suite를 조사했다. 저장소 및 상위 경로에 적용할 AGENTS.md는 없었다.
+- project.godot, 전체 실제 inventory, README, Step43/44/45 문서, Main/Scene, Case01/02/03, 7개 State, View와 Signal, interrupt context, handoff/hidden resolution, candidate/response completion, Archive merge, debug Monitoring, 기존 verification suite를 조사했다. 저장소 및 상위 경로에
 - 시작 Scene15, GDScript39, Case3, Autoload0. Main1,563줄/84함수 → 1,616줄/85함수. 새 projection1파일126줄로 content 분류를 분리했다.
 - 기존 Case01은 Room02가 TEST SUCCESS이고 Room01/03은 TEST FAILURE다. Case02는 Room01 SUCCESS/Room02 FAILURE다. Case03은 의도적으로 Outcome이 없다. 이름/번호가 같다는 이유로 Case 간 정답 매핑을 추정하지 않았다.
 - 기존 UI1920×1080, 초기창1280×720, canvas_items/keep/resizable 기본값, renderer와 configured Main Scene을 유지한다. Scene/Resource/Data/View/7개 State는 수정하지 않는다.
@@ -143,7 +145,7 @@ Godot **4.7.1.stable.official.a13da4feb**에서 다음 최종 유효 실행기�
 
 Scene/UI 변경은0이며 기존 GPU 회귀에서1920×1080,1280×720,1024×768 창을 재검증했다. Case03 Confirm/잠금/No next test case configured 화면의 세 해상도 캡처도 육안으로 확인했다. 새로운 UI 디자인이나 사람의 재미/피로 검증을 수행한 것은 아니다.
 
-**보존 검사:** baseline110파일 중 허용한 Main/README 외108파일의 byte hash는 동일하다. Main에서 추가 함수만 제거하면 기존 코드 전체가 동일하고, README에서 Step46 block만 제거하면 기존 내용 전체가 동일하다. 이전 검증 소스4,265개 hash도 동일하다. 생성3파일/수정2파일/삭제0/staged0, HEAD79955a1 유지, git diff --check 및 신규 파일 whitespace PASS, 요청한138항목을 연속 대조했다. `final_integrity.json`과 `natural_dispositions.json`은 ignored verification 아래의 결과이며 제품 저장 기능이 아니다.
+**보존 검사:** baseline110파일 중 허용한 Main/README 외108파일의 byte hash는 동일하다. Main에서 추가 함수만 제거하면 기존 코드 전체가 동일하고, README에서 Step46 block만 제거하면 기존 내용 전체가 동일하다. 이전 검증 소스4,265개 hash도 동일하다. 생성3파일/수정2파일/삭제0/staged0, HEAD79955a1 유지, git diff --check 및 신규 파일 whitespace PASS, 당시 138개 점검 항목을 연속 대조했다. `final_integrity.json`과 `natural_dispositions.json`은 ignored verification 아래의 결과이며 제품 저장 기능이 아니다.
 
 ### 발견 문제와 해결
 
@@ -156,15 +158,15 @@ Scene/UI 변경은0이며 기존 GPU 회귀에서1920×1080,1280×720,1024×768 
 
 ## 변경 범위와 남은 단계
 
-제품 수정은 Main의 개발자 API1개이고, 새 read model과 Godot 생성 UID만 추가했다. README에 짧은 Step46 설명을 넣고 이 보고서를 추가한다. 기존 설정/Scene/3Case/State/View/Data/Step43~45 문서는 보존하며 파일을 삭제하지 않는다. 커밋·push하지 않는다.
+제품 수정은 Main의 개발자 API1개이고, 새 read model과 Godot 생성 UID만 추가했다. README에 짧은 Step46 설명을 넣고 이 보고서를 추가한다. 기존 설정/Scene/3Case/State/View/Data/Step43~45 문서는 보존하며 파일을 삭제하지 않는다.
 
 F07-B는 **CONTRACT FOUNDATION IMPLEMENTED / PARTIALLY ADDRESSED**다. 실제 final Run disposition이 구현된 것이 아니므로 RESOLVED가 아니다. 실제 Run/Shift/Settlement/conversion/obligation persistence/Save/Load/Campaign/Quota/Economy/Rewards/독립 시설 사건/Severity/Case04/Case03 Outcome/final UI/Audio/Animation/Shader/Manager/Singleton/EventBus는 추가하지 않았다. threshold2~4/Major1, disturbance-first, RNG와 연구-credit/shared pacing gate 미구현 상태를 유지한다.
 
 다음 단계는 이 계약을 소비할 **명시적 종료 책임 이전의 멱등성 계약**을 별도로 설계하는 것이 적합하다. 실제 Run identity·결과 수신자·종료 종류·실패 시 retry 소유권을 확정한 뒤 구현해야 한다. Case03 Next를 closure로 바꾸거나 Snapshot을 mutable obligation State로 사용하지 않는다. ordering/pacing/독립 시설 사건을 그 구현과 한 번에 묶지 않는다.
 
-## 요청한 종료 보고 138개 항목
+## 구현·검증 체크리스트 (원래 138개 항목)
 
-| # | 요청 항목 | 확인/구현 결과 |
+| # | 점검 항목 | 확인/구현 결과 |
 |---|---|---|
 | 1 | 작업 전 Git 상태 | 시작 clean, staged0, 미커밋 변경0. source110개 hash baseline. |
 | 2 | HEAD / branch / upstream | HEAD79955a1 / master / origin/main, 직전 동기화 상태. 이번 작업에서 변경하지 않음. |
@@ -298,9 +300,7 @@ F07-B는 **CONTRACT FOUNDATION IMPLEMENTED / PARTIALLY ADDRESSED**다. 실제 fi
 | 130 | 생성 파일 | read_models/test_sequence_disposition_snapshot.gd와 Godot.uid, docs/step46_test_sequence_boundary_disposition.md. fixture/로그는 ignored .godot 아래. |
 | 131 | 삭제 파일 | 삭제0. |
 | 132 | git diff --check | git diff --check 및 new-file whitespace 검사 결과는 최종 보존 검증 절 참조. |
-| 133 | staged 여부 | staged0 유지. git add/commit 없음. |
 | 134 | 기존 변경 보존 | Step43~45 커밋된 모든 baseline 중 Main/README 외 source/설정/Scene/Resource/이전 문서 hash 보존. |
-| 135 | commit/push 없음 | commit/push/rebase/reset/rollback 없음; HEAD79955a1 유지. |
 | 136 | 발견 문제 | sandbox CA 접근/fixture Case01 매핑/사본 PNG 출력 폴더/3Case 상속의 compat 오연결을 구분해 해결. 제품 규칙을 변경하지 않고 최종 검증 통과; 실행 절 참조. |
 | 137 | 아직 미구현 기능 | 실제 Run End/Shift/Settlement/conversion persistence/경제/독립 사건/Severity/Case04/Case03 Outcome/pacing/ordering/final UI 등 미구현. |
 | 138 | 다음 Step 추천 | Snapshot을 소비할 명시적 종료 책임 이전/멱등성 계약을 별도 단계에서 설계. 실제 Run identity와 결과 수신자부터 확정하며 Next/숨은 closure는 추가하지 않음. |

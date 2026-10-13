@@ -1,5 +1,7 @@
 # Step51 — In-Memory Run Disposition Record + Ownership State
 
+> 개발 이력: 이 문서는 해당 단계 작성 당시의 설계·구현·검증 기록입니다. 현재 구조는 [코드 구조 안내](architecture.md)를 참고하세요. `.godot/verification/` 자료는 Git에 포함되지 않는 로컬 자료이며, 공개 검사 방법은 [검증 안내](verification.md)에 있습니다.
+
 2026-10-06 · Godot `4.7.1.stable.official.a13da4feb` · GDScript · Windows.
 
 **IMPLEMENTED: 독립 in-memory ownership recipient와 immutable-style value Record. NOT IMPLEMENTED: 실제 Run closure / conversion / Gameplay ownership transfer.** Main에는 연결하지 않았다. 명시적 fixture Record 전체를 검증하고, Run ID마다 결과1개와 receipt를 메모리에서 소유한다. 동일한 재요청은 기존 receipt를 반환하고, 다른 내용/경계의 요청은 CONFLICT로 거절한다.
@@ -17,7 +19,7 @@ HEAD `d6d9e4efe625d1688d475e326f8c723d357540a5`, `master`→`origin/main`, remot
 ?? docs/step50_final_run_disposition_responsibility_contract.md
 ```
 
-Step39 트리2줄의 공백→탭 편집, Step49/50 README append, 두 미추적 보고서를 baseline으로 보존한다. 전체 비생성 inventory117파일, project.godot, configured Main Scene/Script, 기존7 RefCounted State, read model, UID, verification 구조, README 및 Step50 계약을 조사했다. 적용할 AGENTS.md는 저장소/상위 경로에 없다.
+Step39 트리2줄의 공백→탭 편집, Step49/50 README append, 두 미추적 보고서를 baseline으로 보존한다. 전체 비생성 inventory117파일, project.godot, configured Main Scene/Script, 기존7 RefCounted State, read model, UID, verification 구조, README 및 Step50 계약을 조사했다.
 
 시작 Scene15/GDScript40/Case Resource3/runtime State7/read model1/Autoload0이다. 현재 Main1,714줄/93함수, Case01→02→03, logical1920×1080/초기1280×720/canvas_items/keep/resizable/GL Compatibility를 보존한다. 현재 Candidate는 source_case_id, Response는 source_case_id+incident_id, Pending/Resolution은 authored case_id 기반 세션 기록이다. 새 타입이 이 State들을 읽거나 변환하지 않는다. 현재 Case03 Outcome 없음/Next 비활성/Snapshot read-only를 유지한다.
 
@@ -48,6 +50,7 @@ var record := RunDispositionRecord.new({
 var recipient := RunDispositionState.new() # Caller가 수명 소유.
 var result: Dictionary = recipient.try_commit(record)
 # result.status == "COMMITTED"; 실제 Gameplay 종료를 호출하지 않는다.
+
 ```
 
 envelope는 위 정확한6필드다. run_instance_id는 nonblank String, boundary는 VOLUNTARY_RUN_END/FORCED_RUN_END만 허용하고 네 category는 Array다. receipt는 envelope에 넣지 않고 State가 소유한다. 새로운 envelope 확장이 필요하면 후속 schema 계약부터 명시적으로 수정한다. unknown top-level/entry field를 silently 무시하지 않는다.
@@ -162,7 +165,7 @@ receipt는 `{run_instance_id, receipt_id: "RUN_DISPOSITION_RECEIPT::" + run_id}`
 
 ## 8. Git / 미구현 범위 / 다음 단계
 
-기존 비생성117개 중 README 원래 bytes prefix를 보존하며 append1개만 변경한다. 기존116개(제품100개/Step39/Step49/Step50 등)는 SHA256 동일하다. 이전 검증 자료50,890개의 SHA256도 기존 baseline과 비교한다. staged0/삭제0, HEAD/branch/upstream 불변, commit/push0. 신규 비생성 파일은 제품Script2+UID2+보고서1이다. git diff에는 원래 Step39 편집과 Step49/50 README append도 보이므로 이를 이번 변경으로 오인하지 않는다.
+기존 비생성117개 중 README 원래 bytes prefix를 보존하며 append1개만 변경한다. 기존116개(제품100개/Step39/Step49/Step50 등)는 SHA256 동일하다. 이전 검증 자료50,890개의 SHA256도 기존 baseline과 비교한다. staged0/삭제0, HEAD/branch/upstream 불변, 작성 당시 Git 기준선 유지. 신규 비생성 파일은 제품Script2+UID2+보고서1이다. git diff에는 원래 Step39 편집과 Step49/50 README append도 보이므로 이를 이번 변경으로 오인하지 않는다.
 
 미구현: RunState/Run 시작·ID 발급/CaseAssignment 생성/closure request·prepare·Main API/hidden Pending resolve/Candidate conversion/Snapshot converter/Plan class/실제 Active voluntary·forced integration/cleanup/Settlement/UI/Economy/Quota/CR/Save/Campaign/Scripted Facility Event/Severity/Case04/Case03 Outcome. 기존 Scene/UI/threshold/pacing/ordering을 변경하지 않았다.
 
@@ -170,9 +173,9 @@ Step52는 명시적 developer closure API와 **source→plan→recipient** 사�
 
 이번 범위의 미해결 P0/P1/P2/P3 제품 결함은 발견하지 않았다. 검증은 recipient의 명시적 schema와 현재 smoke 범위이며 전체 미래 gameplay/crash/persistence를 입증하지 않는다.
 
-## 9. 요청한 174개 종료 보고 항목
+## 9. 구현·검증 체크리스트 (원래 174개 항목)
 
-| 번호 | 요청 항목 | 답변 |
+| 번호 | 점검 항목 | 답변 |
 |---|---|---|
 | 1 | 작업 전 Git 상태 | modified README/Step39, untracked Step49/50 보고서; staged0. §1 원본 status 보존. |
 | 2 | HEAD | d6d9e4efe625d1688d475e326f8c723d357540a5 불변. |
@@ -332,7 +335,6 @@ Step52는 명시적 developer closure API와 **source→plan→recipient** 사�
 | 156 | git diff --check | git diff --check 및 신규파일 whitespace 검사 통과; LF→CRLF 안내는 기존 Git policy. |
 | 157 | staged | staged0 유지, git add 실행0. |
 | 158 | 기존 변경 보존 | 기존116개 SHA256/README 원래prefix 보존; Step39/49/50 변경 포함. 기존검증50890파일 검사. |
-| 159 | commit/push | commit/push0, HEAD/branch/upstream 불변. |
 | 160 | F07-B 현재 상태 | F07-B PARTIALLY ADDRESSED 유지; RESOLVED 아님. |
 | 161 | Ownership recipient 상태 | OWNERSHIP RECIPIENT IMPLEMENTED; 독립 State가 전체 결과+receipt 메모리 소유. |
 | 162 | 실제 closure 상태 | CLOSURE INTEGRATION NOT IMPLEMENTED; 실제 종료 UI/API/변환0. |
