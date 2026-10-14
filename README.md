@@ -11,6 +11,8 @@
 2. **F5**로 프로젝트를 실행합니다. 시작 Scene은 [main.tscn](scenes/main/main.tscn)입니다.
 3. Case01의 PROFILE에서 시작해 화면의 버튼으로 진행합니다.
 
+M2/M3 임시 개체·자료 수집은 [m2_playtest.tscn](scenes/playtests/m2_playtest.tscn)을 열고 **F6**으로 실행합니다. Windows 테스트 빌드의 로컬 경로는 `builds/m3/CAP_M3.exe`입니다.
+
 ## 플레이 흐름
 
 각 Case의 기본 업무는 다음 순서로 진행합니다.
@@ -32,6 +34,7 @@ PROFILE → CCTV → EXPERIMENT → CONTAINMENT
 | **R — Research Log** | 현재 Case에서 확보한 관찰·연구 기록 확인 |
 | **A — Research Archive** | 보관된 Case별 Research와 메모 조회 |
 | **N — Working Hypothesis** | 현재 Case에 대한 추론 메모 작성·수정·삭제 |
+| **저장 / 불러오기** | 안정된 대상 정보·격리 화면에서 저장, 확인 후 마지막 저장 복원 |
 
 사건 대응 중에는 R이 사건 출처 기록 화면으로 연결됩니다.
 
@@ -48,12 +51,14 @@ docs/        단계별 설계·구현·검증 보고서
 ## 현재 개발 범위
 
 - 콘텐츠·이미지 Placeholder·Industrial Theme·Profile 종이 문서 UI는 개발 확인용입니다.
-- 기록과 메모는 **세션 메모리 기반**이며 Save/Load는 구현하지 않았습니다.
+- Campaign별 수동 저장 1개를 지원합니다. 진행·연구·메모·완료 사건·실패 후보·수집 자료를 `user://campaign_saves/`에 보존합니다. 사건·실험·전환 중 저장은 지원하지 않습니다.
+- 보관함의 **스토리 자료** 탭은 발견한 자료만 표시합니다. M2 환경의 자료 3개는 비정사 검증용이며 원본 교육 영상은 아직 없습니다.
 - 마지막 Case 이후의 최종 Campaign 완료·Ending은 구현하지 않았습니다. 기존 Monitoring/Result 재생 경로는 개발 검증용입니다.
 - Godot 4.7.1에서 프로젝트·스크립트 검사와 1920×1080 / 1280×720 GPU 검증을 수행했습니다. 세부 결과와 남은 과제는 아래 보고서에 있습니다.
 
 ## 개발 문서
 
+- [M3 자료 수집·안전한 저장/복원](docs/m3_campaign_records_save_load.md)
 - [개발 문서 안내·개발 방식·이력](docs/README.md)
 - [코드 구조와 주요 흐름](docs/architecture.md)
 - [실행과 검증 방법](docs/verification.md)

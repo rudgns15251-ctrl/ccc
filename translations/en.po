@@ -1807,3 +1807,468 @@ msgstr "ID: [Missing broadcast_id]"
 
 msgid "ID: [Missing result_id]"
 msgstr "ID: [Missing result_id]"
+
+#: Step71 UI
+msgid "PAST OBSERVATIONS"
+msgstr "PAST OBSERVATIONS"
+
+#: Step71 UI
+msgid "RESEARCHER NOTES"
+msgstr "RESEARCHER NOTES"
+
+#: Step71 UI
+msgid "NORMAL FEED"
+msgstr "NORMAL FEED"
+
+#: Step71 UI
+msgid "THERMAL FEED"
+msgstr "THERMAL FEED"
+
+#: Step71 UI
+msgid "CAMERA: %s"
+msgstr "CAMERA: %s"
+
+#: Step71 UI
+msgid "CAMERA: %s / UPDATED"
+msgstr "CAMERA: %s / UPDATED"
+
+#: Step71 UI
+msgid "SELECTED EXPERIMENT DETAILS"
+msgstr "SELECTED EXPERIMENT DETAILS"
+
+#: Step71 UI
+msgid "EXECUTE SELECTED EXPERIMENT"
+msgstr "EXECUTE SELECTED EXPERIMENT"
+
+#: Step71 UI
+msgid "CONTAINMENT CANDIDATES"
+msgstr "CONTAINMENT CANDIDATES"
+
+#: Step71 UI
+msgid "Compare recorded configurations. Outcomes are assessed later."
+msgstr "Compare recorded configurations. Outcomes are assessed later."
+
+#: Step71 UI
+msgid "SELECT A ROOM TO REVIEW"
+msgstr "SELECT A ROOM TO REVIEW"
+
+#: Step71 UI
+msgid "SELECTED CONFIGURATION"
+msgstr "SELECTED CONFIGURATION"
+
+#: Step71 UI
+msgid "AUTHORIZED CONFIGURATION / LOCKED"
+msgstr "AUTHORIZED CONFIGURATION / LOCKED"
+
+#: Step71 UI
+msgid "REVIEW AND AUTHORIZE"
+msgstr "REVIEW AND AUTHORIZE"
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Lamellar Sac"
+msgstr "[TEMP / NON-CANON] Lamellar Sac"
+
+#: M2 temporary authored content
+msgid "Temporary research specimen / mechanism under investigation"
+msgstr "Temporary research specimen / mechanism under investigation"
+
+#: M2 temporary authored content
+msgid "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history."
+msgstr "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history."
+
+#: M2 temporary authored content
+msgid "OBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established."
+msgstr "OBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established."
+
+#: M2 temporary authored content
+msgid "WORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+msgstr "WORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+
+#: M2 temporary authored content
+msgid "SINGLE CAMERA / room 20 C, RH 35%, ordinary lighting, low airflow.\n\n00:00 — An operator passes with a rubbed polymer sleeve on a trolley. Fringe tips lean toward the sleeve, including after the operator steps away. The sac is not consistently oriented toward the person.\n\n00:40 — A warm, electrically isolated metal dummy is stationary at the same distance. It does not reproduce the sleeve-following movement. This comparison does not support warmth alone as the cause.\n\n01:20 — The operator clips the collection tray to a grounding lead. The body folds toward the tray and the broad extension stops. At this dry humidity the fine fringe still rises intermittently. Removing the clip precedes renewed extension; lighting and airflow stay unchanged.\n\nRoute context — The maintenance bypass has a grounded conductive floor and low airflow. The shorter supply passage has dry synthetic floor covering and a ventilation outlet. These are recorded route conditions, not a safety verdict."
+msgstr "SINGLE CAMERA / room 20 C, RH 35%, ordinary lighting, low airflow.\n\n00:00 — An operator passes with a rubbed polymer sleeve on a trolley. Fringe tips lean toward the sleeve, including after the operator steps away. The sac is not consistently oriented toward the person.\n\n00:40 — A warm, electrically isolated metal dummy is stationary at the same distance. It does not reproduce the sleeve-following movement. This comparison does not support warmth alone as the cause.\n\n01:20 — The operator clips the collection tray to a grounding lead. The body folds toward the tray and the broad extension stops. At this dry humidity the fine fringe still rises intermittently. Removing the clip precedes renewed extension; lighting and airflow stay unchanged.\n\nRoute context — The maintenance bypass has a grounded conductive floor and low airflow. The shorter supply passage has dry synthetic floor covering and a ventilation outlet. These are recorded route conditions, not a safety verdict."
+
+#: M2 temporary authored content
+msgid "Electrical connection comparison"
+msgstr "Electrical connection comparison"
+
+#: M2 temporary authored content
+msgid "Purpose: separate grounding from warmth and material. At 20 C and RH 35%, compare the same metal tray electrically isolated and connected to ground. Use no water and do not change the lamp or airflow. Observe broad extension and fine fringe separately."
+msgstr "Purpose: separate grounding from warmth and material. At 20 C and RH 35%, compare the same metal tray electrically isolated and connected to ground. Use no water and do not change the lamp or airflow. Observe broad extension and fine fringe separately."
+
+#: M2 temporary authored content
+msgid "With the tray isolated, the membrane repeatedly extends toward a charged sleeve. Connecting the same tray to ground stops broad extension and folds the body back. Fine fringe still rises intermittently at RH 35%. Tray temperature does not change. Grounding explains much of the tool observation, but this dry configuration is not fully quiet."
+msgstr "With the tray isolated, the membrane repeatedly extends toward a charged sleeve. Connecting the same tray to ground stops broad extension and folds the body back. Fine fringe still rises intermittently at RH 35%. Tray temperature does not change. Grounding explains much of the tool observation, but this dry configuration is not fully quiet."
+
+#: M2 temporary authored content
+msgid "Humidity without liquid contact"
+msgstr "Humidity without liquid contact"
+
+#: M2 temporary authored content
+msgid "Purpose: test the residual response left by grounding. Keep the conductive tray grounded and the room at 20 C. Compare RH 35% and 63% with humid air only; the sac and tray stay free of droplets. Airflow and lighting remain unchanged."
+msgstr "Purpose: test the residual response left by grounding. Keep the conductive tray grounded and the room at 20 C. Compare RH 35% and 63% with humid air only; the sac and tray stay free of droplets. Airflow and lighting remain unchanged."
+
+#: M2 temporary authored content
+msgid "At RH 35%, the grounded body stays folded but fine fringe rises occasionally. At RH 63%, both broad extension and repeated fringe lifting cease during the observation. No membrane pieces detach. Returning to 35% restores fringe lifting. This supports moderate humid air together with grounding, not liquid feeding or heating."
+msgstr "At RH 35%, the grounded body stays folded but fine fringe rises occasionally. At RH 63%, both broad extension and repeated fringe lifting cease during the observation. No membrane pieces detach. Returning to 35% restores fringe lifting. This supports moderate humid air together with grounding, not liquid feeding or heating."
+
+#: M2 temporary authored content
+msgid "Humid air versus direct wetting"
+msgstr "Humid air versus direct wetting"
+
+#: M2 temporary authored content
+msgid "Purpose: distinguish humidity control from the earlier liquid-water interpretation. On the grounded tray at RH 63% and 20 C, compare humid air alone with a small direct droplet applied through remote equipment. Capture any detached material; do not change the fan."
+msgstr "Purpose: distinguish humidity control from the earlier liquid-water interpretation. On the grounded tray at RH 63% and 20 C, compare humid air alone with a small direct droplet applied through remote equipment. Capture any detached material; do not change the fan."
+
+#: M2 temporary authored content
+msgid "Humid air alone keeps the body folded without shedding. Direct droplets loosen transparent pieces from the outer folds even though grounding and RH stay the same. Pieces remain separate when the bulk body contracts. More water is therefore not a stronger version of humid-air stabilization; direct wetting creates a transportable hazard."
+msgstr "Humid air alone keeps the body folded without shedding. Direct droplets loosen transparent pieces from the outer folds even though grounding and RH stay the same. Pieces remain separate when the bulk body contracts. More water is therefore not a stronger version of humid-air stabilization; direct wetting creates a transportable hazard."
+
+#: M2 temporary authored content
+msgid "Warm dry polymer enclosure"
+msgstr "Warm dry polymer enclosure"
+
+#: M2 temporary authored content
+msgid "20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation."
+msgstr "20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation."
+
+#: M2 temporary authored content
+msgid "Conductive humid-air enclosure"
+msgstr "Conductive humid-air enclosure"
+
+#: M2 temporary authored content
+msgid "20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed."
+msgstr "20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed."
+
+#: M2 temporary authored content
+msgid "Saturated immersion enclosure"
+msgstr "Saturated immersion enclosure"
+
+#: M2 temporary authored content
+msgid "20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet."
+msgstr "20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Airborne membrane notice"
+msgstr "[TEMP / NON-CANON] Airborne membrane notice"
+
+#: M2 temporary authored content
+msgid "Thin detached material from the submitted specimen has been reported outside its enclosure. This is a later observation; the earlier submission is retained. Avoid the ventilation edge while the origin and route are checked."
+msgstr "Thin detached material from the submitted specimen has been reported outside its enclosure. This is a later observation; the earlier submission is retained. Avoid the ventilation edge while the origin and route are checked."
+
+#: M2 temporary authored content
+msgid "Airborne-material caution is active in the facility. The notice does not claim that the specimen has been recovered or that casualties have occurred."
+msgstr "Airborne-material caution is active in the facility. The notice does not claim that the specimen has been recovered or that casualties have occurred."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Membrane escape into the access corridor"
+msgstr "[TEMP / NON-CANON] Membrane escape into the access corridor"
+
+#: M2 temporary authored content
+msgid "Detached membrane pieces have crossed the enclosure boundary and are visible in the access corridor. Fine fringes follow dry synthetic garments and polymer coverings. Pieces near the grounded conductive maintenance floor fold down; loose pieces at the supply-passage ventilation outlet are carried onward.\n\nThe low-airflow maintenance bypass and the shorter synthetic-lined supply passage remain available as marked routes. Staff need an evacuation instruction now. Recovery and casualties have not been confirmed. Use the recorded attraction and shedding evidence to choose how people should move and what they should avoid."
+msgstr "Detached membrane pieces have crossed the enclosure boundary and are visible in the access corridor. Fine fringes follow dry synthetic garments and polymer coverings. Pieces near the grounded conductive maintenance floor fold down; loose pieces at the supply-passage ventilation outlet are carried onward.\n\nThe low-airflow maintenance bypass and the shorter synthetic-lined supply passage remain available as marked routes. Staff need an evacuation instruction now. Recovery and casualties have not been confirmed. Use the recorded attraction and shedding evidence to choose how people should move and what they should avoid."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Staff evacuation instruction"
+msgstr "[TEMP / NON-CANON] Staff evacuation instruction"
+
+#: M2 temporary authored content
+msgid "Choose one staff evacuation instruction after the membrane escape. Use the Profile droplet record and the CCTV material/grounding observations. Choose the route and contact precautions from the observations already available. No civilian presence has been reported for this temporary incident."
+msgstr "Choose one staff evacuation instruction after the membrane escape. Use the Profile droplet record and the CCTV material/grounding observations. Choose the route and contact precautions from the observations already available. No civilian presence has been reported for this temporary incident."
+
+#: M2 temporary authored content
+msgid "Use the grounded, low-airflow maintenance bypass. Avoid synthetic-lined supply passages, ventilation outlets and loose pieces; do not wet or handle the membrane. Close the access door after passing and keep others out of the exposed corridor."
+msgstr "Use the grounded, low-airflow maintenance bypass. Avoid synthetic-lined supply passages, ventilation outlets and loose pieces; do not wet or handle the membrane. Close the access door after passing and keep others out of the exposed corridor."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Evacuation route exposure reduced"
+msgstr "[TEMP / NON-CANON] Evacuation route exposure reduced"
+
+#: M2 temporary authored content
+msgid "Reports after this instruction describe fewer pieces following the maintenance route. Ground contact and low airflow match the recorded behavior; avoiding direct wetting prevents the documented shedding action. This observation does not establish recapture or complete sealing, and does not undo the original enclosure failure."
+msgstr "Reports after this instruction describe fewer pieces following the maintenance route. Ground contact and low airflow match the recorded behavior; avoiding direct wetting prevents the documented shedding action. This observation does not establish recapture or complete sealing, and does not undo the original enclosure failure."
+
+#: M2 temporary authored content
+msgid "Use the shorter warm-lit synthetic-lined passage. Keep moving close to its polymer wall and push obstructing pieces aside by hand."
+msgstr "Use the shorter warm-lit synthetic-lined passage. Keep moving close to its polymer wall and push obstructing pieces aside by hand."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Synthetic route continues attracting pieces"
+msgstr "[TEMP / NON-CANON] Synthetic route continues attracting pieces"
+
+#: M2 temporary authored content
+msgid "Loose fringes continue following coverings along the synthetic-lined passage. The warm stationary comparison did not establish a heat preference, while the sleeve observation did establish a material-related response. Reports do not establish a safe passage or a casualty total."
+msgstr "Loose fringes continue following coverings along the synthetic-lined passage. The warm stationary comparison did not establish a heat preference, while the sleeve observation did establish a material-related response. Reports do not establish a safe passage or a casualty total."
+
+#: M2 temporary authored content
+msgid "Wet garments and nearby membrane pieces while moving toward the ventilation-side exit; use the short route rather than the maintenance bypass."
+msgstr "Wet garments and nearby membrane pieces while moving toward the ventilation-side exit; use the short route rather than the maintenance bypass."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Wetting adds detached material to the route"
+msgstr "[TEMP / NON-CANON] Wetting adds detached material to the route"
+
+#: M2 temporary authored content
+msgid "Direct contact with droplets precedes more detached pieces near the ventilation-side route. Humid air was not equivalent to direct wetting, and the earlier record showed an air pulse carrying pieces beyond a tray. The route remains under exposure caution; recapture has not been confirmed and no injury count has been established."
+msgstr "Direct contact with droplets precedes more detached pieces near the ventilation-side route. Humid air was not equivalent to direct wetting, and the earlier record showed an air pulse carrying pieces beyond a tray. The route remains under exposure caution; recapture has not been confirmed and no injury count has been established."
+
+#: M2 temporary authored content
+msgid "Fine fringe rises over the dry insulating liner despite the warm lamp."
+msgstr "Fine fringe rises over the dry insulating liner despite the warm lamp."
+
+#: M2 temporary authored content
+msgid "Repeated extension crosses the liner seam. Fan circulation carries detached material toward the outlet."
+msgstr "Repeated extension crosses the liner seam. Fan circulation carries detached material toward the outlet."
+
+#: M2 temporary authored content
+msgid "The submitted enclosure does not retain the membrane material. A later corridor report is required."
+msgstr "The submitted enclosure does not retain the membrane material. A later corridor report is required."
+
+#: M2 temporary authored content
+msgid "The body stays folded on the grounded tray in moderately humid air."
+msgstr "The body stays folded on the grounded tray in moderately humid air."
+
+#: M2 temporary authored content
+msgid "No repeated fringe lifting or liquid-contact shedding is observed in this configuration."
+msgstr "No repeated fringe lifting or liquid-contact shedding is observed in this configuration."
+
+#: M2 temporary authored content
+msgid "The present configuration supports stable containment for the observation interval; no escape report is linked."
+msgstr "The present configuration supports stable containment for the observation interval; no escape report is linked."
+
+#: M2 temporary authored content
+msgid "Direct water contact loosens pieces although the enclosure is very humid."
+msgstr "Direct water contact loosens pieces although the enclosure is very humid."
+
+#: M2 temporary authored content
+msgid "Separate pieces collect along the insulating rim and do not rejoin when the bulk body folds."
+msgstr "Separate pieces collect along the insulating rim and do not rejoin when the bulk body folds."
+
+#: M2 temporary authored content
+msgid "Material crosses the rim during access. Saturated immersion does not retain the specimen."
+msgstr "Material crosses the rim during access. Saturated immersion does not retain the specimen."
+
+#: M2 temporary authored content
+msgid "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history.\n\nOBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established.\n\nWORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+msgstr "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history.\n\nOBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established.\n\nWORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+
+#: M2 temporary authored content
+msgid "Past records / observations versus interpretation"
+msgstr "Past records / observations versus interpretation"
+
+#: M2 temporary authored content
+msgid "Current observation / sleeve, warm dummy and grounding"
+msgstr "Current observation / sleeve, warm dummy and grounding"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Electrical connection comparison"
+msgstr "Executed comparison / Electrical connection comparison"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Humidity without liquid contact"
+msgstr "Executed comparison / Humidity without liquid contact"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Humid air versus direct wetting"
+msgstr "Executed comparison / Humid air versus direct wetting"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation.\nThis record states the approved choice, not its later outcome."
+msgstr "Submitted configuration: 20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation.\nThis record states the approved choice, not its later outcome."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Warm dry polymer enclosure"
+msgstr "Submitted enclosure / Warm dry polymer enclosure"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed.\nThis record states the approved choice, not its later outcome."
+msgstr "Submitted configuration: 20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed.\nThis record states the approved choice, not its later outcome."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Conductive humid-air enclosure"
+msgstr "Submitted enclosure / Conductive humid-air enclosure"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet.\nThis record states the approved choice, not its later outcome."
+msgstr "Submitted configuration: 20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet.\nThis record states the approved choice, not its later outcome."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Saturated immersion enclosure"
+msgstr "Submitted enclosure / Saturated immersion enclosure"
+
+#: M2 temporary authored content
+msgid "Escape report / membrane in access corridor"
+msgstr "Escape report / membrane in access corridor"
+
+#: M2 temporary authored content
+msgid "Evacuation decision context"
+msgstr "Evacuation decision context"
+
+#: M2 temporary authored content
+msgid "Approved instruction / BYPASS"
+msgstr "Approved instruction / BYPASS"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / BYPASS"
+msgstr "Observed after instruction / BYPASS"
+
+#: M2 temporary authored content
+msgid "Approved instruction / WARM_ROUTE"
+msgstr "Approved instruction / WARM_ROUTE"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / WARM_ROUTE"
+msgstr "Observed after instruction / WARM_ROUTE"
+
+#: M2 temporary authored content
+msgid "Approved instruction / WET_ROUTE"
+msgstr "Approved instruction / WET_ROUTE"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / WET_ROUTE"
+msgstr "Observed after instruction / WET_ROUTE"
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] M2 playtest / existing test continuation"
+msgstr "[TEMP / NON-CANON] M2 playtest / existing test continuation"
+
+#: M2 playtest feedback
+msgid "M2 research / observations and interpretations are distinct"
+msgstr "M2 research / observations and interpretations are distinct"
+
+#: M2 playtest feedback
+msgid "M2 submission recorded / outcome awaits next work handoff"
+msgstr "M2 submission recorded / outcome awaits next work handoff"
+
+#: M2 playtest feedback
+msgid "M2 submission archived / check later observations and Archive"
+msgstr "M2 submission archived / check later observations and Archive"
+
+#: M2 playtest feedback
+msgid "M2 recorded observation: stable containment / no escape report"
+msgstr "M2 recorded observation: stable containment / no escape report"
+
+#: M2 playtest feedback
+msgid "M2 enclosure leakage observed / evacuation does not rewrite the first failure"
+msgstr "M2 enclosure leakage observed / evacuation does not rewrite the first failure"
+
+#: M2 playtest feedback
+msgid "TEMP M2 / %s / SESSION MEMORY ONLY"
+msgstr "TEMP M2 / %s / SESSION MEMORY ONLY"
+
+msgid "S"
+msgstr "S"
+
+msgid "L"
+msgstr "L"
+
+msgid "Save progress"
+msgstr "Save progress"
+
+msgid "Load saved progress"
+msgstr "Load saved progress"
+
+msgid "Case Research"
+msgstr "Case Research"
+
+msgid "Campaign Records"
+msgstr "Campaign Records"
+
+msgid "Campaign Records / discovered materials only"
+msgstr "Campaign Records / discovered materials only"
+
+msgid "Diary"
+msgstr "Diary"
+
+msgid "Resident List"
+msgstr "Resident List"
+
+msgid "Training Video"
+msgstr "Training Video"
+
+msgid "No story materials discovered."
+msgstr "No story materials discovered."
+
+msgid "Select a discovered material."
+msgstr "Select a discovered material."
+
+msgid "Play / Pause Video"
+msgstr "Play / Pause Video"
+
+msgid "Video media is not supplied. Verification transcript only."
+msgstr "Video media is not supplied. Verification transcript only."
+
+msgid "No stable Case is active."
+msgstr "No stable Case is active."
+
+msgid "A terminal transaction is in progress."
+msgstr "A terminal transaction is in progress."
+
+msgid "A work transition is in progress."
+msgstr "A work transition is in progress."
+
+msgid "Finish the active incident before saving or loading."
+msgstr "Finish the active incident before saving or loading."
+
+msgid "Close the notice, record panel or confirmation first."
+msgstr "Close the notice, record panel or confirmation first."
+
+msgid "Return to the current work screen first."
+msgstr "Return to the current work screen first."
+
+msgid "Save at Profile or Containment after work has settled."
+msgstr "Save at Profile or Containment after work has settled."
+
+msgid "This debug state is not a supported save boundary."
+msgstr "This debug state is not a supported save boundary."
+
+msgid "Local save available / use Save"
+msgstr "Local save available / use Save"
+
+msgid "Save refused. Existing save and current progress are unchanged."
+msgstr "Save refused. Existing save and current progress are unchanged."
+
+msgid "Last save completed."
+msgstr "Last save completed."
+
+msgid "Save failed. The previous complete save is retained."
+msgstr "Save failed. The previous complete save is retained."
+
+msgid "Load refused. Current progress is unchanged."
+msgstr "Load refused. Current progress is unchanged."
+
+msgid "Replace the current session with the last saved progress? Unsaved work will be discarded."
+msgstr "Replace the current session with the last saved progress? Unsaved work will be discarded."
+
+msgid "Load"
+msgstr "Load"
+
+msgid "Saved progress restored."
+msgstr "Saved progress restored."
+
+msgid "Collected: %s"
+msgstr "Collected: %s"
+
+msgid "Collect TEMP record: %s"
+msgstr "Collect TEMP record: %s"
+
+msgid "Story material collected. Save at a safe work boundary to keep it."
+msgstr "Story material collected. Save at a safe work boundary to keep it."
+
+msgid "[TEMP / NON-CANON] Diary collection check"
+msgstr "[TEMP / NON-CANON] Diary collection check"
+
+msgid "This is a non-canon collection and persistence sample. No predecessor identity, date or facility history is established."
+msgstr "This is a non-canon collection and persistence sample. No predecessor identity, date or facility history is established."
+
+msgid "[TEMP / NON-CANON] Resident-list collection check"
+msgstr "[TEMP / NON-CANON] Resident-list collection check"
+
+msgid "This is a non-canon list-reading sample. No real resident names, population or incident victims are specified."
+msgstr "This is a non-canon list-reading sample. No real resident names, population or incident victims are specified."
+
+msgid "[TEMP / NON-CANON] Training transcript check"
+msgstr "[TEMP / NON-CANON] Training transcript check"
+
+msgid "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
+msgstr "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."

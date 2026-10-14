@@ -13,6 +13,7 @@ config_version=5
 config/name="CAP"
 run/main_scene="res://scenes/main/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+run/main_scene.m2_playtest="res://scenes/playtests/m2_playtest.tscn"
 
 [display]
 
@@ -22,14 +23,13 @@ window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://translations/en.po", "res://translations/ko.po")
+locale/test="ko"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.16, 0.16, 0.16, 1)
-
-[internationalization]
-
-locale/translations=PackedStringArray("res://translations/en.po", "res://translations/ko.po")
-locale/test="ko"
-locale/fallback="en"

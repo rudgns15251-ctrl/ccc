@@ -94,16 +94,20 @@ func _display_experiments() -> void:
 func _append_item(display_name: String, description: String, index: int, selectable: bool = true) -> void:
 	var item := VBoxContainer.new()
 	item.name = "Experiment%d" % index
-	item.add_theme_constant_override("separation", 2)
+	item.add_theme_constant_override("separation", 8)
 	var select_button := CheckBox.new()
 	select_button.name = "Select"
 	select_button.text = display_name
+	select_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	select_button.custom_minimum_size.y = 56
+	select_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	select_button.button_group = _selection_group
 	select_button.disabled = not selectable
 	select_button.pressed.connect(_on_experiment_selected.bind(index))
 	item.add_child(select_button)
 	var item_description := Label.new()
 	item_description.text = description
+	item_description.theme_type_variation = "MutedLabel"
 	item_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	item.add_child(item_description)
 	experiment_list.add_child(item)
@@ -206,11 +210,13 @@ func _can_select_experiment(index: int) -> bool:
 
 
 func _update_execution_ui() -> void:
+	_refresh_result_image()
 	GameText.set_text(remaining_label, "Experiments Remaining: %d / %d", [_remaining_count, _experiment_limit])
 	for index in range(experiment_list.get_child_count()):
 		var button: CheckBox = experiment_list.get_child(index).get_child(0) as CheckBox
 		var experiment: ExperimentData = _experiments[index]
 		button.disabled = _review_only or not _can_select_experiment(index)
+		button.theme_type_variation = "CompletedCandidateCheckBox" if experiment != null and _executed_ids.has(experiment.experiment_id) else "SelectedCandidateCheckBox" if index == _selected_experiment_index else "CheckBox"
 		if experiment != null:
 			var name_text: String = experiment.display_name if not experiment.display_name.strip_edges().is_empty() else "[Missing display_name]"
 			GameText.set_text(button, "%s [Executed]" if _executed_ids.has(experiment.experiment_id) else "%s", [name_text])
@@ -229,6 +235,8 @@ func _reset_result() -> void:
 	%SelectedName.text = "SELECT AN EXPERIMENT"
 	%SelectedDescription.text = ""
 	result_label.text = "No experiment has been executed." if _executed_ids.is_empty() else "No result selected. Review executed experiments in Research Log."
+	%ResultImage.texture = null
+	%ResultImage.visible = false
 	_clear_condition_observations()
 	%ResultScroll.scroll_vertical = 0
 
@@ -283,9 +291,19 @@ func _display_detail(experiment: ExperimentData) -> void:
 	if experiment == null: return
 	%SelectedName.text = experiment.display_name
 	%SelectedDescription.text = experiment.description
+	_update_execution_ui()
 
 
 func set_review_only(value: bool) -> void:
 	_review_only = value
 	_update_execution_ui()
 	%RecheckCCTVButton.disabled = value
+
+
+func _refresh_result_image() -> void:
+	%ResultImage.texture = null
+	if _executed_ids.has(_displayed_result_id):
+		for experiment: ExperimentData in _experiments:
+			if experiment != null and experiment.experiment_id == _displayed_result_id:
+				%ResultImage.texture = experiment.result_texture
+	%ResultImage.visible = %ResultImage.texture != null

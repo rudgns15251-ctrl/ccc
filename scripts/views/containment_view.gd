@@ -75,16 +75,20 @@ func _display_rooms() -> void:
 func _append_item(display_name: String, description: String, index: int, selectable: bool = true) -> void:
 	var item := VBoxContainer.new()
 	item.name = "Room%d" % index
-	item.add_theme_constant_override("separation", 2)
+	item.add_theme_constant_override("separation", 8)
 	var select_button := CheckBox.new()
 	select_button.name = "Select"
 	select_button.text = display_name
+	select_button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	select_button.custom_minimum_size.y = 56
+	select_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	select_button.button_group = _selection_group
 	select_button.disabled = not selectable
 	select_button.pressed.connect(_on_room_selected.bind(index))
 	item.add_child(select_button)
 	var item_description := Label.new()
 	item_description.text = description
+	item_description.theme_type_variation = "MutedLabel"
 	item_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	item.add_child(item_description)
 	room_list.add_child(item)
@@ -144,14 +148,20 @@ func _update_confirmation_ui() -> void:
 		var button: CheckBox = room_list.get_child(index).get_child(0) as CheckBox
 		var room: ContainmentData = _rooms[index] if index < _rooms.size() else null
 		button.disabled = confirmed or room == null or room.room_id.strip_edges().is_empty()
+		button.theme_type_variation = "CompletedCandidateCheckBox" if confirmed and room != null and room.room_id == _confirmed_room_id else "SelectedCandidateCheckBox" if index == _selected_room_index else "CheckBox"
 		if room != null:
 			var name_text: String = room.display_name if not room.display_name.strip_edges().is_empty() else "[Missing display_name]"
 			GameText.set_text(button, "%s [Confirmed]" if confirmed and room.room_id == _confirmed_room_id else "%s", [name_text])
 			if confirmed and room.room_id == _confirmed_room_id:
 				button.set_pressed_no_signal(true)
 	var selected_room: ContainmentData = _get_selected_room()
-	if selected_room != null:
-		GameText.set_text(%RoomDetail, "%s\n%s", [selected_room.display_name, selected_room.description])
+	var displayed_room: ContainmentData = selected_room
+	if confirmed:
+		for room: ContainmentData in _rooms:
+			if room != null and room.room_id == _confirmed_room_id: displayed_room = room
+	%SelectionStatus.text = "AUTHORIZED CONFIGURATION / LOCKED" if confirmed else "SELECTED CONFIGURATION" if selected_room != null else "SELECT A ROOM TO REVIEW"
+	if displayed_room != null:
+		GameText.set_text(%RoomDetail, "%s\n%s", [displayed_room.display_name, displayed_room.description])
 	else:
 		GameText.set_text(%RoomDetail, "Decision recorded." if confirmed else "SELECT A ROOM")
 	confirm_button.disabled = confirmed or selected_room == null or selected_room.room_id.strip_edges().is_empty()
@@ -177,11 +187,11 @@ func set_environment_conditions(summary: EnvironmentConditions.Summary) -> void:
 func capture_work_state() -> Dictionary:
 	var state: Dictionary = super.capture_work_state()
 	var selected: ContainmentData = _get_selected_room()
-	state.merge({"selected_room_id": selected.room_id if selected != null and _confirmed_room_id.is_empty() else "", "confirmed_room_id": _confirmed_room_id, "room_scroll": room_scroll.scroll_vertical})
+	state.merge({"selected_room_id": selected.room_id if selected != null and _confirmed_room_id.is_empty() else "", "confirmed_room_id": _confirmed_room_id, "room_scroll": room_scroll.scroll_vertical, "room_detail_scroll": %RoomDetailScroll.scroll_vertical})
 	return state
 
 
-func restore_work_state(state: Dictionary) -> bool:
+func restore_work_selection(state: Dictionary) -> bool:
 	if state.confirmed_room_id != _confirmed_room_id or not _confirmed_room_id.is_empty() and not state.selected_room_id.is_empty(): return false
 	_selected_room_index = -1
 	for index: int in range(_rooms.size()):
@@ -189,7 +199,13 @@ func restore_work_state(state: Dictionary) -> bool:
 			_selected_room_index = index
 			(room_list.get_child(index).get_child(0) as CheckBox).set_pressed_no_signal(true)
 	_update_confirmation_ui()
+	return state.selected_room_id.is_empty() or _get_selected_room() != null
+
+
+func restore_work_state(state: Dictionary) -> bool:
+	if not restore_work_selection(state): return false
 	room_scroll.scroll_vertical = state.room_scroll
+	%RoomDetailScroll.scroll_vertical = state.room_detail_scroll
 	return restore_work_focus(state)
 
 func _confirmation_conditions() -> String:

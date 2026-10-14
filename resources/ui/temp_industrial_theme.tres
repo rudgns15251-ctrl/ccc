@@ -288,6 +288,7 @@ CheckBox/styles/pressed = SubResource("pressed")
 CheckBox/styles/disabled = SubResource("disabled")
 
 CheckBox/styles/focus = SubResource("focus")
+CheckBox/styles/hover_pressed = SubResource("pressed")
 
 CheckButton/styles/normal = SubResource("button")
 
@@ -402,3 +403,15 @@ PaperMetadataLabel/colors/font_color = Color(0.34902, 0.372549, 0.333333, 1)
 PaperMetadataLabel/font_sizes/font_size = 18
 PaperSeparator/base_type = "HSeparator"
 PaperSeparator/styles/separator = SubResource("paper_separator")
+
+PaperSectionLabel/base_type = "PaperBodyLabel"
+PaperSectionLabel/font_sizes/font_size = 24
+SelectedCandidateCheckBox/base_type = "CheckBox"
+SelectedCandidateCheckBox/styles/normal = SubResource("primary")
+SelectedCandidateCheckBox/styles/pressed = SubResource("primary")
+SelectedCandidateCheckBox/styles/hover = SubResource("primary")
+SelectedCandidateCheckBox/styles/hover_pressed = SubResource("primary")
+CompletedCandidateCheckBox/base_type = "CheckBox"
+CompletedCandidateCheckBox/styles/normal = SubResource("primary")
+CompletedCandidateCheckBox/styles/disabled = SubResource("primary")
+CompletedCandidateCheckBox/colors/font_disabled_color = Color(0.87, 0.90, 0.85, 1)

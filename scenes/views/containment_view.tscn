@@ -55,6 +55,22 @@ theme_type_variation = "MutedLabel"
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="CandidateHeading" type="Label" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "CONTAINMENT CANDIDATES"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
+
+[node name="ComparisonHint" type="Label" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Compare recorded configurations. Outcomes are assessed later."
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
 [node name="RoomScroll" type="ScrollContainer" parent="Margin/Content"]
 follow_focus = true
 unique_name_in_owner = true
@@ -70,6 +86,14 @@ custom_minimum_size = Vector2(0, 0)
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 16
+
+[node name="SelectionStatus" type="Label" parent="Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SELECT A ROOM TO REVIEW"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "HeadingLabel"
 
 [node name="RoomDetailScroll" type="ScrollContainer" parent="Margin/Content"]
 follow_focus = true
@@ -89,7 +113,6 @@ layout_mode = 2
 text = "SELECT A ROOM"
 autowrap_mode = 3
 size_flags_horizontal = 3
-theme_type_variation = "MutedLabel"
 
 [node name="RecheckCCTVButton" type="Button" parent="Margin/Content"]
 unique_name_in_owner = true
@@ -117,7 +140,7 @@ size_flags_horizontal = 3
 [node name="ConfirmButton" type="Button" parent="Margin/Content/Actions"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "AUTHORIZE"
+text = "REVIEW AND AUTHORIZE"
 custom_minimum_size = Vector2(240, 48)
 theme_type_variation = "PrimaryButton"
 

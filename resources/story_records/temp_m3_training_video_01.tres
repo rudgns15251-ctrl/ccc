@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StoryRecordData" load_steps=4 format=3]
+[ext_resource type="Script" path="res://scripts/data/story_record_data.gd" id="record"]
+[ext_resource type="Script" path="res://scripts/data/story_record_content.gd" id="content"]
+[sub_resource type="Resource" id="Content"]
+script = ExtResource("content")
+text = "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
+[resource]
+script = ExtResource("record")
+record_id = "TEMP_M3_TRAINING_VIDEO_01"
+kind = 2
+title = "[TEMP / NON-CANON] Training transcript check"
+content = SubResource("Content")
+discovery_entry_id = "TEMP_M2_ENTRY_01"
+discovery_stage = "CONTAINMENT"

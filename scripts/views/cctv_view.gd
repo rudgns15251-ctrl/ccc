@@ -22,28 +22,33 @@ class ConditionSnapshot extends RefCounted:
 var _cctv_data: CCTVData
 var _condition_observations: Array[ConditionObservation] = []
 var _displayed_observation_ids: Array[String] = []
+var _thermal_mode: bool = false
 
 
 func setup(cctv_data: CCTVData) -> void:
 	_cctv_data = cctv_data
+	_thermal_mode = false
 	if is_node_ready():
 		_display_cctv()
 
 
 func _ready() -> void:
 	super._ready()
+	%NormalMode.pressed.connect(_on_feed_mode_requested.bind(false))
+	%ThermalMode.pressed.connect(_on_feed_mode_requested.bind(true))
 	_display_cctv()
 	_display_condition_observations()
 
 
 func _display_cctv() -> void:
+	_display_feed()
 	if _cctv_data == null:
 		push_warning("CCTVView.setup(): CCTVData is missing.")
 		camera_id_label.text = "CCTV data unavailable"
 		observation_label.text = "No CCTVData was provided to this View."
 		return
 
-	%CameraTab.text = "CAMERA 01 / UPDATED" if not _condition_observations.is_empty() else "CAMERA 01"
+	_display_camera_heading()
 	camera_id_label.text = _text_or_placeholder(_cctv_data.camera_id, "camera_id")
 	observation_label.text = _text_or_placeholder(_cctv_data.observation_text, "observation_text")
 
@@ -76,7 +81,7 @@ func _display_condition_observations() -> void:
 		list.remove_child(item)
 		item.queue_free()
 	%ConditionObservationSection.visible = not _condition_observations.is_empty()
-	%CameraTab.text = "CAMERA 01 / UPDATED" if not _condition_observations.is_empty() else "CAMERA 01"
+	_display_camera_heading()
 	for entry: ConditionObservation in _condition_observations:
 		var label := Label.new()
 		GameText.set_text(label, "%s\n%s", [entry.display_name, entry.observation_text])
@@ -99,9 +104,38 @@ func is_displaying_cctv(cctv_data: CCTVData) -> bool:
 func capture_work_state() -> Dictionary:
 	var state: Dictionary = super.capture_work_state()
 	state["condition_scroll"] = %ConditionObservationScroll.scroll_vertical
+	state["thermal_mode"] = _thermal_mode
 	return state
 
 
 func restore_work_state(state: Dictionary) -> bool:
+	if state.thermal_mode and (_cctv_data == null or _cctv_data.thermal_texture == null): return false
+	_thermal_mode = state.thermal_mode
+	_display_feed()
 	%ConditionObservationScroll.scroll_vertical = state.condition_scroll
 	return restore_work_focus(state)
+
+
+func _display_camera_heading() -> void:
+	var id: String = _cctv_data.camera_id if _cctv_data != null else "[Unavailable]"
+	GameText.set_text(%CameraTab, "CAMERA: %s / UPDATED" if not _condition_observations.is_empty() else "CAMERA: %s", [id])
+
+
+func _on_feed_mode_requested(thermal: bool) -> void:
+	if not _allows_local_input() or _cctv_data == null:
+		_display_feed()
+		return
+	if thermal and _cctv_data.thermal_texture == null: return
+	_thermal_mode = thermal
+	_display_feed()
+
+
+func _display_feed() -> void:
+	var has_thermal: bool = _cctv_data != null and _cctv_data.thermal_texture != null
+	if not has_thermal: _thermal_mode = false
+	%FeedModes.visible = has_thermal
+	%NormalMode.set_pressed_no_signal(not _thermal_mode)
+	%ThermalMode.set_pressed_no_signal(_thermal_mode)
+	%FeedTexture.texture = (_cctv_data.thermal_texture if _thermal_mode else _cctv_data.feed_texture) if _cctv_data != null else null
+	%FeedTexture.visible = %FeedTexture.texture != null
+	%Placeholder.visible = not %FeedTexture.visible

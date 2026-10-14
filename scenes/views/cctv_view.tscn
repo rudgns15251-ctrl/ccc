@@ -62,7 +62,7 @@ theme_override_constants/separation = 16
 [node name="Feed" type="VBoxContainer" parent="Margin/Content/Workspace"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(1120, 0)
+custom_minimum_size = Vector2(960, 0)
 size_flags_horizontal = 0
 size_flags_vertical = 3
 theme_override_constants/separation = 16
@@ -75,10 +75,43 @@ autowrap_mode = 3
 size_flags_horizontal = 3
 theme_type_variation = "HeadingLabel"
 
+[node name="FeedModes" type="HBoxContainer" parent="Margin/Content/Workspace/Feed"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 12
+
+[node name="NormalMode" type="Button" parent="Margin/Content/Workspace/Feed/FeedModes"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+toggle_mode = true
+text = "NORMAL FEED"
+
+[node name="ThermalMode" type="Button" parent="Margin/Content/Workspace/Feed/FeedModes"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 48)
+toggle_mode = true
+text = "THERMAL FEED"
+
 [node name="CameraImage" type="PanelContainer" parent="Margin/Content/Workspace/Feed"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="FeedTexture" type="TextureRect" parent="Margin/Content/Workspace/Feed/CameraImage"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Placeholder" type="Label" parent="Margin/Content/Workspace/Feed/CameraImage"]
 unique_name_in_owner = true

@@ -19,11 +19,14 @@ Step 보고서의 설계·코드 위치·수치는 해당 단계 작성 당시�
 
 ### UI와 업무 Navigation
 
+- [M3 — 스토리 자료·안전한 저장과 복원](m3_campaign_records_save_load.md)
+- [M2 — 임시 개체 관찰·연구·격리 플레이테스트](m2_temp_case_vertical_slice.md)
 - [Step64 — GameShell·임시 Industrial Theme](step64_ui_ux_structural_rebuild.md)
 - [Step65 — UI 안정화·레이아웃 검증](step65_ui_ux_acceptance_and_stabilization.md)
 - [Step66 — 직접 Navigation·Archive 복귀](step66_navigation_interaction_ux_rework.md)
 - [Step66.1 — Utility Rail 직접 전환](step66_1_utility_rail_direct_switching.md)
 - [Step70 — Profile 종이 문서 UI](step70_profile_paper_document_ui_pilot.md)
+- [Step71 — 플레이 가능한 Case UI·이미지/문서 연결](m1_playable_case_ui_integration.md)
 
 ### Campaign과 사건 대응
 

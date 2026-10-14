@@ -1,0 +1,15 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/main/main.tscn" id="main"]
+[ext_resource type="Script" path="res://scripts/main/m2_playtest.gd" id="script"]
+[ext_resource type="Resource" path="res://resources/campaigns/temp_m2_playtest.tres" id="campaign"]
+
+[ext_resource type="Resource" path="res://resources/story_records/temp_m3_diary_01.tres" id="record0"]
+[ext_resource type="Resource" path="res://resources/story_records/temp_m3_resident_list_01.tres" id="record1"]
+[ext_resource type="Resource" path="res://resources/story_records/temp_m3_training_video_01.tres" id="record2"]
+
+[node name="M2Playtest" instance=ExtResource("main")]
+script = ExtResource("script")
+campaign_data = ExtResource("campaign")
+
+story_records = Array[Resource]([ExtResource("record0"), ExtResource("record1"), ExtResource("record2")])

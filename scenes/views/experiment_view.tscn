@@ -127,6 +127,14 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 16
 
+[node name="SelectionHeading" type="Label" parent="Margin/Content/Workspace/Execution/ResultScroll/ResultBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SELECTED EXPERIMENT DETAILS"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "MutedLabel"
+
 [node name="SelectedDescription" type="Label" parent="Margin/Content/Workspace/Execution/ResultScroll/ResultBody"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -148,6 +156,17 @@ layout_mode = 2
 text = ""
 autowrap_mode = 3
 size_flags_horizontal = 3
+
+[node name="ResultImage" type="TextureRect" parent="Margin/Content/Workspace/Execution/ResultScroll/ResultBody"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 280)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ConditionObservationList" type="VBoxContainer" parent="Margin/Content/Workspace/Execution/ResultScroll/ResultBody"]
 unique_name_in_owner = true
@@ -192,6 +211,6 @@ theme_type_variation = "Button"
 size_flags_horizontal = 8
 unique_name_in_owner = true
 layout_mode = 2
-text = "EXECUTE"
+text = "EXECUTE SELECTED EXPERIMENT"
 custom_minimum_size = Vector2(240, 48)
 theme_type_variation = "PrimaryButton"

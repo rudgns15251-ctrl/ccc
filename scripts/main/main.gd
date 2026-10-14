@@ -44,6 +44,14 @@ const VIEW_SCENES: Array[PackedScene] = [
 ]
 
 @export var campaign_data: CampaignData
+@export var story_records: Array[StoryRecordData] = []
+
+var story_collection: StoryCollectionState
+var _persistence_busy: bool = false
+var _save_feedback: String = ""
+const SaveCodec = preload("res://scripts/persistence/campaign_save_codec.gd")
+const SaveStore = preload("res://scripts/persistence/campaign_save_store.gd")
+const StoryRecordsView = preload("res://scripts/views/story_records_view.gd")
 
 var current_case: CaseData
 # Derived navigation Array from Campaign entries; authored references stay read-only.
@@ -125,6 +133,9 @@ func _notification(what: int) -> void:
 
 
 func _ready() -> void:
+	game_shell.save_requested.connect(save_game)
+	game_shell.load_requested.connect(_request_load_game)
+	game_shell.collect_record_requested.connect(_collect_story_record)
 	game_shell.navigation_requested.connect(_on_work_navigation_requested)
 	get_viewport().gui_focus_changed.connect(_on_work_focus_changed)
 	game_shell.research_requested.connect(_shell_research_requested)
@@ -156,6 +167,16 @@ func _ready() -> void:
 	containment_resolutions = ContainmentResolutionState.new()
 	failure_candidates = FailureEventCandidateState.new()
 	incident_responses = IncidentResponseState.new()
+	story_collection = StoryCollectionState.new()
+	if not story_collection.configure(story_records):
+		push_error("Main: invalid story record catalog.")
+		return
+	for record: StoryRecordData in story_records:
+		if not record.discovery_entry_id.is_empty():
+			var entry: CampaignEntryData = campaign_data.get_entry(record.discovery_entry_id)
+			if entry == null or entry.entry_kind != CampaignEntryData.EntryKind.CASE:
+				push_error("Main: story record discovery must refer to an authored CASE entry.")
+				return
 	_campaign_fact_queries = CampaignFactQueries.new(campaign_data, campaign_progress, containment_resolutions, pending_containment, incident_responses, research_archive)
 	_event_rng.randomize()
 	_dispatch_campaign_entry()
@@ -325,6 +346,8 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		_discover_response_research(stage, displayed_source)
 	if discover_displayed_source and displayed_source != null:
 		_discover_displayed_research_entry(_current_view, stage, displayed_source)
+	if stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
+		StoryRecordsView.mount_archive(_current_view, story_records, story_collection, not _is_response_route())
 	if stage == Stage.CCTV and not restoring_work:
 		_discover_cctv_condition_observations(_current_view as CCTVView)
 	# Account the accepted work once before choosing a presentation. A matching
@@ -1261,6 +1284,7 @@ func _cleanup_verified_source(recipient: RunDispositionState) -> Dictionary:
 	failure_candidates.reset()
 	incident_responses.reset()
 	research_archive.reset()
+	if story_collection != null: story_collection.reset()
 	working_hypotheses.reset()
 	if case_runtime != null: case_runtime.reset()
 	case_runtime = null
@@ -1284,6 +1308,7 @@ func _cleaned_source_is_empty() -> bool:
 		and failure_candidates.get_candidate_case_ids().is_empty() and incident_responses.get_responses().is_empty()
 		and incident_responses.get_active_response().is_empty() and research_archive.get_archived_case_ids().is_empty()
 		and working_hypotheses.get("_records_by_case").is_empty() and working_hypotheses.get("_next_id_by_case").is_empty()
+		and (story_collection == null or story_collection.get_collected_ids().is_empty())
 		and case_runtime == null and current_case == null and _case_index == -1
 		and not is_instance_valid(_current_view) and is_instance_valid(view_host) and view_host.get_child_count() == 0
 		and not is_instance_valid(_disturbance_notice) and not is_instance_valid(_focus_before_notice)
@@ -1451,6 +1476,7 @@ func _terminal_action_allowed(action: String = "gameplay") -> bool:
 
 
 func _accept_view_action(view: FlowView, action: String = "gameplay") -> bool:
+	if _persistence_busy: return false
 	if _navigation_busy or action == "gameplay" and _is_work_review(): return false
 	if _side_restore_pending: return false
 	if not _side_due.is_empty() and action != "response": return false
@@ -2520,6 +2546,9 @@ func _restore_side_work() -> void:
 	if stage == Stage.EXPERIMENT and not (restored as ExperimentView).restore_work_result(state, _recorded_experiment_conditions(state.displayed_result_id)):
 		_side_resume_error = "EXPERIMENT_RESULT_RESTORE_FAILED"
 		return
+	if stage == Stage.CONTAINMENT and not (restored as ContainmentView).restore_work_selection(state):
+		_side_resume_error = "CONTAINMENT_SELECTION_RESTORE_FAILED"
+		return
 	# Containers recalculate scroll ranges after layout. Keep all input closed.
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -2561,18 +2590,27 @@ func _refresh_shell() -> void:
 	var environment: String = ""
 	for condition: EnvironmentConditions.Condition in _build_environment_summary().entries:
 		environment += (" / " if not environment.is_empty() else "") + condition.display_name
-	var blocked: bool = _navigation_busy or _developer_closure_busy or is_instance_valid(_disturbance_notice) or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_current_view) and _current_view.has_open_confirmation() or not _terminal_action_allowed("archive")
+	var blocked: bool = _persistence_busy or _navigation_busy or _developer_closure_busy or is_instance_valid(_disturbance_notice) or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_current_view) and _current_view.has_open_confirmation() or not _terminal_action_allowed("archive")
 	var work: bool = _current_stage <= Stage.CONTAINMENT and _has_current_case_runtime() and not _is_response_route()
 	var response: bool = _is_response_route() and _current_stage in [Stage.INCIDENT, Stage.BROADCAST, Stage.INCIDENT_RESULT] and _has_response_context()
 	var archive_work: bool = _has_normal_work_archive()
 	var tool: bool = not blocked and (work or response or archive_work)
-	var status: String = "SESSION MEMORY / NO PERSISTENT SAVE"
+	var status: String = _persistent_status()
 	if _has_current_case_runtime() and case_runtime.has_confirmed_containment(): status += " / CONTAINMENT DECISION RECORDED"
 	game_shell.display(subject, stage, environment, work_stage if work else -1, tool, tool, not blocked and (work or archive_work), status, runtime_id)
 	var archive_open: bool = _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] and (is_instance_valid(_utility_work_view) or _has_response_context())
 	if archive_open and not blocked: game_shell.get_node("%Archive").disabled = false
 	game_shell.display_navigation(work_stage, _navigation_work_stage(), _work_screens.keys(), not blocked and not _is_response_route() and (_current_stage <= Stage.CONTAINMENT or is_instance_valid(_utility_work_view)))
 	game_shell.show_active_utility(_drawer_kind if is_instance_valid(_drawer_view) else "ARCHIVE" if _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] else "")
+	game_shell.get_node("%Save").disabled = not save_unavailable_reason().is_empty()
+	game_shell.get_node("%Save").tooltip_text = tr("Save progress") + "\n" + tr(save_unavailable_reason())
+	game_shell.get_node("%Load").disabled = not _load_unavailable_reason().is_empty() or campaign_data == null or not SaveStore.exists(campaign_data.campaign_id)
+	game_shell.get_node("%Load").tooltip_text = tr("Load saved progress") + "\n" + tr(_load_unavailable_reason())
+	var record: StoryRecordData = _offered_story_record()
+	game_shell.get_node("%CollectRecord").visible = record != null
+	if record != null:
+		game_shell.get_node("%CollectRecord").disabled = blocked or story_collection.has_collected(record.record_id) or _persistence_busy
+		GameText.set_text(game_shell.get_node("%CollectRecord"), "Collected: %s" if story_collection.has_collected(record.record_id) else "Collect TEMP record: %s", [record.title])
 
 # Only a normal work Archive owns a detached work View. Source Archives never do.
 func _has_normal_work_archive() -> bool:
@@ -2739,6 +2777,9 @@ func _restore_navigation_screen(view: FlowView, stage: int, snapshot: Dictionary
 	if stage == Stage.EXPERIMENT and not (view as ExperimentView).restore_work_result(snapshot.work, _recorded_experiment_conditions(snapshot.work.displayed_result_id)):
 		push_warning("Main: navigation result restore rejected.")
 		return
+	if stage == Stage.CONTAINMENT and not (view as ContainmentView).restore_work_selection(snapshot.work):
+		push_warning("Main: navigation selection restore rejected.")
+		return
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_inside_tree() or not is_instance_valid(view) or view != _current_view or view.is_queued_for_deletion(): return
@@ -2755,7 +2796,7 @@ func _restore_navigation_screen(view: FlowView, stage: int, snapshot: Dictionary
 	_refresh_shell()
 
 func _on_work_navigation_requested(destination: int) -> void:
-	if destination < Stage.PROFILE or destination > Stage.CONTAINMENT or _navigation_busy or _developer_closure_busy or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_disturbance_notice) or _is_response_route() or not _terminal_action_allowed() or not _has_current_case_runtime(): return
+	if destination < Stage.PROFILE or destination > Stage.CONTAINMENT or _persistence_busy or _navigation_busy or _developer_closure_busy or _side_restore_pending or not _side_due.is_empty() or is_instance_valid(_disturbance_notice) or _is_response_route() or not _terminal_action_allowed() or not _has_current_case_runtime(): return
 	var canonical: int = _navigation_work_stage()
 	if canonical < 0 or is_instance_valid(_current_view) and _current_view.has_open_confirmation(): return
 	var known: bool = _work_runtime_id == case_runtime.get_instance_id() and _work_screens.has(destination)
@@ -2812,3 +2853,111 @@ func _close_archive(view: FlowView) -> bool:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not event.is_echo() and _current_stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		if _close_archive(_current_view): get_viewport().set_input_as_handled()
+
+
+# Player save/load integration. The codec publishes no state until all IDs and
+# cross-owner relationships have been checked against authored Resources.
+func _load_unavailable_reason() -> String:
+	if campaign_progress == null or not _has_current_case_runtime(): return "No stable Case is active."
+	if _developer_terminal.mode != TerminalMode.NONE or _developer_closure_busy or not _developer_closure_context.is_empty(): return "A terminal transaction is in progress."
+	if _persistence_busy or _navigation_busy or _side_restore_pending or not _side_due.is_empty() or not campaign_progress.get_transition().is_empty(): return "A work transition is in progress."
+	if not incident_responses.get_active_response().is_empty() or _is_response_route() or not _interrupt_context.is_empty(): return "Finish the active incident before saving or loading."
+	if is_instance_valid(_disturbance_notice) or is_instance_valid(_drawer_view) or is_instance_valid(_utility_work_view) or not is_instance_valid(_current_view) or _current_view.has_open_confirmation(): return "Close the notice, record panel or confirmation first."
+	if _current_stage > Stage.CONTAINMENT or _is_work_review(): return "Return to the current work screen first."
+	return ""
+
+func save_unavailable_reason() -> String:
+	var blocked: String = _load_unavailable_reason()
+	if not blocked.is_empty(): return blocked
+	if _current_stage not in [Stage.PROFILE, Stage.CONTAINMENT]: return "Save at Profile or Containment after work has settled."
+	if case_runtime.has_monitoring_result() or case_runtime.has_confirmed_broadcast_option(): return "This debug state is not a supported save boundary."
+	return ""
+
+func _persistent_status() -> String:
+	if not _save_feedback.is_empty(): return _save_feedback
+	return "Local save available / use Save" if save_unavailable_reason().is_empty() else save_unavailable_reason()
+
+func save_game() -> bool:
+	if not save_unavailable_reason().is_empty(): return false
+	var payload: Dictionary = SaveCodec.capture(self)
+	var prepared: Dictionary = SaveCodec.prepare(payload, campaign_data, story_records)
+	if not prepared.error.is_empty():
+		_save_feedback = "Save refused. Existing save and current progress are unchanged."
+		_refresh_shell();return false
+	var error: String = SaveStore.write(campaign_data.campaign_id, payload, SaveCodec.signature(campaign_data,story_records))
+	_save_feedback = "Last save completed." if error.is_empty() else "Save failed. The previous complete save is retained."
+	_refresh_shell()
+	return error.is_empty()
+
+func prepare_saved_game() -> Dictionary:
+	var stored: Dictionary = SaveStore.read(campaign_data.campaign_id)
+	if not stored.error.is_empty(): return stored
+	if stored.signature != SaveCodec.signature(campaign_data,story_records): return {"error":"AUTHORED_CONTENT_CHANGED"}
+	return SaveCodec.prepare(stored.payload,campaign_data,story_records)
+
+func _request_load_game() -> void:
+	if not _load_unavailable_reason().is_empty(): return
+	var prepared: Dictionary = prepare_saved_game()
+	if not prepared.error.is_empty():
+		_save_feedback = "Load refused. Current progress is unchanged."
+		_refresh_shell();return
+	_current_view.open_confirmation("Load saved progress", "Replace the current session with the last saved progress? Unsaved work will be discarded.", "Load", Vector2(700,300), _apply_saved_game.bind(prepared))
+
+func _apply_saved_game(prepared: Dictionary) -> void:
+	if not _load_unavailable_reason().is_empty() or not prepared.error.is_empty(): return
+	_persistence_busy = true
+	_dispose_auxiliary_ui()
+	if _campaign_fact_queries != null: _campaign_fact_queries.release_sources()
+	campaign_progress = prepared.progress
+	current_case = campaign_data.get_entry(campaign_progress.get_current_entry_id()).case_data
+	case_runtime = prepared.runtime
+	pending_containment = prepared.pending
+	containment_resolutions = prepared.resolutions
+	failure_candidates = prepared.candidates
+	incident_responses = prepared.responses
+	research_archive = prepared.archive
+	working_hypotheses = prepared.hypotheses
+	story_collection = prepared.stories
+	_campaign_fact_queries = CampaignFactQueries.new(campaign_data,campaign_progress,containment_resolutions,pending_containment,incident_responses,research_archive)
+	_campaign_fact_queries.set_current_runtime(campaign_progress.get_current_entry_id(),current_case.case_id,case_runtime)
+	var payload: Dictionary = prepared.payload
+	_event_rng.seed = payload.rng.seed.to_int()
+	_event_rng.state = payload.rng.state.to_int()
+	_processed_opportunities.clear();_completed_research_tokens.clear()
+	for key: String in payload.pacing.processed: _processed_opportunities[key] = true
+	for key: String in payload.pacing.tokens: _completed_research_tokens[key] = true
+	_event_presentation_credit = payload.pacing.credit
+	_research_log_return_stage = -1;_cctv_review_return_stage = -1;_archive_detail_case_id = ""
+	_source_archive_return_stage = -1;_incident_route = IncidentRoute.DEBUG_RUNTIME
+	_research_display.clear();_side_due.clear();_interrupt_context.clear();_side_resume_error = ""
+	_work_runtime_id = case_runtime.get_instance_id()
+	var stage: int = Stage.PROFILE if payload.stage == "PROFILE" else Stage.CONTAINMENT
+	# Old review scrolls and drafts are presentation only. Canonical facts remain
+	# exact; known prior Views reopen with safe defaults and recorded results.
+	if stage == Stage.CONTAINMENT:
+		_work_screens[Stage.PROFILE] = {"work":{"focus_path":"","document_scroll":0,"identity_scroll":0},"scrolls":{}}
+		_work_screens[Stage.CCTV] = {"work":{"focus_path":"","condition_scroll":0,"thermal_mode":false},"scrolls":{}}
+		var history: Array[String] = case_runtime.get_experiment_execution_history()
+		_work_screens[Stage.EXPERIMENT] = {"work":{"focus_path":"","selected_experiment_id":"","displayed_result_id":history[-1] if not history.is_empty() else "","experiment_scroll":0,"result_scroll":0},"scrolls":{}}
+	_show_view(stage,false,true)
+	await _restore_navigation_screen(_current_view,stage,{"work":payload.view,"scrolls":{}})
+	if not is_inside_tree(): return
+	_persistence_busy = false
+	_save_feedback = "Saved progress restored."
+	_refresh_shell()
+
+func _offered_story_record() -> StoryRecordData:
+	if story_collection == null or campaign_progress == null or _current_stage > Stage.CONTAINMENT or _is_work_review() or not _has_current_case_runtime(): return null
+	var found: StoryRecordData = null
+	for record: StoryRecordData in story_records:
+		if record.discovery_entry_id == campaign_progress.get_current_entry_id() and record.discovery_stage == Stage.keys()[_current_stage]:
+			found = record
+			if not story_collection.has_collected(record.record_id): return record
+	return found
+
+func _collect_story_record() -> void:
+	var record: StoryRecordData = _offered_story_record()
+	if record == null or not _accept_view_action(_current_view) or _current_view.has_open_confirmation() or _persistence_busy: return
+	if story_collection.try_discover(record.record_id):
+		_save_feedback = "Story material collected. Save at a safe work boundary to keep it."
+		_refresh_shell()

@@ -85,3 +85,12 @@ func remove_completed_candidate(source_case_id: String, incident_id: String) -> 
 	_candidates.erase(source_case_id)
 	_case_order.erase(source_case_id)
 	return true
+
+
+# Restore counters without replaying accepted gameplay opportunities.
+# The codec validates authored sources and cross-owner consistency first.
+func restore_validated_save_data(records: Array) -> void:
+	reset()
+	for record: Dictionary in records:
+		_case_order.append(record.source_case_id)
+		_candidates[record.source_case_id] = record.duplicate(true)

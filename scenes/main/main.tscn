@@ -160,6 +160,13 @@ autowrap_mode = 3
 size_flags_horizontal = 3
 theme_type_variation = "MutedLabel"
 
+[node name="CollectRecord" type="Button" parent="GameShell/Frame/Body/PrimaryNavigation/Navigation"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+custom_minimum_size = Vector2(0, 56)
+
 [node name="Workspace" type="Control" parent="GameShell/Frame/Body"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -213,6 +220,26 @@ layout_mode = 2
 text = "N"
 theme_override_font_sizes/font_size = 16
 tooltip_text = "WORKING HYPOTHESIS"
+custom_minimum_size = Vector2(24, 56)
+
+[node name="Save" type="Button" parent="GameShell/Frame/Body/UtilityRail/Utilities"]
+autowrap_mode = 3
+unique_name_in_owner = true
+layout_mode = 2
+text = "S"
+disabled = true
+theme_override_font_sizes/font_size = 16
+tooltip_text = "Save progress"
+custom_minimum_size = Vector2(24, 56)
+
+[node name="Load" type="Button" parent="GameShell/Frame/Body/UtilityRail/Utilities"]
+autowrap_mode = 3
+unique_name_in_owner = true
+layout_mode = 2
+text = "L"
+disabled = true
+theme_override_font_sizes/font_size = 16
+tooltip_text = "Load saved progress"
 custom_minimum_size = Vector2(24, 56)
 
 [node name="DrawerLayer" type="Control" parent="GameShell"]

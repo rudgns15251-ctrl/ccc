@@ -63,3 +63,12 @@ func clear_all() -> void:
 func reset() -> void:
 	_records_by_case.clear()
 	_next_id_by_case.clear()
+
+
+func get_save_data() -> Dictionary:
+	return {"records": _records_by_case.duplicate(true), "counters": _next_id_by_case.duplicate()}
+
+# Called only on a new, unpublished owner after CampaignSaveCodec validation.
+func restore_validated_save_data(data: Dictionary) -> void:
+	_records_by_case.assign(data.records.duplicate(true))
+	_next_id_by_case.assign(data.counters.duplicate())

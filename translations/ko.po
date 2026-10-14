@@ -1807,3 +1807,468 @@ msgstr "식별자: [방송 식별자 없음]"
 
 msgid "ID: [Missing result_id]"
 msgstr "식별자: [결과 식별자 없음]"
+
+#: Step71 UI
+msgid "PAST OBSERVATIONS"
+msgstr "과거 관찰 사실"
+
+#: Step71 UI
+msgid "RESEARCHER NOTES"
+msgstr "연구자 소견"
+
+#: Step71 UI
+msgid "NORMAL FEED"
+msgstr "일반 영상"
+
+#: Step71 UI
+msgid "THERMAL FEED"
+msgstr "열화상 영상"
+
+#: Step71 UI
+msgid "CAMERA: %s"
+msgstr "카메라: %s"
+
+#: Step71 UI
+msgid "CAMERA: %s / UPDATED"
+msgstr "카메라: %s · 추가 관찰 있음"
+
+#: Step71 UI
+msgid "SELECTED EXPERIMENT DETAILS"
+msgstr "선택한 실험의 상세 정보"
+
+#: Step71 UI
+msgid "EXECUTE SELECTED EXPERIMENT"
+msgstr "선택한 실험 실행"
+
+#: Step71 UI
+msgid "CONTAINMENT CANDIDATES"
+msgstr "격리 후보 비교"
+
+#: Step71 UI
+msgid "Compare recorded configurations. Outcomes are assessed later."
+msgstr "기록된 환경 구성을 비교하세요. 격리 결과는 이후에 확인됩니다."
+
+#: Step71 UI
+msgid "SELECT A ROOM TO REVIEW"
+msgstr "격리실을 선택해 구성을 확인하세요"
+
+#: Step71 UI
+msgid "SELECTED CONFIGURATION"
+msgstr "선택한 격리 구성"
+
+#: Step71 UI
+msgid "AUTHORIZED CONFIGURATION / LOCKED"
+msgstr "승인한 격리 구성 · 변경 불가"
+
+#: Step71 UI
+msgid "REVIEW AND AUTHORIZE"
+msgstr "선택 확인 후 격리 승인"
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Lamellar Sac"
+msgstr "[임시 · 비정사] 박막낭"
+
+#: M2 temporary authored content
+msgid "Temporary research specimen / mechanism under investigation"
+msgstr "임시 연구 개체 / 반응 원인 조사 중"
+
+#: M2 temporary authored content
+msgid "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history."
+msgstr "길이 약 70cm의 은회색 막주머니. 몸을 접으면 길게 찌그러진 자루처럼 보이며, 짙은 세로 이음선과 건조하고 가는 가장자리가 있다. 눈이나 입은 확인되지 않았다. 가장자리의 섬유가 먼저 일어난 뒤 몸체가 펼쳐진다. 확보 당시에는 금속 포집 트레이 안에 조밀하게 접혀 있었다.\n\n아래 관찰과 해석은 이번 임시 플레이테스트에만 속한다. 공식 개체의 정체나 시설의 과거를 확정하는 기록이 아니다."
+
+#: M2 temporary authored content
+msgid "OBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established."
+msgstr "관찰 A — 확보 트레이에는 접지선이 연결되어 있었고 실내 상대습도는 61%였다. 두 조건이 함께 존재했으므로 어느 조건이 작용했는지는 분리되지 않았다. 접힌 몸체를 아크릴 포장 매트로 옮긴 뒤 가장자리 섬유가 일어났다. 이동 당시 습도는 기록되지 않았다.\n\n관찰 B — 따뜻한 금속 도구를 이음선에 접촉시키면 가장자리가 내려갔다. 접촉을 끝내자 다시 일어났다. 도구의 온도, 전도성, 접촉 자체의 효과는 분리되지 않았다.\n\n관찰 C — 물방울이 몸에 직접 닿으면 투명한 막편이 떨어졌다. 이어진 기류 변화가 막편을 트레이 밖으로 운반했다. 물방울 없이 습한 공기만 공급한 경우에는 같은 탈락이 기록되지 않았다. 물에 담그는 처치의 안전성은 확인되지 않았다."
+
+#: M2 temporary authored content
+msgid "WORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+msgstr "잠정 해석 — 이전 관찰자는 따뜻하고 습한 환경을 찾는 개체일 수 있다고 보았다. 이는 측정된 선호가 아니라 해석이다. 따뜻한 도구는 금속이었고 몸체에 접촉했으며, 습한 공기와 액체 물은 관찰에서 같은 효과를 보이지 않았다.\n\n격리 구성을 고르기 전에 사람을 향한 반응과 사람이 들고 있는 물건을 향한 반응을 나눠 보아야 한다. 재료와 온도를 고정하고 전기적 연결을 비교한 다음, 몸을 적시지 않고 습도를 비교할 것을 제안한다. 짧은 관찰에서 반응이 줄었다는 이유만으로 장기 격리가 확인됐다고 보지 않는다. 구체적인 격리 구성은 이 소견에서 확정하지 않는다."
+
+#: M2 temporary authored content
+msgid "SINGLE CAMERA / room 20 C, RH 35%, ordinary lighting, low airflow.\n\n00:00 — An operator passes with a rubbed polymer sleeve on a trolley. Fringe tips lean toward the sleeve, including after the operator steps away. The sac is not consistently oriented toward the person.\n\n00:40 — A warm, electrically isolated metal dummy is stationary at the same distance. It does not reproduce the sleeve-following movement. This comparison does not support warmth alone as the cause.\n\n01:20 — The operator clips the collection tray to a grounding lead. The body folds toward the tray and the broad extension stops. At this dry humidity the fine fringe still rises intermittently. Removing the clip precedes renewed extension; lighting and airflow stay unchanged.\n\nRoute context — The maintenance bypass has a grounded conductive floor and low airflow. The shorter supply passage has dry synthetic floor covering and a ventilation outlet. These are recorded route conditions, not a safety verdict."
+msgstr "단일 카메라 / 실내 20℃, 상대습도 35%, 일반 조명, 약한 기류.\n\n00:00 — 작업자가 마찰된 합성수지 슬리브를 실은 카트를 끌고 지나간다. 가장자리 끝이 슬리브 쪽으로 기울며, 작업자가 물러난 뒤에도 슬리브를 따라간다. 사람의 위치만을 일관되게 향하지는 않는다.\n\n00:40 — 같은 거리에 따뜻하지만 전기적으로 절연된 금속 모형을 둔다. 슬리브를 따라가던 움직임은 재현되지 않는다. 온기만으로 반응을 설명하는 가설은 이 비교로 뒷받침되지 않는다.\n\n01:20 — 포집 트레이에 접지선을 연결하자 몸체가 트레이 쪽으로 접히고 넓게 뻗던 움직임이 멎는다. 다만 건조한 조건에서는 가는 가장자리가 간헐적으로 일어난다. 접지선을 제거하면 다시 펼쳐진다. 조명과 기류는 유지된다.\n\n경로 참고 — 정비 우회로에는 접지된 도전성 바닥과 약한 기류가 있다. 더 짧은 자재 통로에는 건조한 합성수지 바닥과 환기구가 있다. 이는 관찰된 경로 조건이며 안전 판정은 아니다."
+
+#: M2 temporary authored content
+msgid "Electrical connection comparison"
+msgstr "전기적 연결 비교"
+
+#: M2 temporary authored content
+msgid "Purpose: separate grounding from warmth and material. At 20 C and RH 35%, compare the same metal tray electrically isolated and connected to ground. Use no water and do not change the lamp or airflow. Observe broad extension and fine fringe separately."
+msgstr "목적: 접지 효과를 온기와 재료 효과에서 분리한다. 20℃, 습도 35%에서 같은 금속 트레이의 절연 상태와 접지 상태를 비교한다. 물을 공급하지 않고 조명과 기류를 유지한다. 몸체가 넓게 펼쳐지는 반응과 가는 가장자리 반응을 나누어 관찰한다."
+
+#: M2 temporary authored content
+msgid "With the tray isolated, the membrane repeatedly extends toward a charged sleeve. Connecting the same tray to ground stops broad extension and folds the body back. Fine fringe still rises intermittently at RH 35%. Tray temperature does not change. Grounding explains much of the tool observation, but this dry configuration is not fully quiet."
+msgstr "절연된 트레이에서는 대전된 슬리브 쪽으로 막이 반복해서 펼쳐졌다. 같은 트레이를 접지하자 넓게 펼쳐지는 반응이 멎고 몸체가 돌아와 접혔다. 습도 35%에서는 가는 가장자리가 여전히 간헐적으로 일어났다. 트레이 온도는 변하지 않았다. 도구 관찰의 상당 부분은 접지로 설명되지만, 이 건조한 구성의 모든 반응이 가라앉지는 않았다."
+
+#: M2 temporary authored content
+msgid "Humidity without liquid contact"
+msgstr "물 접촉 없는 습도 비교"
+
+#: M2 temporary authored content
+msgid "Purpose: test the residual response left by grounding. Keep the conductive tray grounded and the room at 20 C. Compare RH 35% and 63% with humid air only; the sac and tray stay free of droplets. Airflow and lighting remain unchanged."
+msgstr "목적: 접지 후 남는 반응의 원인을 확인한다. 도전성 트레이를 접지한 채 실내 온도를 20℃로 유지한다. 몸체와 트레이에 물방울이 맺히지 않도록 습한 공기만 공급해 습도 35%와 63%를 비교한다. 기류와 조명은 유지한다."
+
+#: M2 temporary authored content
+msgid "At RH 35%, the grounded body stays folded but fine fringe rises occasionally. At RH 63%, both broad extension and repeated fringe lifting cease during the observation. No membrane pieces detach. Returning to 35% restores fringe lifting. This supports moderate humid air together with grounding, not liquid feeding or heating."
+msgstr "습도 35%에서는 접지된 몸체가 접힌 채로 있었지만 가는 가장자리가 가끔 일어났다. 습도 63%에서는 관찰 중 몸체 확장과 반복적인 가장자리 상승이 모두 멎었다. 막편은 떨어지지 않았다. 다시 35%로 낮추자 가장자리가 일어났다. 접지와 적당한 습도를 함께 유지하는 구성의 근거이며, 액체 공급이나 가열을 검증한 결과는 아니다."
+
+#: M2 temporary authored content
+msgid "Humid air versus direct wetting"
+msgstr "습한 공기와 직접 적심 비교"
+
+#: M2 temporary authored content
+msgid "Purpose: distinguish humidity control from the earlier liquid-water interpretation. On the grounded tray at RH 63% and 20 C, compare humid air alone with a small direct droplet applied through remote equipment. Capture any detached material; do not change the fan."
+msgstr "목적: 습도 조절을 과거의 액체 물 해석과 구분한다. 20℃, 습도 63%의 접지된 트레이에서 습한 공기만 유지하는 조건과 원격 장비로 작은 물방울을 직접 접촉시키는 조건을 비교한다. 떨어지는 물질은 포집하며 송풍 조건을 바꾸지 않는다."
+
+#: M2 temporary authored content
+msgid "Humid air alone keeps the body folded without shedding. Direct droplets loosen transparent pieces from the outer folds even though grounding and RH stay the same. Pieces remain separate when the bulk body contracts. More water is therefore not a stronger version of humid-air stabilization; direct wetting creates a transportable hazard."
+msgstr "습한 공기만 유지하면 몸체가 접힌 채로 있었고 막편은 떨어지지 않았다. 접지와 습도가 같은 상태에서도 물방울을 직접 대면 바깥 접힘부에서 투명한 조각이 떨어졌다. 몸체가 수축해도 떨어진 조각은 남았다. 물을 더 공급하는 것은 습한 공기 안정화의 강화판이 아니다. 직접 적시는 처치는 이동 가능한 위험 물질을 만든다."
+
+#: M2 temporary authored content
+msgid "Warm dry polymer enclosure"
+msgstr "따뜻한 건조 수지 격리함"
+
+#: M2 temporary authored content
+msgid "20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation."
+msgstr "실내 20℃에 국소적으로 따뜻한 조명. 습도 30~35%, 전기적으로 절연된 합성수지 안감, 지속적인 송풍. 직접 물을 공급하지 않는다. 과거의 따뜻한 도구 해석을 따른 구성."
+
+#: M2 temporary authored content
+msgid "Conductive humid-air enclosure"
+msgstr "도전성 습공기 격리함"
+
+#: M2 temporary authored content
+msgid "20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed."
+msgstr "20℃, 물방울이 맺히지 않는 습도 60~65%, 접지된 도전성 트레이, 일반 조명, 약한 기류와 출구의 막편 포집망. 몸체를 물에 담그거나 직접 분무하지 않는다."
+
+#: M2 temporary authored content
+msgid "Saturated immersion enclosure"
+msgstr "포화 습도 침수 격리함"
+
+#: M2 temporary authored content
+msgid "20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet."
+msgstr "20℃, 습도 90~95%, 전기적으로 절연된 아크릴 바닥 위의 얕은 물, 정지된 공기와 일반 조명. 몸체를 계속 적셔 과거의 수분 해석을 강화하려는 구성."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Airborne membrane notice"
+msgstr "[임시 · 비정사] 부유 막편 주의"
+
+#: M2 temporary authored content
+msgid "Thin detached material from the submitted specimen has been reported outside its enclosure. This is a later observation; the earlier submission is retained. Avoid the ventilation edge while the origin and route are checked."
+msgstr "제출된 개체에서 분리된 얇은 물질이 격리함 밖에서 보고됐다. 승인 이후의 관찰이며 이전 제출 기록은 유지된다. 출처와 이동 경로를 확인하는 동안 환기구 주변 접근을 피한다."
+
+#: M2 temporary authored content
+msgid "Airborne-material caution is active in the facility. The notice does not claim that the specimen has been recovered or that casualties have occurred."
+msgstr "시설에 부유 물질 주의 조건이 활성화됐다. 이 알림은 개체 재확보나 인명 피해 발생을 주장하지 않는다."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Membrane escape into the access corridor"
+msgstr "[임시 · 비정사] 출입 복도 막편 유출"
+
+#: M2 temporary authored content
+msgid "Detached membrane pieces have crossed the enclosure boundary and are visible in the access corridor. Fine fringes follow dry synthetic garments and polymer coverings. Pieces near the grounded conductive maintenance floor fold down; loose pieces at the supply-passage ventilation outlet are carried onward.\n\nThe low-airflow maintenance bypass and the shorter synthetic-lined supply passage remain available as marked routes. Staff need an evacuation instruction now. Recovery and casualties have not been confirmed. Use the recorded attraction and shedding evidence to choose how people should move and what they should avoid."
+msgstr "떨어진 막편이 격리 경계를 넘어 출입 복도에서 관찰됐다. 가는 가장자리는 건조한 합성섬유 의복과 합성수지 덮개를 따라간다. 접지된 도전성 정비 바닥 근처의 막편은 내려앉지만, 자재 통로 환기구에 있는 조각은 기류를 타고 이동한다.\n\n약한 기류의 정비 우회로와 더 짧은 합성수지 자재 통로가 표시된 이동로로 남아 있다. 지금 직원에게 대피 행동을 지시해야 한다. 이 보고는 재확보나 인명 피해를 확인한 보고가 아니다. 기록된 유인 반응과 막편 탈락 근거를 바탕으로 이동 경로와 피해야 할 접촉을 판단한다."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Staff evacuation instruction"
+msgstr "[임시 · 비정사] 직원 대피 지시"
+
+#: M2 temporary authored content
+msgid "Choose one staff evacuation instruction after the membrane escape. Use the Profile droplet record and the CCTV material/grounding observations. Choose the route and contact precautions from the observations already available. No civilian presence has been reported for this temporary incident."
+msgstr "막편 유출 이후 직원 대피 지시 하나를 선택한다. Profile의 물방울 기록과 CCTV의 재료·접지 관찰을 근거로 삼는다. 미실행 실험만을 근거로 요구하지 않는다. 이번 임시 사건에는 민간인 출입이 보고되지 않았다."
+
+#: M2 temporary authored content
+msgid "Use the grounded, low-airflow maintenance bypass. Avoid synthetic-lined supply passages, ventilation outlets and loose pieces; do not wet or handle the membrane. Close the access door after passing and keep others out of the exposed corridor."
+msgstr "접지된 바닥과 약한 기류가 있는 정비 우회로로 대피한다. 합성수지 자재 통로·환기구·떠다니는 막편을 피하고 물로 적시거나 손으로 만지지 않는다. 통과 후 출입문을 닫고 노출 복도에 다른 사람이 들어오지 않도록 한다."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Evacuation route exposure reduced"
+msgstr "[임시 · 비정사] 대피 경로 노출 감소"
+
+#: M2 temporary authored content
+msgid "Reports after this instruction describe fewer pieces following the maintenance route. Ground contact and low airflow match the recorded behavior; avoiding direct wetting prevents the documented shedding action. This observation does not establish recapture or complete sealing, and does not undo the original enclosure failure."
+msgstr "지시 이후 정비 이동로를 따라오던 막편이 줄었다고 보고됐다. 접지와 약한 기류는 기존 행동 관찰과 일치하고, 직접 적심을 피한 행동은 기록된 탈락 반응을 유발하지 않는다. 이 관찰만으로 재확보나 완전한 봉쇄가 확인되지는 않았으며 최초 격리함의 유출도 없던 일이 되지 않는다."
+
+#: M2 temporary authored content
+msgid "Use the shorter warm-lit synthetic-lined passage. Keep moving close to its polymer wall and push obstructing pieces aside by hand."
+msgstr "더 짧고 따뜻한 조명의 합성수지 통로로 대피한다. 수지 벽 가까이 이동하면서 길을 막는 조각은 손으로 밀어낸다."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Synthetic route continues attracting pieces"
+msgstr "[임시 · 비정사] 합성수지 이동로의 막편 추적 지속"
+
+#: M2 temporary authored content
+msgid "Loose fringes continue following coverings along the synthetic-lined passage. The warm stationary comparison did not establish a heat preference, while the sleeve observation did establish a material-related response. Reports do not establish a safe passage or a casualty total."
+msgstr "합성수지 통로의 덮개를 따라 가는 가장자리의 움직임이 계속됐다. 따뜻한 정지 모형은 온기 선호를 입증하지 못했고 슬리브 관찰에서는 재료와 연결된 반응이 확인됐다. 안전한 통과나 피해 인원은 이 보고로 확정되지 않는다."
+
+#: M2 temporary authored content
+msgid "Wet garments and nearby membrane pieces while moving toward the ventilation-side exit; use the short route rather than the maintenance bypass."
+msgstr "의복과 가까운 막편을 물로 적시면서 환기구 쪽 출구로 이동한다. 정비 우회로보다 짧은 경로를 택한다."
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] Wetting adds detached material to the route"
+msgstr "[임시 · 비정사] 적심 이후 이동로의 분리 물질 증가"
+
+#: M2 temporary authored content
+msgid "Direct contact with droplets precedes more detached pieces near the ventilation-side route. Humid air was not equivalent to direct wetting, and the earlier record showed an air pulse carrying pieces beyond a tray. The route remains under exposure caution; recapture has not been confirmed and no injury count has been established."
+msgstr "환기구 쪽 이동로에서 물방울 직접 접촉 뒤 떨어진 조각이 더 관찰됐다. 습한 공기는 직접 적심과 같지 않았고, 과거 기록에는 기류가 조각을 트레이 밖으로 운반한 관찰이 있다. 해당 이동로의 노출 주의는 유지된다. 재확보나 임의의 부상 인원을 기록하지 않는다."
+
+#: M2 temporary authored content
+msgid "Fine fringe rises over the dry insulating liner despite the warm lamp."
+msgstr "따뜻한 조명 아래에서도 건조한 절연 안감 위의 가장자리가 일어난다."
+
+#: M2 temporary authored content
+msgid "Repeated extension crosses the liner seam. Fan circulation carries detached material toward the outlet."
+msgstr "반복적인 확장이 안감의 이음선을 넘는다. 송풍이 분리 물질을 출구 쪽으로 운반한다."
+
+#: M2 temporary authored content
+msgid "The submitted enclosure does not retain the membrane material. A later corridor report is required."
+msgstr "제출한 격리함이 막 물질을 유지하지 못한다. 이후 복도 관찰 보고를 확인해야 한다."
+
+#: M2 temporary authored content
+msgid "The body stays folded on the grounded tray in moderately humid air."
+msgstr "적당히 습한 공기와 접지된 트레이에서 몸체가 접힌 채로 유지된다."
+
+#: M2 temporary authored content
+msgid "No repeated fringe lifting or liquid-contact shedding is observed in this configuration."
+msgstr "이 구성에서 반복적인 가장자리 상승이나 물 접촉에 따른 탈락은 관찰되지 않는다."
+
+#: M2 temporary authored content
+msgid "The present configuration supports stable containment for the observation interval; no escape report is linked."
+msgstr "관찰 구간에서 현재 구성이 안정적인 격리를 뒷받침하며 연결된 유출 보고는 없다."
+
+#: M2 temporary authored content
+msgid "Direct water contact loosens pieces although the enclosure is very humid."
+msgstr "높은 습도에서도 물 직접 접촉이 조각을 느슨하게 만든다."
+
+#: M2 temporary authored content
+msgid "Separate pieces collect along the insulating rim and do not rejoin when the bulk body folds."
+msgstr "분리된 조각이 절연된 테두리에 모이고 몸체가 접혀도 다시 합쳐지지 않는다."
+
+#: M2 temporary authored content
+msgid "Material crosses the rim during access. Saturated immersion does not retain the specimen."
+msgstr "접근 작업 중 물질이 테두리를 넘는다. 포화 습도 침수 구성으로 개체를 유지하지 못한다."
+
+#: M2 temporary authored content
+msgid "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history.\n\nOBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established.\n\nWORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+msgstr "길이 약 70cm의 은회색 막주머니. 몸을 접으면 길게 찌그러진 자루처럼 보이며, 짙은 세로 이음선과 건조하고 가는 가장자리가 있다. 눈이나 입은 확인되지 않았다. 가장자리의 섬유가 먼저 일어난 뒤 몸체가 펼쳐진다. 확보 당시에는 금속 포집 트레이 안에 조밀하게 접혀 있었다.\n\n아래 관찰과 해석은 이번 임시 플레이테스트에만 속한다. 공식 개체의 정체나 시설의 과거를 확정하는 기록이 아니다.\n\n관찰 A — 확보 트레이에는 접지선이 연결되어 있었고 실내 상대습도는 61%였다. 두 조건이 함께 존재했으므로 어느 조건이 작용했는지는 분리되지 않았다. 접힌 몸체를 아크릴 포장 매트로 옮긴 뒤 가장자리 섬유가 일어났다. 이동 당시 습도는 기록되지 않았다.\n\n관찰 B — 따뜻한 금속 도구를 이음선에 접촉시키면 가장자리가 내려갔다. 접촉을 끝내자 다시 일어났다. 도구의 온도, 전도성, 접촉 자체의 효과는 분리되지 않았다.\n\n관찰 C — 물방울이 몸에 직접 닿으면 투명한 막편이 떨어졌다. 이어진 기류 변화가 막편을 트레이 밖으로 운반했다. 물방울 없이 습한 공기만 공급한 경우에는 같은 탈락이 기록되지 않았다. 물에 담그는 처치의 안전성은 확인되지 않았다.\n\n잠정 해석 — 이전 관찰자는 따뜻하고 습한 환경을 찾는 개체일 수 있다고 보았다. 이는 측정된 선호가 아니라 해석이다. 따뜻한 도구는 금속이었고 몸체에 접촉했으며, 습한 공기와 액체 물은 관찰에서 같은 효과를 보이지 않았다.\n\n격리 구성을 고르기 전에 사람을 향한 반응과 사람이 들고 있는 물건을 향한 반응을 나눠 보아야 한다. 재료와 온도를 고정하고 전기적 연결을 비교한 다음, 몸을 적시지 않고 습도를 비교할 것을 제안한다. 짧은 관찰에서 반응이 줄었다는 이유만으로 장기 격리가 확인됐다고 보지 않는다. 구체적인 격리 구성은 이 소견에서 확정하지 않는다."
+
+#: M2 temporary authored content
+msgid "Past records / observations versus interpretation"
+msgstr "과거 기록 / 관찰과 해석의 구분"
+
+#: M2 temporary authored content
+msgid "Current observation / sleeve, warm dummy and grounding"
+msgstr "현재 관찰 / 슬리브·따뜻한 모형·접지"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Electrical connection comparison"
+msgstr "실행한 비교 / 전기적 연결 비교"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Humidity without liquid contact"
+msgstr "실행한 비교 / 물 접촉 없는 습도 비교"
+
+#: M2 temporary authored content
+msgid "Executed comparison / Humid air versus direct wetting"
+msgstr "실행한 비교 / 습한 공기와 직접 적심 비교"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation.\nThis record states the approved choice, not its later outcome."
+msgstr "제출 구성: 실내 20℃에 국소적으로 따뜻한 조명. 습도 30~35%, 전기적으로 절연된 합성수지 안감, 지속적인 송풍. 직접 물을 공급하지 않는다. 과거의 따뜻한 도구 해석을 따른 구성.\n이 기록은 승인한 선택을 뜻하며 이후 결과를 뜻하지 않는다."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Warm dry polymer enclosure"
+msgstr "제출한 격리함 / 따뜻한 건조 수지 격리함"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed.\nThis record states the approved choice, not its later outcome."
+msgstr "제출 구성: 20℃, 물방울이 맺히지 않는 습도 60~65%, 접지된 도전성 트레이, 일반 조명, 약한 기류와 출구의 막편 포집망. 몸체를 물에 담그거나 직접 분무하지 않는다.\n이 기록은 승인한 선택을 뜻하며 이후 결과를 뜻하지 않는다."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Conductive humid-air enclosure"
+msgstr "제출한 격리함 / 도전성 습공기 격리함"
+
+#: M2 temporary authored content
+msgid "Submitted configuration: 20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet.\nThis record states the approved choice, not its later outcome."
+msgstr "제출 구성: 20℃, 습도 90~95%, 전기적으로 절연된 아크릴 바닥 위의 얕은 물, 정지된 공기와 일반 조명. 몸체를 계속 적셔 과거의 수분 해석을 강화하려는 구성.\n이 기록은 승인한 선택을 뜻하며 이후 결과를 뜻하지 않는다."
+
+#: M2 temporary authored content
+msgid "Submitted enclosure / Saturated immersion enclosure"
+msgstr "제출한 격리함 / 포화 습도 침수 격리함"
+
+#: M2 temporary authored content
+msgid "Escape report / membrane in access corridor"
+msgstr "유출 보고 / 출입 복도의 막편"
+
+#: M2 temporary authored content
+msgid "Evacuation decision context"
+msgstr "대피 지시 판단 근거"
+
+#: M2 temporary authored content
+msgid "Approved instruction / BYPASS"
+msgstr "승인한 지시 / 정비 우회로"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / BYPASS"
+msgstr "지시 이후 관찰 / 노출 감소"
+
+#: M2 temporary authored content
+msgid "Approved instruction / WARM_ROUTE"
+msgstr "승인한 지시 / 따뜻한 수지 통로"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / WARM_ROUTE"
+msgstr "지시 이후 관찰 / 추적 지속"
+
+#: M2 temporary authored content
+msgid "Approved instruction / WET_ROUTE"
+msgstr "승인한 지시 / 물 접촉·환기구 경로"
+
+#: M2 temporary authored content
+msgid "Observed after instruction / WET_ROUTE"
+msgstr "지시 이후 관찰 / 분리 물질 증가"
+
+#: M2 temporary authored content
+msgid "[TEMP / NON-CANON] M2 playtest / existing test continuation"
+msgstr "[임시 · 비정사] M2 플레이테스트 / 기존 테스트 업무로 이어짐"
+
+#: M2 playtest feedback
+msgid "M2 research / observations and interpretations are distinct"
+msgstr "M2 연구 / 관찰 사실과 해석을 구분하세요"
+
+#: M2 playtest feedback
+msgid "M2 submission recorded / outcome awaits next work handoff"
+msgstr "M2 승인 기록됨 / 다음 업무 전환까지 결과 대기"
+
+#: M2 playtest feedback
+msgid "M2 submission archived / check later observations and Archive"
+msgstr "M2 제출 보관됨 / 후속 관찰과 기록 보관함을 확인하세요"
+
+#: M2 playtest feedback
+msgid "M2 recorded observation: stable containment / no escape report"
+msgstr "M2 관찰 기록: 격리 안정 / 유출 보고 없음"
+
+#: M2 playtest feedback
+msgid "M2 enclosure leakage observed / evacuation does not rewrite the first failure"
+msgstr "M2 격리함 유출 관찰 / 대피 이후에도 최초 실패 기록은 유지됩니다"
+
+#: M2 playtest feedback
+msgid "TEMP M2 / %s / SESSION MEMORY ONLY"
+msgstr "임시 M2 / %s / 현재 세션 기록"
+
+msgid "S"
+msgstr "저장"
+
+msgid "L"
+msgstr "불러오기"
+
+msgid "Save progress"
+msgstr "진행 저장"
+
+msgid "Load saved progress"
+msgstr "저장한 진행 불러오기"
+
+msgid "Case Research"
+msgstr "사례 연구"
+
+msgid "Campaign Records"
+msgstr "스토리 자료"
+
+msgid "Campaign Records / discovered materials only"
+msgstr "스토리 자료 / 발견한 자료만 열람 가능"
+
+msgid "Diary"
+msgstr "일기"
+
+msgid "Resident List"
+msgstr "주민 명단"
+
+msgid "Training Video"
+msgstr "교육 영상"
+
+msgid "No story materials discovered."
+msgstr "아직 발견한 스토리 자료가 없습니다."
+
+msgid "Select a discovered material."
+msgstr "발견한 자료를 선택하세요."
+
+msgid "Play / Pause Video"
+msgstr "영상 재생 / 일시 정지"
+
+msgid "Video media is not supplied. Verification transcript only."
+msgstr "영상 파일이 아직 제공되지 않았습니다. 검증용 전사문만 표시합니다."
+
+msgid "No stable Case is active."
+msgstr "저장할 수 있는 사례가 활성화되지 않았습니다."
+
+msgid "A terminal transaction is in progress."
+msgstr "종료 기록 처리가 진행 중입니다."
+
+msgid "A work transition is in progress."
+msgstr "업무 전환이 진행 중입니다."
+
+msgid "Finish the active incident before saving or loading."
+msgstr "사건 대응을 마친 뒤 저장하거나 불러오세요."
+
+msgid "Close the notice, record panel or confirmation first."
+msgstr "알림·기록 패널·확인창을 먼저 닫으세요."
+
+msgid "Return to the current work screen first."
+msgstr "현재 진행 중인 업무 화면으로 돌아오세요."
+
+msgid "Save at Profile or Containment after work has settled."
+msgstr "업무를 마친 대상 정보 또는 격리 화면에서 저장하세요."
+
+msgid "This debug state is not a supported save boundary."
+msgstr "이 개발용 상태에서는 저장을 지원하지 않습니다."
+
+msgid "Local save available / use Save"
+msgstr "진행 저장 가능 / 오른쪽 저장 버튼 사용"
+
+msgid "Save refused. Existing save and current progress are unchanged."
+msgstr "저장을 거부했습니다. 기존 저장과 현재 진행은 유지됩니다."
+
+msgid "Last save completed."
+msgstr "마지막 저장 완료"
+
+msgid "Save failed. The previous complete save is retained."
+msgstr "저장에 실패했습니다. 이전에 완료한 저장은 유지됩니다."
+
+msgid "Load refused. Current progress is unchanged."
+msgstr "불러오기를 거부했습니다. 현재 진행은 유지됩니다."
+
+msgid "Replace the current session with the last saved progress? Unsaved work will be discarded."
+msgstr "마지막 저장 시점으로 돌아갈까요? 저장하지 않은 현재 진행은 사라집니다."
+
+msgid "Load"
+msgstr "불러오기"
+
+msgid "Saved progress restored."
+msgstr "저장한 진행을 복원했습니다."
+
+msgid "Collected: %s"
+msgstr "확보한 자료: %s"
+
+msgid "Collect TEMP record: %s"
+msgstr "임시 자료 확보: %s"
+
+msgid "Story material collected. Save at a safe work boundary to keep it."
+msgstr "스토리 자료 확보 / 안전한 업무 화면에서 저장하면 보존됩니다."
+
+msgid "[TEMP / NON-CANON] Diary collection check"
+msgstr "[임시 · 비정사] 일기 수집 검증"
+
+msgid "This is a non-canon collection and persistence sample. No predecessor identity, date or facility history is established."
+msgstr "수집·열람·저장 검증을 위한 비정사 자료입니다. 전임자의 정체, 날짜, 시설의 과거를 확정하지 않습니다."
+
+msgid "[TEMP / NON-CANON] Resident-list collection check"
+msgstr "[임시 · 비정사] 주민 명단 수집 검증"
+
+msgid "This is a non-canon list-reading sample. No real resident names, population or incident victims are specified."
+msgstr "명단 열람을 확인하는 비정사 자료입니다. 실제 주민 이름, 인구, 사건 피해자를 지정하지 않습니다."
+
+msgid "[TEMP / NON-CANON] Training transcript check"
+msgstr "[임시 · 비정사] 교육 전사문 검증"
+
+msgid "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
+msgstr "수집과 저장·불러오기를 검증하기 위한 비정사 전사문입니다. 원본 교육 영상, 공식 지침, 스토리 사건을 작성한 자료가 아닙니다."

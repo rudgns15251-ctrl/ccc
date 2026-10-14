@@ -8,16 +8,17 @@ static func get_validation_error(stage_id: String, state: Dictionary, data: Case
 	if data == null or runtime == null or runtime.case_id != data.case_id: return "WORK_RUNTIME_MISMATCH"
 	var fields: Dictionary = {"focus_path": TYPE_STRING}
 	match stage_id:
-		"PROFILE": pass
-		"CCTV": fields["condition_scroll"] = TYPE_INT
+		"PROFILE": fields.merge({"document_scroll": TYPE_INT, "identity_scroll": TYPE_INT})
+		"CCTV": fields.merge({"condition_scroll": TYPE_INT, "thermal_mode": TYPE_BOOL})
 		"EXPERIMENT": fields.merge({"selected_experiment_id": TYPE_STRING, "displayed_result_id": TYPE_STRING, "experiment_scroll": TYPE_INT, "result_scroll": TYPE_INT})
-		"CONTAINMENT": fields.merge({"selected_room_id": TYPE_STRING, "confirmed_room_id": TYPE_STRING, "room_scroll": TYPE_INT})
+		"CONTAINMENT": fields.merge({"selected_room_id": TYPE_STRING, "confirmed_room_id": TYPE_STRING, "room_scroll": TYPE_INT, "room_detail_scroll": TYPE_INT})
 		_: return "UNSUPPORTED_WORK_STAGE"
 	if state.size() != fields.size(): return "INVALID_WORK_FIELDS"
 	for key: String in fields:
 		if not state.has(key) or typeof(state[key]) != fields[key]: return "INVALID_WORK_FIELD_" + key
 		if fields[key] == TYPE_INT and state[key] < 0: return "INVALID_WORK_SCROLL"
 	if not _valid_focus(stage_id, state.focus_path, data): return "INVALID_WORK_FOCUS"
+	if stage_id == "CCTV" and state.thermal_mode and (data.cctv_data == null or data.cctv_data.thermal_texture == null): return "UNAVAILABLE_THERMAL_MODE"
 	if stage_id == "EXPERIMENT":
 		var selected: String = state.selected_experiment_id
 		var displayed: String = state.displayed_result_id
@@ -54,6 +55,8 @@ static func get_validation_error(stage_id: String, state: Dictionary, data: Case
 
 static func _valid_focus(stage_id: String, path: String, data: CaseData) -> bool:
 	if path.is_empty(): return true
+	if stage_id == "CCTV" and data.cctv_data != null and data.cctv_data.thermal_texture != null:
+		if path in ["Margin/Content/Workspace/Feed/FeedModes/NormalMode", "Margin/Content/Workspace/Feed/FeedModes/ThermalMode"]: return true
 	var actions: Array[String] = ["NextButton", "OpenResearchLogButton"]
 	if stage_id in ["EXPERIMENT", "CONTAINMENT"]: actions.append("RecheckCCTVButton")
 	if stage_id == "EXPERIMENT": actions.append("RunButton")

@@ -5,8 +5,17 @@ signal navigation_requested(stage: int)
 signal research_requested
 signal archive_requested
 signal hypothesis_requested
+signal save_requested
+signal load_requested
+signal collect_record_requested
 
 func _ready() -> void:
+	%Save.pressed.connect(func() -> void:
+		if not %Save.disabled: save_requested.emit())
+	%Load.pressed.connect(func() -> void:
+		if not %Load.disabled: load_requested.emit())
+	%CollectRecord.pressed.connect(func() -> void:
+		if not %CollectRecord.disabled: collect_record_requested.emit())
 	for index: int in range(4):
 		var button: Button = get_node("%" + ["PROFILE", "CCTV", "EXPERIMENT", "CONTAINMENT"][index])
 		button.pressed.connect(func() -> void:

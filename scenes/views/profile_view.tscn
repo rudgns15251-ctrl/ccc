@@ -63,6 +63,17 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 224)
 size_flags_vertical = 3
 
+[node name="SubjectTexture" type="TextureRect" parent="Margin/Content/Workspace/Identity/SubjectImage"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Placeholder" type="Label" parent="Margin/Content/Workspace/Identity/SubjectImage"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -153,6 +164,50 @@ layout_mode = 2
 theme_type_variation = "PaperSeparator"
 
 [node name="Description" type="Label" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "PaperBodyLabel"
+
+[node name="PastObservationsSection" type="VBoxContainer" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 12
+
+[node name="PastObservationsSectionHeading" type="Label" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody/PastObservationsSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "PAST OBSERVATIONS"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "PaperSectionLabel"
+
+[node name="PastObservations" type="Label" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody/PastObservationsSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "PaperBodyLabel"
+
+[node name="ResearcherNotesSection" type="VBoxContainer" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody"]
+unique_name_in_owner = true
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 12
+
+[node name="ResearcherNotesSectionHeading" type="Label" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody/ResearcherNotesSection"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "RESEARCHER NOTES"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_type_variation = "PaperSectionLabel"
+
+[node name="ResearcherNotes" type="Label" parent="Margin/Content/Workspace/Document/DocumentScroll/DocumentBody/ResearcherNotesSection"]
 unique_name_in_owner = true
 layout_mode = 2
 text = ""
