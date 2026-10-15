@@ -1,0 +1,161 @@
+[gd_scene format=3]
+
+[node name="BroadcastConsole" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Identification" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "EmergencyPanel"
+
+[node name="Row" type="HBoxContainer" parent="Identification"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleSlot" type="HBoxContainer" parent="Identification/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="State" type="Label" parent="Identification/Row"]
+layout_mode = 2
+theme_type_variation = "HeadingLabel"
+
+[node name="Steps" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ComposeStep" type="Label" parent="Steps"]
+layout_mode = 2
+text = "01 / INSTRUCTIONS"
+size_flags_horizontal = 3
+theme_type_variation = "InstrumentLabel"
+
+[node name="ReviewStep" type="Label" parent="Steps"]
+layout_mode = 2
+text = "02 / TRANSCRIPT REVIEW"
+size_flags_horizontal = 3
+theme_type_variation = "InstrumentLabel"
+
+[node name="AuthorizeStep" type="Label" parent="Steps"]
+layout_mode = 2
+text = "03 / AUTHORIZATION"
+size_flags_horizontal = 3
+theme_type_variation = "InstrumentLabel"
+
+[node name="QuestionLayout" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Context" type="PanelContainer" parent="QuestionLayout"]
+layout_mode = 2
+custom_minimum_size = Vector2(440,0)
+theme_type_variation = "ChassisPanel"
+
+[node name="ContextSlot" type="VBoxContainer" parent="QuestionLayout/Context"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Selection" type="PanelContainer" parent="QuestionLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_type_variation = "InstrumentPanel"
+
+[node name="Stack" type="VBoxContainer" parent="QuestionLayout/Selection"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HeadingSlot" type="VBoxContainer" parent="QuestionLayout/Selection/Stack"]
+layout_mode = 2
+
+[node name="ProgressSlot" type="VBoxContainer" parent="QuestionLayout/Selection/Stack"]
+layout_mode = 2
+
+[node name="QuestionScrollSlot" type="VBoxContainer" parent="QuestionLayout/Selection/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="QuestionNavigationSlot" type="HBoxContainer" parent="QuestionLayout/Selection/Stack"]
+layout_mode = 2
+
+[node name="PreviewLayout" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+visible = false
+theme_override_constants/separation = 16
+
+[node name="Transcript" type="PanelContainer" parent="PreviewLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+theme_type_variation = "TranscriptPanel"
+
+[node name="Stack" type="VBoxContainer" parent="PreviewLayout/Transcript"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Heading" type="Label" parent="PreviewLayout/Transcript/Stack"]
+layout_mode = 2
+text = "TRANSMISSION TRANSCRIPT"
+theme_type_variation = "HeadingLabel"
+
+[node name="PreviewScrollSlot" type="VBoxContainer" parent="PreviewLayout/Transcript/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Receipt" type="PanelContainer" parent="PreviewLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+theme_type_variation = "ChassisPanel"
+
+[node name="Stack" type="VBoxContainer" parent="PreviewLayout/Receipt"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Heading" type="Label" parent="PreviewLayout/Receipt/Stack"]
+layout_mode = 2
+text = "SELECTED INSTRUCTIONS"
+theme_type_variation = "HeadingLabel"
+
+[node name="SummaryScroll" type="ScrollContainer" parent="PreviewLayout/Receipt/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+focus_mode = 2
+
+[node name="Summary" type="VBoxContainer" parent="PreviewLayout/Receipt/Stack/SummaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Answers" type="Label" parent="PreviewLayout/Receipt/Stack/SummaryScroll/Summary"]
+layout_mode = 2
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="SourceSlot" type="VBoxContainer" parent="PreviewLayout/Receipt/Stack/SummaryScroll/Summary"]
+layout_mode = 2
+
+[node name="Controls" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "ChassisPanel"
+
+[node name="ActionSlot" type="VBoxContainer" parent="Controls"]
+layout_mode = 2

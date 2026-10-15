@@ -1,0 +1,77 @@
+[gd_scene format=3]
+
+[node name="SurveillanceConsole" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Equipment" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Monitor" type="PanelContainer" parent="Equipment"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.95
+theme_type_variation = "MonitorBezel"
+
+[node name="Stack" type="VBoxContainer" parent="Equipment/Monitor"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Identification" type="HBoxContainer" parent="Equipment/Monitor/Stack"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleSlot" type="VBoxContainer" parent="Equipment/Monitor/Stack/Identification"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 0)
+
+[node name="CameraSlot" type="HBoxContainer" parent="Equipment/Monitor/Stack/Identification"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ModeSlot" type="HBoxContainer" parent="Equipment/Monitor/Stack"]
+layout_mode = 2
+
+[node name="VideoSlot" type="MarginContainer" parent="Equipment/Monitor/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Information" type="PanelContainer" parent="Equipment"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+theme_type_variation = "InstrumentPanel"
+
+[node name="Stack" type="VBoxContainer" parent="Equipment/Information"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeadingSlot" type="VBoxContainer" parent="Equipment/Information/Stack"]
+layout_mode = 2
+
+[node name="ObservationSlot" type="VBoxContainer" parent="Equipment/Information/Stack"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EnvironmentSlot" type="VBoxContainer" parent="Equipment/Information/Stack"]
+layout_mode = 2
+
+[node name="Controls" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "ChassisPanel"
+
+[node name="ActionSlot" type="VBoxContainer" parent="Controls"]
+layout_mode = 2

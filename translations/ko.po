@@ -2407,3 +2407,72 @@ msgstr "사고 대응 보고서"
 
 msgid "Acknowledge this report to complete the response and resume work."
 msgstr "보고서를 확인하면 사건 대응을 완료하고 업무 또는 다음 Campaign 항목으로 복귀합니다."
+
+# M4.5 structural comparison presentation
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "OBSERVATION / VIDEO"
+msgstr "관찰 화면 / 영상 입력"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "01 / INSTRUCTIONS"
+msgstr "01 / 방송 지시 작성"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "02 / TRANSCRIPT REVIEW"
+msgstr "02 / 방송문 검토"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "03 / AUTHORIZATION"
+msgstr "03 / 전송 승인"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "TRANSMISSION TRANSCRIPT"
+msgstr "최종 송출문"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "SELECTED INSTRUCTIONS"
+msgstr "선택한 지시"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "FINAL AUTHORIZATION"
+msgstr "최종 전송 승인"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "TRANSMISSION LOCKED"
+msgstr "송출 확정 / 지시 잠금"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "REVIEW BEFORE TRANSMISSION"
+msgstr "송출 전 검토"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "PREPARING INSTRUCTIONS"
+msgstr "방송 지시 작성 중"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "No footage assigned\nTemporary observation area"
+msgstr "영상 자료 미연결\n임시 관찰 영역"
+
+
+msgid "Collect record"
+msgstr "자료 확보"
+
+msgid "Collected record"
+msgstr "자료 확보됨"
+
+# M5-A temporary visual asset labels
+
+msgid "TEMP / REPLACEABLE — static reference; observations determine decisions."
+msgstr "임시 정지 참고 이미지 · 교체 가능 · 판단 단서는 관찰 기록 기준"
+
+msgid "TEMP / REPLACEABLE — visual stand-in, not the authored creature or evidence."
+msgstr "임시 외형 참고 · 교체 가능 · 박막낭 설정·정답 단서와 무관"
+
+msgid "VISUAL TEST DOCUMENT / existing research rules unchanged"
+msgstr "시각 검증용 연구문서 / 기존 연구 규칙 유지"
+
+msgid "Experiment-specific result image not supplied. Text is the execution record."
+msgstr "실험별 결과 이미지 미제공 · 실제 결과는 위 텍스트 기록 기준"
+
+msgid "TEMP environment reference / shared illustration, not a candidate configuration."
+msgstr "임시 공간 공통 참고 · 후보별 실제 구성은 아래 설명 기준"

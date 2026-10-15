@@ -84,7 +84,9 @@ func _display_response_context() -> void:
 
 func capture_work_state() -> Dictionary:
 	var focused: Control = get_viewport().gui_get_focus_owner()
-	return {"focus_path": String(get_path_to(focused)) if focused != null and is_ancestor_of(focused) else ""}
+	# A comparison layout may move the same Control, while saves retain its
+	# original, validated work path. Normal product Views have no such metadata.
+	return {"focus_path": String(focused.get_meta("work_focus_path", String(get_path_to(focused)))) if focused != null and is_ancestor_of(focused) else ""}
 
 
 func restore_work_state(state: Dictionary) -> bool:
@@ -98,6 +100,11 @@ func restore_work_focus(state: Dictionary) -> bool:
 		if focused != null and is_ancestor_of(focused): focused.release_focus()
 		return true
 	var control: Control = get_node_or_null(NodePath(path)) as Control
+	if control == null:
+		for candidate: Node in find_children("*", "Control", true, false):
+			if candidate.get_meta("work_focus_path", "") == path:
+				control = candidate as Control
+				break
 	if control == null or not is_ancestor_of(control) or not control.is_visible_in_tree() or control.focus_mode == Control.FOCUS_NONE: return false
 	control.grab_focus()
 	return get_viewport().gui_get_focus_owner() == control

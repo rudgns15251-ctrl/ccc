@@ -1,0 +1,442 @@
+; TEMP / REPLACEABLE visual-only copy of M4. Authored mechanics unchanged.
+[gd_resource type="Resource" script_class="CaseData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/case_data.gd" id="case"]
+
+[ext_resource type="Script" path="res://scripts/data/profile_data.gd" id="profile"]
+
+[ext_resource type="Script" path="res://scripts/data/cctv_data.gd" id="cctv"]
+
+[ext_resource type="Script" path="res://scripts/data/experiment_data.gd" id="experiment"]
+
+[ext_resource type="Script" path="res://scripts/data/containment_data.gd" id="room"]
+
+[ext_resource type="Script" path="res://scripts/data/monitoring_outcome_data.gd" id="outcome"]
+
+[ext_resource type="Script" path="res://scripts/data/monitoring_stage_data.gd" id="stage"]
+
+[ext_resource type="Script" path="res://scripts/data/incident_data.gd" id="incident"]
+
+[ext_resource type="Script" path="res://scripts/data/environmental_disturbance_data.gd" id="disturbance"]
+
+[ext_resource type="Script" path="res://scripts/data/emergency_broadcast_data.gd" id="broadcast"]
+
+[ext_resource type="Script" path="res://scripts/data/broadcast_option_data.gd" id="option"]
+
+[ext_resource type="Script" path="res://scripts/data/incident_result_data.gd" id="result"]
+
+[ext_resource type="Script" path="res://scripts/data/research_entry_data.gd" id="research"]
+
+[ext_resource type="Script" path="res://scripts/data/broadcast_question_data.gd" id="question"]
+[ext_resource type="Script" path="res://scripts/data/broadcast_outcome_data.gd" id="combination"]
+
+[ext_resource type="Texture2D" path="res://assets/temp/m5_a/creature/temp_creature_reference.png" id="m5_portrait"]
+[ext_resource type="Texture2D" path="res://assets/temp/m5_a/cctv/temp_cctv_reference.png" id="m5_feed"]
+
+[sub_resource type="Resource" id="Profile"]
+script = ExtResource("profile")
+profile_id = "TEMP_M4_PROFILE"
+subject_texture = ExtResource("m5_portrait")
+subject_name = "[TEMP / NON-CANON] Lamellar Sac"
+classification = "Temporary research specimen / mechanism under investigation"
+basic_description = "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history."
+past_observations = "OBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established."
+researcher_notes = "WORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+
+[sub_resource type="Resource" id="CCTV"]
+script = ExtResource("cctv")
+camera_id = "TEMP_M4_CAM_01"
+feed_texture = ExtResource("m5_feed")
+observation_text = "SINGLE CAMERA / room 20 C, RH 35%, ordinary lighting, low airflow.\n\n00:00 — An operator passes with a rubbed polymer sleeve on a trolley. Fringe tips lean toward the sleeve, including after the operator steps away. The sac is not consistently oriented toward the person.\n\n00:40 — A warm, electrically isolated metal dummy is stationary at the same distance. It does not reproduce the sleeve-following movement. This comparison does not support warmth alone as the cause.\n\n01:20 — The operator clips the collection tray to a grounding lead. The body folds toward the tray and the broad extension stops. At this dry humidity the fine fringe still rises intermittently. Removing the clip precedes renewed extension; lighting and airflow stay unchanged.\n\nRoute context — The maintenance bypass has a grounded conductive floor and low airflow. The shorter supply passage has dry synthetic floor covering and a ventilation outlet. These are recorded route conditions, not a safety verdict."
+
+[sub_resource type="Resource" id="Exp_GROUND"]
+script = ExtResource("experiment")
+experiment_id = "TEMP_M4_EXP_GROUND"
+display_name = "Electrical connection comparison"
+description = "Purpose: separate grounding from warmth and material. At 20 C and RH 35%, compare the same metal tray electrically isolated and connected to ground. Use no water and do not change the lamp or airflow. Observe broad extension and fine fringe separately."
+result_text = "With the tray isolated, the membrane repeatedly extends toward a charged sleeve. Connecting the same tray to ground stops broad extension and folds the body back. Fine fringe still rises intermittently at RH 35%. Tray temperature does not change. Grounding explains much of the tool observation, but this dry configuration is not fully quiet."
+
+[sub_resource type="Resource" id="Exp_HUMID"]
+script = ExtResource("experiment")
+experiment_id = "TEMP_M4_EXP_HUMID"
+display_name = "Humidity without liquid contact"
+description = "Purpose: test the residual response left by grounding. Keep the conductive tray grounded and the room at 20 C. Compare RH 35% and 63% with humid air only; the sac and tray stay free of droplets. Airflow and lighting remain unchanged."
+result_text = "At RH 35%, the grounded body stays folded but fine fringe rises occasionally. At RH 63%, both broad extension and repeated fringe lifting cease during the observation. No membrane pieces detach. Returning to 35% restores fringe lifting. This supports moderate humid air together with grounding, not liquid feeding or heating."
+
+[sub_resource type="Resource" id="Exp_WATER"]
+script = ExtResource("experiment")
+experiment_id = "TEMP_M4_EXP_WATER"
+display_name = "Humid air versus direct wetting"
+description = "Purpose: distinguish humidity control from the earlier liquid-water interpretation. On the grounded tray at RH 63% and 20 C, compare humid air alone with a small direct droplet applied through remote equipment. Capture any detached material; do not change the fan."
+result_text = "Humid air alone keeps the body folded without shedding. Direct droplets loosen transparent pieces from the outer folds even though grounding and RH stay the same. Pieces remain separate when the bulk body contracts. More water is therefore not a stronger version of humid-air stabilization; direct wetting creates a transportable hazard."
+
+[sub_resource type="Resource" id="Room_WARM"]
+script = ExtResource("room")
+room_id = "TEMP_M4_ROOM_WARM"
+display_name = "Warm dry polymer enclosure"
+description = "20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation."
+
+[sub_resource type="Resource" id="Room_CONDUCTIVE"]
+script = ExtResource("room")
+room_id = "TEMP_M4_ROOM_CONDUCTIVE"
+display_name = "Conductive humid-air enclosure"
+description = "20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed."
+
+[sub_resource type="Resource" id="Room_BATH"]
+script = ExtResource("room")
+room_id = "TEMP_M4_ROOM_BATH"
+display_name = "Saturated immersion enclosure"
+description = "20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet."
+
+[sub_resource type="Resource" id="Stage_WARM_0"]
+script = ExtResource("stage")
+time_offset = 0
+observation_text = "Fine fringe rises over the dry insulating liner despite the warm lamp."
+
+[sub_resource type="Resource" id="Stage_WARM_1"]
+script = ExtResource("stage")
+time_offset = 10
+observation_text = "Repeated extension crosses the liner seam. Fan circulation carries detached material toward the outlet."
+
+[sub_resource type="Resource" id="Stage_WARM_2"]
+script = ExtResource("stage")
+time_offset = 20
+observation_text = "The submitted enclosure does not retain the membrane material. A later corridor report is required."
+
+[sub_resource type="Resource" id="Outcome_WARM"]
+script = ExtResource("outcome")
+room_id = "TEMP_M4_ROOM_WARM"
+stages = Array[ExtResource("stage")]([SubResource("Stage_WARM_0"), SubResource("Stage_WARM_1"), SubResource("Stage_WARM_2")])
+final_result = 2
+incident_id = "TEMP_M4_INCIDENT_ESCAPE"
+
+[sub_resource type="Resource" id="Stage_CONDUCTIVE_0"]
+script = ExtResource("stage")
+time_offset = 0
+observation_text = "The body stays folded on the grounded tray in moderately humid air."
+
+[sub_resource type="Resource" id="Stage_CONDUCTIVE_1"]
+script = ExtResource("stage")
+time_offset = 10
+observation_text = "No repeated fringe lifting or liquid-contact shedding is observed in this configuration."
+
+[sub_resource type="Resource" id="Stage_CONDUCTIVE_2"]
+script = ExtResource("stage")
+time_offset = 20
+observation_text = "The present configuration supports stable containment for the observation interval; no escape report is linked."
+
+[sub_resource type="Resource" id="Outcome_CONDUCTIVE"]
+script = ExtResource("outcome")
+room_id = "TEMP_M4_ROOM_CONDUCTIVE"
+stages = Array[ExtResource("stage")]([SubResource("Stage_CONDUCTIVE_0"), SubResource("Stage_CONDUCTIVE_1"), SubResource("Stage_CONDUCTIVE_2")])
+final_result = 1
+incident_id = ""
+
+[sub_resource type="Resource" id="Stage_BATH_0"]
+script = ExtResource("stage")
+time_offset = 0
+observation_text = "Direct water contact loosens pieces although the enclosure is very humid."
+
+[sub_resource type="Resource" id="Stage_BATH_1"]
+script = ExtResource("stage")
+time_offset = 10
+observation_text = "Separate pieces collect along the insulating rim and do not rejoin when the bulk body folds."
+
+[sub_resource type="Resource" id="Stage_BATH_2"]
+script = ExtResource("stage")
+time_offset = 20
+observation_text = "Material crosses the rim during access. Saturated immersion does not retain the specimen."
+
+[sub_resource type="Resource" id="Outcome_BATH"]
+script = ExtResource("outcome")
+room_id = "TEMP_M4_ROOM_BATH"
+stages = Array[ExtResource("stage")]([SubResource("Stage_BATH_0"), SubResource("Stage_BATH_1"), SubResource("Stage_BATH_2")])
+final_result = 2
+incident_id = "TEMP_M4_INCIDENT_ESCAPE"
+
+[sub_resource type="Resource" id="Disturbance"]
+script = ExtResource("disturbance")
+disturbance_id = "TEMP_M4_DISTURBANCE_MEMBRANE"
+display_name = "[TEMP / NON-CANON] Airborne membrane notice"
+notice_text = "Thin detached material from the submitted specimen has been reported outside its enclosure. This is a later observation; the earlier submission is retained. Avoid the ventilation edge while the origin and route are checked."
+condition_change_text = "Airborne-material caution is active in the facility. The notice does not claim that the specimen has been recovered or that casualties have occurred."
+
+[sub_resource type="Resource" id="Incident"]
+script = ExtResource("incident")
+incident_id = "TEMP_M4_INCIDENT_ESCAPE"
+display_name = "[TEMP / NON-CANON] Membrane escape into the access corridor"
+description = "Detached membrane pieces have crossed the enclosure boundary and are visible in the access corridor. Fine fringes follow dry synthetic garments and polymer coverings. Pieces near the grounded conductive maintenance floor fold down; loose pieces at the supply-passage ventilation outlet are carried onward.\n\nThe low-airflow maintenance bypass and the shorter synthetic-lined supply passage remain available as marked routes. Staff need an evacuation instruction now. Recovery and casualties have not been confirmed. Use the recorded attraction and shedding evidence to choose how people should move and what they should avoid."
+broadcast_id = "TEMP_M4_BROADCAST_EVAC"
+environmental_disturbance = SubResource("Disturbance")
+
+[sub_resource type="Resource" id="Research_PROFILE"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_PROFILE"
+source_kind = 0
+source_id = "TEMP_M4_PROFILE"
+title = "Past records / observations versus interpretation"
+body_text = "A folded, silver-grey membrane sac about 70 cm long. It has a dark longitudinal seam and many fine, dry fringes, but no visible eyes or mouth. The fringes rise before the body unrolls. It was recovered as a compact fold in a metal collection tray.\n\nThe following observations and interpretations belong only to this temporary playtest. They do not identify an official Case or establish facility history.\n\nOBSERVATION A — The recovery tray was connected to a grounding lead; the room meter read 61% relative humidity. Both conditions were present together, so the recovery does not identify which mattered. Moving the fold onto an acrylic packing mat preceded fringe lifting. The humidity during transfer was not recorded.\n\nOBSERVATION B — A warm metal tool pressed the fringes down while touching the seam. After contact ended they rose again. Tool temperature, conductivity and the contact itself were not separated.\n\nOBSERVATION C — Direct droplets loosened transparent membrane pieces. A subsequent air pulse carried pieces beyond the tray. The same report records no comparable shedding during humid-air exposure without droplets. No conclusion about immersion safety was established.\n\nWORKING INTERPRETATION — The earlier observer proposed that the sac seeks warm, moist surroundings. This is an interpretation, not a measured preference. The warm tool was also metal and made contact; humid air and liquid water were not equivalent in the observations.\n\nBefore choosing a configuration, separate attraction to a person from attraction to something the person carries. Compare electrical connection at the same material and temperature, then compare humidity without wetting the body. Avoid treating a reduction in one brief observation as proof of long-term containment. These notes leave the exact configuration open."
+
+[sub_resource type="Resource" id="Research_CCTV"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_CCTV"
+source_kind = 1
+source_id = "TEMP_M4_CAM_01"
+title = "Current observation / sleeve, warm dummy and grounding"
+body_text = "SINGLE CAMERA / room 20 C, RH 35%, ordinary lighting, low airflow.\n\n00:00 — An operator passes with a rubbed polymer sleeve on a trolley. Fringe tips lean toward the sleeve, including after the operator steps away. The sac is not consistently oriented toward the person.\n\n00:40 — A warm, electrically isolated metal dummy is stationary at the same distance. It does not reproduce the sleeve-following movement. This comparison does not support warmth alone as the cause.\n\n01:20 — The operator clips the collection tray to a grounding lead. The body folds toward the tray and the broad extension stops. At this dry humidity the fine fringe still rises intermittently. Removing the clip precedes renewed extension; lighting and airflow stay unchanged.\n\nRoute context — The maintenance bypass has a grounded conductive floor and low airflow. The shorter supply passage has dry synthetic floor covering and a ventilation outlet. These are recorded route conditions, not a safety verdict."
+
+[sub_resource type="Resource" id="Research_EXP_GROUND"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_EXP_GROUND"
+source_kind = 2
+source_id = "TEMP_M4_EXP_GROUND"
+title = "Executed comparison / Electrical connection comparison"
+body_text = "With the tray isolated, the membrane repeatedly extends toward a charged sleeve. Connecting the same tray to ground stops broad extension and folds the body back. Fine fringe still rises intermittently at RH 35%. Tray temperature does not change. Grounding explains much of the tool observation, but this dry configuration is not fully quiet."
+
+[sub_resource type="Resource" id="Research_EXP_HUMID"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_EXP_HUMID"
+source_kind = 2
+source_id = "TEMP_M4_EXP_HUMID"
+title = "Executed comparison / Humidity without liquid contact"
+body_text = "At RH 35%, the grounded body stays folded but fine fringe rises occasionally. At RH 63%, both broad extension and repeated fringe lifting cease during the observation. No membrane pieces detach. Returning to 35% restores fringe lifting. This supports moderate humid air together with grounding, not liquid feeding or heating."
+
+[sub_resource type="Resource" id="Research_EXP_WATER"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_EXP_WATER"
+source_kind = 2
+source_id = "TEMP_M4_EXP_WATER"
+title = "Executed comparison / Humid air versus direct wetting"
+body_text = "Humid air alone keeps the body folded without shedding. Direct droplets loosen transparent pieces from the outer folds even though grounding and RH stay the same. Pieces remain separate when the bulk body contracts. More water is therefore not a stronger version of humid-air stabilization; direct wetting creates a transportable hazard."
+
+[sub_resource type="Resource" id="Research_ROOM_WARM"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ROOM_WARM"
+source_kind = 3
+source_id = "TEMP_M4_ROOM_WARM"
+title = "Submitted enclosure / Warm dry polymer enclosure"
+body_text = "Submitted configuration: 20 C baseline with a locally warm lamp; RH 30-35%; electrically isolated polymer liner; continuous fan circulation. No direct water. Intended to reproduce the earlier warm-tool interpretation.\nThis record states the approved choice, not its later outcome."
+
+[sub_resource type="Resource" id="Research_ROOM_CONDUCTIVE"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ROOM_CONDUCTIVE"
+source_kind = 3
+source_id = "TEMP_M4_ROOM_CONDUCTIVE"
+title = "Submitted enclosure / Conductive humid-air enclosure"
+body_text = "Submitted configuration: 20 C; RH 60-65% without droplets; grounded conductive tray; ordinary lighting; low airflow with a membrane-capture screen at the outlet. The body is not immersed or directly sprayed.\nThis record states the approved choice, not its later outcome."
+
+[sub_resource type="Resource" id="Research_ROOM_BATH"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ROOM_BATH"
+source_kind = 3
+source_id = "TEMP_M4_ROOM_BATH"
+title = "Submitted enclosure / Saturated immersion enclosure"
+body_text = "Submitted configuration: 20 C; RH 90-95%; shallow water over an electrically isolated acrylic base; still air and ordinary lighting. Intended to strengthen the earlier moisture interpretation by keeping the body wet.\nThis record states the approved choice, not its later outcome."
+
+[sub_resource type="Resource" id="Research_INCIDENT"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_INCIDENT"
+source_kind = 4
+source_id = "TEMP_M4_INCIDENT_ESCAPE"
+title = "Escape report / membrane in access corridor"
+body_text = "Detached membrane pieces have crossed the enclosure boundary and are visible in the access corridor. Fine fringes follow dry synthetic garments and polymer coverings. Pieces near the grounded conductive maintenance floor fold down; loose pieces at the supply-passage ventilation outlet are carried onward.\n\nThe low-airflow maintenance bypass and the shorter synthetic-lined supply passage remain available as marked routes. Staff need an evacuation instruction now. Recovery and casualties have not been confirmed. Use the recorded attraction and shedding evidence to choose how people should move and what they should avoid."
+
+[sub_resource type="Resource" id="Research_BROADCAST"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_BROADCAST"
+source_kind = 5
+source_id = "TEMP_M4_BROADCAST_EVAC"
+title = "Evacuation decision context"
+body_text = "Select a route and contact precautions using the Profile and CCTV observations. Review the complete broadcast before transmission. Selection alone does not transmit an order."
+
+[sub_resource type="Resource" id="Answer_GROUND"]
+script = ExtResource("option")
+option_id = "TEMP_M4_ANSWER_GROUND"
+display_text = "Use the grounded maintenance bypass."
+instruction_text = "Evacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet."
+
+[sub_resource type="Resource" id="Answer_SHORT"]
+script = ExtResource("option")
+option_id = "TEMP_M4_ANSWER_SHORT"
+display_text = "Use the shorter synthetic-lined passage."
+instruction_text = "Evacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet."
+
+[sub_resource type="Resource" id="Answer_AVOID"]
+script = ExtResource("option")
+option_id = "TEMP_M4_ANSWER_AVOID"
+display_text = "Avoid handling or wetting membrane pieces."
+instruction_text = "Keep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+
+[sub_resource type="Resource" id="Answer_WET"]
+script = ExtResource("option")
+option_id = "TEMP_M4_ANSWER_WET"
+display_text = "Wet and move obstructing membrane pieces by hand."
+instruction_text = "Wet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+
+[sub_resource type="Resource" id="Question_ROUTE"]
+script = ExtResource("question")
+question_id = "ROUTE"
+prompt_text = "Which evacuation route should staff use?"
+options = Array[ExtResource("option")]([SubResource("Answer_GROUND"), SubResource("Answer_SHORT")])
+
+[sub_resource type="Resource" id="Question_CONTACT"]
+script = ExtResource("question")
+question_id = "CONTACT"
+prompt_text = "How should staff respond to membrane pieces along the route?"
+options = Array[ExtResource("option")]([SubResource("Answer_AVOID"), SubResource("Answer_WET")])
+
+[sub_resource type="Resource" id="Result_0"]
+script = ExtResource("result")
+result_id = "TEMP_M4_RESULT_0"
+display_name = "[TEMP / NON-CANON] Evacuation observation 1"
+description = "Staff used the grounded bypass without handling or wetting pieces. No staff deaths or injuries were found in the inspected evacuation group. This is a local observation, not a facility-wide headcount."
+staff_deaths = 0
+staff_injuries = 0
+facility_damage = "No additional facility damage was found in the inspected bypass."
+additional_observation = "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+
+[sub_resource type="Resource" id="Combination_0"]
+script = ExtResource("combination")
+option_id = "TEMP_M4_COMBINATION_0"
+display_text = "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported.\n\nEvacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet.\n\nKeep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+result_id = "TEMP_M4_RESULT_0"
+answers = Dictionary[String, String]({"ROUTE": "TEMP_M4_ANSWER_GROUND", "CONTACT": "TEMP_M4_ANSWER_AVOID"})
+
+[sub_resource type="Resource" id="Research_RESULT_0"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_RESULT_0"
+source_kind = 7
+source_id = "TEMP_M4_RESULT_0"
+title = "[TEMP / NON-CANON] Evacuation observation 1"
+body_text = "Staff used the grounded bypass without handling or wetting pieces. No staff deaths or injuries were found in the inspected evacuation group. This is a local observation, not a facility-wide headcount."
+
+[sub_resource type="Resource" id="Result_1"]
+script = ExtResource("result")
+result_id = "TEMP_M4_RESULT_1"
+display_name = "[TEMP / NON-CANON] Evacuation observation 2"
+description = "Wetting detached more membrane along the bypass. One staff injury was confirmed during handling. No deaths were found among the checked evacuees; facility damage has not been checked."
+staff_deaths = 0
+staff_injuries = 1
+facility_damage = ""
+additional_observation = "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+
+[sub_resource type="Resource" id="Combination_1"]
+script = ExtResource("combination")
+option_id = "TEMP_M4_COMBINATION_1"
+display_text = "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported.\n\nEvacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet.\n\nWet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+result_id = "TEMP_M4_RESULT_1"
+answers = Dictionary[String, String]({"ROUTE": "TEMP_M4_ANSWER_GROUND", "CONTACT": "TEMP_M4_ANSWER_WET"})
+
+[sub_resource type="Resource" id="Research_RESULT_1"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_RESULT_1"
+source_kind = 7
+source_id = "TEMP_M4_RESULT_1"
+title = "[TEMP / NON-CANON] Evacuation observation 2"
+body_text = "Wetting detached more membrane along the bypass. One staff injury was confirmed during handling. No deaths were found among the checked evacuees; facility damage has not been checked."
+
+[sub_resource type="Resource" id="Result_2"]
+script = ExtResource("result")
+result_id = "TEMP_M4_RESULT_2"
+display_name = "[TEMP / NON-CANON] Evacuation observation 3"
+description = "Pieces followed synthetic coverings toward the ventilation outlet. Two staff injuries were confirmed. The death count has not been confirmed, even though staff avoided handling the membrane."
+staff_deaths = -1
+staff_injuries = 2
+facility_damage = "A ventilation outlet cover was damaged; the inspected extent is local."
+additional_observation = "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+
+[sub_resource type="Resource" id="Combination_2"]
+script = ExtResource("combination")
+option_id = "TEMP_M4_COMBINATION_2"
+display_text = "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported.\n\nEvacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet.\n\nKeep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+result_id = "TEMP_M4_RESULT_2"
+answers = Dictionary[String, String]({"ROUTE": "TEMP_M4_ANSWER_SHORT", "CONTACT": "TEMP_M4_ANSWER_AVOID"})
+
+[sub_resource type="Resource" id="Research_RESULT_2"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_RESULT_2"
+source_kind = 7
+source_id = "TEMP_M4_RESULT_2"
+title = "[TEMP / NON-CANON] Evacuation observation 3"
+body_text = "Pieces followed synthetic coverings toward the ventilation outlet. Two staff injuries were confirmed. The death count has not been confirmed, even though staff avoided handling the membrane."
+
+[sub_resource type="Resource" id="Result_3"]
+script = ExtResource("result")
+result_id = "TEMP_M4_RESULT_3"
+display_name = "[TEMP / NON-CANON] Evacuation observation 4"
+description = "Wetting and handling produced more detached pieces near the outlet. One staff death and three staff injuries were confirmed in the exposed passage. These authored TEMP counts do not establish total facility staffing."
+staff_deaths = 1
+staff_injuries = 3
+facility_damage = "The ventilation outlet cover was damaged and detached pieces spread into the adjacent supply passage."
+additional_observation = "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+
+[sub_resource type="Resource" id="Combination_3"]
+script = ExtResource("combination")
+option_id = "TEMP_M4_COMBINATION_3"
+display_text = "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported.\n\nEvacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet.\n\nWet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+result_id = "TEMP_M4_RESULT_3"
+answers = Dictionary[String, String]({"ROUTE": "TEMP_M4_ANSWER_SHORT", "CONTACT": "TEMP_M4_ANSWER_WET"})
+
+[sub_resource type="Resource" id="Research_RESULT_3"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_RESULT_3"
+source_kind = 7
+source_id = "TEMP_M4_RESULT_3"
+title = "[TEMP / NON-CANON] Evacuation observation 4"
+body_text = "Wetting and handling produced more detached pieces near the outlet. One staff death and three staff injuries were confirmed in the exposed passage. These authored TEMP counts do not establish total facility staffing."
+
+[sub_resource type="Resource" id="Research_ANSWER_GROUND"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ANSWER_GROUND"
+source_kind = 6
+source_id = "TEMP_M4_ANSWER_GROUND"
+title = "Use the grounded maintenance bypass."
+body_text = "Evacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet."
+
+[sub_resource type="Resource" id="Research_ANSWER_SHORT"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ANSWER_SHORT"
+source_kind = 6
+source_id = "TEMP_M4_ANSWER_SHORT"
+title = "Use the shorter synthetic-lined passage."
+body_text = "Evacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet."
+
+[sub_resource type="Resource" id="Research_ANSWER_AVOID"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ANSWER_AVOID"
+source_kind = 6
+source_id = "TEMP_M4_ANSWER_AVOID"
+title = "Avoid handling or wetting membrane pieces."
+body_text = "Keep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+
+[sub_resource type="Resource" id="Research_ANSWER_WET"]
+script = ExtResource("research")
+entry_id = "TEMP_M4_RESEARCH_ANSWER_WET"
+source_kind = 6
+source_id = "TEMP_M4_ANSWER_WET"
+title = "Wet and move obstructing membrane pieces by hand."
+body_text = "Wet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+
+[sub_resource type="Resource" id="Broadcast"]
+script = ExtResource("broadcast")
+broadcast_id = "TEMP_M4_BROADCAST_EVAC"
+display_name = "[TEMP / NON-CANON] Membrane escape / staff evacuation"
+prompt_text = "Select a route and contact precautions using the Profile and CCTV observations. Review the complete broadcast before transmission. Selection alone does not transmit an order."
+warning_text = "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported."
+questions = Array[ExtResource("question")]([SubResource("Question_ROUTE"),SubResource("Question_CONTACT")])
+outcomes = Array[ExtResource("combination")]([SubResource("Combination_0"), SubResource("Combination_1"), SubResource("Combination_2"), SubResource("Combination_3")])
+
+[resource]
+script = ExtResource("case")
+case_id = "TEMP_M4_CASE_01"
+display_name = "[TEMP / NON-CANON] Lamellar Sac"
+profile_data = SubResource("Profile")
+cctv_data = SubResource("CCTV")
+experiment_limit = 2
+available_experiments = Array[ExtResource("experiment")]([SubResource("Exp_GROUND"), SubResource("Exp_HUMID"), SubResource("Exp_WATER")])
+available_containment_rooms = Array[ExtResource("room")]([SubResource("Room_WARM"), SubResource("Room_CONDUCTIVE"), SubResource("Room_BATH")])
+containment_outcomes = Array[ExtResource("outcome")]([SubResource("Outcome_WARM"), SubResource("Outcome_CONDUCTIVE"), SubResource("Outcome_BATH")])
+incidents = Array[ExtResource("incident")]([SubResource("Incident")])
+emergency_broadcasts = Array[ExtResource("broadcast")]([SubResource("Broadcast")])
+incident_results = Array[ExtResource("result")]([SubResource("Result_0"), SubResource("Result_1"), SubResource("Result_2"), SubResource("Result_3")])
+research_entries = Array[ExtResource("research")]([SubResource("Research_PROFILE"), SubResource("Research_CCTV"), SubResource("Research_EXP_GROUND"), SubResource("Research_EXP_HUMID"), SubResource("Research_EXP_WATER"), SubResource("Research_ROOM_WARM"), SubResource("Research_ROOM_CONDUCTIVE"), SubResource("Research_ROOM_BATH"), SubResource("Research_INCIDENT"), SubResource("Research_BROADCAST"), SubResource("Research_RESULT_0"), SubResource("Research_RESULT_1"), SubResource("Research_RESULT_2"), SubResource("Research_RESULT_3"), SubResource("Research_ANSWER_GROUND"), SubResource("Research_ANSWER_SHORT"), SubResource("Research_ANSWER_AVOID"), SubResource("Research_ANSWER_WET")])

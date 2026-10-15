@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAP — 원본 / FACILITY CONTROL 구조 비교</title>
+<style>
+body{margin:24px;background:#19201d;color:#e4e8df;font:16px system-ui,sans-serif}h1{font-size:24px}p{line-height:1.6;max-width:1100px}label{display:inline-block;margin:8px 24px 20px 0}select{padding:9px;color:inherit;background:#424a43;border:1px solid #8c967f}main{display:grid;grid-template-columns:1fr 1fr;gap:16px}figure{margin:0}figcaption{margin-bottom:10px}img{display:block;width:100%;border:1px solid #69796b}a{color:#dfcd8e}@media(max-width:1000px){main{grid-template-columns:1fr}}
+</style>
+<h1>원본 / FACILITY CONTROL — 구조 비교</h1>
+<p>실제 Godot 실행에서 동일한 View 인스턴스와 게임 상태를 유지하며 배치만 전환한 캡처입니다. 확인 창은 취소 후 동일한 미확정 방송문으로 다시 열었습니다. 이미지 가공·합성 없이 저장했으며, 클릭하면 원래 크기로 볼 수 있습니다.</p>
+<label>화면 <select id="stage"><option value="profile">공통 Shell / Profile</option><option value="cctv">CCTV</option><option value="question_1">방송 질문 1</option><option value="question_2">방송 질문 2</option><option value="preview">방송문 검토</option><option value="confirm">전송 승인</option><option value="experiment">실험</option><option value="containment">격리</option><option value="accident_report">사고보고서</option><option value="resume">업무 복귀</option><option value="accident_archive">완료 사고 기록</option></select></label>
+<label>해상도 <select id="resolution"><option value="1280">1280 × 720</option><option value="1920">1920 × 1080</option></select></label>
+<main><figure><figcaption>기존 원본</figcaption><a id="oldLink"><img id="oldImage" alt="기존 원본 UI"></a></figure><figure><figcaption>FACILITY CONTROL — 구조 시안</figcaption><a id="newLink"><img id="newImage" alt="시설 제어 구조 시안"></a></figure></main>
+<p>새 시안: 가로 업무 Navigation + 하단 기록 도구, 영상 약 63%의 CCTV 작업 영역, 작성/검토/승인별 방송 구성을 확인하세요. 기본 F5 UI로 채택하지 않았습니다.</p>
+<p><a id="fx">CCTV 효과 켠 실제 캡처</a> · <a id="paper">긴 종이 문서 스크롤</a></p>
+<script>
+const stage=document.querySelector('#stage'),resolution=document.querySelector('#resolution');
+function render(){for(const [image,link,kind] of [['oldImage','oldLink','original'],['newImage','newLink','new']]){const file=`${stage.value}_${kind}_${resolution.value}.png`;document.getElementById(image).src=file;document.getElementById(link).href=file}document.querySelector('#fx').href=`cctv_fx_${resolution.value}.png`;document.querySelector('#paper').href=`profile_end_${resolution.value}.png`}
+stage.addEventListener('change',render);resolution.addEventListener('change',render);render();
+</script>
+</html>

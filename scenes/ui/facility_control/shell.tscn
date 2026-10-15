@@ -1,0 +1,74 @@
+[gd_scene format=3]
+
+[node name="FacilityControl" type="MarginContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="Console" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Identification" type="PanelContainer" parent="Console"]
+layout_mode = 2
+theme_type_variation = "ChassisPanel"
+
+[node name="Row" type="HBoxContainer" parent="Console/Identification"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="FacilitySlot" type="HBoxContainer" parent="Console/Identification/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(400,0)
+
+[node name="SubjectSlot" type="VBoxContainer" parent="Console/Identification/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ComparisonSlot" type="HBoxContainer" parent="Console/Identification/Row"]
+layout_mode = 2
+alignment = 2
+
+[node name="Navigation" type="HBoxContainer" parent="Console"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Alerts" type="PanelContainer" parent="Console"]
+layout_mode = 2
+visible = false
+theme_type_variation = "EmergencyPanel"
+
+[node name="AlertSlot" type="VBoxContainer" parent="Console/Alerts"]
+layout_mode = 2
+
+[node name="WorkSlot" type="MarginContainer" parent="Console"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Records" type="PanelContainer" parent="Console"]
+layout_mode = 2
+theme_type_variation = "ChassisPanel"
+
+[node name="Stack" type="VBoxContainer" parent="Console/Records"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Tools" type="HBoxContainer" parent="Console/Records/Stack"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CollectionSlot" type="HBoxContainer" parent="Console/Identification/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(180,0)
+
+[node name="StatusSlot" type="HBoxContainer" parent="Console"]
+layout_mode = 2

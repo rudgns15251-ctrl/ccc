@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/playtests/m4_playtest.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/main/m4_5_structural_comparison.gd" id="script"]
+
+[node name="FacilityControlComparison" instance=ExtResource("base")]
+script = ExtResource("script")
+structural_design = true

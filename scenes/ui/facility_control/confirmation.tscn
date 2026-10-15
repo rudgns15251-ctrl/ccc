@@ -1,0 +1,51 @@
+[gd_scene format=3]
+
+[node name="Authorization" type="VBoxContainer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleSlot" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Body" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Transcript" type="PanelContainer" parent="Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+theme_type_variation = "PaperDocumentPanel"
+
+[node name="MessageSlot" type="VBoxContainer" parent="Body/Transcript"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Approval" type="VBoxContainer" parent="Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+theme_override_constants/separation = 24
+
+[node name="Heading" type="Label" parent="Body/Approval"]
+layout_mode = 2
+text = "FINAL AUTHORIZATION"
+theme_type_variation = "HeadingLabel"
+
+[node name="NoticeSlot" type="VBoxContainer" parent="Body/Approval"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ActionSlot" type="VBoxContainer" parent="Body/Approval"]
+layout_mode = 2

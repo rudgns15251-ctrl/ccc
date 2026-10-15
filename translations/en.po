@@ -2407,3 +2407,72 @@ msgstr "Accident response report"
 
 msgid "Acknowledge this report to complete the response and resume work."
 msgstr "Acknowledge this report to complete the response and resume work."
+
+# M4.5 structural comparison presentation
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "OBSERVATION / VIDEO"
+msgstr "OBSERVATION / VIDEO"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "01 / INSTRUCTIONS"
+msgstr "01 / INSTRUCTIONS"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "02 / TRANSCRIPT REVIEW"
+msgstr "02 / TRANSCRIPT REVIEW"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "03 / AUTHORIZATION"
+msgstr "03 / AUTHORIZATION"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "TRANSMISSION TRANSCRIPT"
+msgstr "TRANSMISSION TRANSCRIPT"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "SELECTED INSTRUCTIONS"
+msgstr "SELECTED INSTRUCTIONS"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "FINAL AUTHORIZATION"
+msgstr "FINAL AUTHORIZATION"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "TRANSMISSION LOCKED"
+msgstr "TRANSMISSION LOCKED"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "REVIEW BEFORE TRANSMISSION"
+msgstr "REVIEW BEFORE TRANSMISSION"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "PREPARING INSTRUCTIONS"
+msgstr "PREPARING INSTRUCTIONS"
+
+#: scenes/ui/facility_control/ scripts/presentation/facility_control.gd
+msgid "No footage assigned\nTemporary observation area"
+msgstr "No footage assigned\nTemporary observation area"
+
+
+msgid "Collect record"
+msgstr "Collect record"
+
+msgid "Collected record"
+msgstr "Collected record"
+
+# M5-A temporary visual asset labels
+
+msgid "TEMP / REPLACEABLE — static reference; observations determine decisions."
+msgstr "TEMP / REPLACEABLE — static reference; observations determine decisions."
+
+msgid "TEMP / REPLACEABLE — visual stand-in, not the authored creature or evidence."
+msgstr "TEMP / REPLACEABLE — visual stand-in, not the authored creature or evidence."
+
+msgid "VISUAL TEST DOCUMENT / existing research rules unchanged"
+msgstr "VISUAL TEST DOCUMENT / existing research rules unchanged"
+
+msgid "Experiment-specific result image not supplied. Text is the execution record."
+msgstr "Experiment-specific result image not supplied. Text is the execution record."
+
+msgid "TEMP environment reference / shared illustration, not a candidate configuration."
+msgstr "TEMP environment reference / shared illustration, not a candidate configuration."

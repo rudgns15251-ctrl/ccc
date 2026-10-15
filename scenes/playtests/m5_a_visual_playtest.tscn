@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/playtests/m4_5_structural_comparison.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/main/m5_a_visual_playtest.gd" id="script"]
+[ext_resource type="Resource" path="res://resources/campaigns/temp_m5_a_visual_playtest.tres" id="campaign"]
+[ext_resource type="Texture2D" path="res://assets/temp/m5_a/environment/temp_environment_reference.png" id="environment"]
+
+[node name="M5AVisualPlaytest" instance=ExtResource("base")]
+script = ExtResource("script")
+campaign_data = ExtResource("campaign")
+environment_reference = ExtResource("environment")

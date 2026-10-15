@@ -1,0 +1,30 @@
+{
+  "1280": {
+    "failed": false,
+    "checks": 432,
+    "geometry": [
+      {
+        "id": "cctv",
+        "video": "[P: (42.0, 282.0), S: (1188.0, 537.0)]",
+        "video_ratio": 0.631914893617021,
+        "workspace": "[P: (20.0, 200.0), S: (1880.0, 735.0)]"
+      }
+    ]
+  },
+  "1920": {
+    "failed": false,
+    "checks": 432,
+    "geometry": [
+      {
+        "id": "cctv",
+        "video": "[P: (42.0, 282.0), S: (1188.0, 537.0)]",
+        "video_ratio": 0.631914893617021,
+        "workspace": "[P: (20.0, 200.0), S: (1880.0, 735.0)]"
+      }
+    ]
+  },
+  "headless": {
+    "failed": false,
+    "checks": 375
+  }
+}

@@ -1,0 +1,3848 @@
+{
+  "engine": "Godot 4.7.1.stable.official.a13da4feb",
+  "date": "2026-10-16",
+  "gpu": "AMD Radeon RX 6800 / OpenGL Compatibility",
+  "configured_f5_unchanged": true,
+  "public_smoke": {
+    "import": true,
+    "scripts_checked": 72,
+    "main_headless": true
+  },
+  "runs": {
+    "gpu_1280": {
+      "name": "gpu_1280",
+      "exit": 0,
+      "native": true,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 10.25
+    },
+    "gpu_1920": {
+      "name": "gpu_1920",
+      "exit": 0,
+      "native": true,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 11.172
+    },
+    "journey_headless": {
+      "name": "journey_headless",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 6.094
+    },
+    "original_m4_regression": {
+      "name": "original_m4_regression",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 15.266
+    },
+    "m3_save_compatibility": {
+      "name": "m3_save_compatibility",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 2.328
+    },
+    "original_m2_regression": {
+      "name": "original_m2_regression",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 16.812
+    },
+    "assets_and_stable_route": {
+      "name": "assets_and_stable_route",
+      "exit": 0,
+      "native": true,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 2.422
+    },
+    "public_import": {
+      "name": "public_import",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 5.25
+    },
+    "public_portable": {
+      "name": "public_portable",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 1.328
+    },
+    "check_final_presenter": {
+      "name": "check_final_presenter",
+      "exit": 0,
+      "native": false,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 0.375
+    },
+    "bounded_render_measurement": {
+      "name": "bounded_render_measurement",
+      "exit": 0,
+      "native": true,
+      "warnings": 0,
+      "errors": 0,
+      "parse_errors": 0,
+      "script_errors": 0,
+      "seconds": 9.875
+    }
+  },
+  "gpu_1280": {
+    "checks": 448,
+    "failed": false,
+    "geometry": [
+      {
+        "id": "cctv",
+        "video": "[P: (42.0, 282.0), S: (1188.0, 498.0)]",
+        "video_ratio": 0.631914893617021,
+        "workspace": "[P: (20.0, 200.0), S: (1880.0, 735.0)]"
+      }
+    ],
+    "pictures": [
+      "profile_new_1280.png",
+      "profile_original_1280.png",
+      "profile_end_1280.png",
+      "cctv_new_1280.png",
+      "cctv_original_1280.png",
+      "cctv_fx_1280.png",
+      "experiment_new_1280.png",
+      "experiment_original_1280.png",
+      "containment_new_1280.png",
+      "containment_original_1280.png",
+      "environment_notice_1280.png",
+      "incident_new_1280.png",
+      "incident_original_1280.png",
+      "question_1_new_1280.png",
+      "question_1_original_1280.png",
+      "question_2_new_1280.png",
+      "question_2_original_1280.png",
+      "preview_new_1280.png",
+      "preview_original_1280.png",
+      "confirm_new_1280.png",
+      "confirm_original_1280.png",
+      "accident_report_new_1280.png",
+      "accident_report_original_1280.png",
+      "resume_new_1280.png",
+      "resume_original_1280.png",
+      "accident_archive_new_1280.png",
+      "accident_archive_original_1280.png"
+    ],
+    "rows": [
+      {
+        "id": "structural_entry_real_m4",
+        "passed": true
+      },
+      {
+        "id": "profile_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "profile_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_new",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_profile",
+        "passed": true
+      },
+      {
+        "id": "long_paper_scroll",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_end",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "cctv_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "cctv_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "video_dominant",
+        "passed": true
+      },
+      {
+        "id": "observations_outside_fx",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_new",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_cctv",
+        "passed": true
+      },
+      {
+        "id": "fx_feed_only",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_fx",
+        "passed": true
+      },
+      {
+        "id": "canonical_focus_path",
+        "passed": true
+      },
+      {
+        "id": "work_snapshot_valid",
+        "passed": true
+      },
+      {
+        "id": "research_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "archive_exact_view",
+        "passed": true
+      },
+      {
+        "id": "navigation_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "experiment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "experiment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_experiment_new",
+        "passed": true
+      },
+      {
+        "id": "capture_experiment_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_experiment",
+        "passed": true
+      },
+      {
+        "id": "containment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "containment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_containment_new",
+        "passed": true
+      },
+      {
+        "id": "capture_containment_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_containment",
+        "passed": true
+      },
+      {
+        "id": "save_contract",
+        "passed": true
+      },
+      {
+        "id": "save_real",
+        "passed": true
+      },
+      {
+        "id": "load_confirmation",
+        "passed": true
+      },
+      {
+        "id": "save_load_equal",
+        "passed": true
+      },
+      {
+        "id": "load_actually_replaced_runtime",
+        "passed": true
+      },
+      {
+        "id": "capture_environment_notice",
+        "passed": true
+      },
+      {
+        "id": "incident_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "incident_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "incident_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_incident_new",
+        "passed": true
+      },
+      {
+        "id": "capture_incident_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_incident",
+        "passed": true
+      },
+      {
+        "id": "natural_major_source",
+        "passed": true
+      },
+      {
+        "id": "active_cannot_save",
+        "passed": true
+      },
+      {
+        "id": "unanswered_blocked",
+        "passed": true
+      },
+      {
+        "id": "initial_keyboard_focus",
+        "passed": true
+      },
+      {
+        "id": "keyboard_answer",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "question_1_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "capture_question_1_new",
+        "passed": true
+      },
+      {
+        "id": "capture_question_1_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_1",
+        "passed": true
+      },
+      {
+        "id": "draft_no_commit",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "question_order",
+        "passed": true
+      },
+      {
+        "id": "question_2_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_AVOID",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_WET",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_PreviousQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "capture_question_2_new",
+        "passed": true
+      },
+      {
+        "id": "capture_question_2_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_2",
+        "passed": true
+      },
+      {
+        "id": "previous_retains_answer",
+        "passed": true
+      },
+      {
+        "id": "preview_real_prose",
+        "passed": true
+      },
+      {
+        "id": "preview_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "preview_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "preview_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "preview_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "capture_preview_new",
+        "passed": true
+      },
+      {
+        "id": "capture_preview_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_preview",
+        "passed": true
+      },
+      {
+        "id": "long_broadcast_keyboard_scroll",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "modal_no_commit",
+        "passed": true
+      },
+      {
+        "id": "confirm_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "capture_confirm_new",
+        "passed": true
+      },
+      {
+        "id": "capture_confirm_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_confirm",
+        "passed": true
+      },
+      {
+        "id": "modal_cancel_preserves",
+        "passed": true
+      },
+      {
+        "id": "active_after_transmission",
+        "passed": true
+      },
+      {
+        "id": "canonical_answers_and_consequences",
+        "passed": true
+      },
+      {
+        "id": "transmission_locked",
+        "passed": true
+      },
+      {
+        "id": "not_archived_until_ack",
+        "passed": true
+      },
+      {
+        "id": "duplicate_or_legacy_bypass_blocked",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "transmission_roundtrip_locked",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "result_active_and_authored",
+        "passed": true
+      },
+      {
+        "id": "report_consequences",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_before_ack",
+        "passed": true
+      },
+      {
+        "id": "accident_report_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_report_new",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_report_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_report",
+        "passed": true
+      },
+      {
+        "id": "exact_work_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_once",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_after_ack",
+        "passed": true
+      },
+      {
+        "id": "resume_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resume_action_Select",
+        "passed": true
+      },
+      {
+        "id": "resume_action_RecheckCCTVButton",
+        "passed": true
+      },
+      {
+        "id": "resume_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_resume_new",
+        "passed": true
+      },
+      {
+        "id": "capture_resume_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_list",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_content",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_ResearchTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_StoryTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_AccidentTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_@Button@369",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_archive_new",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_archive_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_archive",
+        "passed": true
+      },
+      {
+        "id": "archive_tabs_exclusive",
+        "passed": true
+      },
+      {
+        "id": "research_separate",
+        "passed": true
+      },
+      {
+        "id": "archive_pure",
+        "passed": true
+      },
+      {
+        "id": "m4_full_path",
+        "passed": true
+      },
+      {
+        "id": "completed_payload_valid",
+        "passed": true
+      },
+      {
+        "id": "tampered_answers",
+        "passed": true
+      },
+      {
+        "id": "tampered_deaths",
+        "passed": true
+      },
+      {
+        "id": "tampered_source",
+        "passed": true
+      },
+      {
+        "id": "tampered_result",
+        "passed": true
+      },
+      {
+        "id": "tampered_text",
+        "passed": true
+      },
+      {
+        "id": "tampered_sequence",
+        "passed": true
+      },
+      {
+        "id": "tampered_active",
+        "passed": true
+      },
+      {
+        "id": "tampered_research",
+        "passed": true
+      },
+      {
+        "id": "tampered_combination",
+        "passed": true
+      },
+      {
+        "id": "stable_save",
+        "passed": true
+      }
+    ]
+  },
+  "gpu_1920": {
+    "checks": 448,
+    "failed": false,
+    "geometry": [
+      {
+        "id": "cctv",
+        "video": "[P: (42.0, 282.0), S: (1188.0, 498.0)]",
+        "video_ratio": 0.631914893617021,
+        "workspace": "[P: (20.0, 200.0), S: (1880.0, 735.0)]"
+      }
+    ],
+    "pictures": [
+      "profile_new_1920.png",
+      "profile_original_1920.png",
+      "profile_end_1920.png",
+      "cctv_new_1920.png",
+      "cctv_original_1920.png",
+      "cctv_fx_1920.png",
+      "experiment_new_1920.png",
+      "experiment_original_1920.png",
+      "containment_new_1920.png",
+      "containment_original_1920.png",
+      "environment_notice_1920.png",
+      "incident_new_1920.png",
+      "incident_original_1920.png",
+      "question_1_new_1920.png",
+      "question_1_original_1920.png",
+      "question_2_new_1920.png",
+      "question_2_original_1920.png",
+      "preview_new_1920.png",
+      "preview_original_1920.png",
+      "confirm_new_1920.png",
+      "confirm_original_1920.png",
+      "accident_report_new_1920.png",
+      "accident_report_original_1920.png",
+      "resume_new_1920.png",
+      "resume_original_1920.png",
+      "accident_archive_new_1920.png",
+      "accident_archive_original_1920.png"
+    ],
+    "rows": [
+      {
+        "id": "structural_entry_real_m4",
+        "passed": true
+      },
+      {
+        "id": "profile_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "profile_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_new",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_profile",
+        "passed": true
+      },
+      {
+        "id": "long_paper_scroll",
+        "passed": true
+      },
+      {
+        "id": "capture_profile_end",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1280_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resize_1920_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "cctv_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "cctv_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "video_dominant",
+        "passed": true
+      },
+      {
+        "id": "observations_outside_fx",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_new",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_cctv",
+        "passed": true
+      },
+      {
+        "id": "fx_feed_only",
+        "passed": true
+      },
+      {
+        "id": "capture_cctv_fx",
+        "passed": true
+      },
+      {
+        "id": "canonical_focus_path",
+        "passed": true
+      },
+      {
+        "id": "work_snapshot_valid",
+        "passed": true
+      },
+      {
+        "id": "research_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "archive_exact_view",
+        "passed": true
+      },
+      {
+        "id": "navigation_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "experiment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "experiment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_experiment_new",
+        "passed": true
+      },
+      {
+        "id": "capture_experiment_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_experiment",
+        "passed": true
+      },
+      {
+        "id": "containment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "containment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_containment_new",
+        "passed": true
+      },
+      {
+        "id": "capture_containment_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_containment",
+        "passed": true
+      },
+      {
+        "id": "save_contract",
+        "passed": true
+      },
+      {
+        "id": "save_real",
+        "passed": true
+      },
+      {
+        "id": "load_confirmation",
+        "passed": true
+      },
+      {
+        "id": "save_load_equal",
+        "passed": true
+      },
+      {
+        "id": "load_actually_replaced_runtime",
+        "passed": true
+      },
+      {
+        "id": "capture_environment_notice",
+        "passed": true
+      },
+      {
+        "id": "incident_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "incident_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "incident_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_incident_new",
+        "passed": true
+      },
+      {
+        "id": "capture_incident_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_incident",
+        "passed": true
+      },
+      {
+        "id": "natural_major_source",
+        "passed": true
+      },
+      {
+        "id": "active_cannot_save",
+        "passed": true
+      },
+      {
+        "id": "unanswered_blocked",
+        "passed": true
+      },
+      {
+        "id": "initial_keyboard_focus",
+        "passed": true
+      },
+      {
+        "id": "keyboard_answer",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "question_1_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "capture_question_1_new",
+        "passed": true
+      },
+      {
+        "id": "capture_question_1_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_1",
+        "passed": true
+      },
+      {
+        "id": "draft_no_commit",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "question_order",
+        "passed": true
+      },
+      {
+        "id": "question_2_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_AVOID",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_WET",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_PreviousQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "capture_question_2_new",
+        "passed": true
+      },
+      {
+        "id": "capture_question_2_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_2",
+        "passed": true
+      },
+      {
+        "id": "previous_retains_answer",
+        "passed": true
+      },
+      {
+        "id": "preview_real_prose",
+        "passed": true
+      },
+      {
+        "id": "preview_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "preview_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "preview_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "preview_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "capture_preview_new",
+        "passed": true
+      },
+      {
+        "id": "capture_preview_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_preview",
+        "passed": true
+      },
+      {
+        "id": "long_broadcast_keyboard_scroll",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "modal_no_commit",
+        "passed": true
+      },
+      {
+        "id": "confirm_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "capture_confirm_new",
+        "passed": true
+      },
+      {
+        "id": "capture_confirm_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_confirm",
+        "passed": true
+      },
+      {
+        "id": "modal_cancel_preserves",
+        "passed": true
+      },
+      {
+        "id": "active_after_transmission",
+        "passed": true
+      },
+      {
+        "id": "canonical_answers_and_consequences",
+        "passed": true
+      },
+      {
+        "id": "transmission_locked",
+        "passed": true
+      },
+      {
+        "id": "not_archived_until_ack",
+        "passed": true
+      },
+      {
+        "id": "duplicate_or_legacy_bypass_blocked",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "transmission_roundtrip_locked",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "result_active_and_authored",
+        "passed": true
+      },
+      {
+        "id": "report_consequences",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_before_ack",
+        "passed": true
+      },
+      {
+        "id": "accident_report_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_report_new",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_report_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_report",
+        "passed": true
+      },
+      {
+        "id": "exact_work_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_once",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_after_ack",
+        "passed": true
+      },
+      {
+        "id": "resume_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resume_action_Select",
+        "passed": true
+      },
+      {
+        "id": "resume_action_RecheckCCTVButton",
+        "passed": true
+      },
+      {
+        "id": "resume_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_resume_new",
+        "passed": true
+      },
+      {
+        "id": "capture_resume_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_list",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_content",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_ResearchTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_StoryTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_AccidentTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_@Button@369",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_archive_new",
+        "passed": true
+      },
+      {
+        "id": "capture_accident_archive_original",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_archive",
+        "passed": true
+      },
+      {
+        "id": "archive_tabs_exclusive",
+        "passed": true
+      },
+      {
+        "id": "research_separate",
+        "passed": true
+      },
+      {
+        "id": "archive_pure",
+        "passed": true
+      },
+      {
+        "id": "m4_full_path",
+        "passed": true
+      },
+      {
+        "id": "completed_payload_valid",
+        "passed": true
+      },
+      {
+        "id": "tampered_answers",
+        "passed": true
+      },
+      {
+        "id": "tampered_deaths",
+        "passed": true
+      },
+      {
+        "id": "tampered_source",
+        "passed": true
+      },
+      {
+        "id": "tampered_result",
+        "passed": true
+      },
+      {
+        "id": "tampered_text",
+        "passed": true
+      },
+      {
+        "id": "tampered_sequence",
+        "passed": true
+      },
+      {
+        "id": "tampered_active",
+        "passed": true
+      },
+      {
+        "id": "tampered_research",
+        "passed": true
+      },
+      {
+        "id": "tampered_combination",
+        "passed": true
+      },
+      {
+        "id": "stable_save",
+        "passed": true
+      }
+    ]
+  },
+  "headless": {
+    "checks": 388,
+    "failed": false,
+    "geometry": [
+      {
+        "id": "cctv",
+        "video": "[P: (42.0, 282.0), S: (1188.0, 498.0)]",
+        "video_ratio": 0.631914893617021,
+        "workspace": "[P: (20.0, 200.0), S: (1880.0, 735.0)]"
+      }
+    ],
+    "pictures": [],
+    "rows": [
+      {
+        "id": "structural_entry_real_m4",
+        "passed": true
+      },
+      {
+        "id": "profile_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "profile_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "profile_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_profile",
+        "passed": true
+      },
+      {
+        "id": "long_paper_scroll",
+        "passed": true
+      },
+      {
+        "id": "cctv_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "cctv_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "cctv_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "video_dominant",
+        "passed": true
+      },
+      {
+        "id": "observations_outside_fx",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_cctv",
+        "passed": true
+      },
+      {
+        "id": "fx_feed_only",
+        "passed": true
+      },
+      {
+        "id": "canonical_focus_path",
+        "passed": true
+      },
+      {
+        "id": "work_snapshot_valid",
+        "passed": true
+      },
+      {
+        "id": "research_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "archive_exact_view",
+        "passed": true
+      },
+      {
+        "id": "navigation_focus_restore",
+        "passed": true
+      },
+      {
+        "id": "experiment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "experiment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "experiment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_experiment",
+        "passed": true
+      },
+      {
+        "id": "containment_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "containment_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "containment_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_containment",
+        "passed": true
+      },
+      {
+        "id": "save_contract",
+        "passed": true
+      },
+      {
+        "id": "save_real",
+        "passed": true
+      },
+      {
+        "id": "load_confirmation",
+        "passed": true
+      },
+      {
+        "id": "save_load_equal",
+        "passed": true
+      },
+      {
+        "id": "load_actually_replaced_runtime",
+        "passed": true
+      },
+      {
+        "id": "incident_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "incident_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "incident_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "incident_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_incident",
+        "passed": true
+      },
+      {
+        "id": "natural_major_source",
+        "passed": true
+      },
+      {
+        "id": "active_cannot_save",
+        "passed": true
+      },
+      {
+        "id": "unanswered_blocked",
+        "passed": true
+      },
+      {
+        "id": "initial_keyboard_focus",
+        "passed": true
+      },
+      {
+        "id": "keyboard_answer",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "m4_broadcast_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "question_1_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_1_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_GROUND",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_TEMP_M4_ANSWER_SHORT",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_NextQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_1_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_1",
+        "passed": true
+      },
+      {
+        "id": "draft_no_commit",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "question_order",
+        "passed": true
+      },
+      {
+        "id": "question_2_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "question_2_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_AVOID",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_TEMP_M4_ANSWER_WET",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_PreviousQuestion",
+        "passed": true
+      },
+      {
+        "id": "question_2_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_question_2",
+        "passed": true
+      },
+      {
+        "id": "previous_retains_answer",
+        "passed": true
+      },
+      {
+        "id": "preview_real_prose",
+        "passed": true
+      },
+      {
+        "id": "preview_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "preview_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "preview_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "preview_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "preview_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_preview",
+        "passed": true
+      },
+      {
+        "id": "long_broadcast_keyboard_scroll",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "modal_no_commit",
+        "passed": true
+      },
+      {
+        "id": "confirm_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "confirm_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_EditBroadcast",
+        "passed": true
+      },
+      {
+        "id": "confirm_action_ConfirmButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_confirm",
+        "passed": true
+      },
+      {
+        "id": "modal_cancel_preserves",
+        "passed": true
+      },
+      {
+        "id": "active_after_transmission",
+        "passed": true
+      },
+      {
+        "id": "canonical_answers_and_consequences",
+        "passed": true
+      },
+      {
+        "id": "transmission_locked",
+        "passed": true
+      },
+      {
+        "id": "not_archived_until_ack",
+        "passed": true
+      },
+      {
+        "id": "duplicate_or_legacy_bypass_blocked",
+        "passed": true
+      },
+      {
+        "id": "active_report_tab_blocked",
+        "passed": true
+      },
+      {
+        "id": "draft_source_roundtrip",
+        "passed": true
+      },
+      {
+        "id": "transmission_roundtrip_locked",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_transmitted_answer_discovered",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "no_premature_result",
+        "passed": true
+      },
+      {
+        "id": "result_active_and_authored",
+        "passed": true
+      },
+      {
+        "id": "report_consequences",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "only_presented_result_discovered",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_before_ack",
+        "passed": true
+      },
+      {
+        "id": "accident_report_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_report_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_OpenResearchLogButton",
+        "passed": true
+      },
+      {
+        "id": "accident_report_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_report",
+        "passed": true
+      },
+      {
+        "id": "exact_work_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_once",
+        "passed": true
+      },
+      {
+        "id": "failure_retained_after_ack",
+        "passed": true
+      },
+      {
+        "id": "resume_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "resume_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "resume_action_Select",
+        "passed": true
+      },
+      {
+        "id": "resume_action_RecheckCCTVButton",
+        "passed": true
+      },
+      {
+        "id": "resume_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_resume",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_list",
+        "passed": true
+      },
+      {
+        "id": "completed_archive_content",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_single_workspace",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_PROFILE",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CCTV",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_EXPERIMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_CONTAINMENT",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Research",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Archive",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Hypothesis",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Save",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_shell_Load",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_ResearchTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_StoryTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_AccidentTab",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_@Button@369",
+        "passed": true
+      },
+      {
+        "id": "accident_archive_action_NextButton",
+        "passed": true
+      },
+      {
+        "id": "comparison_same_owners_accident_archive",
+        "passed": true
+      },
+      {
+        "id": "archive_tabs_exclusive",
+        "passed": true
+      },
+      {
+        "id": "research_separate",
+        "passed": true
+      },
+      {
+        "id": "archive_pure",
+        "passed": true
+      },
+      {
+        "id": "m4_full_path",
+        "passed": true
+      },
+      {
+        "id": "completed_payload_valid",
+        "passed": true
+      },
+      {
+        "id": "tampered_answers",
+        "passed": true
+      },
+      {
+        "id": "tampered_deaths",
+        "passed": true
+      },
+      {
+        "id": "tampered_source",
+        "passed": true
+      },
+      {
+        "id": "tampered_result",
+        "passed": true
+      },
+      {
+        "id": "tampered_text",
+        "passed": true
+      },
+      {
+        "id": "tampered_sequence",
+        "passed": true
+      },
+      {
+        "id": "tampered_active",
+        "passed": true
+      },
+      {
+        "id": "tampered_research",
+        "passed": true
+      },
+      {
+        "id": "tampered_combination",
+        "passed": true
+      },
+      {
+        "id": "stable_save",
+        "passed": true
+      }
+    ]
+  },
+  "render_measurements": [
+    {
+      "dimension": 1280,
+      "draw_calls": 37.0,
+      "frame_median_ms": 6.932,
+      "frame_p95_ms": 7.411,
+      "measured_viewports": 1,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 0,
+      "video_memory_bytes": 34287168.0,
+      "viewport_cpu_median_ms": 0.10900000077486,
+      "viewport_gpu_median_ms": 0.0750000029802322
+    },
+    {
+      "dimension": 1280,
+      "draw_calls": 149.0,
+      "frame_median_ms": 6.957,
+      "frame_p95_ms": 7.406,
+      "measured_viewports": 1,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 1,
+      "video_memory_bytes": 34336376.0,
+      "viewport_cpu_median_ms": 0.17599999499321,
+      "viewport_gpu_median_ms": 0.0850000008940697
+    },
+    {
+      "dimension": 1280,
+      "draw_calls": 152.0,
+      "frame_median_ms": 6.947,
+      "frame_p95_ms": 7.402,
+      "measured_viewports": 2,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 2,
+      "video_memory_bytes": 38645944.0,
+      "viewport_cpu_median_ms": 0.217999998152256,
+      "viewport_gpu_median_ms": 0.393000014126301
+    },
+    {
+      "dimension": 1920,
+      "draw_calls": 224.0,
+      "frame_median_ms": 6.967,
+      "frame_p95_ms": 7.332,
+      "measured_viewports": 1,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 0,
+      "video_memory_bytes": 44245904.0,
+      "viewport_cpu_median_ms": 0.236999999403954,
+      "viewport_gpu_median_ms": 0.291000008583069
+    },
+    {
+      "dimension": 1920,
+      "draw_calls": 224.0,
+      "frame_median_ms": 6.954,
+      "frame_p95_ms": 7.306,
+      "measured_viewports": 1,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 1,
+      "video_memory_bytes": 44295112.0,
+      "viewport_cpu_median_ms": 0.246000000715256,
+      "viewport_gpu_median_ms": 0.317999988794327
+    },
+    {
+      "dimension": 1920,
+      "draw_calls": 227.0,
+      "frame_median_ms": 6.958,
+      "frame_p95_ms": 7.263,
+      "measured_viewports": 2,
+      "sample_frames": 150,
+      "stage": "cctv",
+      "variant": 2,
+      "video_memory_bytes": 48604680.0,
+      "viewport_cpu_median_ms": 0.269999997198582,
+      "viewport_gpu_median_ms": 0.452000003308058
+    }
+  ],
+  "screenshots": {
+    "accident_archive_new_1280.png": "d93f996bd7ccdb5c8c63a0a478ae12178f9ae369b56fcd9d28b3f304c1403d27",
+    "accident_archive_new_1920.png": "ea6c680cbeee684f2d88be1c00f415e0c6d6c916ce1fb50b3fe264e7dd1e8d61",
+    "accident_archive_original_1280.png": "4e54055371c6d4be32abc74ec26fc18faf7137126230713089737f6668cc0941",
+    "accident_archive_original_1920.png": "0c530b0352ecfc495d1a3e672e151d922205f697b809ec02169bbffc8cb7555d",
+    "accident_report_new_1280.png": "436ee634f720ad5012a6178c1e9e812a4ba25d34de21bbcd08397556a69a77c5",
+    "accident_report_new_1920.png": "c89fc1d32e0d12072173e9b2ecb1a680a5bd18a486d00aeceb3cfa8d21ec5007",
+    "accident_report_original_1280.png": "bfdbca15f6a1df98f366e85b3e069497aac524665edd69a8a033c2b47a12641e",
+    "accident_report_original_1920.png": "488d143668c9d4d5f488624dde4e84866b9c136059e05dc6e2ad5172208d91ed",
+    "cctv_fx_1280.png": "160e473833744f13f8e6574f18ae35593a33a0f27670e67f3ff8b2115a71ba6d",
+    "cctv_fx_1920.png": "2d9d199500371ff0608fd9afa8e045e857a77429a11d428c656b9fd8af2658e1",
+    "cctv_new_1280.png": "70016d75625d50b1c4c3d70dc0aefbed16004e15f3d851c52af1e573de01b20d",
+    "cctv_new_1920.png": "9bf386f9abb8eb454f6b5f86e1d9393ae8874dcd292d643b5f9697fa60ab3933",
+    "cctv_original_1280.png": "3e260706d05eceff698930ea533938d47db3e115e532d301e2b77e8e221a9dcf",
+    "cctv_original_1920.png": "14221ac6797d3a71bcfbbce48966a9b6382e0fed13d577fddab7ed4af184e043",
+    "confirm_new_1280.png": "c6b9b2d66288059dc35a82faab4d2e40b1bf18d6a82a89c3a8b72142ada2e524",
+    "confirm_new_1920.png": "635beac20c7df6ca7234232789242317412dc4b6a16eb473169550ef1d3494d4",
+    "confirm_original_1280.png": "19ddacd2715f7bf450062c0ca92e20cc552527a7736884b2e725f29e671f234a",
+    "confirm_original_1920.png": "6d6cdaed6503e2d2bbf6bbdfe54ae9c8b676870e50b6826b78616dba8f098df9",
+    "containment_new_1280.png": "72d68b35993e73a3a08f002940aea33eca149336fd3538952e9578d7c0a4d63a",
+    "containment_new_1920.png": "a82947fcdca6e85cf0722b3c9a7e6fdc97f1eedfd37d473d9ad4b52eed1ff1c9",
+    "containment_original_1280.png": "60dc382d8f61a75569c5154640b272e9053a1c7406f76f88cfcb6d15cafd6abb",
+    "containment_original_1920.png": "463b9a27826f43257d73d8e5dafe279d40ca913b51d674ed2fc7663299c0efa8",
+    "environment_notice_1280.png": "5c3c0b31856f6dbc5a363a8c20ffd41941c749ff4b31d3c164dde66944df2889",
+    "environment_notice_1920.png": "30eec1b457a28d698b097e46426803b9282d55b0d2ff066ad7ff516cf40964cc",
+    "experiment_new_1280.png": "cd2d47713a4f3bb9e17b03dd1dd2b85fafb238bce45636851d08a73f1ad0ea53",
+    "experiment_new_1920.png": "57e1554b5f3f622dcffb2d95b2ff8fd43d443ddb6a6d91137ca5289c6cebc1dd",
+    "experiment_original_1280.png": "5328fd7d46bfb2e14924c758c020c80371a2cf9a16c89985a64baaa486a3f22c",
+    "experiment_original_1920.png": "7ce6f98948cdf9f332d905696856a30916996302ea66d5d85742e8fb9ceb0e5a",
+    "experiment_selected_new_1280.png": "24042a7ce6be8fe7154a1c23b4bba521c8c64a6acd8ddf3848c3b39ac9456f8d",
+    "experiment_selected_original_1280.png": "642556a2006a66abe1ef4f1ef8120c1503a57531efb4760d64015d920adbd029",
+    "incident_new_1280.png": "62c5a630030c731ed84699d09d4fdd95aca0f0b00d63d5abe77d1df318c37afc",
+    "incident_new_1920.png": "bcfc17e59188c251b9fc268047d4bd6da51bc59170b38307ec0312c568c29ebb",
+    "incident_original_1280.png": "b6af0405a1b8691dc79030bfb729551f84695cfda3472038efa1ff90c0d47337",
+    "incident_original_1920.png": "4f4e1875bd7e8c97450dc19afe753009281f089a0835f29c477f20b2723f30d7",
+    "preview_new_1280.png": "a37b88f272a61aaf09e96308c98adea1a8bc902397c638616974dc7498188f45",
+    "preview_new_1920.png": "19e5f0812c192f3768d6996b388435fea6ed458ec2af9ff4b1bfa233e2ec7484",
+    "preview_original_1280.png": "3684c7e857c6d393b933b472a07f73f2c0f3374752a8471a221b80a3585e969a",
+    "preview_original_1920.png": "1d273e9faab405b3368c98182da955782dc3bce9f56d4eba7b9c40ea16756966",
+    "profile_end_1280.png": "8ef1e02421569431ef9b29c2032c8b8ed234ea352fa14cf1d342fccf7852c66d",
+    "profile_end_1920.png": "e52b94f212c682d05e773ded65f956170951046c3a055007bf6f5b821b11392e",
+    "profile_new_1280.png": "6e8cc44ae3c8c06b0b242a47bfed493d73eea04f05fbdfa18a9241684ded1e94",
+    "profile_new_1920.png": "59bab8af476ace62a865296db5b9813adbd4194cdf31f605bbd1ebd23ab485ac",
+    "profile_original_1280.png": "91fa6bb77602b175f6121751e8b17957eacfea85b1704efcd12f7a49709e85bc",
+    "profile_original_1920.png": "a4e8c7e478687e5343a15913f4b28e66b529a0a1e1f7ca1a7e03d4707843c4e5",
+    "question_1_new_1280.png": "ad0e467854743fd6723eecb042a283955ccdbfc20f7cc3f348e1694ce87dbf59",
+    "question_1_new_1920.png": "f12fff4de57fd50daab802ab6737edf752bdc3bc9c8d147210db82bb39c7a48f",
+    "question_1_original_1280.png": "39f9460bb05be382fcff6823711704fa8b594d7f027d3c42a16e89afb96e4ecf",
+    "question_1_original_1920.png": "4e13666255af1e1ebf33d5df05f04e50252030c0c8d8615aa6dcfff2211f2e63",
+    "question_2_new_1280.png": "90be53ef5812501687fbe8198bd2ce00e154e24df4f4f3ce8425d6f46cfcea13",
+    "question_2_new_1920.png": "fd5d807b95ddbb0d25dcec95e4905796642b178496342c75c2ee257dfdcacb71",
+    "question_2_original_1280.png": "d05bd2a4b471dd929b3b3224db86b5c18fd2a6f9920777cb5b140500318fc187",
+    "question_2_original_1920.png": "39ce326eb6ee64bfdfe7d8bf3bd184b2e1193ae79fd6a4cc63c7af9f2acce7f0",
+    "resume_new_1280.png": "110f4cd08715fef906f7c068c75debd710caa159e83259a2e661dd9e62aed538",
+    "resume_new_1920.png": "d3bb01b1edbd6af4338800e0dc6f0567d750ae25068706db6bf5e0e804724674",
+    "resume_original_1280.png": "cd6a45d92f95163df378f9ee684d6827bf5b688cbc28c713b7e90b6c9bfebb83",
+    "resume_original_1920.png": "9672f519abd720a608d8ec820b457d071c436e85004d1e21f0d88ce1b8ec553c"
+  },
+  "limitations": [
+    "Static visual stand-ins differ from the authored creature; gameplay evidence is textual.",
+    "Experiment/incident/disturbance/thermal art not supplied.",
+    "No human listening or long-duration user evaluation.",
+    "Local scripted input fixtures are not distributed as product gameplay."
+  ]
+}
