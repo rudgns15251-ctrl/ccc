@@ -1,0 +1,264 @@
+{
+  "retrieved": "2026-10-15",
+  "original_downloads": [
+    {
+      "id": "sfx",
+      "source": "https://heyheythere.itch.io/analog-horror-sfx-free",
+      "filename": "analog-horror-sfx-free-assets.zip",
+      "bytes": 13841469,
+      "sha256": "0d4320f575f207d503bc1170014f06ec831725c4df1d9345bb3722c6a5903773",
+      "upload_id": "19525562",
+      "downloaded": true
+    },
+    {
+      "id": "retro",
+      "source": "https://inkharbor.itch.io/retro-screen-fx-lite",
+      "filename": "retro-screen-fx-lite.zip",
+      "bytes": 30939,
+      "sha256": "6d120f67bdb4288a9971b2644d6947653aaee63e3c2d959b36db70b71b88ded9",
+      "upload_id": "19667038",
+      "downloaded": true
+    },
+    {
+      "id": "mause",
+      "source": "https://bokx.itch.io/mause-os-minimalist-ui-theme-for-godot",
+      "filename": "Sifi Minimalist Theme.tres",
+      "bytes": 6559022,
+      "sha256": "f0ce689c1b6f3cfe7c6b7701ba7e2fe0e6a384d915317e1ecd96cd12feb3b370",
+      "upload_id": "19276665",
+      "downloaded": true
+    },
+    {
+      "id": "vhs",
+      "source": "https://heyheythere.itch.io/vhs-ui-free",
+      "filename": "vhs-ui-free-assets.zip",
+      "bytes": 325275,
+      "sha256": "133dcf5aa25a33c5546b7047de7598a116b5ccd51a54da635dead9375c7abe59",
+      "downloaded": true
+    }
+  ],
+  "public_files": [
+    {
+      "path": "assets/third_party/m4_5/analog_horror_sfx_free/alert_beeps.ogg",
+      "bytes": 15364,
+      "sha256": "1155d3fcc6269d1efe4aacfa9eb6f312a72297591eece95764f586ae565101d1"
+    },
+    {
+      "path": "assets/third_party/m4_5/analog_horror_sfx_free/channel_change_01.ogg",
+      "bytes": 12152,
+      "sha256": "9e90f8128e7572cf0201220baf684c4dc070eea03482ff3c4520d6ffb0a5ba07"
+    },
+    {
+      "path": "assets/third_party/m4_5/analog_horror_sfx_free/LICENSE.txt",
+      "bytes": 19320,
+      "sha256": "adb92a8f1dea7b276d54bbe9a1846bd16f9a31f55214aea3923d62ca50999609"
+    },
+    {
+      "path": "assets/third_party/m4_5/analog_horror_sfx_free/vhs_play.ogg",
+      "bytes": 25472,
+      "sha256": "0b2fad49b832648430b22cb8784155df02a5a55691bcc4b9a399d54c97f2a157"
+    },
+    {
+      "path": "assets/third_party/m4_5/CREDITS.md",
+      "bytes": 803,
+      "sha256": "285424318fb2b39e831a82fe00d3adca9460f3b68d4199bd0ff4fe243c3496ed"
+    },
+    {
+      "path": "assets/third_party/m4_5/mause_os/ATTRIBUTION.md",
+      "bytes": 774,
+      "sha256": "40abf908c431235017252590e970c19ca0e3a444092154efce6922dfc6ea5936"
+    },
+    {
+      "path": "assets/third_party/m4_5/mause_os/LICENSE-CC-BY-4.0.txt",
+      "bytes": 19522,
+      "sha256": "31a6c0b203e504afe8facafc9afe65d0c2433254347734e962c5122dd09d3f2a"
+    },
+    {
+      "path": "assets/third_party/m4_5/mause_os/LICENSE-MIT.txt",
+      "bytes": 1305,
+      "sha256": "791f45c4ad7947d24e6ec99acc00c75ecb9d44b8d50fa994a210a05b37a88fb0"
+    },
+    {
+      "path": "assets/third_party/m4_5/mause_os/styles_only.tres",
+      "bytes": 35846,
+      "sha256": "37e246014dec90d4927b3dd739f43e16751cb473fdb110d5f9010c6c5318e6b8"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/CHANGES.md",
+      "bytes": 248,
+      "sha256": "7fc7fc71301abf4889c2c49a074ddd11156380e74d764e95a710a13ceaecf389"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/icons/corner.png",
+      "bytes": 112,
+      "sha256": "ec3fc6cfa863b519d709a03ae1a95f53962544c250f5cfed5a9eddc06538c47c"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/icons/rec.png",
+      "bytes": 130,
+      "sha256": "d7ca6216ecc1a4c7ccf43a00df571e21f66280f018a4fb0db1115960e5861255"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/LICENSE.txt",
+      "bytes": 19254,
+      "sha256": "8bd755f3b6735cc3e74d7a497f7ceb2a8cec4e7ae30663533fc43a3d2573f659"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/shaders/snow.gdshader",
+      "bytes": 1384,
+      "sha256": "cd148d63edd3b6b75be8b863ab03153b5a69a3a6db2ef09d15b09df863fed66a"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/arrow.png",
+      "bytes": 99,
+      "sha256": "07d3d839a37d304da2bb47d38c554657af28926326a99c192393c2cf99ab5103"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/bar_off.png",
+      "bytes": 95,
+      "sha256": "bb5c416033809c47f06298bf7fece804b63ef2ea07632cb88528d5291dd70542"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/bar_on.png",
+      "bytes": 95,
+      "sha256": "f495faa977a09c4af5548c111204d8b87056278a120af0527fd52290ad660dce"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_disabled.png",
+      "bytes": 111,
+      "sha256": "16bfd130faed1a9a2ba95a31fb9a2b5a0830c486570c0aec6963f85feeff3194"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_hover.png",
+      "bytes": 93,
+      "sha256": "6a4b88cb0fd3ab9188e4287e68766ae2ccdfd6e17b92c09838608acec1fac2c6"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_normal.png",
+      "bytes": 109,
+      "sha256": "e4e293c0b4d073bb3fa1c3d6b656bfa828e67dfd218def250def8b775cf809a0"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_pressed.png",
+      "bytes": 93,
+      "sha256": "e371b154b57824f98effe784ccf4fcaabddfd3caed4b4f8228eb66f0bc3aaed2"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/checkbox_off.png",
+      "bytes": 117,
+      "sha256": "19d636acbe4762bed67eb74f7e90c0c0cfa994b8263ac757846714a412e36dcc"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/checkbox_on.png",
+      "bytes": 134,
+      "sha256": "28bcfe957b2317824c6d4e44795bb958c3e9f1c44bedccb5546831391b499305"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/divider.png",
+      "bytes": 85,
+      "sha256": "8b7beb56b3265eecb70ee6691adffae8cc84f59a5cc14c8dbfaf16625527a65f"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/focus.png",
+      "bytes": 89,
+      "sha256": "84dad13c68fd4502338937c451da8f370df081e1cb239501a714a3756196075b"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber.png",
+      "bytes": 92,
+      "sha256": "a28aa9b3e1d6e8b0c204e98ea20543103f569a7eb9eb44c2320ce261faa794dd"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber_disabled.png",
+      "bytes": 92,
+      "sha256": "8dd3ff7f14edb0022f669fff84284268d0cab9928dc0e8a455b24cd5b8c70303"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber_hover.png",
+      "bytes": 92,
+      "sha256": "c1ec8ffd8a9135828598c41a41f8ebc481cdf65f24b6849a251e89a209c39a37"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/line_edit.png",
+      "bytes": 85,
+      "sha256": "0615f0c8fce7dd67587e23d9f12057647b98027d2730ed29c9c3f559a0b411c1"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/line_edit_focus.png",
+      "bytes": 84,
+      "sha256": "74f14733c8b01a2f0f779c0f7e15cdf43e6f7ed382dd3af84afc0b41d9252f28"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/menu_hover.png",
+      "bytes": 94,
+      "sha256": "7b77f7af7ea951f322cdc6dc3efe819415d2cf0c744159cb892da2fc8ce415f5"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/panel.png",
+      "bytes": 109,
+      "sha256": "e4e293c0b4d073bb3fa1c3d6b656bfa828e67dfd218def250def8b775cf809a0"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/pointer.png",
+      "bytes": 106,
+      "sha256": "9bb7b6d36321ef76985c2093d981ed6debb8aeb6b01cc42a1543d0834b1cedc3"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/radio_off.png",
+      "bytes": 142,
+      "sha256": "d241c21ca92246aba24b2793aaa3a1a95e9e70cbeb5a23eb85269acd31af8ae6"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/radio_on.png",
+      "bytes": 156,
+      "sha256": "d77e1643f7a32fba2b396f6daa543c27cc8afc6b2f90ad122fea794990b502ee"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll.png",
+      "bytes": 84,
+      "sha256": "82874de43e15d37739f011fe7288f7f76331a7688b6a907c873d65d51c4ac4d9"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber.png",
+      "bytes": 78,
+      "sha256": "9c895ed0963cfd093f7769079e4f2064964d510a63b9aebf111e693bd3f4f81d"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber_hover.png",
+      "bytes": 78,
+      "sha256": "7812c9813434982f107f20ffa411cd60e72a50bef4aea57628fe9332c02af555"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber_pressed.png",
+      "bytes": 78,
+      "sha256": "7812c9813434982f107f20ffa411cd60e72a50bef4aea57628fe9332c02af555"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_hover.png",
+      "bytes": 86,
+      "sha256": "33273552c50498c90cd1ed0e596af514dc8da9c7e857100faacb6c69fda6e985"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_selected.png",
+      "bytes": 94,
+      "sha256": "7b77f7af7ea951f322cdc6dc3efe819415d2cf0c744159cb892da2fc8ce415f5"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_unselected.png",
+      "bytes": 71,
+      "sha256": "e0f89dc98bc3cd5e36fe43afbf3d9ce142f69be881931e0a9733700e0df30628"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder/window.png",
+      "bytes": 137,
+      "sha256": "729aff52b088bb63fdd66026bd9ad52aa29e4dcb299d20e18904d7bec238f979"
+    },
+    {
+      "path": "assets/third_party/m4_5/vhs_ui_free/themes/camcorder.tres",
+      "bytes": 26032,
+      "sha256": "6e61f7efce9302a013a6b1b632da8b0a118aff03ab9995888a2f25bf52d8f160"
+    }
+  ],
+  "restricted_local_only": "assets/local_only/m4_5/retro_screen_fx_lite/",
+  "notes": "Original downloads quarantined outside public source. No external GDScripts/plugins executed. Public files retain attribution and modification notes. Retro source excluded from Git."
+}

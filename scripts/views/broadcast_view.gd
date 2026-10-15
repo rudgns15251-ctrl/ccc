@@ -1,5 +1,9 @@
 extends "res://scripts/views/flow_view.gd"
 
+signal multi_confirmation_requested(broadcast_id: String, answers: Dictionary)
+
+var multi: VBoxContainer
+
 signal broadcast_confirmation_requested(broadcast_id: String, option_id: String)
 
 @onready var broadcast_id_label: Label = %BroadcastId
@@ -33,6 +37,9 @@ func _ready() -> void:
 
 func _display_broadcast() -> void:
 	_selected_option_index = -1
+	if is_instance_valid(multi):
+		multi.review.queue_free();multi.edit.queue_free()
+		multi = null
 	_selection_group = ButtonGroup.new()
 	_selection_group.allow_unpress = false
 	next_button.disabled = true
@@ -57,6 +64,11 @@ func _display_broadcast() -> void:
 	GameText.set_text(broadcast_id_label, "ID: %s", [_broadcast_data.broadcast_id])
 	display_name_label.text = _text_or_placeholder(_broadcast_data.display_name, "display_name")
 	prompt_label.text = _text_or_placeholder(_broadcast_data.prompt_text, "prompt_text")
+	if _broadcast_data.is_multi_question():
+		multi = preload("res://scripts/views/multi_broadcast_view.gd").new()
+		option_list.add_child(multi)
+		multi.initialize(self,_broadcast_data)
+		return
 	if _broadcast_data.options.is_empty():
 		push_warning("BroadcastView: options is empty.")
 		prompt_label.text = "Broadcast data unavailable"
@@ -81,7 +93,7 @@ func _display_broadcast() -> void:
 func _has_valid_options() -> bool:
 	if _broadcast_data == null or _broadcast_data.broadcast_id.strip_edges().is_empty():
 		return false
-	for option: BroadcastOptionData in _broadcast_data.options:
+	for option: BroadcastOptionData in _broadcast_data.get_response_options():
 		if option != null and not option.option_id.strip_edges().is_empty():
 			return true
 	return false
@@ -144,7 +156,7 @@ func _has_confirmation_snapshot() -> bool:
 func _has_matching_confirmation() -> bool:
 	if _broadcast_data == null or _broadcast_data.broadcast_id.strip_edges().is_empty() or _confirmed_broadcast_id != _broadcast_data.broadcast_id or _confirmed_option_id.strip_edges().is_empty():
 		return false
-	for option: BroadcastOptionData in _broadcast_data.options:
+	for option: BroadcastOptionData in _broadcast_data.get_response_options():
 		if option != null and not option.option_id.strip_edges().is_empty() and option.option_id == _confirmed_option_id:
 			return true
 	return false
@@ -152,6 +164,9 @@ func _has_matching_confirmation() -> bool:
 
 func _on_confirm_broadcast_pressed() -> void:
 	if not _allows_local_input(): return
+	if multi != null:
+		multi.confirm()
+		return
 	if confirm_button.disabled or _has_confirmation_snapshot():
 		return
 	var option: BroadcastOptionData = _get_option(_selected_option_index)
@@ -174,6 +189,9 @@ func update_confirmation_state(confirmed_broadcast_id: String, confirmed_option_
 
 
 func _update_confirmation_ui() -> void:
+	if multi != null:
+		multi.refresh()
+		return
 	var has_snapshot: bool = _has_confirmation_snapshot()
 	var confirmed: bool = _has_matching_confirmation()
 	if has_snapshot and not confirmed:

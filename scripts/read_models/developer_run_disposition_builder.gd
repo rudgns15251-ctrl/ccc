@@ -78,6 +78,13 @@ static func classify_response_records(records: Array, campaign: CampaignData) ->
 			if authored == null or authored.entry_kind != CampaignEntryData.EntryKind.CASE or authored.case_data.case_id != row.source_definition_id or row.get("source_case_id") != authored.case_data.case_id:
 				result.issue = "INVALID_CASE_RESPONSE_SOURCE"
 				return result
+			var broadcast: EmergencyBroadcastData = unique_content(authored.case_data.emergency_broadcasts,"broadcast_id",row.broadcast_id)
+			if broadcast != null and not row.confirmed_option_id.is_empty() and not IncidentResponseState.valid_details(row,broadcast,unique_content(authored.case_data.incident_results,"result_id",row.incident_result_id)):
+				result.issue = "INVALID_CASE_BROADCAST_DETAILS"
+				return result
+			if row.confirmed_option_id.is_empty() and row.has("broadcast_details"):
+				result.issue = "UNCONFIRMED_BROADCAST_DETAILS"
+				return result
 			result.responses.append(row.duplicate(true))
 		else:
 			result.scripted_responses.append(row.duplicate(true))
@@ -85,10 +92,12 @@ static func classify_response_records(records: Array, campaign: CampaignData) ->
 
 
 static func _response_has_primitive_shape(row: Dictionary) -> bool:
-	var fields: Array[String] = ["origin_kind", "source_occurrence_id", "source_definition_id", "incident_id", "broadcast_id", "confirmed_option_id", "incident_result_id", "status", "source_entry_id", "source_case_id"]
+	var fields: Array[String] = ["origin_kind", "source_occurrence_id", "source_definition_id", "incident_id", "broadcast_id", "confirmed_option_id", "incident_result_id", "status", "source_entry_id", "source_case_id", "broadcast_details"]
 	for key: Variant in row:
 		if not key is String or not fields.has(key): return false
-		if key in ["origin_kind", "status"]:
+		if key == "broadcast_details":
+			if not row[key] is Dictionary: return false
+		elif key in ["origin_kind", "status"]:
 			if not row[key] is int: return false
 		elif not row[key] is String: return false
 	return true
@@ -156,10 +165,12 @@ static func project_completed_scripted_responses(facts: Dictionary, campaign: Ca
 		if not response.get("confirmed_option_id") is String or not response.get("incident_result_id") is String: return rejected
 		var option_id: String = response.confirmed_option_id
 		var result_id: String = response.incident_result_id
+		if option_id.is_empty() and response.has("broadcast_details"): return rejected
 		if not option_id.is_empty() or not result_id.is_empty() or response.status == IncidentResponseState.Status.COMPLETED:
 			if not _is_id(option_id) or not _is_id(result_id): return rejected
-			var option: BroadcastOptionData = unique_content(broadcast.options, "option_id", option_id) as BroadcastOptionData
+			var option: BroadcastOptionData = unique_content(broadcast.get_response_options(), "option_id", option_id) as BroadcastOptionData
 			if option == null or option.result_id != result_id or unique_content(definition.incident_results, "result_id", result_id) == null: return rejected
+		if not option_id.is_empty() and not IncidentResponseState.valid_details(response, broadcast, unique_content(definition.incident_results, "result_id", result_id)): return rejected
 		if source.origin_kind == IncidentSource.OriginKind.CAMPAIGN_ENTRY:
 			if response.status == IncidentResponseState.Status.COMPLETED:
 				if not completed.has(source.source_occurrence_id): return rejected
@@ -243,6 +254,7 @@ static func build(context: Dictionary, facts: Dictionary, sequence: Array[CaseDa
 			continue
 		if response.status != IncidentResponseState.Status.COMPLETED: return {"issue": "INVALID_RESPONSE_STATUS", "data": {}}
 		var actual: Dictionary = response.duplicate(true)
+		actual.erase("broadcast_details") # Historical schema stays stable; details remain source-keyed in ResponseState.
 		actual["result_displayed"] = "UNKNOWN"
 		var value: Dictionary = entry(mapping, response.source_case_id, "EVENT", "COMPLETED_RESPONSE_FACT", actual)
 		value["incident_id"] = response.incident_id

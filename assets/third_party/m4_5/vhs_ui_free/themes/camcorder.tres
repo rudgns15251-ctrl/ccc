@@ -1,0 +1,605 @@
+[gd_resource type="Theme" load_steps=67 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/focus.png" id="1_focus"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/panel.png" id="2_panel"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/bar_off.png" id="3_bar_off"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/bar_on.png" id="4_bar_on"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_selected.png" id="5_tab_selected"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_unselected.png" id="6_tab_unselected"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/tab_hover.png" id="7_tab_hover"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_normal.png" id="9_button_normal"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_hover.png" id="10_button_hover"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_disabled.png" id="11_button_disabled"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/button_pressed.png" id="12_button_pressed"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/arrow.png" id="13_arrow"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/pointer.png" id="14_pointer"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/checkbox_on.png" id="15_checkbox_on"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/checkbox_off.png" id="16_checkbox_off"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/radio_on.png" id="17_radio_on"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/radio_off.png" id="18_radio_off"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber.png" id="19_grabber"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber_hover.png" id="20_grabber_hover"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/grabber_disabled.png" id="21_grabber_disabled"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/line_edit.png" id="22_line_edit"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/line_edit_focus.png" id="23_line_edit_focus"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/menu_hover.png" id="24_menu_hover"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll.png" id="25_scroll"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber.png" id="26_scroll_grabber"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber_hover.png" id="27_scroll_grabber_hover"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/scroll_grabber_pressed.png" id="28_scroll_grabber_pressed"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/divider.png" id="29_divider"]
+[ext_resource type="Texture2D" path="res://assets/third_party/m4_5/vhs_ui_free/themes/camcorder/window.png" id="30_window"]
+
+[sub_resource type="StyleBoxEmpty" id="sb_1"]
+
+[sub_resource type="StyleBoxTexture" id="sb_2"]
+texture = ExtResource("1_focus")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxEmpty" id="sb_3"]
+content_margin_left = 2.0
+content_margin_top = 1.0
+content_margin_right = 4.0
+content_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxTexture" id="sb_4"]
+texture = ExtResource("2_panel")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 5.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxTexture" id="sb_5"]
+texture = ExtResource("3_bar_off")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 5.0
+content_margin_right = 0.0
+content_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_6"]
+texture = ExtResource("4_bar_on")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_7"]
+texture = ExtResource("5_tab_selected")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 1.0
+content_margin_right = 5.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_8"]
+texture = ExtResource("6_tab_unselected")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 1.0
+content_margin_right = 5.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_9"]
+texture = ExtResource("7_tab_hover")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 1.0
+content_margin_right = 5.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_10"]
+texture = ExtResource("9_button_normal")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_11"]
+texture = ExtResource("10_button_hover")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_12"]
+texture = ExtResource("11_button_disabled")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_13"]
+texture = ExtResource("12_button_pressed")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_14"]
+texture = ExtResource("9_button_normal")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_15"]
+texture = ExtResource("10_button_hover")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_16"]
+texture = ExtResource("11_button_disabled")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_17"]
+texture = ExtResource("12_button_pressed")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="sb_18"]
+texture = ExtResource("3_bar_off")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 5.0
+content_margin_right = 0.0
+content_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_19"]
+texture = ExtResource("4_bar_on")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 5.0
+content_margin_right = 0.0
+content_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_20"]
+texture = ExtResource("4_bar_on")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 5.0
+content_margin_right = 0.0
+content_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_21"]
+texture = ExtResource("22_line_edit")
+texture_margin_left = 2.0
+texture_margin_top = 1.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 1.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_22"]
+texture = ExtResource("23_line_edit_focus")
+texture_margin_left = 2.0
+texture_margin_top = 1.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 1.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_23"]
+texture = ExtResource("22_line_edit")
+texture_margin_left = 2.0
+texture_margin_top = 1.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 1.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="sb_24"]
+texture = ExtResource("2_panel")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxTexture" id="sb_25"]
+texture = ExtResource("2_panel")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxTexture" id="sb_26"]
+texture = ExtResource("24_menu_hover")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 1.0
+content_margin_right = 4.0
+content_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxTexture" id="sb_27"]
+texture = ExtResource("25_scroll")
+texture_margin_left = 1.0
+texture_margin_top = 1.0
+texture_margin_right = 1.0
+texture_margin_bottom = 1.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="sb_28"]
+texture = ExtResource("26_scroll_grabber")
+texture_margin_left = 1.0
+texture_margin_top = 1.0
+texture_margin_right = 1.0
+texture_margin_bottom = 1.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="sb_29"]
+texture = ExtResource("27_scroll_grabber_hover")
+texture_margin_left = 1.0
+texture_margin_top = 1.0
+texture_margin_right = 1.0
+texture_margin_bottom = 1.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="sb_30"]
+texture = ExtResource("28_scroll_grabber_pressed")
+texture_margin_left = 1.0
+texture_margin_top = 1.0
+texture_margin_right = 1.0
+texture_margin_bottom = 1.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="sb_31"]
+texture = ExtResource("29_divider")
+texture_margin_left = 0.0
+texture_margin_top = 0.0
+texture_margin_right = 0.0
+texture_margin_bottom = 0.0
+content_margin_left = 0.0
+content_margin_top = 1.0
+content_margin_right = 0.0
+content_margin_bottom = 1.0
+axis_stretch_horizontal = 1
+
+[sub_resource type="StyleBoxTexture" id="sb_32"]
+texture = ExtResource("30_window")
+texture_margin_left = 3.0
+texture_margin_top = 16.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 5.0
+content_margin_top = 2.0
+content_margin_right = 6.0
+content_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxEmpty" id="sb_33"]
+content_margin_left = 1.0
+
+[sub_resource type="StyleBoxFlat" id="sb_34"]
+bg_color = Color(0.000, 0.000, 0.000, 1.0)
+
+[sub_resource type="StyleBoxTexture" id="sb_35"]
+texture = ExtResource("24_menu_hover")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 2.0
+content_margin_top = 1.0
+content_margin_right = 3.0
+content_margin_bottom = 2.0
+
+[resource]
+Button/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+Button/colors/font_hover_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/font_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/font_hover_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/font_focus_color = Color(0.973, 0.973, 0.973, 1.0)
+Button/colors/font_disabled_color = Color(0.588, 0.588, 0.588, 1.0)
+Button/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Button/colors/icon_normal_color = Color(0.973, 0.973, 0.973, 1.0)
+Button/colors/icon_hover_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/icon_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/icon_hover_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+Button/colors/icon_focus_color = Color(0.973, 0.973, 0.973, 1.0)
+Button/colors/icon_disabled_color = Color(0.588, 0.588, 0.588, 1.0)
+Button/constants/h_separation = 4
+Button/constants/shadow_offset_x = 1
+Button/constants/shadow_offset_y = 1
+Button/styles/normal = SubResource("sb_10")
+Button/styles/hover = SubResource("sb_11")
+Button/styles/disabled = SubResource("sb_12")
+Button/styles/pressed = SubResource("sb_13")
+Button/styles/hover_pressed = SubResource("sb_13")
+Button/styles/normal_mirrored = SubResource("sb_10")
+Button/styles/hover_mirrored = SubResource("sb_11")
+Button/styles/disabled_mirrored = SubResource("sb_12")
+Button/styles/pressed_mirrored = SubResource("sb_13")
+Button/styles/hover_pressed_mirrored = SubResource("sb_13")
+Button/styles/focus = SubResource("sb_2")
+OptionButton/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+OptionButton/colors/font_hover_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/font_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/font_hover_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/font_focus_color = Color(0.973, 0.973, 0.973, 1.0)
+OptionButton/colors/font_disabled_color = Color(0.588, 0.588, 0.588, 1.0)
+OptionButton/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+OptionButton/colors/icon_normal_color = Color(0.973, 0.973, 0.973, 1.0)
+OptionButton/colors/icon_hover_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/icon_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/icon_hover_pressed_color = Color(0.063, 0.047, 0.000, 1.0)
+OptionButton/colors/icon_focus_color = Color(0.973, 0.973, 0.973, 1.0)
+OptionButton/colors/icon_disabled_color = Color(0.588, 0.588, 0.588, 1.0)
+OptionButton/constants/arrow_margin = 4
+OptionButton/icons/arrow = ExtResource("13_arrow")
+OptionButton/styles/normal = SubResource("sb_14")
+OptionButton/styles/hover = SubResource("sb_15")
+OptionButton/styles/disabled = SubResource("sb_16")
+OptionButton/styles/pressed = SubResource("sb_17")
+OptionButton/styles/hover_pressed = SubResource("sb_17")
+OptionButton/styles/normal_mirrored = SubResource("sb_14")
+OptionButton/styles/hover_mirrored = SubResource("sb_15")
+OptionButton/styles/disabled_mirrored = SubResource("sb_16")
+OptionButton/styles/pressed_mirrored = SubResource("sb_17")
+OptionButton/styles/hover_pressed_mirrored = SubResource("sb_17")
+OptionButton/styles/focus = SubResource("sb_2")
+MenuItem/base_type = &"Button"
+MenuItem/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+MenuItem/colors/font_hover_color = Color(1.000, 0.808, 0.188, 1.0)
+MenuItem/colors/font_focus_color = Color(1.000, 0.808, 0.188, 1.0)
+MenuItem/colors/font_pressed_color = Color(1.000, 0.808, 0.188, 1.0)
+MenuItem/colors/font_hover_pressed_color = Color(1.000, 0.808, 0.188, 1.0)
+MenuItem/colors/font_disabled_color = Color(0.588, 0.588, 0.588, 1.0)
+MenuItem/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+MenuItem/colors/icon_normal_color = Color(1.000, 1.000, 1.000, 0.0)
+MenuItem/colors/icon_disabled_color = Color(1.000, 1.000, 1.000, 0.0)
+MenuItem/colors/icon_hover_color = Color(1.000, 1.000, 1.000, 1.0)
+MenuItem/colors/icon_focus_color = Color(1.000, 1.000, 1.000, 1.0)
+MenuItem/colors/icon_pressed_color = Color(1.000, 1.000, 1.000, 1.0)
+MenuItem/colors/icon_hover_pressed_color = Color(1.000, 1.000, 1.000, 1.0)
+MenuItem/constants/h_separation = 3
+MenuItem/constants/shadow_offset_x = 1
+MenuItem/constants/shadow_offset_y = 1
+MenuItem/icons/icon = ExtResource("14_pointer")
+MenuItem/styles/normal = SubResource("sb_3")
+MenuItem/styles/disabled = SubResource("sb_3")
+MenuItem/styles/hover = SubResource("sb_3")
+MenuItem/styles/pressed = SubResource("sb_3")
+MenuItem/styles/hover_pressed = SubResource("sb_3")
+MenuItem/styles/focus = SubResource("sb_3")
+MenuItem/styles/normal_mirrored = SubResource("sb_3")
+MenuItem/styles/disabled_mirrored = SubResource("sb_3")
+MenuItem/styles/hover_mirrored = SubResource("sb_3")
+MenuItem/styles/pressed_mirrored = SubResource("sb_3")
+MenuItem/styles/hover_pressed_mirrored = SubResource("sb_3")
+Label/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+Label/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Label/constants/line_spacing = 0
+Panel/styles/panel = SubResource("sb_4")
+PanelContainer/styles/panel = SubResource("sb_4")
+CheckBox/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+CheckBox/colors/font_hover_color = Color(1.000, 0.808, 0.188, 1.0)
+CheckBox/colors/font_pressed_color = Color(0.973, 0.973, 0.973, 1.0)
+CheckBox/colors/font_hover_pressed_color = Color(1.000, 0.808, 0.188, 1.0)
+CheckBox/colors/font_focus_color = Color(0.973, 0.973, 0.973, 1.0)
+CheckBox/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+CheckBox/constants/h_separation = 4
+CheckBox/constants/shadow_offset_x = 1
+CheckBox/constants/shadow_offset_y = 1
+CheckBox/icons/checked = ExtResource("15_checkbox_on")
+CheckBox/icons/unchecked = ExtResource("16_checkbox_off")
+CheckBox/icons/radio_checked = ExtResource("17_radio_on")
+CheckBox/icons/radio_unchecked = ExtResource("18_radio_off")
+CheckBox/icons/checked_disabled = ExtResource("15_checkbox_on")
+CheckBox/icons/unchecked_disabled = ExtResource("16_checkbox_off")
+CheckBox/icons/radio_checked_disabled = ExtResource("17_radio_on")
+CheckBox/icons/radio_unchecked_disabled = ExtResource("18_radio_off")
+CheckBox/styles/normal = SubResource("sb_1")
+CheckBox/styles/normal_mirrored = SubResource("sb_1")
+CheckBox/styles/hover = SubResource("sb_1")
+CheckBox/styles/hover_mirrored = SubResource("sb_1")
+CheckBox/styles/pressed = SubResource("sb_1")
+CheckBox/styles/pressed_mirrored = SubResource("sb_1")
+CheckBox/styles/hover_pressed = SubResource("sb_1")
+CheckBox/styles/hover_pressed_mirrored = SubResource("sb_1")
+CheckBox/styles/disabled = SubResource("sb_1")
+CheckBox/styles/disabled_mirrored = SubResource("sb_1")
+CheckBox/styles/focus = SubResource("sb_1")
+HSlider/icons/grabber = ExtResource("19_grabber")
+HSlider/icons/grabber_highlight = ExtResource("20_grabber_hover")
+HSlider/icons/grabber_disabled = ExtResource("21_grabber_disabled")
+HSlider/styles/slider = SubResource("sb_18")
+HSlider/styles/grabber_area = SubResource("sb_19")
+HSlider/styles/grabber_area_highlight = SubResource("sb_20")
+ProgressBar/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+ProgressBar/colors/font_outline_color = Color(0.000, 0.000, 0.000, 1.0)
+ProgressBar/constants/outline_size = 0
+ProgressBar/styles/background = SubResource("sb_5")
+ProgressBar/styles/fill = SubResource("sb_6")
+LineEdit/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+LineEdit/colors/font_placeholder_color = Color(0.588, 0.588, 0.588, 1.0)
+LineEdit/colors/caret_color = Color(1.000, 0.808, 0.188, 1.0)
+LineEdit/colors/selection_color = Color(0.588, 0.588, 0.588, 1.0)
+LineEdit/constants/caret_width = 2
+LineEdit/styles/normal = SubResource("sb_21")
+LineEdit/styles/focus = SubResource("sb_22")
+LineEdit/styles/read_only = SubResource("sb_23")
+TooltipPanel/styles/panel = SubResource("sb_24")
+TooltipLabel/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+TooltipLabel/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+TooltipLabel/constants/shadow_offset_x = 1
+TooltipLabel/constants/shadow_offset_y = 1
+PopupMenu/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+PopupMenu/colors/font_hover_color = Color(0.063, 0.047, 0.000, 1.0)
+PopupMenu/styles/panel = SubResource("sb_25")
+PopupMenu/styles/hover = SubResource("sb_26")
+VScrollBar/styles/scroll = SubResource("sb_27")
+VScrollBar/styles/grabber = SubResource("sb_28")
+VScrollBar/styles/grabber_highlight = SubResource("sb_29")
+VScrollBar/styles/grabber_pressed = SubResource("sb_30")
+HSeparator/constants/separation = 5
+HSeparator/styles/separator = SubResource("sb_31")
+WindowPanel/base_type = &"PanelContainer"
+WindowPanel/styles/panel = SubResource("sb_32")
+Title/base_type = &"Label"
+Title/colors/font_color = Color(0.063, 0.047, 0.000, 1.0)
+Title/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 0.0)
+Title/styles/normal = SubResource("sb_33")
+ScreenPanel/base_type = &"PanelContainer"
+ScreenPanel/styles/panel = SubResource("sb_34")
+Big/base_type = &"Label"
+Big/colors/font_color = Color(0.973, 0.973, 0.973, 1.0)
+Big/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Big/constants/shadow_offset_x = 2
+Big/constants/shadow_offset_y = 2
+BigRec/base_type = &"Label"
+BigRec/colors/font_color = Color(0.941, 0.141, 0.141, 1.0)
+BigRec/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+BigRec/constants/shadow_offset_x = 2
+BigRec/constants/shadow_offset_y = 2
+Accent/base_type = &"Label"
+Accent/colors/font_color = Color(1.000, 0.808, 0.188, 1.0)
+Accent/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Dim/base_type = &"Label"
+Dim/colors/font_color = Color(0.588, 0.588, 0.588, 1.0)
+Dim/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Rec/base_type = &"Label"
+Rec/colors/font_color = Color(0.941, 0.141, 0.141, 1.0)
+Rec/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+Inverse/base_type = &"Label"
+Inverse/colors/font_color = Color(0.063, 0.047, 0.000, 1.0)
+Inverse/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 0.0)
+Inverse/styles/normal = SubResource("sb_35")
+Osd/colors/ink = Color(0.973, 0.973, 0.973, 1.0)
+Osd/colors/shadow = Color(0.000, 0.000, 0.000, 1.0)
+Osd/colors/hot = Color(1.000, 0.808, 0.188, 1.0)
+Osd/colors/hot_ink = Color(0.063, 0.047, 0.000, 1.0)
+Osd/colors/accent = Color(1.000, 0.808, 0.188, 1.0)
+Osd/colors/dim = Color(0.588, 0.588, 0.588, 1.0)
+Osd/colors/rec = Color(0.941, 0.141, 0.141, 1.0)
+Osd/colors/screen = Color(0.000, 0.000, 0.000, 1.0)
+TabContainer/colors/font_selected_color = Color(0.063, 0.047, 0.000, 1.0)
+TabContainer/colors/font_unselected_color = Color(0.588, 0.588, 0.588, 1.0)
+TabContainer/colors/font_hovered_color = Color(0.973, 0.973, 0.973, 1.0)
+TabContainer/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+TabContainer/styles/panel = SubResource("sb_4")
+TabContainer/styles/tab_selected = SubResource("sb_7")
+TabContainer/styles/tab_unselected = SubResource("sb_8")
+TabContainer/styles/tab_hovered = SubResource("sb_9")
+TabContainer/styles/tab_focus = SubResource("sb_1")
+TabBar/colors/font_selected_color = Color(0.063, 0.047, 0.000, 1.0)
+TabBar/colors/font_unselected_color = Color(0.588, 0.588, 0.588, 1.0)
+TabBar/colors/font_hovered_color = Color(0.973, 0.973, 0.973, 1.0)
+TabBar/colors/font_shadow_color = Color(0.000, 0.000, 0.000, 1.0)
+TabBar/styles/tab_selected = SubResource("sb_7")
+TabBar/styles/tab_unselected = SubResource("sb_8")
+TabBar/styles/tab_hovered = SubResource("sb_9")
+TabBar/styles/tab_focus = SubResource("sb_1")
+HScrollBar/styles/scroll = SubResource("sb_27")
+HScrollBar/styles/grabber = SubResource("sb_28")
+HScrollBar/styles/grabber_highlight = SubResource("sb_29")
+HScrollBar/styles/grabber_pressed = SubResource("sb_30")

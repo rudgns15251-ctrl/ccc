@@ -31,6 +31,10 @@ static func signature(campaign: CampaignData, records: Array[StoryRecordData]) -
 		data.append(row)
 	for occurrence: ScriptedInterruptOccurrenceData in campaign.scripted_interrupts:
 		data.append([occurrence.interrupt_id, occurrence.target_entry_id, occurrence.checkpoint_kind, occurrence.stage_id, occurrence.action_id, _bundle_signature(occurrence.scripted_incident_data)])
+	for entry: CampaignEntryData in campaign.entries:
+		var scope: Resource = entry.case_data if entry.entry_kind == CampaignEntryData.EntryKind.CASE else entry.scripted_incident_data
+		_append_multi_signature(data, scope)
+	for occurrence: ScriptedInterruptOccurrenceData in campaign.scripted_interrupts: _append_multi_signature(data, occurrence.scripted_incident_data)
 	for record: StoryRecordData in records: data.append([record.record_id, record.kind, record.discovery_entry_id, record.discovery_stage])
 	return JSON.stringify(data).sha256_text()
 
@@ -71,6 +75,7 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 		var schema: Dictionary = {"origin_kind":TYPE_INT,"source_occurrence_id":TYPE_STRING,"source_definition_id":TYPE_STRING,"incident_id":TYPE_STRING,"broadcast_id":TYPE_STRING,"confirmed_option_id":TYPE_STRING,"incident_result_id":TYPE_STRING,"status":TYPE_INT}
 		if row is Dictionary and row.get("origin_kind") in [0,1]: schema.source_entry_id = TYPE_STRING
 		if row is Dictionary and row.get("origin_kind") == 0: schema.source_case_id = TYPE_STRING
+		if row is Dictionary and row.has("broadcast_details"): schema.broadcast_details = TYPE_DICTIONARY
 		if not _fields(row,schema) or row.status != IncidentResponseState.Status.COMPLETED: return _bad("ACTIVE_OR_INVALID_RESPONSE")
 		var source: IncidentSource = IncidentSource.from_record(row)
 		var scope: Resource = null
@@ -94,9 +99,13 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 		var incident: IncidentData = _unique(scope.incidents,"incident_id",row.incident_id) if scope is CaseData else scope.incident_data
 		var broadcast: EmergencyBroadcastData = _unique(scope.emergency_broadcasts,"broadcast_id",row.broadcast_id)
 		if incident == null or incident.incident_id != row.incident_id or incident.broadcast_id != row.broadcast_id or broadcast == null: return _bad("BROADCAST")
-		var option: BroadcastOptionData = _unique(broadcast.options,"option_id",row.confirmed_option_id)
+		var option: BroadcastOptionData = _unique(broadcast.get_response_options(),"option_id",row.confirmed_option_id)
 		if option == null or option.result_id != row.incident_result_id or _unique(scope.incident_results,"result_id",row.incident_result_id) == null: return _bad("RESPONSE_RESULT")
-		if not responses.try_begin(source,row.incident_id,row.broadcast_id) or not responses.try_confirm(source,row.incident_id,row.broadcast_id,row.confirmed_option_id,row.incident_result_id) or not responses.try_complete(source,row.incident_id): return _bad("DUPLICATE_RESPONSE")
+		var result: IncidentResultData = _unique(scope.incident_results,"result_id",row.incident_result_id)
+		if not broadcast.get_validation_error(scope.incident_results).is_empty() or not IncidentResponseState.valid_details(row,broadcast,result): return _bad("BROADCAST_DETAILS")
+		if not responses.try_begin(source,row.incident_id,row.broadcast_id): return _bad("DUPLICATE_RESPONSE")
+		var confirmed: bool = responses.try_confirm_multi(source,row.incident_id,broadcast,row.broadcast_details.answers,result) if broadcast.is_multi_question() else responses.try_confirm(source,row.incident_id,row.broadcast_id,row.confirmed_option_id,row.incident_result_id)
+		if not confirmed or not responses.try_complete(source,row.incident_id): return _bad("DUPLICATE_RESPONSE")
 		response_keys.append(JSON.stringify([source.origin_kind,source.source_occurrence_id,row.incident_id]))
 	for entry: CampaignEntryData in campaign.entries.slice(0,index):
 		if entry.entry_kind == CampaignEntryData.EntryKind.SCRIPTED_INCIDENT and not responses.has_response(IncidentSource.new(1,entry.entry_id,entry.scripted_incident_data.event_id),entry.scripted_incident_data.incident_data.incident_id): return _bad("MISSING_COMPLETED_SCRIPTED")
@@ -176,7 +185,24 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 		if not _fields(row,{"case_id":TYPE_STRING,"entries":TYPE_ARRAY}) or not completed_cases.has(row.case_id) or archive_ids.has(row.case_id) or not _strings(row.entries) or row.entries.is_empty(): return _bad("ARCHIVE")
 		var source_data: CaseData = campaign.get_case_entry(row.case_id).case_data
 		for id: String in row.entries:
-			if _unique(source_data.research_entries,"entry_id",id) == null: return _bad("ARCHIVE_RESEARCH_ID")
+			var research: ResearchEntryData = _unique(source_data.research_entries,"entry_id",id)
+			if research == null: return _bad("ARCHIVE_RESEARCH_ID")
+			# New multi-question records cannot unlock untransmitted answers/results.
+			for broadcast: EmergencyBroadcastData in source_data.emergency_broadcasts:
+				if not broadcast.is_multi_question() or research.source_kind not in [ResearchEntryData.SourceKind.BROADCAST_OPTION,ResearchEntryData.SourceKind.INCIDENT_RESULT]: continue
+				var belongs: bool = false
+				for question: BroadcastQuestionData in broadcast.questions:
+					for option: BroadcastOptionData in question.options:
+						if research.source_kind == ResearchEntryData.SourceKind.BROADCAST_OPTION and option.option_id == research.source_id: belongs = true
+				for outcome: BroadcastOutcomeData in broadcast.outcomes:
+					if research.source_kind == ResearchEntryData.SourceKind.INCIDENT_RESULT and outcome.result_id == research.source_id: belongs = true
+				if not belongs: continue
+				var witnessed: bool = false
+				for response: Dictionary in responses.get_responses():
+					if response.get("source_case_id", "") != source_data.case_id or response.broadcast_id != broadcast.broadcast_id: continue
+					if research.source_kind == ResearchEntryData.SourceKind.INCIDENT_RESULT and response.incident_result_id == research.source_id: witnessed = true
+					if research.source_kind == ResearchEntryData.SourceKind.BROADCAST_OPTION and response.broadcast_details.answers.values().has(research.source_id): witnessed = true
+				if not witnessed: return _bad("UNOBSERVED_BROADCAST_RESEARCH")
 		var entries: Array[String] = [];entries.assign(row.entries)
 		archive.merge_case_discoveries(row.case_id,entries);archive_ids.append(row.case_id)
 	for id: String in completed_cases:
@@ -287,3 +313,13 @@ static func _int64(value: String) -> bool:
 
 static func _bad(error: String) -> Dictionary:
 	return {"error":error}
+
+static func _append_multi_signature(data: Array, scope: Resource) -> void:
+	for broadcast: EmergencyBroadcastData in scope.emergency_broadcasts:
+		if not broadcast.is_multi_question(): continue
+		var row: Array = [broadcast.broadcast_id,broadcast.warning_text]
+		for question: BroadcastQuestionData in broadcast.questions:
+			row.append([question.question_id,question.prompt_text,question.options.map(func(o: BroadcastOptionData) -> Array: return [o.option_id,o.display_text,o.instruction_text])])
+		for outcome: BroadcastOutcomeData in broadcast.outcomes: row.append([outcome.option_id,outcome.answers,outcome.result_id,outcome.display_text])
+		for result: IncidentResultData in scope.incident_results: row.append([result.result_id,result.description,result.consequences()])
+		data.append(row)

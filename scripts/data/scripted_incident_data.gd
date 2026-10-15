@@ -20,10 +20,11 @@ func get_validation_error() -> String:
 		result_ids.append(result.result_id)
 	for broadcast: EmergencyBroadcastData in emergency_broadcasts:
 		if broadcast == null or broadcast.broadcast_id.strip_edges().is_empty() or broadcast_ids.has(broadcast.broadcast_id): return "Missing/duplicate broadcast_id."
-		if broadcast.display_name.strip_edges().is_empty() or broadcast.prompt_text.strip_edges().is_empty() or broadcast.options.is_empty(): return "Broadcast content/options is empty."
+		if broadcast.display_name.strip_edges().is_empty() or broadcast.prompt_text.strip_edges().is_empty() or broadcast.get_response_options().is_empty(): return "Broadcast content/options is empty."
+		if not broadcast.get_validation_error(incident_results).is_empty(): return broadcast.get_validation_error(incident_results)
 		broadcast_ids.append(broadcast.broadcast_id)
 		var option_ids: Array[String] = []
-		for option: BroadcastOptionData in broadcast.options:
+		for option: BroadcastOptionData in broadcast.get_response_options():
 			if option == null or option.option_id.strip_edges().is_empty() or option_ids.has(option.option_id): return "Missing/duplicate option_id."
 			if option.display_text.strip_edges().is_empty() or not result_ids.has(option.result_id): return "Invalid option text/result link."
 			option_ids.append(option.option_id)

@@ -3,3 +3,6 @@
 
 # Build output (create this directory only when exporting).
 /builds/
+
+# Local evaluation assets whose raw source cannot be redistributed.
+/assets/local_only/

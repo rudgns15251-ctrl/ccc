@@ -64,3 +64,19 @@ func try_complete(source: IncidentSource, incident_id: String) -> bool:
 func reset() -> void:
 	_responses.clear()
 	_active_key = ""
+
+# All snapshots belong to the same response and commit at the same boundary.
+func try_confirm_multi(source: IncidentSource, incident_id: String, broadcast: EmergencyBroadcastData, answers: Dictionary, result: IncidentResultData) -> bool:
+	if broadcast == null or not broadcast.is_multi_question() or result == null or not result.valid_consequences(): return false
+	var outcome: BroadcastOutcomeData = broadcast.find_outcome(answers)
+	if outcome == null or outcome.result_id != result.result_id: return false
+	if not try_confirm(source, incident_id, broadcast.broadcast_id, outcome.option_id, result.result_id): return false
+	_responses[_active_key]["broadcast_details"] = {"answers": answers.duplicate(true), "transmitted_text": broadcast.compose(answers), "consequences": result.consequences()}
+	return true
+
+static func valid_details(row: Dictionary, broadcast: EmergencyBroadcastData, result: IncidentResultData) -> bool:
+	if not broadcast.is_multi_question(): return not row.has("broadcast_details")
+	var details: Variant = row.get("broadcast_details")
+	if not details is Dictionary or details.size() != 3 or not details.get("answers") is Dictionary or not details.get("transmitted_text") is String or not details.get("consequences") is Dictionary: return false
+	var outcome: BroadcastOutcomeData = broadcast.find_outcome(details.answers)
+	return outcome != null and outcome.option_id == row.get("confirmed_option_id") and outcome.result_id == row.get("incident_result_id") and result != null and result.result_id == outcome.result_id and details.transmitted_text == broadcast.compose(details.answers) and details.consequences == result.consequences()

@@ -1,0 +1,146 @@
+{
+  "1280": {
+    "checks": 322,
+    "failed": false,
+    "gpu": "AMD Radeon RX 6800",
+    "timings": [
+      {
+        "dimension": 1280,
+        "draw_calls": 130.0,
+        "frame_median_ms": 0.44,
+        "frame_p95_ms": 8.636,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 0,
+        "video_memory_bytes": 18526403.0,
+        "viewport_cpu_median_ms": 0.154999999165535,
+        "viewport_gpu_median_ms": 0.162000000476837
+      },
+      {
+        "dimension": 1280,
+        "draw_calls": 133.0,
+        "frame_median_ms": 0.452,
+        "frame_p95_ms": 12.969,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 1,
+        "video_memory_bytes": 18524667.0,
+        "viewport_cpu_median_ms": 0.156999997138977,
+        "viewport_gpu_median_ms": 0.164000004529953
+      },
+      {
+        "dimension": 1280,
+        "draw_calls": 294.0,
+        "frame_median_ms": 0.545,
+        "frame_p95_ms": 10.154,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 2,
+        "video_memory_bytes": 18514019.0,
+        "viewport_cpu_median_ms": 0.301000008583069,
+        "viewport_gpu_median_ms": 0.211999997496605
+      },
+      {
+        "dimension": 1280,
+        "draw_calls": 136.0,
+        "frame_median_ms": 0.573,
+        "frame_p95_ms": 13.801,
+        "measured_viewports": 2,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 3,
+        "video_memory_bytes": 28374875.0,
+        "viewport_cpu_median_ms": 0.168999991983175,
+        "viewport_gpu_median_ms": 0.302999999374151
+      },
+      {
+        "dimension": 1280,
+        "draw_calls": 138.0,
+        "frame_median_ms": 0.572,
+        "frame_p95_ms": 12.325,
+        "measured_viewports": 2,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 4,
+        "video_memory_bytes": 28374875.0,
+        "viewport_cpu_median_ms": 0.181000001400709,
+        "viewport_gpu_median_ms": 0.306000001728535
+      }
+    ]
+  },
+  "1920": {
+    "checks": 322,
+    "failed": false,
+    "gpu": "AMD Radeon RX 6800",
+    "timings": [
+      {
+        "dimension": 1920,
+        "draw_calls": 225.0,
+        "frame_median_ms": 0.563,
+        "frame_p95_ms": 12.605,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 0,
+        "video_memory_bytes": 27480257.0,
+        "viewport_cpu_median_ms": 0.204999996185303,
+        "viewport_gpu_median_ms": 0.248999997973442
+      },
+      {
+        "dimension": 1920,
+        "draw_calls": 217.0,
+        "frame_median_ms": 0.551,
+        "frame_p95_ms": 8.334,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 1,
+        "video_memory_bytes": 27391141.0,
+        "viewport_cpu_median_ms": 0.192999999642372,
+        "viewport_gpu_median_ms": 0.246999993920326
+      },
+      {
+        "dimension": 1920,
+        "draw_calls": 528.0,
+        "frame_median_ms": 0.801,
+        "frame_p95_ms": 11.484,
+        "measured_viewports": 1,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 2,
+        "video_memory_bytes": 27555257.0,
+        "viewport_cpu_median_ms": 0.446999992847443,
+        "viewport_gpu_median_ms": 0.344999998807907
+      },
+      {
+        "dimension": 1920,
+        "draw_calls": 223.0,
+        "frame_median_ms": 0.781,
+        "frame_p95_ms": 14.712,
+        "measured_viewports": 2,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 3,
+        "video_memory_bytes": 39415233.0,
+        "viewport_cpu_median_ms": 0.245000004440546,
+        "viewport_gpu_median_ms": 0.474999986588955
+      },
+      {
+        "dimension": 1920,
+        "draw_calls": 222.0,
+        "frame_median_ms": 0.781,
+        "frame_p95_ms": 12.111,
+        "measured_viewports": 2,
+        "sample_frames": 150,
+        "stage": "cctv",
+        "variant": 4,
+        "video_memory_bytes": 39415233.0,
+        "viewport_cpu_median_ms": 0.224999999299645,
+        "viewport_gpu_median_ms": 0.469999987632036
+      }
+    ]
+  }
+}

@@ -275,6 +275,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 	elif stage == Stage.BROADCAST:
 		var broadcast_view: BroadcastView = _current_view as BroadcastView
 		var broadcast: EmergencyBroadcastData = _get_current_emergency_broadcast()
+		broadcast_view.multi_confirmation_requested.connect(_on_multi_confirmation_requested.bind(broadcast_view))
 		broadcast_view.broadcast_confirmation_requested.connect(_on_broadcast_confirmation_requested.bind(broadcast_view))
 		var confirmed_broadcast_id: String = case_runtime.get_confirmed_broadcast_id() if case_runtime != null else ""
 		var confirmed_option_id: String = case_runtime.get_confirmed_broadcast_option_id() if case_runtime != null else ""
@@ -348,6 +349,7 @@ func _show_view(stage: int, discover_displayed_source: bool = true, restoring_wo
 		_discover_displayed_research_entry(_current_view, stage, displayed_source)
 	if stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]:
 		StoryRecordsView.mount_archive(_current_view, story_records, story_collection, not _is_response_route())
+		preload("res://scripts/views/accident_reports_view.gd").mount_archive(_current_view,IncidentReports.completed(campaign_data,incident_responses.get_responses()),not _is_response_route())
 	if stage == Stage.CCTV and not restoring_work:
 		_discover_cctv_condition_observations(_current_view as CCTVView)
 	# Account the accepted work once before choosing a presentation. A matching
@@ -873,7 +875,7 @@ func _get_current_emergency_broadcast() -> EmergencyBroadcastData:
 func _has_valid_broadcast_options(broadcast: EmergencyBroadcastData) -> bool:
 	if broadcast == null or broadcast.broadcast_id.strip_edges().is_empty():
 		return false
-	for option: BroadcastOptionData in broadcast.options:
+	for option: BroadcastOptionData in broadcast.get_response_options():
 		if option != null and not option.option_id.strip_edges().is_empty():
 			return true
 	return false
@@ -882,7 +884,7 @@ func _has_valid_broadcast_options(broadcast: EmergencyBroadcastData) -> bool:
 func _get_broadcast_option(broadcast: EmergencyBroadcastData, option_id: String) -> BroadcastOptionData:
 	if broadcast == null or broadcast.broadcast_id.strip_edges().is_empty() or option_id.strip_edges().is_empty():
 		return null
-	for option: BroadcastOptionData in broadcast.options:
+	for option: BroadcastOptionData in broadcast.get_response_options():
 		if option != null and not option.option_id.strip_edges().is_empty() and option.option_id == option_id:
 			return option
 	return null
@@ -1505,9 +1507,9 @@ func _developer_active_response_facts() -> Dictionary:
 	if broadcast == null: return {"reference_issue": "INVALID_ACTIVE_INCIDENT_BROADCAST_LINK"}
 	var result: IncidentResultData = null
 	if not active.confirmed_option_id.is_empty():
-		var option: BroadcastOptionData = DeveloperDispositionBuilder.unique_content(broadcast.options, "option_id", active.confirmed_option_id) as BroadcastOptionData
+		var option: BroadcastOptionData = DeveloperDispositionBuilder.unique_content(broadcast.get_response_options(), "option_id", active.confirmed_option_id) as BroadcastOptionData
 		result = DeveloperDispositionBuilder.unique_content(source.incident_results, "result_id", active.incident_result_id) as IncidentResultData if option != null and option.result_id == active.incident_result_id else null
-		if result == null: return {"reference_issue": "INVALID_ACTIVE_CONFIRMED_RESULT_LINK"}
+		if result == null or not IncidentResponseState.valid_details(active,broadcast,result): return {"reference_issue": "INVALID_ACTIVE_CONFIRMED_RESULT_LINK"}
 	elif not active.incident_result_id.is_empty(): return {"reference_issue": "UNCONFIRMED_ACTIVE_RESULT_ID"}
 	var stage: int = _current_stage
 	var overlay: bool = stage in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL]
@@ -1738,7 +1740,7 @@ func _response_option(option_id: String = "") -> BroadcastOptionData:
 	var id: String = option_id if not option_id.is_empty() else incident_responses.get_active_response().get("confirmed_option_id", "")
 	if broadcast == null or id.is_empty():
 		return null
-	return _unique_response_content(broadcast.options, "option_id", id) as BroadcastOptionData
+	return _unique_response_content(broadcast.get_response_options(), "option_id", id) as BroadcastOptionData
 
 
 func _response_result(option: BroadcastOptionData = null) -> IncidentResultData:
@@ -1780,6 +1782,9 @@ func _restore_response_broadcast_draft(view: BroadcastView) -> void:
 	var response: Dictionary = incident_responses.get_active_response()
 	if not response.get("confirmed_option_id", "").is_empty() or not IncidentSource.from_record(response).matches(draft) or draft.get("incident_id", "") != response.get("incident_id", "") or draft.get("broadcast_id", "") != response.get("broadcast_id", ""):
 		return
+	if draft.has("multi") and view.multi != null:
+		view.multi.restore_draft(draft.multi)
+		return
 	var option: BroadcastOptionData = _response_option(draft.get("option_id", ""))
 	if option != null and _response_result(option) != null:
 		view.restore_unconfirmed_option(option.option_id)
@@ -1805,11 +1810,12 @@ func _try_start_major_incident(source_case_id: String) -> bool:
 	if broadcast == null or broadcast.display_name.strip_edges().is_empty() or broadcast.prompt_text.strip_edges().is_empty():
 		push_warning("Main: Major Incident has no valid Broadcast; retaining candidate.")
 		return false
+	if not broadcast.get_validation_error(source.incident_results).is_empty(): return false
 	var usable: bool = false
-	for option: BroadcastOptionData in broadcast.options:
+	for option: BroadcastOptionData in broadcast.get_response_options():
 		if option == null or option.option_id.strip_edges().is_empty() or option.display_text.strip_edges().is_empty():
 			continue
-		if _unique_response_content(broadcast.options, "option_id", option.option_id) != option:
+		if _unique_response_content(broadcast.get_response_options(), "option_id", option.option_id) != option:
 			continue
 		var result: IncidentResultData = _unique_response_content(source.incident_results, "result_id", option.result_id) as IncidentResultData
 		if result != null and not result.display_name.strip_edges().is_empty() and not result.description.strip_edges().is_empty():
@@ -1834,7 +1840,7 @@ func _merge_response_research(source_kind: int, source_id: String) -> void:
 		var actual: Dictionary = {
 			ResearchEntryData.SourceKind.INCIDENT: [Stage.INCIDENT, active.incident_id],
 			ResearchEntryData.SourceKind.BROADCAST: [Stage.BROADCAST, active.broadcast_id],
-			ResearchEntryData.SourceKind.BROADCAST_OPTION: [Stage.BROADCAST, active.confirmed_option_id],
+			ResearchEntryData.SourceKind.BROADCAST_OPTION: [Stage.BROADCAST, source_id if active.get("broadcast_details",{}).get("answers",{}).values().has(source_id) else active.confirmed_option_id],
 			ResearchEntryData.SourceKind.INCIDENT_RESULT: [Stage.INCIDENT_RESULT, active.incident_result_id],
 		}
 		if not actual.has(source_kind) or actual[source_kind] != [_current_stage, source_id] or source_id.is_empty(): return
@@ -1868,7 +1874,7 @@ func _confirm_response_option(broadcast_id: String, option_id: String, view: Bro
 		return
 	var response: Dictionary = incident_responses.get_active_response()
 	var broadcast: EmergencyBroadcastData = _response_broadcast()
-	if response.is_empty() or broadcast == null or broadcast.broadcast_id != broadcast_id or view.get("_broadcast_data") != broadcast:
+	if response.is_empty() or broadcast == null or broadcast.is_multi_question() or broadcast.broadcast_id != broadcast_id or view.get("_broadcast_data") != broadcast:
 		return
 	if response.confirmed_option_id.is_empty():
 		var option: BroadcastOptionData = _response_option(option_id)
@@ -1941,6 +1947,11 @@ func _on_source_archive_requested(view: FlowView, source_stage: int) -> void:
 			var draft: Dictionary = IncidentSource.from_record(response).to_dictionary()
 			draft.merge({"incident_id": response.incident_id, "broadcast_id": response.broadcast_id, "option_id": option_id})
 			_interrupt_context["broadcast_draft"] = draft
+	if view is BroadcastView and view.multi != null and incident_responses.get_active_response().confirmed_option_id.is_empty():
+		var response: Dictionary = incident_responses.get_active_response()
+		var draft: Dictionary = IncidentSource.from_record(response).to_dictionary()
+		draft.merge({"incident_id":response.incident_id,"broadcast_id":response.broadcast_id,"multi":view.multi.capture_draft()})
+		_interrupt_context["broadcast_draft"] = draft
 	_source_archive_return_stage = source_stage
 	_archive_detail_case_id = source.case_id if source != null else ""
 	_show_view(Stage.RESEARCH_ARCHIVE_LIST if _is_scripted_response() or _is_side_interrupt() else Stage.RESEARCH_ARCHIVE_DETAIL, false)
@@ -2961,3 +2972,16 @@ func _collect_story_record() -> void:
 	if story_collection.try_discover(record.record_id):
 		_save_feedback = "Story material collected. Save at a safe work boundary to keep it."
 		_refresh_shell()
+
+func _on_multi_confirmation_requested(broadcast_id: String, answers: Dictionary, view: BroadcastView) -> void:
+	if not _accept_view_action(view,"response") or not _has_response_context() or not view.is_visible_in_tree() or view.multi == null: return
+	var response: Dictionary = incident_responses.get_active_response()
+	var broadcast: EmergencyBroadcastData = _response_broadcast()
+	if response.is_empty() or broadcast == null or not broadcast.is_multi_question() or broadcast.broadcast_id != broadcast_id or view._broadcast_data != broadcast or not view.multi.preview or view.multi.answers != answers: return
+	var outcome: BroadcastOutcomeData = broadcast.find_outcome(answers)
+	var result: IncidentResultData = _response_result(outcome) if outcome != null else null
+	if result == null or not incident_responses.try_confirm_multi(IncidentSource.from_record(response),response.incident_id,broadcast,answers,result): return
+	for id: String in answers.values(): _merge_response_research(ResearchEntryData.SourceKind.BROADCAST_OPTION,id)
+	response = incident_responses.get_active_response()
+	if _is_side_interrupt(): view.set_meta("interrupt_response_binding",response)
+	view.update_confirmation_state(response.broadcast_id,response.confirmed_option_id)

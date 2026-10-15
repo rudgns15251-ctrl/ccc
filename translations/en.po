@@ -2272,3 +2272,138 @@ msgstr "[TEMP / NON-CANON] Training transcript check"
 
 msgid "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
 msgstr "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
+
+msgid "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported."
+msgstr "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported."
+
+msgid "Use the grounded maintenance bypass."
+msgstr "Use the grounded maintenance bypass."
+
+msgid "Evacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet."
+msgstr "Evacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet."
+
+msgid "Use the shorter synthetic-lined passage."
+msgstr "Use the shorter synthetic-lined passage."
+
+msgid "Evacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet."
+msgstr "Evacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet."
+
+msgid "Avoid handling or wetting membrane pieces."
+msgstr "Avoid handling or wetting membrane pieces."
+
+msgid "Keep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+msgstr "Keep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+
+msgid "Wet and move obstructing membrane pieces by hand."
+msgstr "Wet and move obstructing membrane pieces by hand."
+
+msgid "Wet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+msgstr "Wet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+
+msgid "Which evacuation route should staff use?"
+msgstr "Which evacuation route should staff use?"
+
+msgid "How should staff respond to membrane pieces along the route?"
+msgstr "How should staff respond to membrane pieces along the route?"
+
+msgid "No additional facility damage was found in the inspected bypass."
+msgstr "No additional facility damage was found in the inspected bypass."
+
+msgid "Staff used the grounded bypass without handling or wetting pieces. No staff deaths or injuries were found in the inspected evacuation group. This is a local observation, not a facility-wide headcount."
+msgstr "Staff used the grounded bypass without handling or wetting pieces. No staff deaths or injuries were found in the inspected evacuation group. This is a local observation, not a facility-wide headcount."
+
+msgid "Wetting detached more membrane along the bypass. One staff injury was confirmed during handling. No deaths were found among the checked evacuees; facility damage has not been checked."
+msgstr "Wetting detached more membrane along the bypass. One staff injury was confirmed during handling. No deaths were found among the checked evacuees; facility damage has not been checked."
+
+msgid "A ventilation outlet cover was damaged; the inspected extent is local."
+msgstr "A ventilation outlet cover was damaged; the inspected extent is local."
+
+msgid "Pieces followed synthetic coverings toward the ventilation outlet. Two staff injuries were confirmed. The death count has not been confirmed, even though staff avoided handling the membrane."
+msgstr "Pieces followed synthetic coverings toward the ventilation outlet. Two staff injuries were confirmed. The death count has not been confirmed, even though staff avoided handling the membrane."
+
+msgid "The ventilation outlet cover was damaged and detached pieces spread into the adjacent supply passage."
+msgstr "The ventilation outlet cover was damaged and detached pieces spread into the adjacent supply passage."
+
+msgid "Wetting and handling produced more detached pieces near the outlet. One staff death and three staff injuries were confirmed in the exposed passage. These authored TEMP counts do not establish total facility staffing."
+msgstr "Wetting and handling produced more detached pieces near the outlet. One staff death and three staff injuries were confirmed in the exposed passage. These authored TEMP counts do not establish total facility staffing."
+
+msgid "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+msgstr "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+
+msgid "[TEMP / NON-CANON] Evacuation observation 1"
+msgstr "[TEMP / NON-CANON] Evacuation observation 1"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 2"
+msgstr "[TEMP / NON-CANON] Evacuation observation 2"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 3"
+msgstr "[TEMP / NON-CANON] Evacuation observation 3"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 4"
+msgstr "[TEMP / NON-CANON] Evacuation observation 4"
+
+msgid "[TEMP / NON-CANON] Membrane escape / staff evacuation"
+msgstr "[TEMP / NON-CANON] Membrane escape / staff evacuation"
+
+msgid "Select a route and contact precautions using the Profile and CCTV observations. Review the complete broadcast before transmission. Selection alone does not transmit an order."
+msgstr "Select a route and contact precautions using the Profile and CCTV observations. Review the complete broadcast before transmission. Selection alone does not transmit an order."
+
+msgid "Previous question"
+msgstr "Previous question"
+
+msgid "Next question"
+msgstr "Next question"
+
+msgid "Review broadcast"
+msgstr "Review broadcast"
+
+msgid "Edit instructions"
+msgstr "Edit instructions"
+
+msgid "Transmit broadcast"
+msgstr "Transmit broadcast"
+
+msgid "Answered %d / %d — unanswered: %d"
+msgstr "Answered %d / %d — unanswered: %d"
+
+msgid "Question %d / %d\n%s"
+msgstr "Question %d / %d\n%s"
+
+msgid "Unconfirmed / not recorded"
+msgstr "Unconfirmed / not recorded"
+
+msgid "Confirmed staff deaths: %s\nConfirmed staff injuries: %s\nFacility damage: %s\nAdditional observation: %s"
+msgstr "Confirmed staff deaths: %s\nConfirmed staff injuries: %s\nFacility damage: %s\nAdditional observation: %s"
+
+msgid "Incident source"
+msgstr "Incident source"
+
+msgid "Transmitted broadcast"
+msgstr "Transmitted broadcast"
+
+msgid "Observed response result"
+msgstr "Observed response result"
+
+msgid "Accident Reports"
+msgstr "Accident Reports"
+
+msgid "Completed incidents only"
+msgstr "Completed incidents only"
+
+msgid "Select a completed incident."
+msgstr "Select a completed incident."
+
+msgid "No completed incident reports."
+msgstr "No completed incident reports."
+
+msgid "Broadcast preview"
+msgstr "Broadcast preview"
+
+msgid "Response questions"
+msgstr "Response questions"
+
+msgid "Accident response report"
+msgstr "Accident response report"
+
+msgid "Acknowledge this report to complete the response and resume work."
+msgstr "Acknowledge this report to complete the response and resume work."

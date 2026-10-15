@@ -361,7 +361,7 @@ func _resolve_response(meta: Dictionary, source: IncidentSource, incident_id: St
 	if not option_id.is_empty():
 		var option: BroadcastOptionData
 		matches = 0
-		for item: BroadcastOptionData in broadcast.options:
+		for item: BroadcastOptionData in broadcast.get_response_options():
 			if item != null and item.option_id == option_id:
 				option = item
 				matches += 1

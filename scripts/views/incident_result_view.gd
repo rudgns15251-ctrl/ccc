@@ -15,11 +15,14 @@ func setup(incident_result_data: IncidentResultData) -> void:
 
 func _ready() -> void:
 	super._ready()
+	get_node("%ReportScroll").focus_mode = Control.FOCUS_ALL
 	_display_incident_result()
 
 
 func _display_incident_result() -> void:
 	next_button.disabled = true
+	get_node("%ScreenTitle").text = "Accident response report"
+	get_node("%ResponseHint").text = "Acknowledge this report to complete the response and resume work."
 	if _incident_result_data == null:
 		push_warning("IncidentResultView.setup(): IncidentResultData is missing.")
 		GameText.set_text(result_id_label, "")
@@ -36,6 +39,8 @@ func _display_incident_result() -> void:
 	GameText.set_text(result_id_label, "ID: %s", [_incident_result_data.result_id])
 	display_name_label.text = _text_or_placeholder(_incident_result_data.display_name, "display_name")
 	description_label.text = _text_or_placeholder(_incident_result_data.description, "description")
+	var details: Label = get_node_or_null("%ReportDetails") as Label
+	if details != null: details.text = IncidentReports.consequence_text(_incident_result_data)
 	next_button.disabled = false
 	next_button.grab_focus()
 

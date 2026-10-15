@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAP M4.5 — 원본 / 외부 에셋 비교</title>
+<style>
+body{margin:24px;background:#151919;color:#e4e8e1;font:16px system-ui,sans-serif}h1{font-size:24px}label{display:inline-block;margin:0 16px 12px 0}select{padding:8px;background:#303735;color:inherit;border:1px solid #69766f}p{line-height:1.6;max-width:1000px}main{display:grid;grid-template-columns:1fr 1fr;gap:16px}figure{margin:0}figcaption{padding:10px 0}img{display:block;width:100%;border:1px solid #69766f}a{color:#e9d581}small{color:#a8b7ad}@media(max-width:1000px){main{grid-template-columns:1fr}}
+</style>
+<h1>CAP M4.5 — 실제 Godot GPU 화면 비교</h1>
+<p>같은 플레이 경로에서 UI 시안만 바꾼 무가공 캡처입니다. 이미지를 클릭하면 원래 크기로 열립니다. 최종 채택된 디자인이 아닙니다.</p>
+<label>화면 <select id="stage"><option value="profile">Profile · 종이 문서</option><option value="cctv">CCTV · 영상 영역</option><option value="broadcast_question">Broadcast · 질문</option><option value="broadcast_preview">Broadcast · 송출문 검토</option><option value="broadcast_confirm">Broadcast · 확인 창</option></select></label>
+<label>해상도 <select id="resolution"><option value="1280">1280 × 720</option><option value="1920">1920 × 1080</option></select></label>
+<label>비교 시안 <select id="variant"></select></label>
+<main><figure><figcaption>기존 UI</figcaption><a id="originalLink"><img id="original" alt="기존 UI"></a></figure><figure><figcaption id="newTitle"></figcaption><a id="newLink"><img id="replacement" alt="비교 UI"></a></figure></main>
+<p id="note"></p>
+<small>Windows · Godot 4.7.1 Compatibility · RX 6800. CCTV는 프로젝트의 기존 임시 영상 영역이며 실제 영상 화질 평가는 포함하지 않습니다. Retro 원본 소스는 이 폴더에 포함하지 않습니다.</small>
+<script>
+const stage=document.querySelector('#stage'),resolution=document.querySelector('#resolution'),variant=document.querySelector('#variant');
+const titles=['원본','MAUSE OS','VHS UI','MAUSE + CRT Lite','MAUSE + VHS Lite'];
+function options(){const previous=Number(variant.value)||1;variant.replaceChildren();for(let i=1;i<(stage.value==='cctv'?5:3);i++){const option=document.createElement('option');option.value=i;option.textContent=titles[i];variant.append(option)}variant.value=previous<variant.options.length+1?previous:1;render()}
+function render(){const prefix=stage.value,suffix=resolution.value;for(const [image,link,id] of [['original','originalLink',0],['replacement','newLink',variant.value]]){const filename=`${prefix}_${id}_${suffix}.png`;document.getElementById(image).src=filename;document.getElementById(link).href=filename}document.querySelector('#newTitle').textContent=titles[Number(variant.value)];document.querySelector('#note').textContent=stage.value==='cctv'?'CRT/VHS 처리는 왼쪽 영상 안에만 적용됩니다. 오른쪽 관찰 기록과 Shell에는 적용하지 않습니다.':'한국어 폰트와 종이 문서 스타일은 유지했습니다. 확인 창 배경은 겹침 방지를 위해 불투명하게 보정했습니다.'}
+stage.addEventListener('change',options);resolution.addEventListener('change',render);variant.addEventListener('change',render);options();
+</script>
+</html>

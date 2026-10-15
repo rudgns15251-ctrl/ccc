@@ -2272,3 +2272,138 @@ msgstr "[임시 · 비정사] 교육 전사문 검증"
 
 msgid "This is a non-canon transcript for collection and save/load verification. No original training video, official instruction or story event is authored here."
 msgstr "수집과 저장·불러오기를 검증하기 위한 비정사 전사문입니다. 원본 교육 영상, 공식 지침, 스토리 사건을 작성한 자료가 아닙니다."
+
+msgid "[TEMP / NON-CANON] Emergency warning. Detached membrane is present in the access corridor. All staff in the exposed corridor must evacuate using the following instructions. No civilian presence has been reported."
+msgstr "[임시 / 비정식] 비상 경고. 출입 복도에서 탈락한 막편이 확인되었습니다. 노출된 복도의 모든 직원은 다음 지시에 따라 대피하십시오. 민간인의 존재는 보고되지 않았습니다."
+
+msgid "Use the grounded maintenance bypass."
+msgstr "접지된 정비 우회로로 이동한다."
+
+msgid "Evacuate through the maintenance bypass with the grounded conductive floor and low airflow. Avoid the shorter synthetic-lined supply passage and its ventilation outlet."
+msgstr "접지된 전도성 바닥과 낮은 기류가 유지되는 정비 우회로로 대피하십시오. 합성재 바닥의 짧은 보급 통로와 그 환기구를 피하십시오."
+
+msgid "Use the shorter synthetic-lined passage."
+msgstr "합성재 바닥의 짧은 통로로 이동한다."
+
+msgid "Evacuate through the shorter supply passage with synthetic floor covering, toward its ventilation outlet."
+msgstr "합성재 바닥의 짧은 보급 통로를 이용하여 환기구 방향으로 대피하십시오."
+
+msgid "Avoid handling or wetting membrane pieces."
+msgstr "막편에 손을 대거나 물을 묻히지 않는다."
+
+msgid "Keep clear of loose membrane and dry synthetic coverings. Do not handle the pieces or apply water to them. Close the access door after passing and keep other staff out of the exposed corridor."
+msgstr "떨어진 막편과 건조한 합성재 덮개에 접근하지 마십시오. 막편을 만지거나 물을 뿌리지 마십시오. 통과한 뒤 출입문을 닫고 다른 직원이 노출된 복도에 진입하지 않도록 안내하십시오."
+
+msgid "Wet and move obstructing membrane pieces by hand."
+msgstr "길을 막는 막편에 물을 묻히고 손으로 옮긴다."
+
+msgid "Wet obstructing membrane pieces with water, then move them aside by hand so staff can pass. Close the access door after passing."
+msgstr "길을 막는 막편에 물을 묻힌 뒤 손으로 치워 직원들이 통과하게 하십시오. 통과한 뒤 출입문을 닫으십시오."
+
+msgid "Which evacuation route should staff use?"
+msgstr "직원은 어느 경로로 대피해야 합니까?"
+
+msgid "How should staff respond to membrane pieces along the route?"
+msgstr "대피 경로의 막편에는 어떻게 대응해야 합니까?"
+
+msgid "No additional facility damage was found in the inspected bypass."
+msgstr "점검한 우회로에서 추가 시설 피해가 발견되지 않았습니다."
+
+msgid "Staff used the grounded bypass without handling or wetting pieces. No staff deaths or injuries were found in the inspected evacuation group. This is a local observation, not a facility-wide headcount."
+msgstr "직원들이 막편을 만지거나 적시지 않고 접지된 우회로로 대피했습니다. 확인한 대피 인원에서 사망자와 부상자가 발견되지 않았습니다. 이는 해당 대피 인원에 관한 관찰이며 시설 전체 인원 집계가 아닙니다."
+
+msgid "Wetting detached more membrane along the bypass. One staff injury was confirmed during handling. No deaths were found among the checked evacuees; facility damage has not been checked."
+msgstr "물을 묻히자 우회로에서 추가 막편이 떨어졌습니다. 손으로 옮기던 중 직원 1명의 부상이 확인되었습니다. 확인한 대피 인원에서 사망자는 발견되지 않았으며 시설 피해는 아직 점검되지 않았습니다."
+
+msgid "A ventilation outlet cover was damaged; the inspected extent is local."
+msgstr "환기구 덮개가 손상되었습니다. 피해 확인 범위는 해당 지점에 한정됩니다."
+
+msgid "Pieces followed synthetic coverings toward the ventilation outlet. Two staff injuries were confirmed. The death count has not been confirmed, even though staff avoided handling the membrane."
+msgstr "막편이 합성재 덮개를 따라 환기구 쪽으로 이동했습니다. 직원 2명의 부상이 확인되었습니다. 막편을 직접 만지지 않았으나 사망자 수는 아직 확인되지 않았습니다."
+
+msgid "The ventilation outlet cover was damaged and detached pieces spread into the adjacent supply passage."
+msgstr "환기구 덮개가 손상되었고 탈락한 막편이 인접 보급 통로로 퍼졌습니다."
+
+msgid "Wetting and handling produced more detached pieces near the outlet. One staff death and three staff injuries were confirmed in the exposed passage. These authored TEMP counts do not establish total facility staffing."
+msgstr "물을 묻히고 손으로 옮기는 동안 환기구 주변에서 추가 막편이 떨어졌습니다. 노출된 통로에서 직원 사망 1명과 부상 3명이 확인되었습니다. 이 임시 결과 수치는 시설 전체 직원 규모를 확정하지 않습니다."
+
+msgid "Recapture and complete sealing are unconfirmed. The original containment failure remains recorded. These consequences are authored TEMP observations, not a casualty formula."
+msgstr "재확보와 완전 봉쇄 여부는 미확인입니다. 최초 격리 실패 기록은 유지됩니다. 이 피해는 임시로 작성된 관찰 결과이며 피해 산정 공식이 아닙니다."
+
+msgid "[TEMP / NON-CANON] Evacuation observation 1"
+msgstr "[임시 / 비정식] 대피 관찰 결과 1"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 2"
+msgstr "[임시 / 비정식] 대피 관찰 결과 2"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 3"
+msgstr "[임시 / 비정식] 대피 관찰 결과 3"
+
+msgid "[TEMP / NON-CANON] Evacuation observation 4"
+msgstr "[임시 / 비정식] 대피 관찰 결과 4"
+
+msgid "[TEMP / NON-CANON] Membrane escape / staff evacuation"
+msgstr "[임시 / 비정식] 막편 탈출 / 직원 대피"
+
+msgid "Select a route and contact precautions using the Profile and CCTV observations. Review the complete broadcast before transmission. Selection alone does not transmit an order."
+msgstr "대상 정보와 관찰 영상의 단서를 바탕으로 경로와 접촉 주의사항을 선택하십시오. 송출 전에 방송문 전체를 검토하십시오. 선택만으로 지시가 송출되지는 않습니다."
+
+msgid "Previous question"
+msgstr "이전 질문"
+
+msgid "Next question"
+msgstr "다음 질문"
+
+msgid "Review broadcast"
+msgstr "방송문 검토"
+
+msgid "Edit instructions"
+msgstr "지시 수정"
+
+msgid "Transmit broadcast"
+msgstr "방송 송출"
+
+msgid "Answered %d / %d — unanswered: %d"
+msgstr "응답 %d / %d — 미응답: %d"
+
+msgid "Question %d / %d\n%s"
+msgstr "질문 %d / %d\n%s"
+
+msgid "Unconfirmed / not recorded"
+msgstr "미확인 / 미기록"
+
+msgid "Confirmed staff deaths: %s\nConfirmed staff injuries: %s\nFacility damage: %s\nAdditional observation: %s"
+msgstr "확인된 직원 사망: %s\n확인된 직원 부상: %s\n시설 피해: %s\n추가 관찰: %s"
+
+msgid "Incident source"
+msgstr "사건 출처"
+
+msgid "Transmitted broadcast"
+msgstr "송출한 방송"
+
+msgid "Observed response result"
+msgstr "관찰된 대응 결과"
+
+msgid "Accident Reports"
+msgstr "사고보고서"
+
+msgid "Completed incidents only"
+msgstr "완료된 사건만 표시"
+
+msgid "Select a completed incident."
+msgstr "완료된 사건을 선택하십시오."
+
+msgid "No completed incident reports."
+msgstr "완료된 사고보고서가 없습니다."
+
+msgid "Broadcast preview"
+msgstr "최종 방송문 미리보기"
+
+msgid "Response questions"
+msgstr "대응 지시 선택"
+
+msgid "Accident response report"
+msgstr "사고 대응 보고서"
+
+msgid "Acknowledge this report to complete the response and resume work."
+msgstr "보고서를 확인하면 사건 대응을 완료하고 업무 또는 다음 Campaign 항목으로 복귀합니다."

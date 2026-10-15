@@ -19,6 +19,8 @@ Step 보고서의 설계·코드 위치·수치는 해당 단계 작성 당시�
 
 ### UI와 업무 Navigation
 
+- [M4.5 — 공식 무료 UI 에셋 비교·라이선스·실행 결과](m4_5_ui_asset_comparison.md)
+- [M4 — 다중 비상방송·사고 피해·사고보고서](m4_broadcast_incident_consequences.md)
 - [M3 — 스토리 자료·안전한 저장과 복원](m3_campaign_records_save_load.md)
 - [M2 — 임시 개체 관찰·연구·격리 플레이테스트](m2_temp_case_vertical_slice.md)
 - [Step64 — GameShell·임시 Industrial Theme](step64_ui_ux_structural_rebuild.md)

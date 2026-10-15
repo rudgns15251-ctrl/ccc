@@ -1,0 +1,1 @@
+CAP: selected texture dependencies, rec/corner icons and snow shader only. Theme paths remapped; ASCII font and font-size assignments excluded for Korean readability. No external scripts or HUD logic imported. Original PNG/shader bytes unchanged.
