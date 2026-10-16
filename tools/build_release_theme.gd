@@ -107,6 +107,28 @@ func _build_textures() -> void:
 	_noise(alarm, ALARM_BG, 0.02, Rect2i(0, 0, s, s))
 	for row in [0, 1, s - 2, s - 1]: _hline(alarm, row, ALARM)
 	_save(alarm, "alarm_panel.png")
+	# Work-key status lamps (18 px): current = lit amber, available = green, locked = dark.
+	var lamps := {"lamp_current": Color("fff3cf"), "lamp_ready": Color("7fb98a"), "lamp_off": Color("2a302a")}
+	for lamp: String in lamps:
+		var img := Image.create_empty(18, 18, false, Image.FORMAT_RGBA8)
+		img.fill(Color(0, 0, 0, 0))
+		for y in 18:
+			for x in 18:
+				var d: float = Vector2(x - 8.5, y - 8.5).length()
+				if d <= 8.5: img.set_pixel(x, y, SHADOW)
+				if d <= 6.0: img.set_pixel(x, y, lamps[lamp])
+				if d <= 2.2 and lamp != "lamp_off": img.set_pixel(x, y, (lamps[lamp] as Color).lightened(0.45))
+		_save(img, lamp + ".png")
+	# Slider knob (28 px): steel cap with an amber index mark.
+	var knob := Image.create_empty(28, 28, false, Image.FORMAT_RGBA8)
+	knob.fill(Color(0, 0, 0, 0))
+	for y in 28:
+		for x in 28:
+			var d: float = Vector2(x - 13.5, y - 13.5).length()
+			if d <= 13.0: knob.set_pixel(x, y, SHADOW)
+			if d <= 11.5: knob.set_pixel(x, y, Color("6b766b"))
+			if d <= 4.0: knob.set_pixel(x, y, AMBER_LIGHT)
+	_save(knob, "slider_knob.png")
 	# Check / radio lamps (24 px): unlit well vs lit amber.
 	for lit in [false, true]:
 		for radio in [false, true]:
@@ -174,6 +196,11 @@ func _set_button(theme: Theme, type: String, bg: Color, border: Color, lip: Colo
 	for key in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
 		theme.set_color(key, type, text)
 	theme.set_color("font_disabled_color", type, TEXT_DISABLED)
+	# Icons are white SVGs tinted by the button's text colour.
+	for key in ["icon_normal_color", "icon_focus_color", "icon_hover_color", "icon_pressed_color", "icon_hover_pressed_color"]:
+		theme.set_color(key, type, text)
+	theme.set_color("icon_disabled_color", type, TEXT_DISABLED)
+	theme.set_constant("h_separation", type, 12)
 
 func _build_theme() -> void:
 	var theme: Theme = (load(BASE_PATH) as Theme).duplicate(true)
@@ -187,7 +214,9 @@ func _build_theme() -> void:
 	# Mono has no Hangul: fall back to the sans for Korean in instrument text.
 	mono.fallbacks = [sans]
 	theme.default_font = sans
-	theme.default_font_size = 22
+	# Type scale is set for the 1280x720 default window: the 1920x1080 logical canvas is
+	# shown at 2/3, so 27 logical px reads as ~18 px on screen (body), 23 as ~15 px (minimum).
+	theme.default_font_size = 27
 
 	# Panels — role equals material.
 	var variations := {"BackgroundPanel": "Panel", "ChassisPanel": "PanelContainer", "InstrumentPanel": "PanelContainer", "TranscriptPanel": "PanelContainer", "MonitorBezel": "PanelContainer", "TransmitButton": "Button", "InstrumentLabel": "Label"}
@@ -201,7 +230,7 @@ func _build_theme() -> void:
 	theme.set_stylebox("panel", "InstrumentPanel", _tex("crt_panel.png", 8, 16))
 	theme.set_stylebox("panel", "TranscriptPanel", _tex("crt_panel.png", 8, 16))
 	theme.set_stylebox("panel", "MonitorBezel", _tex("crt_panel.png", 8, 14))
-	theme.set_stylebox("panel", "PaperDocumentPanel", _tex("paper_panel.png", 2, 28))
+	theme.set_stylebox("panel", "PaperDocumentPanel", _tex("paper_panel.png", 2, 40))
 	theme.set_stylebox("panel", "WarningPanel", _tex("alarm_panel.png", 3, 12))
 	theme.set_stylebox("panel", "EmergencyPanel", _tex("alarm_panel.png", 3, 14))
 	var backdrop := _flat(Color(0.03, 0.04, 0.03, 0.82), Color(0, 0, 0, 0), 0)
@@ -210,7 +239,7 @@ func _build_theme() -> void:
 	tooltip.content_margin_left = 10; tooltip.content_margin_right = 10; tooltip.content_margin_top = 6; tooltip.content_margin_bottom = 6
 	theme.set_stylebox("panel", "TooltipPanel", tooltip)
 	theme.set_color("font_color", "TooltipLabel", TEXT)
-	theme.set_font_size("font_size", "TooltipLabel", 18)
+	theme.set_font_size("font_size", "TooltipLabel", 23)
 
 	# Keys.
 	for type in ["Button", "NavButton", "OptionButton", "CheckButton"]:
@@ -226,6 +255,14 @@ func _build_theme() -> void:
 	_set_button(theme, "TransmitButton", ALARM, ALARM_LIGHT, ALARM_DARK, Color("c9503a"), Color("9c3726"), Color("fff4ee"))
 	theme.set_font("font", "TransmitButton", sans_semibold)
 
+	# Compact key for the header (pause menu) so it never grows the identification bar.
+	theme.set_type_variation("HeaderButton", "Button")
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled", "focus"]:
+		var box: StyleBox = (theme.get_stylebox(state, "Button") as StyleBox).duplicate()
+		box.content_margin_top = 3; box.content_margin_bottom = 3; box.content_margin_left = 14; box.content_margin_right = 14
+		theme.set_stylebox(state, "HeaderButton", box)
+	theme.set_font_size("font_size", "HeaderButton", 22)
+
 	# One TEMP BUILD badge replaces the repeated per-screen temporary notices.
 	theme.set_type_variation("TempBadgeButton", "Button")
 	var badge := _flat(Color(0, 0, 0, 0), AMBER, 1)
@@ -235,7 +272,7 @@ func _build_theme() -> void:
 	for key in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_disabled_color"]:
 		theme.set_color(key, "TempBadgeButton", AMBER)
 	theme.set_font("font", "TempBadgeButton", mono)
-	theme.set_font_size("font_size", "TempBadgeButton", 16)
+	theme.set_font_size("font_size", "TempBadgeButton", 20)
 
 	# Check boxes become indicator lamps on keys.
 	for type: String in ["CheckBox", "SelectedCandidateCheckBox", "CompletedCandidateCheckBox"]:
@@ -269,6 +306,28 @@ func _build_theme() -> void:
 		theme.set_stylebox("grabber_highlight", type, _flat(Color("6b766b"), Color(0, 0, 0, 0), 0))
 		theme.set_stylebox("grabber_pressed", type, _flat(AMBER, Color(0, 0, 0, 0), 0))
 
+	# Sliders (settings): recessed track, amber fill, steel knob.
+	var track := _flat(Color("1f241f"), EDGE)
+	track.content_margin_top = 5; track.content_margin_bottom = 5
+	theme.set_stylebox("slider", "HSlider", track)
+	var fill := _flat(AMBER, Color(0, 0, 0, 0), 0)
+	fill.content_margin_top = 5; fill.content_margin_bottom = 5
+	theme.set_stylebox("grabber_area", "HSlider", fill)
+	theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
+	theme.set_icon("grabber", "HSlider", load(TEX_DIR + "slider_knob.png"))
+	theme.set_icon("grabber_highlight", "HSlider", load(TEX_DIR + "slider_knob.png"))
+	var slider_focus := _flat(Color(0, 0, 0, 0), AMBER_LIGHT, 2)
+	slider_focus.draw_center = false
+	theme.set_stylebox("focus", "HSlider", slider_focus)
+	# Drop-down lists (OptionButton popups).
+	var popup := _flat(WELL, EDGE)
+	popup.content_margin_left = 8; popup.content_margin_right = 8; popup.content_margin_top = 8; popup.content_margin_bottom = 8
+	theme.set_stylebox("panel", "PopupMenu", popup)
+	theme.set_stylebox("hover", "PopupMenu", _flat(Color("4a3f22"), AMBER, 1))
+	theme.set_color("font_color", "PopupMenu", TEXT)
+	theme.set_color("font_hover_color", "PopupMenu", Color("f2e6c4"))
+	theme.set_constant("v_separation", "PopupMenu", 12)
+
 	# Scroll bar for documents on paper: printed rule instead of a steel rail.
 	theme.set_type_variation("PaperVScrollBar", "VScrollBar")
 	var paper_rail := _flat(Color("d6ceb8"), Color(0, 0, 0, 0), 0)
@@ -281,16 +340,28 @@ func _build_theme() -> void:
 
 	# Labels.
 	theme.set_color("font_color", "Label", TEXT)
-	theme.set_constant("line_spacing", "Label", 4)
+	theme.set_constant("line_spacing", "Label", 7)
 	theme.set_color("font_color", "MutedLabel", TEXT_MUTED)
+	theme.set_font_size("font_size", "MutedLabel", 23)
+	theme.set_font_size("font_size", "NavButton", 24)
+	theme.set_font_size("font_size", "PaperMetadataLabel", 22)
+	theme.set_font_size("font_size", "PaperHeadingLabel", 36)
+	theme.set_font_size("font_size", "PaperSectionLabel", 30)
+	# A selected list entry (e.g. the open Archive case) is lit like the current work key.
+	theme.set_type_variation("SelectedListButton", "Button")
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+		theme.set_stylebox(state, "SelectedListButton", _key(AMBER, AMBER_LIGHT, AMBER_DARK))
+	for key in ["font_color", "font_focus_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_disabled_color"]:
+		theme.set_color(key, "SelectedListButton", AMBER_INK)
+	theme.set_font("font", "SelectedListButton", sans_semibold)
 	theme.set_font("font", "TitleLabel", sans_semibold)
-	theme.set_font_size("font_size", "TitleLabel", 28)
+	theme.set_font_size("font_size", "TitleLabel", 36)
 	theme.set_font("font", "HeadingLabel", sans_semibold)
-	theme.set_font_size("font_size", "HeadingLabel", 24)
+	theme.set_font_size("font_size", "HeadingLabel", 30)
 	theme.set_color("font_color", "WarningLabel", Color("e9b8ab"))
 	theme.set_font("font", "InstrumentLabel", mono)
 	theme.set_color("font_color", "InstrumentLabel", Color("c9b27a"))
-	theme.set_font_size("font_size", "InstrumentLabel", 18)
+	theme.set_font_size("font_size", "InstrumentLabel", 23)
 	# Paper documents use the typewriter face and ink colours.
 	for type in ["PaperBodyLabel", "PaperSectionLabel", "PaperMetadataLabel"]:
 		theme.set_font("font", type, typewriter)
@@ -298,7 +369,7 @@ func _build_theme() -> void:
 	theme.set_font("font", "PaperSectionLabel", typewriter_bold)
 	theme.set_color("font_color", "PaperBodyLabel", INK)
 	theme.set_color("font_color", "PaperMetadataLabel", INK_MUTED)
-	theme.set_constant("line_spacing", "PaperBodyLabel", 8)
+	theme.set_constant("line_spacing", "PaperBodyLabel", 11)
 	var rule := StyleBoxLine.new()
 	rule.color = INK
 	rule.thickness = 2

@@ -1,0 +1,129 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/release/title_screen.gd" id="1_title"]
+[ext_resource type="Theme" path="res://resources/ui/release_instrument_steel_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/release/settings_panel.tscn" id="3_settings"]
+[ext_resource type="PackedScene" path="res://scenes/release/credits_panel.tscn" id="4_credits"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_title")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"BackgroundPanel"
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Menu" type="PanelContainer" parent="Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(760, 0)
+layout_mode = 2
+theme_type_variation = &"ChassisPanel"
+
+[node name="Margin" type="MarginContainer" parent="Center/Menu"]
+layout_mode = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
+
+[node name="Stack" type="VBoxContainer" parent="Center/Menu/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Facility" type="Label" parent="Center/Menu/Margin/Stack"]
+layout_mode = 2
+theme_type_variation = &"InstrumentLabel"
+text = "시설 운영실 · 관찰 기록 단말"
+
+[node name="Title" type="Label" parent="Center/Menu/Margin/Stack"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 120
+theme_type_variation = &"TitleLabel"
+text = "CAP"
+
+[node name="Rule" type="ColorRect" parent="Center/Menu/Margin/Stack"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+color = Color(0.788, 0.635, 0.294, 1)
+
+[node name="Spacer" type="Control" parent="Center/Menu/Margin/Stack"]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="Center/Menu/Margin/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+text = "이어하기"
+
+[node name="NewButton" type="Button" parent="Center/Menu/Margin/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "새 근무 시작"
+
+[node name="SettingsButton" type="Button" parent="Center/Menu/Margin/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "설정"
+
+[node name="CreditsButton" type="Button" parent="Center/Menu/Margin/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "크레딧"
+
+[node name="QuitButton" type="Button" parent="Center/Menu/Margin/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "종료"
+
+[node name="SettingsPanel" parent="Center" instance=ExtResource("3_settings")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="CreditsPanel" parent="Center" instance=ExtResource("4_credits")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Footer" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 32.0
+offset_top = -64.0
+offset_right = -32.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"MutedLabel"
+text = "TEMP BUILD · T04 임시 사례 프리뷰 · 정식 설정 아님"
+
+[node name="ClickPlayer" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true

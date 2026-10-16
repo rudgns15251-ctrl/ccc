@@ -74,4 +74,5 @@ func _on_containment_confirmation_requested(room_id: String, containment_view: C
 	super._on_containment_confirmation_requested(room_id, containment_view)
 	if current_case == T04 and case_runtime.has_confirmed_containment():
 		var status: Label = containment_view.get_node("%SelectionStatus")
-		status.text += "\n초기 관찰: 직립 정지와 팔끝의 미세 움직임. 초기 정지만으로 장기 결과를 판단하지 않는다."
+		# Translate the view's status key first; appending to the raw key would show it untranslated.
+		status.text = status.tr(status.text) + "\n초기 관찰: 직립 정지와 팔끝의 미세 움직임. 초기 정지만으로 장기 결과를 판단하지 않는다."

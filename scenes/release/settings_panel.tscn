@@ -1,0 +1,111 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/release/settings_panel.gd" id="1_panel"]
+
+[node name="SettingsPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(900, 0)
+offset_right = 900.0
+offset_bottom = 520.0
+theme_type_variation = &"ChassisPanel"
+script = ExtResource("1_panel")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="Stack" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="Title" type="Label" parent="Margin/Stack"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+text = "설정"
+
+[node name="Grid" type="GridContainer" parent="Margin/Stack"]
+layout_mode = 2
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 22
+columns = 3
+
+[node name="MasterLabel" type="Label" parent="Margin/Stack/Grid"]
+layout_mode = 2
+text = "전체 음량"
+
+[node name="MasterSlider" type="HSlider" parent="Margin/Stack/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 5.0
+
+[node name="MasterValue" type="Label" parent="Margin/Stack/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+theme_type_variation = &"InstrumentLabel"
+text = "80%"
+horizontal_alignment = 2
+
+[node name="UiLabel" type="Label" parent="Margin/Stack/Grid"]
+layout_mode = 2
+text = "조작음"
+
+[node name="UiSlider" type="HSlider" parent="Margin/Stack/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 5.0
+
+[node name="UiValue" type="Label" parent="Margin/Stack/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"InstrumentLabel"
+text = "80%"
+horizontal_alignment = 2
+
+[node name="TextLabel" type="Label" parent="Margin/Stack/Grid"]
+layout_mode = 2
+text = "글자 크기"
+
+[node name="TextSize" type="OptionButton" parent="Margin/Stack/Grid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 1
+item_count = 3
+popup/item_0/text = "작게"
+popup/item_0/id = 0
+popup/item_1/text = "보통"
+popup/item_1/id = 1
+popup/item_2/text = "크게"
+popup/item_2/id = 2
+
+[node name="TextHint" type="Label" parent="Margin/Stack/Grid"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "즉시 적용"
+
+[node name="Note" type="Label" parent="Margin/Stack"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "설정은 이 PC에 자동 저장됩니다. 진행 저장과는 별개입니다."
+autowrap_mode = 3
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Stack"]
+layout_mode = 2
+alignment = 2
+
+[node name="CloseButton" type="Button" parent="Margin/Stack/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+text = "닫기"

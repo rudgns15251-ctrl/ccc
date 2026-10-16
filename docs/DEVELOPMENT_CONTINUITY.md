@@ -10,6 +10,89 @@
 
 ## 작업 기록 (최신이 위)
 
+### 2026-10-16 — UI-P4 / 글자 '크게' 점검 + 크레딧 (Claude Code)
+- 수정:
+  - `scripts/presentation/t04_presentation.gd`: 작업 화면의 시설 조건 블록을 경보 띠에 통합하고, 사고·방송·보고서 화면에서는 경보 띠를 숨김(720p 공간 확보).
+  - `scenes/release/title_screen.tscn` + `title_screen.gd`: 크레딧 버튼.
+- 신규: `scripts/release/credits_panel.gd`, `scenes/release/credits_panel.tscn`(동봉 자료 표기, Godot 라이선스 전문).
+- 검증:
+  - '크게'와 '보통' 각각 ROOM B 경로 1280과 1920: 실패는 옛 기대값 `honest_cctv` 1건뿐.
+  - 메뉴 흐름 14항목과 크레딧 열기·닫기 PASS. verify PASS(79 scripts). Scene 5개 시작 exit 0.
+  - 사용자 데이터 정리: 검사용 T04 저장 삭제, M2 저장 해시 동일, 설정 '보통' 복원.
+- 미검증: 사람의 사용성. '작게' 배율.
+- Git: 미커밋(UI-P1~P4, A1).
+- 다음 우선순위 하나: 방송 화면 레이아웃 비율 조정 → 출시 빌드용 라이선스 파일 동봉 절차 정리 → 커밋 여부 결정.
+
+### 2026-10-16 — UI-P3 / 타이틀 · 설정 · 일시정지 (Claude Code)
+- 신규:
+  - `scripts/release/`: `release_settings.gd`(class_name ReleaseSettings, ConfigFile 저장, Autoload 아님), `settings_panel.gd`, `title_screen.gd`, `pause_menu.gd`.
+  - `scenes/release/`: `settings_panel.tscn`, `title_screen.tscn`, `pause_menu.tscn`.
+  - 텍스처 `slider_knob.png`.
+- 수정:
+  - `scripts/presentation/t04_presentation.gd`: 설정 적용(글자 배율 Theme, 조작음 볼륨, Master 음량), 헤더 메뉴 버튼, Esc 일시정지, 타이틀 이어하기 처리.
+  - `tools/build_release_theme.gd`: 슬라이더, 드롭다운, HeaderButton → Theme 재생성.
+- 기본 F5와 `project.godot`는 변경하지 않았다. 타이틀은 F6로 실행한다(`scenes/release/title_screen.tscn`).
+- 저장: 기존 Main 불러오기 경로를 재사용하고 저장 형식은 그대로다. 설정은 `user://release_settings.cfg`에 별도로 저장된다.
+- 검증:
+  - 흐름 검사 14항목 PASS(검사용 T04 저장은 삭제, M2 저장 해시 동일 확인, 설정은 기본값 복원).
+  - ROOM B 경로 1280과 1920: 실패는 옛 기대값 `honest_cctv` 1건뿐. 헤더 버튼 회귀는 수정했다.
+  - verify PASS(78 scripts). Scene 5개 시작 exit 0.
+- 미검증: 사람의 실제 사용성. 실제 음량 체감. 글자 크기 '크게'일 때 모든 화면의 넘침 여부(설정 화면만 캡처).
+- Git: 미커밋(UI-P1·P2·P3, A1 포함).
+- 다음 우선순위 하나: 글자 크기 '크게'에서 전체 경로의 넘침을 점검하고, 크레딧 화면을 추가한다(라이선스 표기). 이후 커밋 여부를 결정한다.
+
+### 2026-10-16 — UI-P2 / UI 사운드 + 아이콘 연결 (Claude Code)
+- 추가:
+  - `assets/ui/release/sfx/` 6개(87 Clickety Clips의 click28/4/63/27/29/23, CC0).
+  - `assets/ui/release/icons/` 6개(Tabler notebook/archive/pencil/device-floppy/history/lock, MIT, 흰색·32px로만 변경).
+  - 출처 표는 `assets/ui/release/README.md`에 있다.
+- 수정:
+  - `scripts/presentation/t04_presentation.gd`: 버튼 역할별 클릭음(button_down, 플레이어 4개), 기록 도구 아이콘, 잠긴 키 자물쇠 아이콘, 표시등 색 보존.
+  - `tools/build_release_theme.gd`: 버튼 아이콘 색과 간격 → Theme 재생성.
+- 범위: T04 F6 프리뷰만.
+- 검증:
+  - 클릭음 재생 확인(일회용 스크립트).
+  - ROOM B 경로 1280과 1920 실행: 실패는 옛 기대값 `honest_cctv` 1건뿐.
+  - verify PASS. 4개 Scene 시작 exit 0.
+- 미검증: 사람이 귀로 들은 평가. 소리 크기 균형.
+- Git: 미커밋(UI-P1과 A1 변경 포함).
+- 다음 우선순위 하나: 사용자가 F6에서 소리와 아이콘을 직접 확인한다. 이어서 타이틀, 설정(음량, 글자 크기), 일시정지 화면을 만든다.
+
+### 2026-10-16 — A1 / 출시 UI 후보 에셋 다운로드 (Claude Code, 게임 미연결)
+- 사용자 승인으로 4개를 다운로드했다:
+  - 87 Clickety Clips (CC0, OpenGameArt).
+  - Kenney UI Audio (CC0).
+  - Kenney Interface Sounds (CC0).
+  - Tabler Icons 3.48.0 (MIT, npm 패키지).
+- 위치: `assets/third_party/release_ui/` + `.gdignore`(import와 export 제외). 출처, 버전, 아카이브 SHA-256, 라이선스는 `CREDITS.md`에 기록했다.
+- 다운로드 파일은 scratchpad의 개별 폴더에서 압축을 풀어 확인한 뒤 복사했다(오디오, SVG, 라이선스만. `.url` 바로가기는 제외).
+- 아직 Scene, Theme, 코드에 연결하지 않았다. 사용할 때 `.gdignore`를 해제하고 게임 내 크레딧에 반영해야 한다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 기계식 클릭 후보를 골라 UI 사운드를 연결하고, Tabler 아이콘으로 기록 도구와 잠김 상태 아이콘을 적용한다.
+
+### 2026-10-16 — UI-P1 / 출시 품질 패스 1 (Claude Code)
+- 기준: master `45b9143` + 미커밋 연속성 로그.
+- 수정:
+  - `tools/build_release_theme.gd`: 글자 크기와 줄 간격, 종이 여백, 상태 표시등 텍스처 3개, SelectedListButton → Theme과 텍스처 재생성.
+  - `scripts/presentation/t04_presentation.gd`: 개발 메뉴 숨김, 업무 키 표시등, 헤더 부제 한 줄, 기록 도구 글자 크기, 페이드 전환, 격리 비교표와 선택 강조, 목록 설명 숨김.
+  - `scripts/main/t04_playtest.gd`: 승인 상태 문구 번역 버그 수정.
+  - 새 파일: `assets/ui/release/lamp_*.png` 3개.
+  - 화면 20장 갱신.
+- 범위: T04 F6 프리뷰만. F5와 다른 플레이테스트, 데이터, 저장 변경 없음.
+- 검증:
+  - ROOM B 전체 경로를 GPU 1280과 1920에서 실행. 실패는 옛 기대값 `honest_cctv` 1건뿐.
+  - 진행 중 발견한 회귀(승인 후 다음 버튼이 화면 밖으로 밀림)를 수정한 뒤 재통과.
+  - verify PASS. 4개 Scene headless 시작 exit 0.
+- 미검증: 사람의 가독성과 플레이 평가. 1920 이외의 화면 비율.
+- 남은 일 6개: art_direction_v1.md 참고. 에셋 결정이 필요한 항목은 UI 사운드, 아이콘, 아트 텍스처, 콘솔 프레임.
+- Git: 이번 변경은 미커밋.
+- 다음 우선순위 하나: 방송 화면 레이아웃 비율을 조정하고 타이틀, 설정, 일시정지 화면을 만든다. 병행해서 UI 사운드와 아이콘 에셋 확보 방식을 사용자와 결정한다.
+
+### 2026-10-16 — Git 커밋 (사용자 요청)
+- 새 브랜치 `ui-release-theme`에 커밋 `45b9143`(100개 파일)을 만들었다. 이후 사용자 요청으로 `master`를 fast-forward해서 `master` = `45b9143`(origin/main보다 1커밋 앞섬)이고, 현재 브랜치는 `master`다. 푸시는 하지 않았다.
+- 사용자 지시로 제외한 파일(미커밋 유지): README 개인 편집, T04 입력 ZIP과 추출 폴더(그 안의 `.gdignore` 포함), `설치_안내.md`, `CLAUDE_FIRST_SESSION_PROMPT.txt`.
+- 이 기록 자체는 커밋 이후에 추가한 미커밋 변경이다.
+
 ### 2026-10-16 — UI-T3 / 사고보고서 종이화 + 내부 ID 노출 정리 (Claude Code)
 - 수정:
   - `scripts/presentation/t04_presentation.gd`: 보고서 종이 패널, 종이 스크롤바(보고서와 Profile), 보고서 라벨 접두어 제거.
