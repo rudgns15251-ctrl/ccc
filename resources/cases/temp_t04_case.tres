@@ -19,86 +19,103 @@
 [ext_resource type="Texture2D" path="res://assets/temp/t04/t04_master_reference.png" id="17_bftw7"]
 [ext_resource type="Script" path="res://scripts/data/research_entry_data.gd" id="18_gesos"]
 [ext_resource type="Script" path="res://scripts/data/case_data.gd" id="19_1kcul"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_cctv_anchor_temp.png" id="20_t04cc"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_exp_echo_temp.png" id="21_t04ec"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_exp_light_temp.png" id="22_t04li"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_exp_combined_temp.png" id="23_t04co"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_exp_lowstim_temp.png" id="24_t04lo"]
+[ext_resource type="Texture2D" path="res://assets/temp/t04/generated/t04_exp_air_temp.png" id="25_t04ai"]
 
 [sub_resource type="Resource" id="Resource_8sodi"]
 script = ExtResource("1_yfaav")
 room_id = "ROOM_T04_STANDARD"
 display_name = "ROOM A · 표준 격리실"
-description = "일반 조도 / 보통 외부 소음 차단 / 보통 내부 반향 / 표준 기류. 일상 점검 소음과 조명 변화가 남는다. 임시 비교값: 20°C, 상대습도 45%. 온습도는 핵심 판단 기준이 아니다."
+description = "조도: 중간·점검 시 변동 / 외부 차음: 보통(약 35dB 감쇠) / 내부 잔향 시간: 약 1.1초 / 마감: 도장 콘크리트 / 기류: 표준. 임시 비교값: 20°C, 상대습도 45%."
 
 [sub_resource type="Resource" id="Resource_4nvgt"]
 script = ExtResource("1_yfaav")
 room_id = "ROOM_T04_METALLIC"
 display_name = "ROOM B · 저조도 금속 격리실"
-description = "저조도 / 보통 외부 소음 차단 / 낮은 내부 흡음 / 높은 금속성 반향 / 표준 기류. 조용해진 뒤에도 실내 금속 표면에서 잔향이 오래 남을 수 있다. 임시 비교값: 20°C, 상대습도 45%."
+description = "조도: 낮음·일정 / 외부 차음: 보통(약 35dB 감쇠) / 내부 잔향 시간: 약 2.4초 / 마감: 금속 패널 / 기류: 표준. 임시 비교값: 20°C, 상대습도 45%."
 
 [sub_resource type="Resource" id="Resource_xrk5l"]
 script = ExtResource("1_yfaav")
 room_id = "ROOM_T04_LOWSTIM"
-display_name = "ROOM C · 저자극 격리실"
-description = "낮고 일정한 조도 / 높은 내부 흡음 / 강화된 외부 소음 차단 / 표준 기류. 외부 유입음과 실내 반사를 구분해 줄이는 구성이다. 임시 비교값: 20°C, 상대습도 45%."
+display_name = "ROOM C · 흡음 패널 격리실"
+description = "조도: 낮음·일정 / 외부 차음: 강화(약 55dB 감쇠) / 내부 잔향 시간: 약 0.4초 / 마감: 흡음 패널 / 기류: 표준. 임시 비교값: 20°C, 상대습도 45%."
 
 [sub_resource type="Resource" id="Resource_nmc8b"]
 script = ExtResource("2_earpo")
 experiment_id = "EXP_T04_ECHO"
+result_texture = ExtResource("21_t04ec")
 display_name = "음향 반향 비교"
 description = "[임시 실험 / 원격 절차]
-실행 전 안내: 같은 최대 음량의 단발 금속 충격음과 녹음된 잔향 포함 신호를 원격 비교한다. 벽면 재질은 교체하지 않는다. 각 신호를 중단하고 기본 상태로 복구한다."
+실행 전 안내: 같은 최대 음량의 단발 금속 충격음과 녹음된 잔향 포함 신호를 원격 비교한다. 녹음 잔향 신호는 약 2초 길이의 반사음을 포함한다. 벽면 재질은 교체하지 않는다. 각 신호를 중단하고 기본 상태로 복구한다."
 result_text = "[실행 기록 / TEMP]
-단발 충격음에 웃는 두부가 회전하고 상부 팔 1~2개가 반응했다. 잔향 포함 신호에서는 두부 회전과 두 상부 팔의 벽면 접촉이 더 오래 지속됐다. 신호 중단 뒤 탐색이 서서히 감소했다. 일회 반응이 곧 격리 실패를 의미하지 않는다."
+단발 충격음 — 웃는 두부 회전, 상부 팔 1~2개 반응. 벽 접촉 2회, 접촉 지속 약 5초, 회복 약 40초.
+잔향 포함 신호(약 2초) — 같은 최대 음량. 벽·문틀 접촉 9회, 접촉 지속 약 30초, 신호 중단 후 회복 약 4분.
+같은 음량에서도 반사음이 길수록 탐색이 오래 남았다. 일회 반응이 곧 격리 실패를 의미하지는 않는다."
 
 [sub_resource type="Resource" id="Resource_4li76"]
 script = ExtResource("2_earpo")
 experiment_id = "EXP_T04_LIGHT"
+result_texture = ExtResource("22_t04li")
 display_name = "이동광 추적"
 description = "[임시 실험 / 원격 절차]
 실행 전 안내: 한쪽 벽에 제한된 이동광을 조사하고 종료한다. 음향·기류·실내 재질은 바꾸지 않는다."
 result_text = "[실행 기록 / TEMP]
-큰 눈의 두부가 이동광을 즉시 추적했다. 목 회전과 일부 상지 움직임은 증가했으나 전신 협응 붕괴는 관찰되지 않았다. 광원 중단 뒤 시선 추적이 감소하고 자세가 안정됐다."
+이동광 조사 동안 큰 눈의 두부가 광원을 계속 추적했다. 상지 반응 1개, 구조물 접촉 0회. 광원 중단 후 약 30초 안에 자세가 안정됐다. 전신 협응 붕괴는 관찰되지 않았다."
 
 [sub_resource type="Resource" id="Resource_nlxh3"]
 script = ExtResource("2_earpo")
 experiment_id = "EXP_T04_COMBINED"
+result_texture = ExtResource("23_t04co")
 display_name = "복합 감각 부하"
 description = "[임시 실험 / 원격 절차]
 실행 전 안내: 한쪽 벽의 이동광과 반대편 스피커의 잔향 음향을 짧게 중첩한 뒤 원격으로 종료한다. 시험 자극은 장기 노출을 재현하지 않는다."
 result_text = "[실행 기록 / TEMP]
-두 두부가 서로 다른 방향을 향했다. 네 팔의 움직임이 증가하고 일부 팔이 교차했으며 몸통의 균형이 흔들렸다. 자극 중단 후 움직임이 감소하고 균형이 회복됐다. 이 실험만으로 실제 탈출이나 추가 페널티가 발생하지 않는다."
+이동광과 잔향 음향 중첩 — 두 두부가 서로 다른 방향을 향했다. 네 팔의 접촉 14회, 팔 교차 3회, 몸통 균형 흔들림. 자극 중단 후 회복 약 7분.
+단일 자극보다 회복이 크게 늦었다. 이 실험만으로 실제 탈출이나 추가 페널티는 발생하지 않는다."
 
 [sub_resource type="Resource" id="Resource_oaltn"]
 script = ExtResource("2_earpo")
 experiment_id = "EXP_T04_LOWSTIM"
+result_texture = ExtResource("24_t04lo")
 display_name = "저자극 환경 반응"
 description = "[임시 실험 / 원격 절차]
 실행 전 안내: 기본 격리실의 조도를 낮추고 비필수 스피커·시험 장치를 정지한다. 필수 환기는 유지하며 벽면 흡음 재질은 변경하지 않는다."
 result_text = "[실행 기록 / TEMP]
-조도와 음향 자극 감소 후 두부 회전과 상지 탐색이 줄었다. 장시간 직립 정지와 팔끝의 미세 움직임이 지속됐다. 현재 공간의 자극 감소에 대한 결과이며 새 격리실의 흡음 성능 자체를 검증한 것은 아니다."
+조도를 낮추고 비필수 음향을 정지한 10분 — 두부 회전이 기준의 약 1/4로 줄고 구조물 접촉 1회.
+남은 접촉 1회는 시험실 환기 장치의 작동음 직후에 기록됐다. 벽면 마감(잔향 약 1.1초)은 바꾸지 않았으므로 흡음 성능을 검증한 결과는 아니다."
 
 [sub_resource type="Resource" id="Resource_hqbw2"]
 script = ExtResource("2_earpo")
 experiment_id = "EXP_T04_AIR"
+result_texture = ExtResource("25_t04ai")
 display_name = "기류 변화"
 description = "[임시 실험 / 원격 절차]
 실행 전 안내: 기본 환기를 유지하다 송풍량을 제한적으로 높인 뒤 원상 복구한다. 광원·음향 조건은 유지한다."
 result_text = "[실행 기록 / TEMP]
-팔끝과 두부 주변 돌기가 미세하게 움직이고 일부 상지가 송풍 방향을 향했다. 전신 불안정화나 급격한 탐색 증가는 확인되지 않았다. 돌기의 감각 기능은 가설이며 이번 관찰로 확정하지 않는다."
+송풍량 증가 시 팔끝과 두부 주변 돌기가 움직이고 상지 1개가 송풍 방향을 향했다. 구조물 접촉 0회, 송풍 복구 직후 정지. 돌기의 감각 기능은 가설이며 이번 관찰로 확정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_suwgk"]
 script = ExtResource("4_3o80y")
 camera_id = "CAM_T04_TEXT_OBSERVATION"
-observation_text = "[TEMP / DRAFT / NON-CANON] T04 관찰 기록. CCTV 장면과 열화상은 미제공이다. 아래는 사용자 설계에 근거해 작성한 텍스트 관찰이며 Master 전신 이미지를 감시 영상으로 표시하지 않는다.
+camera_label = "CAM T04-01 · 표준 격리실 상부"
+feed_texture = ExtResource("20_t04cc")
+observation_text = "[TEMP / DRAFT / NON-CANON] T04 관찰 기록. 화면의 감시 장면은 Master와 표준 격리실을 합성한 임시 이미지이며 실제 감시 영상이 아니다. 열화상은 미제공이다. 판단 근거는 아래 텍스트 관찰이다.
 
-00:00 — 낮고 일정한 조도에서 장시간 직립 정지한다. 팔끝의 미세 탐색은 계속된다. 정지가 비활성 상태를 뜻하지 않는다.
+00:00 — 낮고 일정한 조도에서 직립 정지. 팔끝의 미세 탐색은 계속된다. 기준 10분간 구조물 접촉 2회.
 
-00:40 — 일상 점검의 짧은 금속음에 웃는 두부와 상부 팔이 먼저 반응한다. 소리가 멎자 반응은 감소한다. 동일한 점검음이 금속 통로에 오래 울릴 때에는 벽과 문틀 접촉이 더 오래 지속된다.
+00:40 — 일상 점검의 짧은 금속음에 웃는 두부와 상부 팔이 먼저 반응했다. 소리가 멎자 반응이 줄었다. 점검원이 금속 통로를 지나간 구간에서는 반응이 조금 더 길었다. 발소리 때문인지 통로의 울림 때문인지는 이 기록으로 구분되지 않는다.
 
-01:20 — 이동 점검등을 큰 눈의 두부가 따라간다. 단독 광원 변화에서는 일부 상지만 움직이고 전신 균형은 유지된다.
+01:20 — 이동 점검등을 큰 눈의 두부가 따라갔다. 일부 상지만 움직였고 전신 균형은 유지됐다.
 
-02:00 — 점검등 이동과 반향음이 겹치자 두부의 지향 방향이 갈리고 네 팔이 교차한다. 두 자극을 멈추자 자세가 회복된다. 이 짧은 관찰에서 격리 이탈은 확인되지 않는다.
+02:00 — 점검등 이동과 금속음이 잠시 겹친 순간 두 두부가 다른 방향을 향했고 팔 움직임이 늘었다. 자극이 멎자 자세가 돌아왔다.
 
-02:40 — 소음 유입을 차단해도 남아 있는 실내 잔향에 구조물 탐색이 계속된다. 외부 유입 감소(방음)와 실내 반사 감소(흡음)는 다른 조건이다. 조용해진 뒤에는 탐색이 감소하지만 완전 정지로 보이는 동안에도 말단 움직임은 지속된다.
+02:20 — 실내 조명을 낮춘 구간에서 큰 눈 두부의 회전이 줄고 정지 시간이 길어졌다.
 
-장기 격리 비교에는 일정한 조명, 외부 소음 유입과 내부 반향을 각각 확인해야 한다. 기류 변화가 주된 불안정화 원인이라는 근거는 이 관찰에 없다."
+02:40 — 외부 점검 소음이 멎은 뒤에도 접촉이 한 차례 더 이어졌다. 원인은 이 기록만으로 확정되지 않는다."
 
 [sub_resource type="Resource" id="Resource_envd2"]
 script = ExtResource("5_clpea")
@@ -126,9 +143,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_0"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
 
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라."
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라."
 result_id = "RESULT_T04_0"
 
 [sub_resource type="Resource" id="Resource_evrdy"]
@@ -140,9 +157,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_1"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
 
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라."
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라."
 result_id = "RESULT_T04_1"
 
 [sub_resource type="Resource" id="Resource_cv0tn"]
@@ -154,9 +171,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_2"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
 
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라."
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라."
 result_id = "RESULT_T04_2"
 
 [sub_resource type="Resource" id="Resource_g27wl"]
@@ -168,9 +185,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_3"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
 
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라."
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라."
 result_id = "RESULT_T04_3"
 
 [sub_resource type="Resource" id="Resource_qrorp"]
@@ -182,9 +199,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_4"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
 
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라."
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라."
 result_id = "RESULT_T04_4"
 
 [sub_resource type="Resource" id="Resource_4c6vu"]
@@ -196,9 +213,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_5"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
 
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라."
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라."
 result_id = "RESULT_T04_5"
 
 [sub_resource type="Resource" id="Resource_4yrjm"]
@@ -210,9 +227,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_6"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
 
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라."
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라."
 result_id = "RESULT_T04_6"
 
 [sub_resource type="Resource" id="Resource_ijvs0"]
@@ -224,9 +241,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_7"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
 
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라."
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라."
 result_id = "RESULT_T04_7"
 
 [sub_resource type="Resource" id="Resource_gy0vp"]
@@ -238,9 +255,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_8"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
 
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라."
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라."
 result_id = "RESULT_T04_8"
 
 [sub_resource type="Resource" id="Resource_1wj6c"]
@@ -252,9 +269,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_9"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
 
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라."
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라."
 result_id = "RESULT_T04_9"
 
 [sub_resource type="Resource" id="Resource_4xm3u"]
@@ -266,9 +283,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_10"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
 
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라."
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라."
 result_id = "RESULT_T04_10"
 
 [sub_resource type="Resource" id="Resource_opdsh"]
@@ -280,9 +297,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_11"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
 
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라."
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라."
 result_id = "RESULT_T04_11"
 
 [sub_resource type="Resource" id="Resource_4c5qx"]
@@ -294,9 +311,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_12"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
 
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라."
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라."
 result_id = "RESULT_T04_12"
 
 [sub_resource type="Resource" id="Resource_myuog"]
@@ -308,9 +325,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_13"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
 
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라."
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라."
 result_id = "RESULT_T04_13"
 
 [sub_resource type="Resource" id="Resource_ptg0v"]
@@ -322,9 +339,9 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_14"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
 
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라."
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라."
 result_id = "RESULT_T04_14"
 
 [sub_resource type="Resource" id="Resource_7slqw"]
@@ -336,70 +353,70 @@ answers = Dictionary[String, String]({
 option_id = "T04_COMBINATION_15"
 display_text = "[TEMP / DRAFT / NON-CANON] 격리동 직원에게 알린다. 대상 T04의 복도 이탈이 확인되었다. 인접 구역은 다음 지시에 따라 대피하라. 인명 피해는 조사 중이다.
 
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
 
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라."
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라."
 result_id = "RESULT_T04_15"
 
 [sub_resource type="Resource" id="Resource_07u07"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_EVACUATION_0"
-display_text = "손전등으로 개체를 계속 비추며 단체 이동"
-instruction_text = "이동 중 손전등으로 대상을 계속 비추며 함께 이동하라."
+display_text = "손전등을 끄고 벽을 짚으며 이동"
+instruction_text = "손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라."
 
 [sub_resource type="Resource" id="Resource_ajb46"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_EVACUATION_1"
-display_text = "큰 소리로 위치를 공유하며 복도로 달리기"
-instruction_text = "큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라."
+display_text = "무전으로 위치를 짧게 공유하며 이동"
+instruction_text = "무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라."
 
 [sub_resource type="Resource" id="Resource_dxrr0"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_EVACUATION_2"
-display_text = "발성·이동광을 줄이고 차단 구역으로 후퇴"
-instruction_text = "불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라."
+display_text = "발밑만 비추고 말없이 차단 구역으로"
+instruction_text = "손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라."
 
 [sub_resource type="Resource" id="Resource_dfahi"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_EVACUATION_3"
-display_text = "금속 장비로 주의를 돌리고 이동"
-instruction_text = "금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라."
+display_text = "현재 위치에서 움직이지 말고 대기"
+instruction_text = "현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라."
 
 [sub_resource type="Resource" id="Resource_5irn4"]
 script = ExtResource("11_x88id")
 question_id = "BQ_T04_EVACUATION"
 prompt_text = "인접 구역에서 직원들이 손전등과 무전기를 사용하며 대피하고 있다. 어떤 행동 지시를 전달할 것인가?"
-options = Array[ExtResource("9_q6od6")]([SubResource("Resource_07u07"), SubResource("Resource_ajb46"), SubResource("Resource_dxrr0"), SubResource("Resource_dfahi")])
+options = Array[ExtResource("9_q6od6")]([SubResource("Resource_dfahi"), SubResource("Resource_dxrr0"), SubResource("Resource_07u07"), SubResource("Resource_ajb46")])
 
 [sub_resource type="Resource" id="Resource_lp63l"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_FACILITY_0"
-display_text = "금속문을 두드리며 일행을 불러 모으기"
-instruction_text = "금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라."
+display_text = "점멸등을 피해 어두운 정비 통로로"
+instruction_text = "점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라."
 
 [sub_resource type="Resource" id="Resource_nrong"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_FACILITY_1"
-display_text = "손전등을 흔들며 가장 밝은 복도로 이동"
-instruction_text = "손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라."
+display_text = "경보음이 울리는 동안 빠르게 통과"
+instruction_text = "경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라."
 
 [sub_resource type="Resource" id="Resource_oe1hm"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_FACILITY_2"
-display_text = "소음·이동광을 줄이고 차음 구역 이용"
-instruction_text = "불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라."
+display_text = "배관 구간을 벗어나 차음 구역에서 대기"
+instruction_text = "금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라."
 
 [sub_resource type="Resource" id="Resource_2mvx0"]
 script = ExtResource("9_q6od6")
 option_id = "BQ_T04_FACILITY_3"
-display_text = "차단문을 열고 개체 옆을 빠르게 통과"
-instruction_text = "차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라."
+display_text = "전원 통과 후 차단문 폐쇄"
+instruction_text = "차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라."
 
 [sub_resource type="Resource" id="Resource_p0065"]
 script = ExtResource("11_x88id")
 question_id = "BQ_T04_FACILITY"
 prompt_text = "반향과 점멸이 심한 복도에 직원들이 노출되어 있다. 어떤 이동·대피 지시를 전달할 것인가?"
-options = Array[ExtResource("9_q6od6")]([SubResource("Resource_lp63l"), SubResource("Resource_nrong"), SubResource("Resource_oe1hm"), SubResource("Resource_2mvx0")])
+options = Array[ExtResource("9_q6od6")]([SubResource("Resource_lp63l"), SubResource("Resource_nrong"), SubResource("Resource_2mvx0"), SubResource("Resource_oe1hm")])
 
 [sub_resource type="Resource" id="Resource_lmlb8"]
 script = ExtResource("8_hu8gu")
@@ -417,15 +434,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- C-2 복도 배관 지지대 근처에서 보호복 소매 섬유가 회수됐다. 벽을 따라간 경로가 대상의 접촉 범위와 겹쳤다.
+- 어두운 정비 통로에서 금속성 충돌음이 이어졌다. 통로 배관에서 대상의 접촉 흔적이 확인됐다.
 
 송출한 지시:
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 정비 통로 배관 지지대 변형 보고. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_6lpx8"]
 script = ExtResource("13_s7u30")
@@ -434,15 +455,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- C-2 복도 배관 지지대 근처에서 보호복 소매 섬유가 회수됐다. 벽을 따라간 경로가 대상의 접촉 범위와 겹쳤다.
+- 경보와 발소리가 겹친 구간에서 대상의 상지 운동이 급증했다. 이동 중 전도 보고가 접수됐으나 인원과 부상 여부는 확인되지 않았다.
 
 송출한 지시:
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_wnsbn"]
 script = ExtResource("13_s7u30")
@@ -451,15 +476,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- C-2 복도 배관 지지대 근처에서 보호복 소매 섬유가 회수됐다. 벽을 따라간 경로가 대상의 접촉 범위와 겹쳤다.
+- B구역 차음 구역 문 폐쇄와 배관 구간 이탈 완료가 보고됐다.
 
 송출한 지시:
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_aiene"]
 script = ExtResource("13_s7u30")
@@ -468,15 +497,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- C-2 복도 배관 지지대 근처에서 보호복 소매 섬유가 회수됐다. 벽을 따라간 경로가 대상의 접촉 범위와 겹쳤다.
+- 차단문 개방 시간이 길어져 대상이 인접 구간까지 이동했다.
 
 송출한 지시:
-이동 중 손전등으로 대상을 계속 비추며 함께 이동하라.
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라.
+손전등을 끄고 벽을 짚으며 가장 가까운 출구로 이동하라.
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 인접 구간 차단문 추가 폐쇄, 폐쇄 범위 확대. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_t801p"]
 script = ExtResource("13_s7u30")
@@ -485,15 +518,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 무전 교신 직후 대상의 두부 회전이 기록됐다. 금속 복도에서 무전 잡음이 반사된 것으로 보인다.
+- 어두운 정비 통로에서 금속성 충돌음이 이어졌다. 통로 배관에서 대상의 접촉 흔적이 확인됐다.
 
 송출한 지시:
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 정비 통로 배관 지지대 변형 보고. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_36oyb"]
 script = ExtResource("13_s7u30")
@@ -502,15 +539,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 무전 교신 직후 대상의 두부 회전이 기록됐다. 금속 복도에서 무전 잡음이 반사된 것으로 보인다.
+- 경보와 발소리가 겹친 구간에서 대상의 상지 운동이 급증했다. 이동 중 전도 보고가 접수됐으나 인원과 부상 여부는 확인되지 않았다.
 
 송출한 지시:
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_ls4fc"]
 script = ExtResource("13_s7u30")
@@ -519,15 +560,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- 무전 교신 직후 대상의 두부 회전이 기록됐다. 금속 복도에서 무전 잡음이 반사된 것으로 보인다.
+- B구역 차음 구역 문 폐쇄와 배관 구간 이탈 완료가 보고됐다.
 
 송출한 지시:
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_j6sim"]
 script = ExtResource("13_s7u30")
@@ -536,15 +581,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 무전 교신 직후 대상의 두부 회전이 기록됐다. 금속 복도에서 무전 잡음이 반사된 것으로 보인다.
+- 차단문 개방 시간이 길어져 대상이 인접 구간까지 이동했다.
 
 송출한 지시:
-큰 소리로 위치를 공유하며 가장 가까운 복도 출구로 뛰어가라.
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라.
+무전으로 위치를 짧게 공유하며 차단 구역으로 이동하라.
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 인접 구간 차단문 추가 폐쇄, 폐쇄 범위 확대. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_e5gfj"]
 script = ExtResource("13_s7u30")
@@ -553,15 +602,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- 차단 구역 문이 닫혔다. 내부 무전 응답은 유지되고 있다.
+- 어두운 정비 통로에서 금속성 충돌음이 이어졌다. 통로 배관에서 대상의 접촉 흔적이 확인됐다.
 
 송출한 지시:
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 정비 통로 배관 지지대 변형 보고. 추가 손상 범위는 조사 중."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_dhvkp"]
 script = ExtResource("13_s7u30")
@@ -570,15 +623,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- 차단 구역 문이 닫혔다. 내부 무전 응답은 유지되고 있다.
+- 경보와 발소리가 겹친 구간에서 대상의 상지 운동이 급증했다. 이동 중 전도 보고가 접수됐으나 인원과 부상 여부는 확인되지 않았다.
 
 송출한 지시:
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_jpnib"]
 script = ExtResource("13_s7u30")
@@ -587,15 +644,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 직원들이 자극을 줄이고 차단 구역으로 후퇴했다. 직접 접촉을 줄이는 방향의 지시였으나 최종 인명 피해는 확인되지 않았다.
+대응 검토: 두 지시 모두 자극 감소와 차단 유지에 부합했다. 직접 접촉 노출은 줄었을 것으로 보이나 최종 인명 피해는 확인되지 않았다.
+
+현장 기록:
+- 차단 구역 문이 닫혔다. 내부 무전 응답은 유지되고 있다.
+- B구역 차음 구역 문 폐쇄와 배관 구간 이탈 완료가 보고됐다.
 
 송출한 지시:
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "직원들이 자극을 줄이고 차단 구역으로 후퇴했다. 직접 접촉을 줄이는 방향의 지시였으나 최종 인명 피해는 확인되지 않았다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "두 지시 모두 자극 감소와 차단 유지에 부합했다. 직접 접촉 노출은 줄었을 것으로 보이나 최종 인명 피해는 확인되지 않았다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_37jvy"]
 script = ExtResource("13_s7u30")
@@ -604,15 +665,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- 차단 구역 문이 닫혔다. 내부 무전 응답은 유지되고 있다.
+- 차단문 개방 시간이 길어져 대상이 인접 구간까지 이동했다.
 
 송출한 지시:
-불필요한 발성과 이동광 사용을 중지하라. 대상과 거리를 유지하며 차단 가능한 구역으로 후퇴한 뒤 출입문을 폐쇄하라.
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라.
+손전등은 발밑만 비추고 말없이 차단 구역으로 후퇴해 문을 닫아라.
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 인접 구간 차단문 추가 폐쇄, 폐쇄 범위 확대. 추가 손상 범위는 조사 중."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_2qvp2"]
 script = ExtResource("13_s7u30")
@@ -621,15 +686,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 복도 잔류 인원과의 연락이 간헐적이다. 대상이 같은 구간의 구조물 접촉을 반복했다.
+- 어두운 정비 통로에서 금속성 충돌음이 이어졌다. 통로 배관에서 대상의 접촉 흔적이 확인됐다.
 
 송출한 지시:
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
-금속문을 두드리고 큰 소리로 일행을 불러 모아 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
+점멸등 구간을 피해 어두운 정비 통로로 돌아서 이동하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 정비 통로 배관 지지대 변형 보고. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_xxfyq"]
 script = ExtResource("13_s7u30")
@@ -638,15 +707,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 복도 잔류 인원과의 연락이 간헐적이다. 대상이 같은 구간의 구조물 접촉을 반복했다.
+- 경보와 발소리가 겹친 구간에서 대상의 상지 운동이 급증했다. 이동 중 전도 보고가 접수됐으나 인원과 부상 여부는 확인되지 않았다.
 
 송출한 지시:
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
-손전등을 흔들어 위치를 알리고 가장 밝은 복도를 따라 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
+경보음이 울리는 동안 그 소리에 묻혀 빠르게 통과하라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_u8lwq"]
 script = ExtResource("13_s7u30")
@@ -655,15 +728,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다.
+대응 검토: 한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다.
+
+현장 기록:
+- 복도 잔류 인원과의 연락이 간헐적이다. 대상이 같은 구간의 구조물 접촉을 반복했다.
+- B구역 차음 구역 문 폐쇄와 배관 구간 이탈 완료가 보고됐다.
 
 송출한 지시:
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
-불필요한 소음과 이동광을 만들지 말라. 확보된 안전 경로로 차음 구역이나 차단 공간에 들어가 문을 유지하고 통제실의 후속 지시를 기다려라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
+금속 배관 구간을 벗어나 차음 구역에 들어가 문을 유지하고 다음 지시를 기다려라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
 facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "일부 지시는 자극 감소에 부합했으나 다른 지시가 소음·이동광 또는 근접 통과 위험을 남겼다. 직원 일부의 상지 접촉 노출 여부를 조사해야 한다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+additional_observation = "한 지시는 자극 감소에 부합했으나 다른 지시가 위험 구간을 남겼다. 해당 구간 인원의 접촉 노출 여부를 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_ootpj"]
 script = ExtResource("13_s7u30")
@@ -672,15 +749,19 @@ display_name = "[임시·초안] T04 사고 후속 보고"
 description = "[TEMP / DRAFT / NON-CANON]
 사고 원인: 반복 반향과 구조물 간섭, 해당 ROOM B의 결함이 결합된 격리 이탈.
 
-대응 검토: 소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다.
+대응 검토: 두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다.
+
+현장 기록:
+- 복도 잔류 인원과의 연락이 간헐적이다. 대상이 같은 구간의 구조물 접촉을 반복했다.
+- 차단문 개방 시간이 길어져 대상이 인접 구간까지 이동했다.
 
 송출한 지시:
-금속 장비를 던져 주의를 돌리고 반대편 출구로 이동하라.
-차단문을 열고 대상 옆을 빠르게 통과해 복도 반대편으로 이동하라.
+현재 위치에서 움직이지 말고 통제실의 다음 지시를 기다려라.
+차단문을 열어 둔 채 전원이 통과할 때까지 기다렸다가 닫아라.
 
 조치 상태: 보고 완료 / 후속 점검 대기. 원래 격리 실패는 방송 대응과 별개의 이력으로 유지한다."
-facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 추가 손상 범위는 조사 중."
-additional_observation = "소음·이동광 또는 근접 이동 지시가 복합 자극과 접촉 위험을 키웠다. 접근 구역 확대와 피해 가능성에 대한 추가 조사가 필요하다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
+facility_damage = "점검 패널 이탈 및 출입문 잠금 이상 확인. 인접 구간 차단문 추가 폐쇄, 폐쇄 범위 확대. 추가 손상 범위는 조사 중."
+additional_observation = "두 지시 모두 대상의 탐색 범위나 복합 자극을 키우는 방향이었다. 접근 구역 확대와 피해 가능성을 조사 중이다. 사망·부상 인원은 UNKNOWN이며 0명으로 단정하지 않는다."
 
 [sub_resource type="Resource" id="Resource_vngbk"]
 script = ExtResource("15_n74k4")
@@ -813,35 +894,35 @@ subject_texture = ExtResource("17_bftw7")
 script = ExtResource("18_gesos")
 entry_id = "RL_T04_PROFILE_01"
 source_id = "PROFILE_T04"
-title = "RL_T04_PROFILE_01"
+title = "단일 개체 · 두부 2 / 상지 4"
 body_text = "T04는 두 개의 두부와 네 개의 상지를 가진 단일 개체이다."
 
 [sub_resource type="Resource" id="Resource_rjsd3"]
 script = ExtResource("18_gesos")
 entry_id = "RL_T04_PROFILE_02"
 source_id = "PROFILE_T04"
-title = "RL_T04_PROFILE_02"
+title = "정지 중에도 말단 탐색"
 body_text = "장시간 정지 상태를 유지하지만, 사지 말단의 미세한 탐색 운동은 지속된다."
 
 [sub_resource type="Resource" id="Resource_m5cq4"]
 script = ExtResource("18_gesos")
 entry_id = "RL_T04_PROFILE_03"
 source_id = "PROFILE_T04"
-title = "RL_T04_PROFILE_03"
+title = "두부별 자극 반응 차이 가능성"
 body_text = "확대 안구를 가진 두부와 과대 구강을 가진 두부가 서로 다른 자극에 반응할 가능성이 있다."
 
 [sub_resource type="Resource" id="Resource_oivbm"]
 script = ExtResource("18_gesos")
 entry_id = "RL_T04_PROFILE_04"
 source_id = "PROFILE_T04"
-title = "RL_T04_PROFILE_04"
+title = "사고 피해 양상: 얽힘·견인"
 body_text = "사고 기록상 직접적인 포식 행위보다 얽힘 및 견인 형태의 피해가 우세하다."
 
 [sub_resource type="Resource" id="Resource_tnp4a"]
 script = ExtResource("18_gesos")
 entry_id = "RL_T04_PROFILE_05"
 source_id = "PROFILE_T04"
-title = "RL_T04_PROFILE_05"
+title = "위험도와 환경 자극의 관련"
 body_text = "대상의 위험도는 외형적 위협성보다 환경 자극 증가와 더 관련이 있는 것으로 보인다."
 
 [sub_resource type="Resource" id="Resource_mivji"]
@@ -849,7 +930,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CCTV_01"
 source_kind = 1
 source_id = "CAM_T04_TEXT_OBSERVATION"
-title = "RL_T04_CCTV_01"
+title = "저자극 상태의 움직임 최소화"
 body_text = "저자극 상태의 T04는 장시간 움직임을 최소화한다."
 
 [sub_resource type="Resource" id="Resource_8q4af"]
@@ -857,7 +938,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CCTV_02"
 source_kind = 1
 source_id = "CAM_T04_TEXT_OBSERVATION"
-title = "RL_T04_CCTV_02"
+title = "소음 시 웃는 두부·상부 상지 반응"
 body_text = "외부 소음 발생 시 웃는 얼굴 쪽 두부와 상부 상지의 반응이 먼저 증가한다."
 
 [sub_resource type="Resource" id="Resource_5ejhq"]
@@ -865,7 +946,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CCTV_03"
 source_kind = 1
 source_id = "CAM_T04_TEXT_OBSERVATION"
-title = "RL_T04_CCTV_03"
+title = "이동광을 따라가는 큰 눈 두부"
 body_text = "이동광 자극 시 큰 눈의 두부가 즉각적인 추적 반응을 보인다."
 
 [sub_resource type="Resource" id="Resource_qryu0"]
@@ -873,7 +954,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CCTV_04"
 source_kind = 1
 source_id = "CAM_T04_TEXT_OBSERVATION"
-title = "RL_T04_CCTV_04"
+title = "복수 자극 시 상지 방향성 저하"
 body_text = "복수 자극이 겹칠 경우 상지 운동의 방향성이 불분명해진다."
 
 [sub_resource type="Resource" id="Resource_ranhw"]
@@ -881,7 +962,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CCTV_05"
 source_kind = 1
 source_id = "CAM_T04_TEXT_OBSERVATION"
-title = "RL_T04_CCTV_05"
+title = "불안정화는 구조물 탐색부터"
 body_text = "T04의 불안정화는 돌진보다 구조물 탐색 증가 형태로 시작된다."
 
 [sub_resource type="Resource" id="Resource_uoqpb"]
@@ -889,7 +970,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_EXP_ECHO"
 source_kind = 2
 source_id = "EXP_T04_ECHO"
-title = "RL_T04_EXP_ECHO"
+title = "반향성 음향 실험 결과"
 body_text = "반향성 음향 자극은 상지 탐색 행동을 유의하게 증가시켰다."
 
 [sub_resource type="Resource" id="Resource_gnj4l"]
@@ -897,7 +978,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_EXP_LIGHT"
 source_kind = 2
 source_id = "EXP_T04_LIGHT"
-title = "RL_T04_EXP_LIGHT"
+title = "이동광 단독 실험 결과"
 body_text = "단독 이동광 자극은 즉각적인 시선 추적을 유발했으나, 전신 운동 증가는 제한적이었다."
 
 [sub_resource type="Resource" id="Resource_kdc5f"]
@@ -905,7 +986,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_EXP_COMBINED"
 source_kind = 2
 source_id = "EXP_T04_COMBINED"
-title = "RL_T04_EXP_COMBINED"
+title = "복합 자극 실험 결과"
 body_text = "시각·음향 복합 자극에서 두부 반응 우선순위가 분리되며 사지 협응성이 급격히 저하되었다."
 
 [sub_resource type="Resource" id="Resource_2iece"]
@@ -913,7 +994,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_EXP_LOWSTIM"
 source_kind = 2
 source_id = "EXP_T04_LOWSTIM"
-title = "RL_T04_EXP_LOWSTIM"
+title = "자극 감소 실험 결과"
 body_text = "조도와 비필수 음향을 낮추자 두부 회전과 상지 탐색이 감소했다. 벽면 흡음 재질은 바꾸지 않았으므로 흡음 성능을 검증한 결과는 아니다."
 
 [sub_resource type="Resource" id="Resource_lg5wx"]
@@ -921,7 +1002,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_EXP_AIR"
 source_kind = 2
 source_id = "EXP_T04_AIR"
-title = "RL_T04_EXP_AIR"
+title = "기류 변화 실험 결과"
 body_text = "기류 변화에 대한 반응은 확인되었으나 주요 불안정화 요인으로 보기는 어렵다."
 
 [sub_resource type="Resource" id="Resource_q18qn"]
@@ -929,7 +1010,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CONTAINMENT_SUCCESS"
 source_kind = 11
 source_id = "ROOM_T04_LOWSTIM"
-title = "RL_T04_CONTAINMENT_SUCCESS"
+title = "장기 격리 안정 확인"
 body_text = "낮고 일정한 조도, 높은 내부 흡음과 외부 소음 차단을 갖춘 환경에서 T04는 장시간 안정 상태를 유지했다."
 
 [sub_resource type="Resource" id="Resource_nljt0"]
@@ -937,7 +1018,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CONTAINMENT_FAIL_01"
 source_kind = 11
 source_id = "ROOM_T04_STANDARD"
-title = "RL_T04_CONTAINMENT_FAIL_01"
+title = "격리 환경 부적합: 탐색 증가"
 body_text = "부적절한 환경에서 T04의 상지 탐색 행동이 점진적으로 증가했다."
 
 [sub_resource type="Resource" id="Resource_60o7j"]
@@ -945,7 +1026,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CONTAINMENT_FAIL_02"
 source_kind = 11
 source_id = "ROOM_T04_METALLIC"
-title = "RL_T04_CONTAINMENT_FAIL_02"
+title = "불안정화 초기: 출입문·벽면 상단 접촉"
 body_text = "불안정화 초기, 대상은 출입문과 벽면 상단 구조를 반복 접촉했다."
 
 [sub_resource type="Resource" id="Resource_idg3t"]
@@ -953,7 +1034,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_CONTAINMENT_FAIL_03"
 source_kind = 11
 source_id = "ROOM_T04_METALLIC"
-title = "RL_T04_CONTAINMENT_FAIL_03"
+title = "격리 실패 양상: 구조 간섭 누적"
 body_text = "T04의 격리 실패는 파괴보다 구조 간섭 누적에 의해 진행될 가능성이 높다."
 
 [sub_resource type="Resource" id="Resource_vwdhb"]
@@ -961,7 +1042,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_INCIDENT_01"
 source_kind = 4
 source_id = "INC_T04_01"
-title = "RL_T04_INCIDENT_01"
+title = "복도 반향과 탐색 범위 확대"
 body_text = "T04는 복도 환경에서 반향 자극이 증가할수록 탐색 범위를 넓혔다."
 
 [sub_resource type="Resource" id="Resource_wtkoq"]
@@ -969,7 +1050,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_INCIDENT_02"
 source_kind = 4
 source_id = "INC_T04_01"
-title = "RL_T04_INCIDENT_02"
+title = "탈출 후 주요 위험: 상지 접촉 범위"
 body_text = "탈출 후 대상의 주요 위험은 예측하기 어려운 상지 접촉 범위에 있다."
 
 [sub_resource type="Resource" id="Resource_g767q"]
@@ -977,7 +1058,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_INCIDENT_03"
 source_kind = 5
 source_id = "BROADCAST_T04_EVACUATION"
-title = "RL_T04_INCIDENT_03"
+title = "현장 위험을 키우는 행동"
 body_text = "강한 지시, 손전등 흔들기, 금속성 충돌음은 현장 위험도를 증가시킨다."
 
 [sub_resource type="Resource" id="Resource_bsh57"]
@@ -985,7 +1066,7 @@ script = ExtResource("18_gesos")
 entry_id = "RL_T04_INCIDENT_04"
 source_kind = 6
 source_id = "BQ_T04_FACILITY_2"
-title = "RL_T04_INCIDENT_04"
+title = "저자극 차폐 공간으로의 후퇴"
 body_text = "저자극 차폐 공간으로의 후퇴가 직접 대면보다 생존 가능성을 높인다."
 
 [sub_resource type="Resource" id="Resource_7aqse"]

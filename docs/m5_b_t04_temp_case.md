@@ -18,7 +18,7 @@ Godot **4.7.1**에서 [`scenes/playtests/t04_playtest.tscn`](../scenes/playtests
 
 ROOM C는 **낮고 일정한 조도 + 높은 내부 흡음 + 외부 소음 차단**이다. ROOM B는 어둡지만 금속 반향이 남는다. 일반적인 단발 반응과 장기 부적합, 격리 실패와 실제 탈출을 구분한다.
 
-방송은 Q01/Q02 모두 세 번째 선택지가 자극을 줄이고 차단 구역으로 후퇴하는 지시다. 4×4 전체 조합에 결과가 있으며, 사망·부상은 모든 조합에서 UNKNOWN이다. 적절한 방송도 최초 격리 실패를 성공으로 바꾸지 않는다. 이 문단은 개발 확인용 공략이며 게임은 승인 전에 정답을 표시하지 않는다.
+방송은 Q01/Q02 모두 option ID `_2`가 자극을 줄이고 차단 구역으로 후퇴하는 지시다. M5-B.2 이후 표시 순서는 Q01 두 번째, Q02 네 번째다. 4×4 전체 조합에 결과가 있으며, 사망·부상은 모든 조합에서 UNKNOWN이다. 적절한 방송도 최초 격리 실패를 성공으로 바꾸지 않는다. 이 문단은 개발 확인용 공략이며 게임은 승인 전에 정답을 표시하지 않는다.
 
 ## 조사한 기존 상태와 입력 자료
 
@@ -118,6 +118,17 @@ T04 결과 공개는 후속 CCTV/경고의 실제 표시 경계에 연결했다.
 실제 확보한 T04 시각 자산은 **Profile의 Master 1장**이다. [원본 출처·교체 안내](../assets/temp/t04/ASSET_PROVENANCE.md)에 해시와 용도를 기록했다. 전신을 자르거나 늘리지 않고 기존 aspect-preserving TextureRect로 표시한다.
 
 미제공: 전용 Profile 촬영본, CCTV Anchor·열화상, 실험별 결과 5종, 후보별 공간 사진, ROOM B 사고 장면과 보고서 증거 이미지. 이미지 없는 장면은 Placeholder/텍스트이며 다른 개체 이미지나 가짜 증거를 만들지 않았다.
+
+**M5-B.2 (2026-10-16) 갱신:** 사용자 승인으로 T04의 정보 전달 방식을 재조정했다. 설정, ID, 판정, Research·Archive·Profile 원문은 바꾸지 않았다.
+- CCTV에서 정답을 직접 말하는 문장을 제거했다.
+- 격리 후보를 측정값(조도, 외부 차음 dB, 내부 잔향 시간)으로 표기하고 ROOM C를 "흡음 패널 격리실"로 이름을 바꿨다.
+- 실험 결과에 수치를 넣었다.
+- 방송 오답을 절충형으로 재작성하고 표시 순서를 바꿨다.
+- 16개 사고 결과에 선택별 현장 기록을 추가했다(피해는 계속 UNKNOWN).
+
+상세: [M5-B.2 초안·적용 기록](content_drafts/t04/t04_m5b2_revision_draft.md), 화면: [screenshots/m5_b2](screenshots/m5_b2).
+
+**M5-B.1 (2026-10-16) 갱신:** 사용자 요청으로 Master와 M5-A 표준 격리실만 합성한 **TEMP 합성 프레임 6장**(CCTV 1장, 실험 5장)을 기존 `feed_texture`/`result_texture`에 연결했다. 모든 프레임에 `TEMP COMPOSITE / NOT EVIDENCE`를 표기하며 실제 촬영·실험 증거가 아니다. 출처와 생성 방법은 [ASSET_PROVENANCE](../assets/temp/t04/ASSET_PROVENANCE.md), 화면은 [screenshots/m5_b1](screenshots/m5_b1)에 있다. 열화상·후보별 공간·ROOM B 사고 이미지는 여전히 미제공이다.
 
 Profile/CCTV/Experiment 이미지는 기존 `subject_texture/feed_texture/result_texture` 참조로 교체한다. 공통 공간 참고는 Playtest의 `environment_reference`에 연결할 수 있다. 현재 ContainmentData에는 후보별 Texture 필드가 없으므로 후보별 사진 선택 기능은 아직 추가하지 않았다.
 

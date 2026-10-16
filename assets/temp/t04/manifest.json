@@ -1,15 +1,74 @@
 {
-  "status": "TEMP / DRAFT / NON-CANON / REPLACEABLE",
-  "source": "User-provided M5-B input bundle, copied unchanged. No separate public asset license claimed.",
-  "path": "assets/temp/t04/t04_master_reference.png",
-  "sha256": "ec314969415a5f813b8fd8a40d3c10a47be326566cc534e1ef9ae62f5094b216",
-  "width": 1086,
-  "height": 1448,
-  "slot": "ProfileData.subject_texture",
-  "not_used_as": [
-    "CCTV footage",
-    "experiment evidence",
-    "incident evidence"
-  ],
-  "height_note": "245–260 cm is an authored estimate, not verified from the image."
+    "status":  "TEMP / DRAFT / NON-CANON / REPLACEABLE",
+    "source":  "User-provided M5-B input bundle, copied unchanged. No separate public asset license claimed.",
+    "path":  "assets/temp/t04/t04_master_reference.png",
+    "sha256":  "ec314969415a5f813b8fd8a40d3c10a47be326566cc534e1ef9ae62f5094b216",
+    "width":  1086,
+    "height":  1448,
+    "slot":  "ProfileData.subject_texture",
+    "not_used_as":  [
+                        "CCTV footage",
+                        "experiment evidence",
+                        "incident evidence"
+                    ],
+    "height_note":  "245–260 cm is an authored estimate, not verified from the image.",
+    "generated_composites":  {
+                                 "status":  "TEMP COMPOSITE / NOT EVIDENCE / REPLACEABLE",
+                                 "created":  "2026-10-16",
+                                 "sources":  [
+                                                 "assets/temp/t04/t04_master_reference.png",
+                                                 "assets/temp/m5_a/environment/temp_environment_reference.png"
+                                             ],
+                                 "generator":  "tools/t04_temp_composite.ps1",
+                                 "not_used_as":  [
+                                                     "real CCTV footage",
+                                                     "experiment evidence",
+                                                     "incident evidence",
+                                                     "final creature or room design"
+                                                 ],
+                                 "files":  [
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_cctv_anchor_temp.png",
+                                                   "sha256":  "dc0c2cf95784e21d04d2430f18e0b808461b4c00e7fb12876e870d24427c8e9b",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "CCTVData.feed_texture (CAM_T04_TEXT_OBSERVATION)"
+                                               },
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_exp_air_temp.png",
+                                                   "sha256":  "47dfc54592765e3c3866b60730339863724902cdc43179a6dffce313859bc82e",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "EXP_T04_AIR.result_texture"
+                                               },
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_exp_combined_temp.png",
+                                                   "sha256":  "4417688581a152ff07c7ab9e901a97aca4a87cdf8654ff8569f880132c9e9749",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "EXP_T04_COMBINED.result_texture"
+                                               },
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_exp_echo_temp.png",
+                                                   "sha256":  "afaa1ada059c3735ffdc1a40ba53e7057fada10fb01b617b0eca47dafd51d312",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "EXP_T04_ECHO.result_texture"
+                                               },
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_exp_light_temp.png",
+                                                   "sha256":  "66d33e36ec2912d3fbae7fb43162df72a6864ccd9e905afe9979f2b32a4f61b6",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "EXP_T04_LIGHT.result_texture"
+                                               },
+                                               {
+                                                   "path":  "assets/temp/t04/generated/t04_exp_lowstim_temp.png",
+                                                   "sha256":  "3bacaea2a9d55eb80d28b2d7fbe0a16dbc58c922da5daab07d47254e0e07179d",
+                                                   "width":  1448,
+                                                   "height":  1086,
+                                                   "slot":  "EXP_T04_LOWSTIM.result_texture"
+                                               }
+                                           ]
+                             }
 }

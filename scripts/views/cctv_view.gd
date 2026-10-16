@@ -49,7 +49,7 @@ func _display_cctv() -> void:
 		return
 
 	_display_camera_heading()
-	camera_id_label.text = _text_or_placeholder(_cctv_data.camera_id, "camera_id")
+	camera_id_label.text = _text_or_placeholder(_cctv_data.get_display_name(), "camera_id")
 	observation_label.text = _text_or_placeholder(_cctv_data.observation_text, "observation_text")
 
 
@@ -98,7 +98,7 @@ func get_displayed_condition_observation_ids() -> Array[String]:
 
 
 func is_displaying_cctv(cctv_data: CCTVData) -> bool:
-	return is_node_ready() and _cctv_data != null and _cctv_data == cctv_data and camera_id_label.text == cctv_data.camera_id
+	return is_node_ready() and _cctv_data != null and _cctv_data == cctv_data and camera_id_label.text == cctv_data.get_display_name()
 
 
 func capture_work_state() -> Dictionary:
@@ -117,7 +117,7 @@ func restore_work_state(state: Dictionary) -> bool:
 
 
 func _display_camera_heading() -> void:
-	var id: String = _cctv_data.camera_id if _cctv_data != null else "[Unavailable]"
+	var id: String = _cctv_data.get_display_name() if _cctv_data != null else "[Unavailable]"
 	GameText.set_text(%CameraTab, "CAMERA: %s / UPDATED" if not _condition_observations.is_empty() else "CAMERA: %s", [id])
 
 
