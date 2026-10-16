@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="CampaignData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/campaign_entry_data.gd" id="1_baha3"]
+[ext_resource type="Resource" path="res://resources/cases/temp_t04_case.tres" id="2_2vmq3"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_01.tres" id="3_42v0i"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_02.tres" id="4_3ctta"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="5_gj4cw"]
+[ext_resource type="Script" path="res://scripts/data/campaign_data.gd" id="6_rqmkb"]
+[ext_resource type="Script" path="res://scripts/data/scripted_interrupt_occurrence_data.gd" id="7_gopaa"]
+
+[sub_resource type="Resource" id="Resource_82l4e"]
+script = ExtResource("1_baha3")
+entry_id = "TEMP_T04_ENTRY"
+case_data = ExtResource("2_2vmq3")
+
+[sub_resource type="Resource" id="Resource_s17h2"]
+script = ExtResource("1_baha3")
+entry_id = "T04_FOLLOWUP_01"
+case_data = ExtResource("3_42v0i")
+
+[sub_resource type="Resource" id="Resource_hw8uf"]
+script = ExtResource("1_baha3")
+entry_id = "T04_FOLLOWUP_02"
+case_data = ExtResource("4_3ctta")
+
+[sub_resource type="Resource" id="Resource_b85pb"]
+script = ExtResource("1_baha3")
+entry_id = "T04_FOLLOWUP_03"
+case_data = ExtResource("5_gj4cw")
+
+[resource]
+script = ExtResource("6_rqmkb")
+campaign_id = "TEMP_T04_M5B_PLAYTEST"
+display_name = "T04 독립 테스트 / TEMP"
+entries = Array[ExtResource("1_baha3")]([SubResource("Resource_82l4e"), SubResource("Resource_s17h2"), SubResource("Resource_hw8uf"), SubResource("Resource_b85pb")])

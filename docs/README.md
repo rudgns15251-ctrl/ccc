@@ -19,6 +19,7 @@ Step 보고서의 설계·코드 위치·수치는 해당 단계 작성 당시�
 
 ### UI와 업무 Navigation
 
+- [M5-B — T04 독립 임시 Case·플레이 검증](m5_b_t04_temp_case.md)
 - [M5-A — 임시 이미지·시설 제어 UI·음향 통합](m5_a_visual_production_slice.md)
 - [M4.5 — FACILITY CONTROL 구조 재설계·화면 비교](m4_5_structural_ui_redesign.md)
 - [M4.5 — 공식 무료 UI 에셋 비교·라이선스·실행 결과](m4_5_ui_asset_comparison.md)

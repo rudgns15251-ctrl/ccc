@@ -5,12 +5,14 @@ var _resolutions: Dictionary[String, Dictionary] = {}
 var _case_order: Array[String] = []
 
 
-func try_record_resolution(case_id: String, room_id: String, result: MonitoringOutcomeData.Result, incident_id: String = "") -> bool:
+func try_record_resolution(case_id: String, room_id: String, result: MonitoringOutcomeData.Result, incident_id: String = "", non_escape_failure: bool = false) -> bool:
 	if case_id.strip_edges().is_empty() or room_id.strip_edges().is_empty() or has_resolution(case_id):
 		return false
 	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE:
 		return false
-	if (result == MonitoringOutcomeData.Result.FAILURE and incident_id.strip_edges().is_empty()) or (result == MonitoringOutcomeData.Result.SUCCESS and not incident_id.is_empty()):
+	if non_escape_failure and (result != MonitoringOutcomeData.Result.FAILURE or not incident_id.is_empty()):
+		return false
+	if (result == MonitoringOutcomeData.Result.FAILURE and incident_id.strip_edges().is_empty() and not non_escape_failure) or (result == MonitoringOutcomeData.Result.SUCCESS and not incident_id.is_empty()):
 		return false
 	_resolutions[case_id] = {"case_id": case_id, "room_id": room_id, "result": result, "incident_id": incident_id}
 	_case_order.append(case_id)

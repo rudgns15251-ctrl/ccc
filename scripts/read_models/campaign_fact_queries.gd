@@ -256,10 +256,13 @@ func _case_meta(entry_id: String) -> Dictionary:
 	if not record.is_empty():
 		if resolved_room.is_empty() or record.get("case_id", "") != meta.definition_id or record.get("result", -1) not in [MonitoringOutcomeData.Result.SUCCESS, MonitoringOutcomeData.Result.FAILURE]: return _unavailable(meta, Availability.INVALID, "INVALID_RESOLUTION_LINK")
 		if record.result == MonitoringOutcomeData.Result.FAILURE:
+			var non_escape: bool = false
+			for outcome: MonitoringOutcomeData in entry.case_data.containment_outcomes:
+				if outcome != null and outcome.room_id == resolved_room and outcome.is_non_escape_failure() and record.get("incident_id", "").is_empty(): non_escape = true
 			var incidents: int = 0
 			for incident: IncidentData in entry.case_data.incidents:
 				if incident != null and incident.incident_id == record.get("incident_id", ""): incidents += 1
-			if incidents != 1: return _unavailable(meta, Availability.INVALID, "INVALID_INCIDENT_ID")
+			if not non_escape and incidents != 1: return _unavailable(meta, Availability.INVALID, "INVALID_INCIDENT_ID")
 		elif not record.get("incident_id", "").is_empty(): return _unavailable(meta, Availability.INVALID, "INVALID_RESOLUTION_LINK")
 	if _pending.has_pending(meta.definition_id) and pending_room.is_empty(): return _unavailable(meta, Availability.INVALID, "INVALID_ROOM_LINK")
 	if not pending_room.is_empty() and not resolved_room.is_empty() and pending_room != resolved_room: return _unavailable(meta, Availability.INVALID, "SOURCE_CONFLICT")

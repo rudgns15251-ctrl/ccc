@@ -641,7 +641,7 @@ func _research_category(source_kind: int) -> String:
 			return "OBSERVATION"
 		ResearchEntryData.SourceKind.EXPERIMENT, ResearchEntryData.SourceKind.EXPERIMENT_CONDITION_OBSERVATION:
 			return "EXPERIMENT"
-		ResearchEntryData.SourceKind.CONTAINMENT:
+		ResearchEntryData.SourceKind.CONTAINMENT, ResearchEntryData.SourceKind.CONTAINMENT_RESULT:
 			return "CONTAINMENT"
 		ResearchEntryData.SourceKind.INCIDENT, ResearchEntryData.SourceKind.BROADCAST, ResearchEntryData.SourceKind.BROADCAST_OPTION, ResearchEntryData.SourceKind.INCIDENT_RESULT:
 			return "INCIDENT"
@@ -673,7 +673,7 @@ func _get_valid_research_entries(case_data: CaseData = null) -> Array[ResearchEn
 		if id_counts.get(entry.entry_id, 0) > 1:
 			push_warning("Main: duplicate ResearchEntryData.entry_id %s; using derived text." % entry.entry_id)
 			valid = false
-		if source_counts.get("%d:%s" % [entry.source_kind, entry.source_id], 0) > 1:
+		if not source_case.grouped_research_entries and source_counts.get("%d:%s" % [entry.source_kind, entry.source_id], 0) > 1:
 			push_warning("Main: duplicate ResearchEntryData source mapping %d/%s; using derived text." % [entry.source_kind, entry.source_id])
 			valid = false
 		if valid:
@@ -689,10 +689,13 @@ func _find_research_entry(entries: Array[ResearchEntryData], source_kind: int, s
 
 
 func _append_source_research_entry(snapshot: ResearchLogView.Snapshot, entries: Array[ResearchEntryData], source_kind: int, category: String, source_id: String, title: String, body_text: String) -> void:
-	var authored: ResearchEntryData = _find_research_entry(entries, source_kind, source_id)
-	if authored != null and (not _has_current_case_runtime() or not case_runtime.has_discovered_research_entry(authored.entry_id)):
-		authored = null
-	_append_research_entry(snapshot, _research_category(source_kind) if authored != null else category, source_id, authored.title if authored != null else title, authored.body_text if authored != null else body_text, source_kind)
+	var found: bool = false
+	for authored: ResearchEntryData in entries:
+		if authored.source_kind == source_kind and authored.source_id == source_id and _has_current_case_runtime() and case_runtime.has_discovered_research_entry(authored.entry_id):
+			_append_research_entry(snapshot, _research_category(source_kind), source_id, authored.title, authored.body_text, source_kind)
+			found = true
+	if not found:
+		_append_research_entry(snapshot, category, source_id, title, body_text, source_kind)
 
 
 func _has_current_case_runtime() -> bool:
@@ -704,8 +707,11 @@ func _try_discover_research_entry(source_kind: int, source_id: String) -> bool:
 	if not _has_current_case_runtime() or source_id.strip_edges().is_empty():
 		return false
 	case_runtime.try_observe_research_source(source_kind, source_id)
-	var authored: ResearchEntryData = _find_research_entry(_get_valid_research_entries(), source_kind, source_id)
-	return authored != null and case_runtime.try_discover_research_entry(authored.entry_id)
+	var discovered: bool = false
+	for authored: ResearchEntryData in _get_valid_research_entries():
+		if authored.source_kind == source_kind and authored.source_id == source_id:
+			discovered = case_runtime.try_discover_research_entry(authored.entry_id) or discovered
+	return discovered
 
 
 func _discover_displayed_research_entry(view: FlowView, stage: int, source: Resource) -> void:
@@ -1548,15 +1554,16 @@ func _try_resolve_pending_without_handoff(source: CaseData, closure_prepare: boo
 	var outcome: MonitoringOutcomeData = matches[0]
 	var result: MonitoringOutcomeData.Result = outcome.final_result
 	var incident_id: String = outcome.incident_id if result == MonitoringOutcomeData.Result.FAILURE else ""
-	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE or (result == MonitoringOutcomeData.Result.FAILURE and (incident_id.strip_edges().is_empty() or failure_candidates.has_candidate(case_id))):
+	var non_escape: bool = outcome.is_non_escape_failure()
+	if result != MonitoringOutcomeData.Result.SUCCESS and result != MonitoringOutcomeData.Result.FAILURE or (outcome.failure_without_incident and not non_escape) or (result == MonitoringOutcomeData.Result.FAILURE and ((incident_id.strip_edges().is_empty() and not non_escape) or failure_candidates.has_candidate(case_id))):
 		push_warning("Main: invalid hidden resolution or existing failure candidate; retaining Pending.")
 		return false
-	if result == MonitoringOutcomeData.Result.FAILURE and _unique_response_content(source.incidents, "incident_id", incident_id) == null:
+	if result == MonitoringOutcomeData.Result.FAILURE and not non_escape and _unique_response_content(source.incidents, "incident_id", incident_id) == null:
 		push_warning("Main: hidden FAILURE requires a unique Incident; retaining Pending.")
 		return false
-	if not containment_resolutions.try_record_resolution(case_id, room_id, result, incident_id):
+	if not containment_resolutions.try_record_resolution(case_id, room_id, result, incident_id, non_escape):
 		return false
-	if result == MonitoringOutcomeData.Result.FAILURE:
+	if result == MonitoringOutcomeData.Result.FAILURE and not non_escape:
 		if not failure_candidates.try_add_candidate(case_id, incident_id, _event_rng.randi_range(PROTOTYPE_DISTURBANCE_THRESHOLD.x, PROTOTYPE_DISTURBANCE_THRESHOLD.y), PROTOTYPE_MAJOR_THRESHOLD):
 			# No cross-State transaction API: retain the monotonic Resolution AND
 			# Pending on insertion failure; never pretend a full prepare succeeded.
@@ -1847,10 +1854,11 @@ func _merge_response_research(source_kind: int, source_id: String) -> void:
 	var source: CaseData = _response_source_case()
 	if source == null:
 		return
-	var entry: ResearchEntryData = _find_research_entry(_get_valid_research_entries(source), source_kind, source_id)
-	if entry != null:
-		var ids: Array[String] = [entry.entry_id]
-		research_archive.merge_case_discoveries(source.case_id, ids)
+	var ids: Array[String] = []
+	for entry: ResearchEntryData in _get_valid_research_entries(source):
+		if entry.source_kind == source_kind and entry.source_id == source_id:
+			ids.append(entry.entry_id)
+	research_archive.merge_case_discoveries(source.case_id, ids)
 
 
 func _discover_response_research(stage: int, source: Resource) -> void:

@@ -1,0 +1,15 @@
+{
+  "status": "TEMP / DRAFT / NON-CANON / REPLACEABLE",
+  "source": "User-provided M5-B input bundle, copied unchanged. No separate public asset license claimed.",
+  "path": "assets/temp/t04/t04_master_reference.png",
+  "sha256": "ec314969415a5f813b8fd8a40d3c10a47be326566cc534e1ef9ae62f5094b216",
+  "width": 1086,
+  "height": 1448,
+  "slot": "ProfileData.subject_texture",
+  "not_used_as": [
+    "CCTV footage",
+    "experiment evidence",
+    "incident evidence"
+  ],
+  "height_note": "245–260 cm is an authored estimate, not verified from the image."
+}

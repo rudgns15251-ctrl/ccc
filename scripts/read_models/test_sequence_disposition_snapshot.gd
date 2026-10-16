@@ -70,7 +70,7 @@ static func _pending_entry(record: Dictionary, resolutions: Array[Dictionary], c
 	if outcome.final_result not in [MonitoringOutcomeData.Result.SUCCESS, MonitoringOutcomeData.Result.FAILURE]:
 		entry.reference_issue = "UNDEFINED_OUTCOME_RESULT"
 		return entry
-	if outcome.final_result == MonitoringOutcomeData.Result.FAILURE:
+	if outcome.final_result == MonitoringOutcomeData.Result.FAILURE and not outcome.is_non_escape_failure():
 		var incident: IncidentData = lookup_content.call(source.incidents, "incident_id", outcome.incident_id) as IncidentData
 		if incident == null:
 			entry.reference_issue = "UNAVAILABLE_OR_AMBIGUOUS_INCIDENT"

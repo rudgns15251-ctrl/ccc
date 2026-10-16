@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/playtests/m5_a_visual_playtest.tscn" id="base"]
+[ext_resource type="Script" path="res://scripts/main/t04_playtest.gd" id="script"]
+[ext_resource type="Resource" path="res://resources/campaigns/temp_t04_playtest.tres" id="campaign"]
+[ext_resource type="Script" path="res://scripts/data/story_record_data.gd" id="story"]
+
+[node name="T04Playtest" instance=ExtResource("base")]
+script = ExtResource("script")
+campaign_data = ExtResource("campaign")
+environment_reference = null
+story_records = Array[ExtResource("story")]([])

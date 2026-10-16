@@ -26,7 +26,7 @@ static func signature(campaign: CampaignData, records: Array[StoryRecordData]) -
 		var row: Array = [entry.entry_id, entry.entry_kind]
 		if entry.entry_kind == CampaignEntryData.EntryKind.CASE:
 			var item: CaseData = entry.case_data
-			row.append([item.case_id, item.experiment_limit, _ids(item.available_experiments,"experiment_id"), _ids(item.available_containment_rooms,"room_id"), item.containment_outcomes.map(func(o: MonitoringOutcomeData) -> Array: return [o.room_id, o.final_result, o.incident_id]), _ids(item.research_entries,"entry_id")])
+			row.append([item.case_id, item.experiment_limit, _ids(item.available_experiments,"experiment_id"), _ids(item.available_containment_rooms,"room_id"), item.containment_outcomes.map(func(o: MonitoringOutcomeData) -> Array: return [o.room_id, o.final_result, o.incident_id, true] if o.failure_without_incident else [o.room_id, o.final_result, o.incident_id]), _ids(item.research_entries,"entry_id")])
 		else: row.append(_bundle_signature(entry.scripted_incident_data))
 		data.append(row)
 	for occurrence: ScriptedInterruptOccurrenceData in campaign.scripted_interrupts:
@@ -68,7 +68,7 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 		if not _fields(row,{"case_id":TYPE_STRING,"room_id":TYPE_STRING,"result":TYPE_INT,"incident_id":TYPE_STRING}) or row.case_id != completed_cases[i]: return _bad("RESOLUTION_ORDER")
 		var data: CaseData = campaign.get_case_entry(row.case_id).case_data
 		var outcome: MonitoringOutcomeData = _unique(data.containment_outcomes,"room_id",row.room_id)
-		if _unique(data.available_containment_rooms,"room_id",row.room_id) == null or outcome == null or outcome.final_result != row.result or outcome.incident_id != row.incident_id or not resolved.try_record_resolution(row.case_id,row.room_id,row.result,row.incident_id): return _bad("RESOLUTION")
+		if _unique(data.available_containment_rooms,"room_id",row.room_id) == null or outcome == null or outcome.final_result != row.result or outcome.incident_id != row.incident_id or not resolved.try_record_resolution(row.case_id,row.room_id,row.result,row.incident_id,outcome.is_non_escape_failure()): return _bad("RESOLUTION")
 	var responses := IncidentResponseState.new()
 	var response_keys: Array[String] = []
 	for row: Variant in p.responses:
@@ -127,7 +127,7 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 	var expected_candidates: Array[String] = []
 	for id: String in completed_cases:
 		var resolution: Dictionary = resolved.get_resolution(id)
-		if resolution.result == 2 and not responses.has_response(IncidentSource.new(0,campaign.get_case_entry(id).entry_id,id),resolution.incident_id): expected_candidates.append(id)
+		if resolution.result == 2 and not resolution.incident_id.is_empty() and not responses.has_response(IncidentSource.new(0,campaign.get_case_entry(id).entry_id,id),resolution.incident_id): expected_candidates.append(id)
 	if candidate_ids != expected_candidates: return _bad("CANDIDATE_ORDER_OR_MISSING")
 	candidates.restore_validated_save_data(p.candidates)
 	var data: CaseData = current.case_data
@@ -187,6 +187,8 @@ static func prepare(p: Dictionary, campaign: CampaignData, records: Array[StoryR
 		for id: String in row.entries:
 			var research: ResearchEntryData = _unique(source_data.research_entries,"entry_id",id)
 			if research == null: return _bad("ARCHIVE_RESEARCH_ID")
+			if research.source_kind == ResearchEntryData.SourceKind.CONTAINMENT_RESULT and resolved.get_resolution(row.case_id).get("room_id", "") != research.source_id:
+				return _bad("UNOBSERVED_CONTAINMENT_RESULT")
 			# New multi-question records cannot unlock untransmitted answers/results.
 			for broadcast: EmergencyBroadcastData in source_data.emergency_broadcasts:
 				if not broadcast.is_multi_question() or research.source_kind not in [ResearchEntryData.SourceKind.BROADCAST_OPTION,ResearchEntryData.SourceKind.INCIDENT_RESULT]: continue

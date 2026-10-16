@@ -202,7 +202,12 @@ static func source_issue(facts: Dictionary, mapping: Dictionary, campaign: Campa
 		if resolution.result == MonitoringOutcomeData.Result.SUCCESS:
 			if not candidate.is_empty() or not resolution.incident_id.is_empty(): return "SUCCESS_WITH_EVENT::" + resolution.case_id
 		elif resolution.result == MonitoringOutcomeData.Result.FAILURE:
-			if candidate.is_empty() and not completed: return "FAILURE_WITHOUT_EVENT_EVIDENCE::" + resolution.case_id
+			var non_escape: bool = false
+			var authored: CampaignEntryData = campaign.get_case_entry(resolution.case_id) if campaign != null else null
+			if authored != null:
+				var outcome: MonitoringOutcomeData = unique_content(authored.case_data.containment_outcomes, "room_id", resolution.room_id) as MonitoringOutcomeData
+				non_escape = outcome != null and outcome.is_non_escape_failure() and resolution.incident_id.is_empty() and candidate.is_empty() and not completed
+			if candidate.is_empty() and not completed and not non_escape: return "FAILURE_WITHOUT_EVENT_EVIDENCE::" + resolution.case_id
 			if not candidate.is_empty() and candidate.incident_id != resolution.incident_id: return "MISMATCHED_CANDIDATE::" + resolution.case_id
 		else: return "INVALID_RESOLUTION_RESULT::" + resolution.case_id
 	for candidate: Dictionary in facts.candidates:

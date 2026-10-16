@@ -13,6 +13,8 @@ extends Resource
 @export var emergency_broadcasts: Array[EmergencyBroadcastData] = []
 @export var incident_results: Array[IncidentResultData] = []
 @export var research_entries: Array[ResearchEntryData] = []
+# Opt in only when one observed source contains several authored research notes.
+@export var grouped_research_entries: bool = false
 @export var disturbance_reactions: Array[CaseDisturbanceReactionData] = []
 @export var cctv_condition_observations: Array[CCTVConditionObservationData] = []
 @export var experiment_condition_observations: Array[ExperimentConditionObservationData] = []
