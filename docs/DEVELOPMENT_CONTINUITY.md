@@ -10,6 +10,86 @@
 
 ## 작업 기록 (최신이 위)
 
+### 2026-10-16 — A5 / 2단계 소리 (Claude Code)
+- 다운로드(사용자 승인): BigSoundBank CC0 WAV 26개 → `assets/third_party/release_ui/sfx/bigsoundbank/`(.gdignore). 출처와 해시는 CREDITS.md.
+- 신규: `tools/build_release_sfx.gd`(자르기, 페이드, 정규화, 루프) → `assets/ui/release/sfx/` 17개 생성.
+- 수정:
+  - `scripts/presentation/t04_presentation.gd`: 이벤트음 재생(`play_event`), 화면별 진입음, 경고·송출·결과 보고서 소리, 운영실 루프 2개. 첫 화면 소리를 위해 플레이어 생성 순서를 조정했다.
+  - `scripts/release/credits_panel.gd`: BigSoundBank·CC0 재질 표기.
+- Sonniss는 봇 확인 때문에 미다운로드(사용자 직접 다운로드 필요).
+- 검증:
+  - 소리 재생과 루프 지속을 확인했다(GPU 창, 일회용 스크립트).
+  - 세 경로 1280, 메뉴 14항목, verify(80), Scene 5개 시작 모두 통과(옛 기대값 1건 제외).
+  - 사용자 데이터 정리 완료(M2 저장 해시 동일).
+- 발견하고 해결한 문제: headless 실행에서는 재생 중인 스트림이 종료 시 누수로 보고됐다(더미 오디오 드라이버가 재생을 해제하지 않음, 창 실행에서는 누수 없음). headless에서는 소리를 재생하지 않게 해서 검사 출력을 깨끗하게 유지했다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 사용자가 실제로 들어보고 음량 균형을 피드백한다. 도장 소리 제작.
+
+### 2026-10-16 — A4 / 콘솔 프레임 직접 제작 (Claude Code)
+- 수정:
+  - `tools/build_release_theme.gd`: `console_frame.png` 생성(CC0 강판 톤 매핑, 베벨, 검은 턱, 모서리 나사), `ConsoleFramePanel` type 추가 → Theme 재생성.
+  - `scripts/presentation/t04_presentation.gd`: 셸 뒤에 프레임 패널을 깔고 셸 여백 조정(26/26/24/22). 기존 undo 경로로 제거된다.
+- 검증:
+  - 탈출 경로 1280과 1920, 큰 글자 세 경로, 메뉴 14항목, verify(80), Scene 5개 모두 통과(옛 기대값 1건 제외).
+  - 설정은 '보통'으로 복원, 테스트 저장 정리, M2 저장 해시 동일.
+- Git: 미커밋.
+- 다음 우선순위 하나: 2단계(무료 소리 선별·가공) 또는 지금까지 변경 커밋.
+
+### 2026-10-16 — A3 / 1단계 CC0 재질 적용 (Claude Code)
+- 다운로드(사용자 승인): Poly Haven 2개, ambientCG 4개. 모두 CC0. 색 이미지 6장만 `assets/third_party/release_ui/materials/`(.gdignore)에 넣었고, 출처·라이선스·해시는 `CREDITS.md`에 기록했다.
+- 수정: `tools/build_release_theme.gd`가 사진을 톤 매핑해 UI 패널을 생성한다(원본이 없으면 노이즈로 대체). 경보 9-slice 여백 3→6.
+  - 재생성된 파일: `assets/ui/release/*_panel.png`, `steel_background.png`, Theme.
+- 검증: 세 경로 1280, 메뉴 14항목, verify, Scene 5개 시작 모두 통과(옛 기대값 1건 제외). 테스트 저장 정리 완료, M2 저장 해시 동일.
+- 참고: 첫 복사를 PowerShell로 했을 때 파일이 프로젝트에 들어가지 않았다(원인 미확인). Bash로 다시 복사한 뒤 해시를 확인했다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 2단계(무료 소리 선별·가공) 또는 콘솔 프레임 직접 제작.
+
+### 2026-10-16 — A2 / 장소감 에셋 확보 계획 (Claude Code, 문서만)
+- 산출물: [docs/ui_release/asset_acquisition_plan.md](ui_release/asset_acquisition_plan.md).
+- 요지:
+  - 1단계는 0원: CC0 재질(ambientCG, Poly Haven), 무료 소리(Sonniss GDC 2026, BigSoundBank, Freesound CC0), 콘솔 프레임과 1차 타이틀 직접 제작.
+  - 구매는 부족한 소리 팩만(약 0~10만 원).
+  - 키 아트는 출시 직전 외주(약 40만~100만 원).
+  - 콘텐츠 이미지는 정식 Case 확정 후 산정.
+- 비용은 조사 시점의 추정이다. 다운로드, 구매, 외주는 각각 사용자 승인이 필요하다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 1단계(CC0 재질 → UI 패널 교체)의 다운로드 파일 목록을 제시하고 승인을 받는다.
+
+### 2026-10-16 — QA2 / 지연 결과 패널 + 방송 화면 (Claude Code)
+- 신규: `scenes/release/result_notice.tscn`, `scripts/release/result_notice.gd`(종이 보고서형 결과 패널).
+- 수정:
+  - `scripts/main/t04_playtest.gd`: A/C 결과가 처음 공개될 때만 패널을 요청한다. 판정과 저장 데이터는 변경 없음.
+  - `scripts/presentation/t04_presentation.gd`: 패널 연결, Esc와 일시정지 우선순위, 방송 상황 패널 확대, 단계줄 숨김, 상황 패널 접두어 정리.
+  - 로컬 QA 스크립트(gitignore 대상) `.godot/verification/m5_b/journey.gd`: 결과 패널 표시와 닫기 검사, 캡처 추가.
+- 검증:
+  - 세 경로 1280과 탈출 경로 1920 재플레이: 실패는 옛 기대값 1건뿐.
+  - 메뉴 14항목, verify(80 scripts), Scene 5개 모두 통과.
+  - 사용자 데이터 정리 완료(M2 저장 해시 동일).
+- 보고서: `docs/ui_release/qa_pass_1.md`의 "QA 2차" 절.
+- Git: 미커밋.
+- 다음 우선순위 하나: 장소감을 위한 에셋 확보 계획을 결정한다(재질, 이미지, 소리, 타이틀 아트). 구조와 정보 전달 쪽 주요 문제는 이번 QA 기준으로 해소됐다.
+
+### 2026-10-16 — QA1 / UI/UX 직접 플레이 점검 + 수정 (Claude Code)
+- 보고서: [docs/ui_release/qa_pass_1.md](ui_release/qa_pass_1.md). T04 세 경로를 끝까지 플레이하고 화면 36장을 비교작 기준으로 검토했다.
+- 결론: 부족함의 일부는 에셋 부족(이미지, 재질, 소리, 타이틀 아트) 때문이지만, 발견한 문제 대부분은 에셋과 무관한 설계와 구현 문제였다.
+- 수정(`scripts/presentation/t04_presentation.gd`, T04 프리뷰만):
+  - 직전 패스의 회귀(Archive와 보고서 정리 꺼짐) 수정.
+  - 실험: 실행 버튼 호박색, 목록 설명 숨김(5개 모두 보임), 남은 횟수 표시등.
+  - 사고 화면의 빈 이미지 틀 숨김.
+  - 승인 확인창 확대.
+  - 연구 기록 서랍 확대, 목록·상세 좌우 배치, 뒤 화면 흐림.
+  - 환경 경고 뒤 화면 흐림.
+- 검증: 세 경로 1280, 탈출 경로 1920, 메뉴 14항목, verify(79), Scene 5개 시작 모두 통과(옛 기대값 1건 제외).
+- 사용자 데이터 주의: `journey.gd --mode=all`은 실제 사용자 폴더에 T04 저장을 쓴다. 이번에 남은 테스트 저장(.json과 .bak)은 삭제했고 M2 저장 해시는 그대로다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 지연 결과 읽기 패널(격리 판정을 사건처럼 전달)과 방송 화면 레이아웃 조정. 장소감용 에셋 확보 방식은 사용자 결정이 필요하다.
+
+### 2026-10-16 — Git 커밋 2 (사용자 요청)
+- 브랜치 `ui-release-theme`에 커밋 `3f87c73`(6,548개 파일, 그중 6,464개는 `.gdignore`된 후보 에셋 팩)을 만들었다. 이후 사용자 요청으로 `master`를 fast-forward해서 `master` = `3f87c73`(origin/main보다 2커밋 앞섬)이고, 현재 브랜치는 `master`다. 푸시하지 않았다.
+- 제외(미커밋 유지): README 개인 편집, T04 입력 ZIP과 추출 폴더, `설치_안내.md`, `CLAUDE_FIRST_SESSION_PROMPT.txt`.
+- **추가로 제외한 파일:** 작업 중(10-16 17:01~17:02) 프로젝트 루트에 생긴 `anki_project/`(Python vendor 패키지, 스크립트)와 `source/`(게임마케팅 강의 PDF 3개). CAP와 무관하고 이 세션이 만든 파일이 아니어서 손대지 않고 커밋에서 뺐다. 위치를 옮길지는 사용자 확인이 필요하다.
+- 이 기록 자체는 커밋 이후에 추가한 미커밋 변경이다.
+
 ### 2026-10-16 — UI-P4 / 글자 '크게' 점검 + 크레딧 (Claude Code)
 - 수정:
   - `scripts/presentation/t04_presentation.gd`: 작업 화면의 시설 조건 블록을 경보 띠에 통합하고, 사고·방송·보고서 화면에서는 경보 띠를 숨김(720p 공간 확보).

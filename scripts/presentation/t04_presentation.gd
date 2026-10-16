@@ -4,6 +4,8 @@ extends "res://scripts/presentation/visual_production.gd"
 const RELEASE_THEME: Theme = preload("res://resources/ui/release_instrument_steel_theme.tres")
 const ARCHIVE_LIST_SCRIPT = preload("res://scripts/views/research_archive_list_view.gd")
 const ARCHIVE_DETAIL_SCRIPT = preload("res://scripts/views/research_archive_detail_view.gd")
+const INCIDENT_SCRIPT = preload("res://scripts/views/incident_view.gd")
+var _drawer_dim: Panel
 # Chrome-only prefix such as "[임시·초안·비정사] " — the TEMP BUILD badge carries that status instead.
 var _temp_prefix := RegEx.create_from_string("^\\[(?:임시|TEMP)[^\\]]*\\]\\s*")
 var _badge: Button
@@ -33,12 +35,84 @@ const SFX := {
 	"transmit": [preload("res://assets/ui/release/sfx/ui_transmit.wav")],
 }
 const SFX_VOLUME_DB := -9.0
+# Event sounds and room ambience from BigSoundBank (CC0), cut by tools/build_release_sfx.gd.
+const EVENT_SFX := {
+	"doc_page": [preload("res://assets/ui/release/sfx/doc_page_a.wav"), preload("res://assets/ui/release/sfx/doc_page_b.wav")],
+	"report_open": [preload("res://assets/ui/release/sfx/report_open.wav")],
+	"switch_heavy": [preload("res://assets/ui/release/sfx/switch_heavy.wav")],
+	"mic_on": [preload("res://assets/ui/release/sfx/mic_on.wav")],
+	"radio_burst": [preload("res://assets/ui/release/sfx/radio_burst.wav")],
+	"radio_static": [preload("res://assets/ui/release/sfx/radio_static.wav")],
+	"radio_start": [preload("res://assets/ui/release/sfx/radio_start.wav")],
+	"crt_switch": [preload("res://assets/ui/release/sfx/crt_switch.wav")],
+	"alarm_warning": [preload("res://assets/ui/release/sfx/alarm_warning.wav")],
+	"alarm_buzzer": [preload("res://assets/ui/release/sfx/alarm_buzzer.wav")],
+	"metal_scrape": [preload("res://assets/ui/release/sfx/metal_scrape.wav")],
+}
+const AMBIENCE := [
+	[preload("res://assets/ui/release/sfx/amb_vent.wav"), 0.0],
+	[preload("res://assets/ui/release/sfx/amb_neon.wav"), -6.0],
+]
+const EVENT_VOLUME_DB := -4.0
+var _event_players: Array[AudioStreamPlayer] = []
+var _event_next: int = 0
+var _ambience: Array[AudioStreamPlayer] = []
+
+
+# Headless runs (CI, checks) use a dummy audio driver that never releases playbacks; stay silent there.
+var _silent: bool = DisplayServer.get_name() == "headless"
+
+
+func play_event(kind: String, delay: float = 0.0) -> void:
+	if _silent: return
+	if not enabled or not EVENT_SFX.has(kind) or _event_players.is_empty(): return
+	if delay > 0.0:
+		get_tree().create_timer(delay).timeout.connect(play_event.bind(kind))
+		return
+	var bank: Array = EVENT_SFX[kind]
+	var player: AudioStreamPlayer = _event_players[_event_next]
+	_event_next = (_event_next + 1) % _event_players.size()
+	player.stream = bank[_sfx_rng.randi() % bank.size()]
+	player.pitch_scale = _sfx_rng.randf_range(0.98, 1.02)
+	player.play()
+
+
+func _exit_tree() -> void:
+	# Release the per-session looping stream copies so nothing outlives the scene.
+	for player: AudioStreamPlayer in _ambience:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+	_ambience.clear()
+
+
+func _start_ambience() -> void:
+	if _silent: return
+	for pair: Array in AMBIENCE:
+		var stream: AudioStreamWAV = (pair[0] as AudioStreamWAV).duplicate()
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		stream.loop_begin = 0
+		stream.loop_end = int(stream.get_length() * stream.mix_rate)
+		var player := AudioStreamPlayer.new()
+		player.stream = stream
+		player.volume_db = pair[1]
+		add_child(player)
+		player.play(_sfx_rng.randf_range(0.0, stream.get_length() * 0.8))
+		_ambience.append(player)
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_next: int = 0
 var _sfx_rng := RandomNumberGenerator.new()
 
 
 const PAUSE_MENU: PackedScene = preload("res://scenes/release/pause_menu.tscn")
+const RESULT_NOTICE: PackedScene = preload("res://scenes/release/result_notice.tscn")
+var _result: Control
+
+
+func show_containment_result(report: Dictionary) -> void:
+	if not enabled or _result == null: return
+	_result.show_report(report)
+	play_event("report_open")
 const TOOL_FONT_SIZE := 25
 var _settings: Dictionary = ReleaseSettings.load_values()
 var _pause: Control
@@ -47,12 +121,19 @@ var _menu_button: Button
 
 func configure(main: Control, initial: bool) -> void:
 	ReleaseSettings.apply_audio(_settings)
-	super.configure(main, initial)
+	# Players exist before the first screen is decorated, so its arrival sound plays.
 	for index: int in 4:
 		var player := AudioStreamPlayer.new()
 		add_child(player)
 		_sfx_players.append(player)
+	for index: int in 3:
+		var player := AudioStreamPlayer.new()
+		player.volume_db = EVENT_VOLUME_DB
+		add_child(player)
+		_event_players.append(player)
 	_apply_ui_volume()
+	super.configure(main, initial)
+	_start_ambience()
 	for node: Node in game.find_children("*", "BaseButton", true, false): _attach_click(node)
 	get_tree().node_added.connect(_on_node_added)
 	var layer := CanvasLayer.new()
@@ -62,6 +143,10 @@ func configure(main: Control, initial: bool) -> void:
 	_pause.theme = theme
 	layer.add_child(_pause)
 	_pause.settings_changed.connect(_on_settings_changed)
+	_result = RESULT_NOTICE.instantiate()
+	_result.theme = theme
+	layer.add_child(_result)
+	_result.archive_requested.connect(func() -> void: game.get_node("%Archive").pressed.emit.call_deferred())
 	_pause.resumed.connect(func() -> void: if is_instance_valid(_menu_button) and _menu_button.is_visible_in_tree(): _menu_button.grab_focus())
 	if ReleaseSettings.continue_requested:
 		ReleaseSettings.continue_requested = false
@@ -83,6 +168,7 @@ func _on_settings_changed(values: Dictionary) -> void:
 	if not rescale: return
 	theme = _make_theme()
 	_pause.theme = theme
+	_result.theme = theme
 	if enabled:
 		game.theme = theme
 		for name: String in TOOL_ICONS: _change(shell, game.get_node("%" + name), "theme_override_font_sizes/font_size", roundi(TOOL_FONT_SIZE * ReleaseSettings.text_scale(_settings)))
@@ -93,12 +179,12 @@ func _apply_ui_volume() -> void:
 
 
 func open_pause() -> void:
-	if enabled and not _pause.is_open() and not _blocked() and game.get("_current_stage") not in [MAIN_STAGE_ARCHIVE_LIST, MAIN_STAGE_ARCHIVE_DETAIL]:
+	if enabled and not _pause.is_open() and not _result.is_open() and not _blocked() and game.get("_current_stage") not in [MAIN_STAGE_ARCHIVE_LIST, MAIN_STAGE_ARCHIVE_DETAIL]:
 		_pause.open()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if not enabled or _pause.is_open() or not event.is_action_pressed("ui_cancel") or event.is_echo(): return
+	if not enabled or _pause.is_open() or _result.is_open() or not event.is_action_pressed("ui_cancel") or event.is_echo(): return
 	if _blocked() or game.get("_current_stage") in [MAIN_STAGE_ARCHIVE_LIST, MAIN_STAGE_ARCHIVE_DETAIL]: return
 	get_viewport().set_input_as_handled()
 	_pause.open()
@@ -116,6 +202,7 @@ func _attach_click(button: BaseButton) -> void:
 
 # Physical keys sound on press-down; the sound follows the key's role (presentation only).
 func _on_button_down(button: BaseButton) -> void:
+	if _silent: return
 	if not enabled or not is_instance_valid(button): return
 	var variation: String = String(button.theme_type_variation)
 	var kind: String = "key"
@@ -129,6 +216,7 @@ func _on_button_down(button: BaseButton) -> void:
 	player.stream = bank[_sfx_rng.randi() % bank.size()]
 	player.pitch_scale = _sfx_rng.randf_range(0.97, 1.03)
 	player.play()
+	if kind == "transmit": play_event("radio_static", 0.3)
 
 const MAIN_STAGE_INCIDENT := 6  # Main.Stage.INCIDENT
 const MAIN_STAGE_BROADCAST := 7  # Main.Stage.BROADCAST
@@ -144,6 +232,17 @@ func _build_shell() -> void:
 	super._build_shell()
 	# Release chrome: the structure-comparison menu is a development control.
 	_change(shell, menu, "visible", false)
+	# Console frame around the whole workstation, drawn in the shell's existing edge margin.
+	var frame := Panel.new()
+	frame.name = "ConsoleFrame"
+	frame.theme_type_variation = "ConsoleFramePanel"
+	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shell.layout.get_parent().add_child(frame)
+	shell.layout.get_parent().move_child(frame, shell.layout.get_index())
+	shell.extra_nodes = shell.get("extra_nodes", []) + [frame]
+	for side: Array in [["left", 26], ["right", 26], ["top", 24], ["bottom", 22]]:
+		_change(shell, shell.layout, "theme_override_constants/margin_" + side[0], side[1])
 	for name: String in ["Research", "Archive", "Hypothesis", "Save", "Load"]:
 		var tool: Button = game.get_node("%" + name)
 		_change(shell, tool, "theme_override_font_sizes/font_size", roundi(TOOL_FONT_SIZE * ReleaseSettings.text_scale(_settings)))
@@ -227,7 +326,70 @@ func decorate_view(view: Control) -> void:
 		_build_paper_report(view)
 	if fresh and view.get_script() == CONTAINMENT_SCRIPT and views.has(view.get_instance_id()):
 		_build_comparison(view, views[view.get_instance_id()])
+	if fresh and view.get_script() == EXPERIMENT_SCRIPT and views.has(view.get_instance_id()):
+		_polish_experiment(view, views[view.get_instance_id()])
+	if fresh and view.get_script() == BROADCAST_SCRIPT and views.has(view.get_instance_id()):
+		# Wider situation column; the step row repeats the banner's status, so it gives its height back.
+		var record: Dictionary = views[view.get_instance_id()]
+		_change(record, record.layout.get_node("QuestionLayout/Context"), "custom_minimum_size", Vector2(600, 0))
+		_change(record, record.layout.get_node("Steps"), "visible", false)
+	if fresh and view.get_script() == INCIDENT_SCRIPT:
+		# No incident artwork exists yet: drop the empty image frame so the report text gets the space.
+		var record: Dictionary = _record(null)
+		record.view = weakref(view)
+		views[view.get_instance_id()] = record
+		_change(record, view.get_node("Margin/Content/Workspace/Report/IncidentImage"), "visible", false)
 	if fresh: _fade_in(view)
+	if fresh: _view_sound(view)
+
+
+# Each screen arrives with the sound of its equipment (presentation only).
+func _view_sound(view: Control) -> void:
+	match view.get_script():
+		PROFILE_SCRIPT: play_event("doc_page")
+		CCTV_SCRIPT: play_event("crt_switch")
+		INCIDENT_SCRIPT:
+			play_event("alarm_buzzer")
+			play_event("radio_burst", 0.6)
+		BROADCAST_SCRIPT: play_event("radio_start")
+		RESULT_SCRIPT: play_event("report_open")
+		ARCHIVE_LIST_SCRIPT: play_event("doc_page")
+
+
+# QA pass 1: red is reserved for alarms/transmission, the list no longer repeats the detail
+# panel's text, and the remaining-run count reads as a row of indicator lamps.
+func _polish_experiment(view: Control, record: Dictionary) -> void:
+	_change(record, view.get_node("%RunButton"), "theme_type_variation", &"PrimaryButton")
+	for item: Node in (view.get("experiment_list") as Node).get_children():
+		for label: Node in item.get_children():
+			if label is Label: _change(record, label, "visible", false)
+	var remaining: Label = view.get_node("%RemainingCount")
+	_change(record, remaining, "horizontal_alignment", HORIZONTAL_ALIGNMENT_RIGHT)
+	var lamps := HBoxContainer.new()
+	lamps.size_flags_horizontal = Control.SIZE_SHRINK_END
+	lamps.name = "RemainingLamps"
+	lamps.add_theme_constant_override("separation", 8)
+	lamps.alignment = BoxContainer.ALIGNMENT_CENTER
+	remaining.get_parent().add_child(lamps)
+	remaining.get_parent().move_child(lamps, remaining.get_index() + 1)
+	record.extra_nodes = record.get("extra_nodes", []) + [lamps]
+	record.counter_lamps = lamps
+
+
+func _update_experiment_lamps(view: Control) -> void:
+	var record: Dictionary = views.get(view.get_instance_id(), {})
+	if not record.has("counter_lamps") or not is_instance_valid(record.counter_lamps): return
+	var lamps: HBoxContainer = record.counter_lamps
+	var limit: int = view.get("_experiment_limit")
+	var left: int = view.get("_remaining_count")
+	while lamps.get_child_count() < limit:
+		var lamp := TextureRect.new()
+		lamp.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+		lamps.add_child(lamp)
+	for index: int in lamps.get_child_count():
+		var lamp: TextureRect = lamps.get_child(index)
+		lamp.visible = index < limit
+		lamp.texture = LAMPS.ready if index < left else LAMPS.off
 
 
 # Screens arrive with a short fade instead of an instant swap (presentation only; state and focus are untouched).
@@ -350,11 +512,22 @@ func _process(delta: float) -> void:
 	var notice: Control = game.get("_disturbance_notice")
 	if is_instance_valid(notice) and not notice.has_meta("release_faded"):
 		notice.set_meta("release_faded", true)
+		play_event("alarm_warning")
+		play_event("metal_scrape", 0.9)
+		# Dim the work screen behind the warning so its text does not compete with the notice.
+		notice.add_child(_make_dim(0.75))
+		notice.move_child(notice.get_child(notice.get_child_count() - 1), 0)
 		_fade_in(notice)
+	_polish_drawer()
 	var view: Control = game.get("_current_view")
 	if view != null and view.get_script() == CONTAINMENT_SCRIPT:
 		_highlight_comparison(view)
+	if view != null and view.get_script() == EXPERIMENT_SCRIPT:
+		_update_experiment_lamps(view)
+	if view != null and view.has_method("has_open_confirmation") and view.has_open_confirmation():
+		_polish_confirmation(view.get("_confirmation"))
 	_merge_conditions_into_band(view)
+	_polish_records(view)
 
 
 # 720p space: the shell's alert band and a work screen's "current facility conditions" block
@@ -376,10 +549,74 @@ func _merge_conditions_into_band(view: Control) -> void:
 	var band: Label = game.get_node("%Environment")
 	if not details.is_empty() and not band.text.is_empty() and not band.text.contains(details[0]):
 		band.text = band.text + " — " + " ".join(details)
-	if view != null and view.get_script() == RESULT_SCRIPT:
+
+
+func _make_dim(alpha: float) -> Panel:
+	var dim := Panel.new()
+	dim.name = "ReleaseDim"
+	dim.theme_type_variation = "ModalBackdropPanel"
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dim.modulate.a = alpha
+	return dim
+
+
+# Research / memo drawer: wider, taller list, and a light dim behind it (visual only; input unchanged).
+func _polish_drawer() -> void:
+	var drawer: Control = game.get("_drawer_panel")
+	if not is_instance_valid(drawer):
+		if is_instance_valid(_drawer_dim): _drawer_dim.queue_free()
+		return
+	drawer.offset_left = -1120; drawer.offset_right = -20; drawer.offset_top = 150; drawer.offset_bottom = -120
+	if not is_instance_valid(_drawer_dim):
+		_drawer_dim = _make_dim(0.55)
+		drawer.get_parent().add_child(_drawer_dim)
+		drawer.get_parent().move_child(_drawer_dim, drawer.get_index())
+		_fade_in(drawer)
+	var log_view: Node = game.get("_drawer_view")
+	if is_instance_valid(log_view) and not log_view.has_meta("release_drawer"):
+		log_view.set_meta("release_drawer", true)
+		# Wide drawer: list and selected record side by side, like a dossier (the drawer is rebuilt on each open).
+		var entries: Control = log_view.get_node_or_null("%EntryScroll")
+		var detail: Control = log_view.get_node_or_null("%EntryDetailScroll")
+		if entries != null and detail != null and entries.get_parent() == detail.get_parent():
+			var row := HBoxContainer.new()
+			row.name = "ReleaseDossierRow"
+			row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			row.add_theme_constant_override("separation", 18)
+			entries.get_parent().add_child(row)
+			entries.get_parent().move_child(row, entries.get_index())
+			for pair: Array in [[entries, 1.0], [detail, 1.3]]:
+				var scroll: Control = pair[0]
+				scroll.reparent(row, false)
+				scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				scroll.size_flags_stretch_ratio = pair[1]
+				scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+				scroll.custom_minimum_size.y = 320
+
+
+# Decision dialogs (e.g. containment approval) get room to show what is being approved.
+func _polish_confirmation(modal: Control) -> void:
+	if not is_instance_valid(modal) or modal.has_meta("facility_authorization") or modal.has_meta("release_modal"): return
+	modal.set_meta("release_modal", true)
+	modal.get_node("%Panel").custom_minimum_size = Vector2(1100, 0)
+	modal.get_node("%BodyScroll").custom_minimum_size = Vector2(0, 320)
+	_fade_in(modal)
+
+
+# Chrome-only "[임시…]" prefixes on the report and Archive, and the lit selected Archive case.
+func _polish_records(view: Control) -> void:
+	if view == null: return
+	if view.get_script() == INCIDENT_SCRIPT:
 		_strip(view.get_node("%DisplayName"))
 		_strip(view.get_node("%ResponseContext"), true)
-	if view != null and view.get_script() in [ARCHIVE_LIST_SCRIPT, ARCHIVE_DETAIL_SCRIPT]:
+	if view.get_script() == BROADCAST_SCRIPT:
+		# Situation column only; the transmission preview must stay identical to the composed script.
+		for node: Node in view.get_node("%Transmission").find_children("*", "Label", true, false): _strip(node, true)
+	if view.get_script() == RESULT_SCRIPT:
+		_strip(view.get_node("%DisplayName"))
+		_strip(view.get_node("%ResponseContext"), true)
+	if view.get_script() in [ARCHIVE_LIST_SCRIPT, ARCHIVE_DETAIL_SCRIPT]:
 		for node: Node in view.find_children("*", "Label", true, false): _strip(node)
 		var cases: Node = view.get_node_or_null("%CaseList")
 		if cases == null: return

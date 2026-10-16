@@ -68,45 +68,143 @@ func _save(img: Image, name: String) -> void:
 	img.save_png(ProjectSettings.globalize_path(TEX_DIR + name))
 	print("TEXTURE ", name)
 
+# CC0 photo sources (assets/third_party/release_ui/materials, see CREDITS.md). That folder is
+# .gdignore'd, so the raw files are read from disk and only the derived panels are imported.
+const PHOTO_DIR := "res://assets/third_party/release_ui/materials/"
+const PANEL := 256
+
+func _photo(file: String) -> Image:
+	var path := ProjectSettings.globalize_path(PHOTO_DIR + file)
+	if not FileAccess.file_exists(path): return null
+	var img := Image.load_from_file(path)
+	if img == null: return null
+	img.convert(Image.FORMAT_RGBA8)
+	return img
+
+
+# Tone-map a seamless photo tile onto a palette colour: keep the photo's light/dark detail
+# (wear, scratches, grain) at the given contrast, but take the hue from the art direction.
+func _graded(src: Image, size: int, base: Color, contrast: float, keep_hue: float = 0.0) -> Image:
+	var img: Image = src.duplicate()
+	img.resize(size, size, Image.INTERPOLATE_LANCZOS)
+	var mean := 0.0
+	for y in size:
+		for x in size: mean += img.get_pixel(x, y).get_luminance()
+	mean /= size * size
+	for y in size:
+		for x in size:
+			var c: Color = img.get_pixel(x, y)
+			var f: float = 1.0 + (c.get_luminance() - mean) * contrast
+			var toned := Color(base.r * f, base.g * f, base.b * f)
+			img.set_pixel(x, y, toned.lerp(c, keep_hue).clamp())
+	return img
+
+
+func _edges(img: Image, light: Color, dark: Color, top_dark: bool = false) -> void:
+	var s := img.get_width()
+	if top_dark:
+		_hline(img, 0, dark); _hline(img, 1, dark); _vline(img, 0, dark)
+		_hline(img, s - 1, light); _vline(img, s - 1, light)
+	else:
+		_hline(img, 0, light); _vline(img, 0, light)
+		_hline(img, s - 1, dark); _hline(img, s - 2, dark); _vline(img, s - 1, dark)
+
+
 func _build_textures() -> void:
 	rng.seed = 41  # deterministic output
 	var s := 48
-	# Painted steel: hammertone noise, raised edge.
-	var steel := Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
-	_noise(steel, STEEL, 0.035, Rect2i(0, 0, s, s))
-	_hline(steel, 0, HIGHLIGHT); _vline(steel, 0, HIGHLIGHT)
-	_hline(steel, s - 1, SHADOW); _hline(steel, s - 2, SHADOW); _vline(steel, s - 1, SHADOW)
+	var rust: Image = _photo("green_metal_rust_diff_1k.jpg")
+	var plate: Image = _photo("metal_plate_02_diff_1k.jpg")
+	var black_metal: Image = _photo("Metal046B_1K-JPG_Color.jpg")
+	var paper_photo: Image = _photo("Paper001_1K-JPG_Color.jpg")
+	var hazard: Image = _photo("PaintedMetal016_1K-JPG_Color.jpg")
+	var chipped: Image = _photo("PaintedMetal012_1K-JPG_Color.jpg")
+	# Painted steel: green painted metal with rust wear, raised edge.
+	var steel: Image
+	if rust != null: steel = _graded(rust, PANEL, STEEL, 0.9, 0.18)
+	else:
+		steel = Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
+		_noise(steel, STEEL, 0.035, Rect2i(0, 0, s, s))
+	_edges(steel, HIGHLIGHT, SHADOW)
 	_save(steel, "steel_panel.png")
 	# Darker steel for the whole-screen background.
-	var back := Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
-	_noise(back, STEEL_DARK, 0.03, Rect2i(0, 0, s, s))
+	var back: Image
+	if rust != null: back = _graded(rust, PANEL, STEEL_DARK, 0.7, 0.1)
+	else:
+		back = Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
+		_noise(back, STEEL_DARK, 0.03, Rect2i(0, 0, s, s))
 	_save(back, "steel_background.png")
-	# Recessed well: shadow on top, light lip at the bottom.
-	var well := Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
-	_noise(well, WELL, 0.025, Rect2i(0, 0, s, s))
-	_hline(well, 0, SHADOW); _hline(well, 1, SHADOW); _vline(well, 0, SHADOW)
-	_hline(well, s - 1, EDGE); _vline(well, s - 1, EDGE)
+	# Recessed well: riveted plate, shadow on top, light lip at the bottom.
+	var well: Image
+	if plate != null: well = _graded(plate, PANEL, WELL, 0.75)
+	else:
+		well = Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
+		_noise(well, WELL, 0.025, Rect2i(0, 0, s, s))
+	_edges(well, EDGE, SHADOW, true)
 	_save(well, "well_panel.png")
-	# CRT: black bezel, thin outline, faint scanlines on the glass.
-	var crt := Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
-	crt.fill(BEZEL)
+	# CRT: black metal bezel, thin outline, faint scanlines on the glass.
+	var crt: Image
+	if black_metal != null: crt = _graded(black_metal, s, BEZEL.lightened(0.04), 0.8)
+	else:
+		crt = Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
+		crt.fill(BEZEL)
 	for y in range(7, s - 7):
 		for x in range(7, s - 7):
 			crt.set_pixel(x, y, CRT.darkened(0.3) if y % 3 == 0 else CRT)
 	for i in s:
 		crt.set_pixel(i, 0, EDGE); crt.set_pixel(i, s - 1, EDGE); crt.set_pixel(0, i, EDGE); crt.set_pixel(s - 1, i, EDGE)
 	_save(crt, "crt_panel.png")
-	# Report paper: warm fibre noise and a printed edge.
-	var paper := Image.create_empty(64, 64, false, Image.FORMAT_RGBA8)
-	_noise(paper, PAPER, 0.03, Rect2i(0, 0, 64, 64))
-	for i in 64:
-		paper.set_pixel(i, 0, PAPER_EDGE); paper.set_pixel(i, 63, PAPER_EDGE); paper.set_pixel(0, i, PAPER_EDGE); paper.set_pixel(63, i, PAPER_EDGE)
+	# Report paper: real paper fibre, warm tone, printed edge.
+	var paper: Image
+	if paper_photo != null: paper = _graded(paper_photo, PANEL, PAPER, 0.45, 0.05)
+	else:
+		paper = Image.create_empty(64, 64, false, Image.FORMAT_RGBA8)
+		_noise(paper, PAPER, 0.03, Rect2i(0, 0, 64, 64))
+	var ps := paper.get_width()
+	for i in ps:
+		paper.set_pixel(i, 0, PAPER_EDGE); paper.set_pixel(i, ps - 1, PAPER_EDGE); paper.set_pixel(0, i, PAPER_EDGE); paper.set_pixel(ps - 1, i, PAPER_EDGE)
 	_save(paper, "paper_panel.png")
-	# Alarm band: dark red with red rails, used only for incidents and transmission.
-	var alarm := Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
-	_noise(alarm, ALARM_BG, 0.02, Rect2i(0, 0, s, s))
-	for row in [0, 1, s - 2, s - 1]: _hline(alarm, row, ALARM)
+	# Alarm band: dark red over chipped paint, hazard-stripe rails (incidents and transmission only).
+	var alarm: Image
+	if chipped != null: alarm = _graded(chipped, s * 2, ALARM_BG, 0.5)
+	else:
+		alarm = Image.create_empty(s, s, false, Image.FORMAT_RGBA8)
+		_noise(alarm, ALARM_BG, 0.02, Rect2i(0, 0, s, s))
+	var aw := alarm.get_width()
+	if hazard != null:
+		var stripe: Image = hazard.duplicate()
+		stripe.resize(aw * 4, aw * 4, Image.INTERPOLATE_LANCZOS)
+		for y in 6:
+			for x in aw:
+				var c: Color = stripe.get_pixel(x, y + aw).darkened(0.25)
+				alarm.set_pixel(x, y, c); alarm.set_pixel(x, aw - 1 - y, c)
+	else:
+		for row in [0, 1, aw - 2, aw - 1]: _hline(alarm, row, ALARM)
 	_save(alarm, "alarm_panel.png")
+	# Console frame (9-slice, 20 px border, hollow centre): bevelled painted-steel rim with a
+	# black inner lip and a screw head in each corner. Drawn around the whole workstation.
+	var fs := 96
+	var frame: Image
+	if rust != null: frame = _graded(rust, fs, STEEL.darkened(0.12), 0.8, 0.12)
+	else:
+		frame = Image.create_empty(fs, fs, false, Image.FORMAT_RGBA8)
+		_noise(frame, STEEL.darkened(0.12), 0.03, Rect2i(0, 0, fs, fs))
+	for y in fs:
+		for x in fs:
+			var d: int = mini(mini(x, y), mini(fs - 1 - x, fs - 1 - y))
+			if d >= 20: frame.set_pixel(x, y, Color(0, 0, 0, 0))
+			elif d >= 16: frame.set_pixel(x, y, BEZEL)
+			elif d == 15: frame.set_pixel(x, y, SHADOW)
+			elif d <= 1: frame.set_pixel(x, y, Color("101310"))
+			elif d <= 3: frame.set_pixel(x, y, HIGHLIGHT.lightened(0.08) if mini(x, y) <= mini(fs - 1 - x, fs - 1 - y) else SHADOW)
+	for corner: Vector2 in [Vector2(10, 10), Vector2(fs - 11, 10), Vector2(10, fs - 11), Vector2(fs - 11, fs - 11)]:
+		for y in range(int(corner.y) - 8, int(corner.y) + 9):
+			for x in range(int(corner.x) - 8, int(corner.x) + 9):
+				var r: float = Vector2(x, y).distance_to(corner)
+				if r <= 7.5: frame.set_pixel(x, y, SHADOW)
+				if r <= 6.3: frame.set_pixel(x, y, Color("7a847a") if (x - corner.x) + (y - corner.y) < 0 else Color("566056"))
+				if r <= 5.5 and absf((x - corner.x) - (y - corner.y)) < 1.2: frame.set_pixel(x, y, Color("2a2f2a"))
+	_save(frame, "console_frame.png")
 	# Work-key status lamps (18 px): current = lit amber, available = green, locked = dark.
 	var lamps := {"lamp_current": Color("fff3cf"), "lamp_ready": Color("7fb98a"), "lamp_off": Color("2a302a")}
 	for lamp: String in lamps:
@@ -231,8 +329,12 @@ func _build_theme() -> void:
 	theme.set_stylebox("panel", "TranscriptPanel", _tex("crt_panel.png", 8, 16))
 	theme.set_stylebox("panel", "MonitorBezel", _tex("crt_panel.png", 8, 14))
 	theme.set_stylebox("panel", "PaperDocumentPanel", _tex("paper_panel.png", 2, 40))
-	theme.set_stylebox("panel", "WarningPanel", _tex("alarm_panel.png", 3, 12))
-	theme.set_stylebox("panel", "EmergencyPanel", _tex("alarm_panel.png", 3, 14))
+	theme.set_type_variation("ConsoleFramePanel", "Panel")
+	var frame_box := _tex("console_frame.png", 20, 0)
+	frame_box.draw_center = false
+	theme.set_stylebox("panel", "ConsoleFramePanel", frame_box)
+	theme.set_stylebox("panel", "WarningPanel", _tex("alarm_panel.png", 6, 12))
+	theme.set_stylebox("panel", "EmergencyPanel", _tex("alarm_panel.png", 6, 14))
 	var backdrop := _flat(Color(0.03, 0.04, 0.03, 0.82), Color(0, 0, 0, 0), 0)
 	theme.set_stylebox("panel", "ModalBackdropPanel", backdrop)
 	var tooltip := _flat(WELL, EDGE)

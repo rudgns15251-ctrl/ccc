@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/release/result_notice.gd" id="1_result"]
+
+[node name="ResultNotice" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_result")
+
+[node name="Backdrop" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"ModalBackdropPanel"
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Paper" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(1080, 0)
+layout_mode = 2
+theme_type_variation = &"PaperDocumentPanel"
+
+[node name="Stack" type="VBoxContainer" parent="Center/Paper"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Header" type="HBoxContainer" parent="Center/Paper/Stack"]
+layout_mode = 2
+
+[node name="Titles" type="VBoxContainer" parent="Center/Paper/Stack/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Kicker" type="Label" parent="Center/Paper/Stack/Header/Titles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"PaperMetadataLabel"
+text = "후속 관찰 보고"
+
+[node name="Verdict" type="Label" parent="Center/Paper/Stack/Header/Titles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"PaperHeadingLabel"
+text = "판정"
+
+[node name="Room" type="Label" parent="Center/Paper/Stack/Header/Titles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"PaperMetadataLabel"
+text = "승인한 격리"
+
+[node name="Stamp" type="Label" parent="Center/Paper/Stack/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+rotation = 0.08
+theme_override_font_sizes/font_size = 44
+theme_type_variation = &"PaperHeadingLabel"
+text = "안정"
+
+[node name="Rule" type="HSeparator" parent="Center/Paper/Stack"]
+layout_mode = 2
+theme_type_variation = &"PaperSeparator"
+
+[node name="Body" type="Label" parent="Center/Paper/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_type_variation = &"PaperBodyLabel"
+text = "본문"
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Center/Paper/Stack"]
+layout_mode = 2
+theme_type_variation = &"PaperMetadataLabel"
+text = "이 보고는 기록 보관함에 보존됩니다. 승인한 격리 결정은 바뀌지 않습니다."
+autowrap_mode = 3
+
+[node name="Actions" type="HBoxContainer" parent="Center/Paper/Stack"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="ArchiveButton" type="Button" parent="Center/Paper/Stack/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 60)
+layout_mode = 2
+text = "기록 보관함에서 보기"
+
+[node name="CloseButton" type="Button" parent="Center/Paper/Stack/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_type_variation = &"PrimaryButton"
+text = "확인"

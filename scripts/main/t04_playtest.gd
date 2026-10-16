@@ -46,11 +46,28 @@ func _reveal_t04_resolution(breach_warning: bool) -> void:
 	if not resolution.incident_id.is_empty() and not breach_warning:
 		return
 	var ids: Array[String] = []
+	var bodies := PackedStringArray()
 	for entry: ResearchEntryData in T04.research_entries:
 		if entry.source_kind == ResearchEntryData.SourceKind.CONTAINMENT_RESULT and entry.source_id == resolution.room_id:
 			ids.append(entry.entry_id)
+			bodies.append(entry.body_text)
+	var fresh: bool = ids.any(func(id: String) -> bool: return not research_archive.has_discovered_entry(T04.case_id, id))
 	research_archive.merge_case_discoveries(T04.case_id, ids)
 	_refresh_shell()
+	# A/C: the result reaches the player as a report the first time it is revealed (not after a reload).
+	# B is delivered by its own warning notice and incident.
+	if fresh and not breach_warning and facility_control != null and facility_control.has_method("show_containment_result"):
+		var room_name: String = resolution.room_id
+		for room: ContainmentData in T04.available_containment_rooms:
+			if room.room_id == resolution.room_id: room_name = room.display_name
+		var success: bool = resolution.result == MonitoringOutcomeData.Result.SUCCESS
+		facility_control.show_containment_result({
+			"kicker": "후속 관찰 보고 · 대상 T04",
+			"verdict": "장기 격리 안정 확인" if success else "격리 환경 부적합 확인 · 탈출 없음",
+			"success": success,
+			"room": "승인한 격리: " + room_name,
+			"body": "\n\n".join(bodies),
+		})
 
 
 func _refresh_shell() -> void:
