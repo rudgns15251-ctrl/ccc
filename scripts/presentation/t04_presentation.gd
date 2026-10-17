@@ -328,6 +328,9 @@ func decorate_view(view: Control) -> void:
 		_build_comparison(view, views[view.get_instance_id()])
 	if fresh and view.get_script() == EXPERIMENT_SCRIPT and views.has(view.get_instance_id()):
 		_polish_experiment(view, views[view.get_instance_id()])
+		_merge_experiment_monitor(view, views[view.get_instance_id()])
+	if fresh and view.get_script() == CCTV_SCRIPT and views.has(view.get_instance_id()):
+		_add_experiment_preview(views[view.get_instance_id()])
 	if fresh and view.get_script() == BROADCAST_SCRIPT and views.has(view.get_instance_id()):
 		# Wider situation column; the step row repeats the banner's status, so it gives its height back.
 		var record: Dictionary = views[view.get_instance_id()]
@@ -524,6 +527,7 @@ func _process(delta: float) -> void:
 		_highlight_comparison(view)
 	if view != null and view.get_script() == EXPERIMENT_SCRIPT:
 		_update_experiment_lamps(view)
+		_update_merged_monitor(view)
 	if view != null and view.has_method("has_open_confirmation") and view.has_open_confirmation():
 		_polish_confirmation(view.get("_confirmation"))
 	_merge_conditions_into_band(view)
@@ -637,3 +641,150 @@ func _strip(control: Control, every_line: bool = false) -> void:
 		for index: int in lines.size(): lines[index] = _temp_prefix.sub(lines[index], "")
 		stripped = "\n".join(lines)
 	if stripped != text: control.set("text", stripped)
+
+
+# ── CCTV · EXPERIMENT shared composition (prototype; presentation only) ───────────────
+# Both work screens use the same column order — monitor | experiment list | text — so the
+# experiment panel is a locked preview beside the CCTV and becomes active on the next stage.
+# Main still owns both stages; every state, signal and Research boundary is unchanged.
+const MONITOR_RATIO := 1.7
+const LIST_RATIO := 0.85
+const TEXT_RATIO := 1.1
+const MERGED_FLASH_SECONDS := 0.55
+
+
+func _merge_experiment_monitor(view: Control, record: Dictionary) -> void:
+	var body: Control = record.layout.get_node("Body")
+	var cctv: CCTVData = game.current_case.cctv_data if game.current_case != null else null
+	var monitor := PanelContainer.new()
+	monitor.name = "MergedMonitor"
+	monitor.theme_type_variation = &"MonitorBezel"
+	monitor.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	monitor.size_flags_stretch_ratio = MONITOR_RATIO
+	body.add_child(monitor)
+	body.move_child(monitor, 0)
+	var stack := VBoxContainer.new()
+	stack.add_theme_constant_override("separation", 10)
+	monitor.add_child(stack)
+
+	var head := HBoxContainer.new()
+	stack.add_child(head)
+	var camera := Label.new()
+	camera.text = cctv.get_display_name() if cctv != null else "CAMERA"
+	camera.theme_type_variation = &"InstrumentLabel"
+	camera.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(camera)
+	var osd := Label.new()
+	osd.text = "LIVE / 기본 상태"
+	osd.theme_type_variation = &"MutedLabel"
+	head.add_child(osd)
+
+	var slot := MarginContainer.new()
+	slot.name = "VideoSlot"
+	slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	slot.custom_minimum_size = Vector2(0, 200)
+	stack.add_child(slot)
+	var base := TextureRect.new()
+	base.name = "BaselineFeed"
+	base.texture = cctv.feed_texture if cctv != null else null
+	base.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	base.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	base.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(base)
+	if base.texture == null:
+		var missing := Label.new()
+		missing.text = "CCTV 장면 미제공\n관찰문을 근거로 판단"
+		missing.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		missing.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		slot.add_child(missing)
+	# The authoritative result image now plays inside the monitor; it hides itself until a run.
+	var image: TextureRect = view.get_node("%ResultImage")
+	_put(record, image, slot, true)
+	_change(record, image, "expand_mode", TextureRect.EXPAND_IGNORE_SIZE)
+	_change(record, image, "stretch_mode", TextureRect.STRETCH_KEEP_ASPECT_CENTERED)
+	var flash := ColorRect.new()
+	flash.name = "SignalFlash"
+	flash.color = Color(0.86, 0.92, 0.88, 0.0)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(flash)
+
+	# The baseline observation text stays on the CCTV stage; here the monitor keeps the same size so the
+	# frame swap reads as the same picture changing.
+
+	_change(record, record.layout.get_node("Body/Left"), "size_flags_stretch_ratio", LIST_RATIO)
+	_change(record, record.layout.get_node("Body/Right"), "size_flags_stretch_ratio", TEXT_RATIO)
+	record.extra_nodes = record.get("extra_nodes", []) + [monitor]
+	record.merged = {"osd": osd, "flash": flash, "last": "", "primed": false}
+
+
+func _update_merged_monitor(view: Control) -> void:
+	var record: Dictionary = views.get(view.get_instance_id(), {})
+	if not record.has("merged") or not is_instance_valid(record.merged.osd): return
+	var merged: Dictionary = record.merged
+	var image: TextureRect = view.get_node("%ResultImage")
+	var result_id: String = view.get_displayed_result_id() if image.visible and image.texture != null else ""
+	var name: String = (view.get_node("%SelectedName") as Label).text
+	merged.osd.text = ("실험 결과 / " + name) if not result_id.is_empty() else "LIVE / 기본 상태"
+	if merged.last == result_id: return
+	merged.last = result_id
+	# A restored or freshly drawn screen shows its state without a signal flash.
+	if not merged.primed:
+		merged.primed = true
+		return
+	var flash: ColorRect = merged.flash
+	flash.color = Color(0.86, 0.92, 0.88, 0.75)
+	flash.create_tween().tween_property(flash, "color:a", 0.0, MERGED_FLASH_SECONDS)
+	play_event("crt_switch")
+
+
+# CCTV stage: the experiment list sits beside the monitor, locked until observation is confirmed.
+func _add_experiment_preview(record: Dictionary) -> void:
+	var equipment: Control = record.layout.get_node("Equipment")
+	var monitor: Control = equipment.get_node("Monitor")
+	var current: CaseData = game.current_case
+	var unlocked: bool = (game.get("_work_screens") as Dictionary).has(2)
+	_change(record, monitor, "size_flags_stretch_ratio", MONITOR_RATIO)
+	_change(record, equipment.get_node("Information"), "size_flags_stretch_ratio", TEXT_RATIO)
+	var panel := PanelContainer.new()
+	panel.name = "ExperimentPreview"
+	panel.theme_type_variation = &"ChassisPanel"
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.size_flags_stretch_ratio = LIST_RATIO
+	equipment.add_child(panel)
+	equipment.move_child(panel, monitor.get_index() + 1)
+	var stack := VBoxContainer.new()
+	stack.add_theme_constant_override("separation", 12)
+	panel.add_child(stack)
+	var heading := Label.new()
+	heading.text = "실험"
+	heading.theme_type_variation = &"InstrumentLabel"
+	stack.add_child(heading)
+	var status := Label.new()
+	status.text = "관찰 기록을 확인한 뒤 '다음'에서 개시합니다." if not unlocked else "개방됨 — 실험 단계에서 실행합니다."
+	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status.theme_type_variation = &"MutedLabel"
+	stack.add_child(status)
+	var experiments: Array = current.available_experiments if current != null else []
+	for experiment: ExperimentData in experiments:
+		if experiment == null: continue
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 10)
+		row.modulate = Color(1, 1, 1, 0.55 if not unlocked else 0.9)
+		var icon := TextureRect.new()
+		icon.texture = LOCK_ICON if not unlocked else LAMPS.ready
+		icon.custom_minimum_size = Vector2(28, 28)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(icon)
+		var label := Label.new()
+		label.text = experiment.display_name
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(label)
+		stack.add_child(row)
+	var limit := Label.new()
+	limit.text = "최대 %d회 · 결과는 실행한 뒤에만 공개됩니다." % (current.experiment_limit if current != null else 0)
+	limit.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	limit.theme_type_variation = &"MutedLabel"
+	stack.add_child(limit)
+	record.extra_nodes = record.get("extra_nodes", []) + [panel]

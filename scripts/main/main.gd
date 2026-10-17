@@ -2779,31 +2779,44 @@ func _capture_work_navigation() -> void:
 	if state.focus_path.is_empty(): state.focus_path = _work_focus.get(_presented_work_stage, "")
 	# A Modal is not a work focus target, including standalone debug Scenes.
 	if InterruptedWorkViewState.get_validation_error(Stage.keys()[_presented_work_stage], state, current_case, case_runtime, pending_containment, containment_resolutions) == "INVALID_WORK_FOCUS": state.focus_path = ""
-	var focus: Control = _current_view.get_node_or_null(NodePath(state.focus_path)) as Control if not state.focus_path.is_empty() else null
-	if focus != null and not focus.is_visible_in_tree():
+	var focus: Control = _find_work_focus(_current_view, state.focus_path) if not state.focus_path.is_empty() else null
+	# A presentation layout moves controls and keeps their original path in "work_focus_path"; a missing, hidden or
+	# unfocusable target must not be stored, or the later restore fails.
+	if not state.focus_path.is_empty() and (focus == null or not focus.is_visible_in_tree() or focus.focus_mode == Control.FOCUS_NONE):
 		state.focus_path = String(_current_view.get_path_to(_current_view.next_button)) if _current_view.next_button.is_visible_in_tree() else ""
 	var scrolls: Dictionary = {}
 	for node: Node in _current_view.find_children("*", "ScrollContainer", true, false):
 		scrolls[String(_current_view.get_path_to(node))] = node.scroll_vertical
 	_work_screens[_presented_work_stage] = {"work": state, "scrolls": scrolls}
 
+func _find_work_focus(view: Control, path: String) -> Control:
+	var control: Control = view.get_node_or_null(NodePath(path)) as Control
+	if control != null: return control
+	for candidate: Node in view.find_children("*", "Control", true, false):
+		if candidate.get_meta("work_focus_path", "") == path: return candidate as Control
+	return null
+
 func _restore_navigation_screen(view: FlowView, stage: int, snapshot: Dictionary) -> void:
 	_navigation_busy = true
 	var error: String = InterruptedWorkViewState.get_validation_error(Stage.keys()[stage], snapshot.get("work", {}), current_case, case_runtime, pending_containment, containment_resolutions)
 	if not error.is_empty():
 		push_warning("Main: navigation snapshot rejected: " + error)
+		_navigation_busy = false
 		return
 	if stage == Stage.EXPERIMENT and not (view as ExperimentView).restore_work_result(snapshot.work, _recorded_experiment_conditions(snapshot.work.displayed_result_id)):
 		push_warning("Main: navigation result restore rejected.")
+		_navigation_busy = false
 		return
 	if stage == Stage.CONTAINMENT and not (view as ContainmentView).restore_work_selection(snapshot.work):
 		push_warning("Main: navigation selection restore rejected.")
+		_navigation_busy = false
 		return
 	await get_tree().process_frame
 	await get_tree().process_frame
 	if not is_inside_tree() or not is_instance_valid(view) or view != _current_view or view.is_queued_for_deletion(): return
 	if not view.restore_work_state(snapshot.work):
 		push_warning("Main: navigation focus/state restore rejected.")
+		_navigation_busy = false
 		return
 	for path: String in snapshot.scrolls:
 		var scroll: ScrollContainer = view.get_node_or_null(NodePath(path)) as ScrollContainer

@@ -1,6 +1,7 @@
 # CAP — AI 도구 간 지속 개발 로그
 
 > Claude Code 및 향후 Codex 복귀 시 공용 문서. 최신 로컬 코드와 실제 검증이 우선이다.
+> **한눈에 보는 현황(2026-10-16): [PROJECT_STATUS.md](PROJECT_STATUS.md)** — Git 상태, 최신 구현, 확정·미정 기획, 남은 문제, 다음 작업.
 
 ## 인수인계 기준 — 2026-10-16
 - GitHub `main`: `122ffb137edcd007424fbda0d11edabfe41c0052` (직접 확인, M5-A).
@@ -9,6 +10,113 @@
 - 다음 추천: M5-B 작업트리 백업 → F6 사용자 수동 플레이 → 부족한 CCTV Anchor / T04 실험 결과/Incident 이미지 준비 및 기존 Texture 슬롯으로 교체 → 실제 이미지로 UI 가독성 점검. 승인 없이는 정식 Campaign/Ending 편입 금지.
 
 ## 작업 기록 (최신이 위)
+
+### 2026-10-17 — D12 / main.gd 근본 수정: 포커스 저장 검사와 복원 실패 시 입력 잠금 해제 (사용자 승인)
+- 변경(`scripts/main/main.gd`, +15/−2줄): (1) `_capture_work_navigation`은 저장할 포커스 대상을 `work_focus_path` 메타 대체 탐색까지 거쳐 확인하고, 없거나 숨겨졌거나 포커스 불가이면 보이는 "다음" 버튼 또는 빈 값으로 바꾼다. 새 헬퍼 `_find_work_focus`. (2) `_restore_navigation_screen`의 거부 경로 4곳에서 `_navigation_busy`를 해제한다.
+- F6 임시 보정(`m4_5_structural_comparison.gd`)은 중복이라 제거했다. 이 파일은 원래 상태.
+- 영향: 프레젠터 레이아웃(F6)에서 화면 이동 후 입력이 잠기던 결함이 F5 경로에서도 막힌다. 일반 경로의 동작은 같다(저장 대상이 보이는 경우 변화 없음).
+- 검증: 잠김 재현 시퀀스, 복귀 후 선택 버튼, verify_project(80, 기본 Main 시작), M4·M4.5·M5-A 경로(종료 코드 0), M5-B 경로 1280/1920(각 620 확인, 옛 기준 2종만 표시). 테스트가 만든 사용자 저장 데이터 정리 완료(M2 저장 해시 동일).
+- 미검증: F5를 사람이 직접 플레이한 확인. 복원 거부가 실제로 생기는 모든 경로.
+- Git: 미커밋. `main.gd`가 변경 파일에 포함된다.
+- 다음 우선순위 하나: 사용자의 통합 화면 확인.
+
+### 2026-10-17 — D11 / 버그 수정: 화면 이동 후 모든 버튼이 잠김 (F6 한정, Claude Code)
+- 증상(사용자): 실험을 하지 않고 "계속"으로 다음 화면에 가면 어떤 버튼도 반응하지 않음.
+- 재현: 실험 건너뛰기 → 격리 화면 → 레일로 다른 화면 방문 → 레일로 격리 화면 복귀 → `navigation focus/state restore rejected` 경고와 함께 `_navigation_busy`가 true로 고정되어 레일·도구·선택이 모두 잠김. 수정 전 프레젠터로도 동일(통합 화면 프로토타입이 원인이 아님).
+- 원인: 프레젠터가 컨트롤을 옮기고 원래 경로를 `work_focus_path` 메타로 저장한다. Main의 포커스 저장 검사는 `get_node_or_null`만 써서 옮겨진 숨은 "다음" 버튼을 찾지 못해 보정이 빠지고, 복원 때 보이지 않는 대상이라 실패했다. 실패 경로는 `_navigation_busy`를 풀지 않는다(알려진 부채).
+- 수정: `scripts/main/m4_5_structural_comparison.gd`(F6 공통 기반)에 두 override 추가. (1) `_capture_work_navigation`: 현재 보이는 포커스 대상만 유지하고 아니면 보이는 "다음" 버튼 또는 빈 값. (2) `_restore_navigation_screen`: 복원이 거부돼도 입력 잠금을 해제. `main.gd`와 F5는 수정하지 않았다.
+- 검증: 잠김 재현 시퀀스 3종 해결, 복귀 후 선택 버튼 동작, 실험 실행 경로, verify_project(80), M5-B 경로 1280(620 확인, 옛 기준 2종만 표시). 저장 데이터 정리 완료.
+- 남은 부채: 같은 결함이 `main.gd`에도 있어 승인 후 근본 수정 권장(F5가 프레젠터 레이아웃을 쓰게 될 때 필수).
+- Git: 미커밋.
+- 다음 우선순위 하나: 사용자의 통합 화면 확인, `main.gd` 근본 수정 승인 여부.
+
+### 2026-10-17 — D10 / 강제 방송 이벤트 #1 초안 (Claude Code)
+- 산출: [story/forced_broadcast_event_01_draft_v1.md](story/forced_broadcast_event_01_draft_v1.md). INC_CH2_01(02 격리실 설비 결함으로 탈출), 단일 스크립트, 질문 2개, 3등급 결과, 보고서 예시, 데이터 매핑, 미정 6개.
+- 코드·Resource 변경 없음. 모두 [DRAFT]. 피해 수치는 UNKNOWN 유지.
+- Git: 미커밋.
+- 결정: 이벤트 미정 1~6 처리(문서 11장). 인원 수 비표시, 2문항, 규칙 상기만, 02 결과 공개는 이 사건(임시). 다음 우선순위 하나: 사용자의 T04 F6 통합 화면 확인 결과 반영.
+
+### 2026-10-17 — D9 / CCTV·실험 통합 화면 프로토타입 (T04 F6 한정, Claude Code)
+- 변경: `scripts/presentation/t04_presentation.gd`(+151줄). Main·F5·다른 View 무변경. 열 순서 `모니터 | 실험 목록 | 텍스트`를 두 단계가 공유. CCTV 단계는 실험 잠금 미리보기, 실험 단계는 모니터가 결과 프레임으로 전환.
+- 검증: 1920/1280 화면 캡처, M5-B 경로 두 해상도(620 확인, 실패 2종 옛 기준: honest_cctv, video_dominant), verify_project(80 scripts) 통과. 사용자 저장 데이터 정리 완료(M2 저장 해시 동일).
+- 미검증: 깜빡임·효과음 체감, 사람 플레이. 상세: ui_release/cctv_experiment_merge_v1.md 6장.
+- Git: 미커밋.
+- 다음 우선순위 하나: 사용자가 F6에서 직접 확인 후 안 B(단계 통합) 진행 여부 결정, 또는 강제 방송 이벤트 문서.
+
+### 2026-10-17 — D8 / 변경 R2 + CCTV·실험 통합 UI 설계 + 탐색 구현 설계 (Claude Code)
+- 결정: 개선 3·7 채택, 1·2·6·8 보류, 4 중간 공포 연출 채택, 5 하한만. 기록: story/team_story_plan_analysis_v1.md 11장.
+- 설계 문서: [ui_release/cctv_experiment_merge_v1.md](ui_release/cctv_experiment_merge_v1.md), [story/exploration_interaction_v1.md](story/exploration_interaction_v1.md).
+- 코드 변경 없음. 모두 [DRAFT].
+- Git: 미커밋.
+- 다음 우선순위 하나: 통합 화면 F6 프로토타입(T04 한정) 또는 강제 방송 이벤트 #1 문서.
+
+### 2026-10-17 — D7 / 변경 R1: 실험 선택 규모 증가 (사용자 요청)
+- 규칙: 진행에 따라 제시 실험 수와 선택 횟수가 늘어남(예: 초반 3개 중 2개, 후반 5개 중 3개). 기록: story/team_story_plan_analysis_v1.md 10장.
+- 영향: Case 01~03 초안은 "4개 제시, 3회"로 쓰여 수정 필요. 코드 변경 없음.
+- Git: 미커밋.
+
+### 2026-10-16 — D6 / Case 03 초안 + 챕터1 종료 연출 (Claude Code)
+- 산출: [story/case_03_draft_v1.md](story/case_03_draft_v1.md). 열을 내는 개체(정답 냉각실), 일반 화면 vs 열화상 함정, 챕터1 종료 연출(장부 9/CCTV 10칸), 강제 방송 이벤트 연결, 미정 7개.
+- 변경점: PDF의 "03 오답 시 챕터2 방송"은 Case 02 결정 4(단일 스크립트)로 폐기. 03 오답은 `failure_without_incident`.
+- 코드·Resource 변경 없음. 모두 [DRAFT]. 열화상 비교 UI는 구현 확인 필요.
+- Git: 미커밋.
+- 결정: Case 03 미정 1~7 처리(문서 12장). 강제 방송 이벤트 대상 = Case 02의 방. 6번(10칸 재열람)만 보류. 다음 우선순위 하나: 강제 방송 이벤트 #1 문서.
+
+### 2026-10-16 — D5 / Case 02 초안 + 강제 방송 이벤트 위치 (Claude Code)
+- 결정: 강제 방송 이벤트는 **챕터2 초반**(Case 03 이후·Case 04 이전). 모든 플레이어가 경험하도록 변형 A(03 오답 탈출)/B(설비 결함) 안을 둠, 원인은 UNDECIDED.
+- 산출: [story/case_02_draft_v1.md](story/case_02_draft_v1.md). 소리에 약한 개체(정답 방음실), 프로필 vs 관찰 불일치 학습, 일기 D1 시작, 미정 6개.
+- 코드·Resource 변경 없음. 모두 [DRAFT].
+- Git: 미커밋.
+- 결정: Case 02 미정 1~6 처리(문서 11장). 강제 이벤트 원인은 단일 스크립트(설비 결함)로 통일. 5번(ARCHIVE_02_01)만 보류. 다음 우선순위 하나: Case 03 초안.
+
+### 2026-10-16 — D4 / 프롤로그 초안 (Claude Code)
+- 산출: [story/prologue_draft_v1.md](story/prologue_draft_v1.md). 도착, 인수인계 서류 2장, 전임자 책상, 안내 영상 3부, 방송 실습 1회(모의, 기록 영향 없음), 엔진 매핑, 제작 시트, 미정 6개.
+- 코드·Resource 변경 없음. 모든 내용 [DRAFT].
+- 엔진 격차: 방송 실습은 본 흐름과 분리된 모드가 필요(코드 변경 필요).
+- Git: 미커밋.
+- 결정: 프롤로그 미정 1~6 처리(문서 8장). 방송 실습 폐기, 강제 이벤트로 대체. 다음 우선순위 하나: 강제 방송 이벤트 위치 결정 + Case 02 초안.
+
+### 2026-10-16 — D3 / Case 01 정식 문서 초안 (Claude Code)
+- 산출: [story/case_01_draft_v1.md](story/case_01_draft_v1.md). 빛 민감 개체(정답 암실), 튜토리얼. Profile, CCTV, 실험 4종, 격리 후보 3, 지연 결과, 데이터 매핑, 제작 시트, 미정 7개.
+- 코드·Resource 변경 없음. 모든 내용 [DRAFT]. 연도·이름·외형 수위 확정 없음.
+- Git: 미커밋.
+- 결정: Case 01 미정 1~7 처리(문서 11장). 3번(ID 형식)만 보류. 다음 우선순위 하나: 프롤로그 안내 영상(방송 실습 포함) 초안 또는 Case 02 초안.
+
+### 2026-10-16 — D2 / 팀 스토리 기획안(PDF) 분석 (Claude Code)
+- 입력: `캡스톤디자인_스토리_수정.pdf`(2026-10-11 수정본)와 T04 전문. 사용자가 이를 개발 기준으로 지정.
+- 산출: [story/team_story_plan_analysis_v1.md](story/team_story_plan_analysis_v1.md). 정합 항목, 충돌 C1~C7, 논리 보완, T04 수정안, 엔진 격차, 개발 순서.
+- 코드·CLAUDE.md 변경 없음. 충돌은 사용자 선택 전까지 [UNDECIDED].
+- 핵심: Case 1은 PDF의 빛 민감 개체(암실)와 기존 시선 반응안이 충돌. 전임자=10번째 개체, 엔딩 5종, 기록 6/3/3은 기존 구조와 맞음.
+- Git: 미커밋.
+- 결정: C1~C7 사용자 결정 완료(분석 문서 9장, CLAUDE.md 갱신). 다음 우선순위 하나: Case 01(빛 → 암실) 정식 문서 초안.
+
+### 2026-10-16 — D1 / 출시 범위 · 이야기 방향 · Case 1 결정 (사용자 결정)
+- **[APPROVED]** 정식 9 Case + 숨겨진 개체 1을 모두 출시(약 90~120분). 앞서 정한 '1차 4~5 Case·60분'은 이 결정으로 대체됐다.
+- **[APPROVED]** 이야기 C. 결합안: 연구원 자리 승계 + 야간 비상방송 책임. 전임자 일지와 직원 명단·방송이 축이다.
+- **[APPROVED]** Case 1 = 시선 반응 개체(콘셉트). 외형과 세부는 DRAFT.
+- 기록 위치: `CLAUDE.md` 목적 절, `docs/release_roadmap.md`, `docs/story/decision_brief_v1.md`.
+- 미정: 전임자의 존재 방식, 결말, Case 2~9와 숨겨진 개체, T04 승격 여부.
+- Git: 미커밋.
+- 다음 우선순위 하나: 9+1 Campaign 골격(Case 배치, 강제 사건, Story Record 12개 위치, 전임자 공개 순서) 초안과 Case 1 정식 문서 초안.
+
+### 2026-10-16 — R2 / 출시 프리뷰 빌드 + 출시 로드맵 (Claude Code)
+- 추가:
+  - `export_presets.cfg` preset.4 "Windows Release Preview"(feature `release_preview`). 제외: docs, tools, local_only, output, anki_project, source.
+  - `project.godot`에 `run/main_scene.release_preview` 한 줄(타이틀 화면). **기본 `run/main_scene`(F5)은 그대로다.**
+- 빌드(Git 제외): `builds/release_preview/CAP_Preview.exe`(138MB, release 템플릿, PCK 포함) + `licenses/`(OFL 3종, Tabler MIT, CC BY 고지, CC0 출처, Godot 라이선스 전문) + README(플레이 메모 질문 포함).
+- 확인:
+  - 제한된 Retro 셰이더, 원본 소리, 재질, Anki 파일, 문서는 패키지에 없다(바이너리 문자열 검사. manifest JSON의 경로 문자열만 있음).
+  - EXE를 headless와 창 모드로 실행해 둘 다 exit 0. verify PASS.
+- 문서: [docs/release_roadmap.md](release_roadmap.md). 현재 위치, A~E 단계, 사용자 결정 항목, 위험.
+- 판단: 기술과 UI 기반은 충분히 왔다. 출시 가능성을 좌우하는 것은 콘텐츠(정식 Case, 이야기, 엔딩)와 사람의 플레이 검증이다.
+- Git: 미커밋.
+- 다음 우선순위 하나: 사용자가 `CAP_Preview.exe`를 플레이하고 피드백한다. 이야기 방향과 첫 정식 개체, 1차 출시 규모를 결정한다.
+
+### 2026-10-16 — Git 커밋 3 (사용자 요청)
+- 브랜치 `ui-release-theme`에 커밋 `ea40822`(119개 파일: QA 수정, 결과 보고서 패널, CC0 재질, 콘솔 프레임, 소리)를 만들었다. 이후 사용자 요청으로 `master`를 fast-forward해서 `master` = `ea40822`(origin/main보다 3커밋 앞섬)이고, 현재 브랜치는 `master`다. 푸시하지 않았다.
+- 제외(미커밋 유지): README 개인 편집, T04 입력 ZIP과 추출 폴더, `설치_안내.md`, `CLAUDE_FIRST_SESSION_PROMPT.txt`, `anki_project/`, `source/`. 추가로 CAP와 무관한 `output/`(Anki 카드 CSV)과 `requirements.txt`도 제외했다.
+- 커밋 전에 남아 있던 빈 `.git/index.lock`(18:16 생성, 실행 중인 git 프로세스 없음)을 삭제했다.
+- 주의: `output/` 안에 `cards.csv.import`가 생겼다. 프로젝트 폴더 안에 있어서 Godot가 import한 것이다. 이 폴더들을 CAP 밖으로 옮기는 것을 권장한다.
 
 ### 2026-10-16 — A5 / 2단계 소리 (Claude Code)
 - 다운로드(사용자 승인): BigSoundBank CC0 WAV 26개 → `assets/third_party/release_ui/sfx/bigsoundbank/`(.gdignore). 출처와 해시는 CREDITS.md.
