@@ -2845,6 +2845,18 @@ func _on_work_navigation_requested(destination: int) -> void:
 			while _navigation_busy and is_inside_tree(): await get_tree().process_frame
 		if is_inside_tree(): _on_advance_requested(_current_view)
 		return
+	# Until a containment decision exists, the Experiment and Containment screens are one open workspace: spare
+	# experiment chances reopen Experiment as the active work stage (not a read-only review). The next Next
+	# returns to Containment and restores its selection. Duplicate failure-event opportunities are keyed per case.
+	if destination == Stage.EXPERIMENT and canonical == Stage.CONTAINMENT and _can_reopen_experiments():
+		_show_view(Stage.EXPERIMENT, false, true, false)
+		if _work_screens.has(Stage.EXPERIMENT):
+			_restore_navigation_screen(_current_view, Stage.EXPERIMENT, _work_screens[Stage.EXPERIMENT].duplicate(true))
+		return
+	# After reopening Experiment, the Containment key advances the work again instead of opening a read-only copy.
+	if destination == Stage.CONTAINMENT and canonical == Stage.EXPERIMENT and next and _cctv_review_return_stage < 0 and not _is_work_review() and not _current_view.next_button.disabled:
+		_on_advance_requested(_current_view)
+		return
 	if known:
 		_show_view(destination, false, true, true)
 		_restore_navigation_screen(_current_view, destination, _work_screens[destination].duplicate(true))
@@ -2868,6 +2880,12 @@ func _on_work_navigation_requested(destination: int) -> void:
 		if not is_inside_tree() or _current_stage != canonical: return
 		await get_tree().process_frame
 	if not _current_view.next_button.disabled: _on_advance_requested(_current_view)
+
+func _can_reopen_experiments() -> bool:
+	if not _has_current_case_runtime() or current_case == null or _is_response_route() or _is_normal_interrupt() or _is_side_interrupt() or _cctv_review_return_stage >= 0: return false
+	if not incident_responses.get_active_response().is_empty() or not campaign_progress.get_transition().is_empty(): return false
+	if case_runtime.has_confirmed_containment(): return false
+	return not current_case.available_experiments.is_empty() and case_runtime.get_remaining_experiment_count(current_case.experiment_limit) > 0
 
 func _close_archive(view: FlowView) -> bool:
 	if _current_stage not in [Stage.RESEARCH_ARCHIVE_LIST, Stage.RESEARCH_ARCHIVE_DETAIL] or not _accept_view_action(view, "archive"): return false

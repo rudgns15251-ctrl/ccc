@@ -221,6 +221,7 @@ func _on_button_down(button: BaseButton) -> void:
 const MAIN_STAGE_INCIDENT := 6  # Main.Stage.INCIDENT
 const MAIN_STAGE_BROADCAST := 7  # Main.Stage.BROADCAST
 const MAIN_STAGE_INCIDENT_RESULT := 8  # Main.Stage.INCIDENT_RESULT
+const MAIN_STAGE_CONTAINMENT := 3  # Main.Stage.CONTAINMENT
 const MAIN_STAGE_ARCHIVE_LIST := 10  # Main.Stage.RESEARCH_ARCHIVE_LIST
 const MAIN_STAGE_ARCHIVE_DETAIL := 11  # Main.Stage.RESEARCH_ARCHIVE_DETAIL
 
@@ -248,6 +249,8 @@ func _build_shell() -> void:
 		_change(shell, tool, "theme_override_font_sizes/font_size", roundi(TOOL_FONT_SIZE * ReleaseSettings.text_scale(_settings)))
 		_change(shell, tool, "icon", TOOL_ICONS[name])
 		_change(shell, tool, "icon_alignment", HORIZONTAL_ALIGNMENT_LEFT)
+	# Long stage captions such as "비상 방송 / 중단된 …" need the room the subject slot has to spare.
+	_change(shell, shell.layout.get_node("Console/Identification/Row/FacilitySlot"), "custom_minimum_size", Vector2(640, 0))
 	var stage: Label = game.get_node("%Stage")
 	_change(shell, stage, "autowrap_mode", TextServer.AUTOWRAP_OFF)
 	_change(shell, stage, "text_overrun_behavior", TextServer.OVERRUN_TRIM_ELLIPSIS)
@@ -326,6 +329,7 @@ func decorate_view(view: Control) -> void:
 		_build_paper_report(view)
 	if fresh and view.get_script() == CONTAINMENT_SCRIPT and views.has(view.get_instance_id()):
 		_build_comparison(view, views[view.get_instance_id()])
+		_add_reopen_note(view, views[view.get_instance_id()])
 	if fresh and view.get_script() == EXPERIMENT_SCRIPT and views.has(view.get_instance_id()):
 		_polish_experiment(view, views[view.get_instance_id()])
 		_merge_experiment_monitor(view, views[view.get_instance_id()])
@@ -336,6 +340,10 @@ func decorate_view(view: Control) -> void:
 		var record: Dictionary = views[view.get_instance_id()]
 		_change(record, record.layout.get_node("QuestionLayout/Context"), "custom_minimum_size", Vector2(600, 0))
 		_change(record, record.layout.get_node("Steps"), "visible", false)
+		# The question screen needs the height for all four options: the banner already says "emergency broadcast"
+		# and the progress line works as the heading, so the duplicate heading is dropped and spacing tightened.
+		_change(record, view.get_node("%OrdersHeading"), "visible", false)
+		_change(record, record.layout.get_node("QuestionLayout/Selection/Stack"), "theme_override_constants/separation", 8)
 	if fresh and view.get_script() == INCIDENT_SCRIPT:
 		# No incident artwork exists yet: drop the empty image frame so the report text gets the space.
 		var record: Dictionary = _record(null)
@@ -503,6 +511,9 @@ func _process(delta: float) -> void:
 	if game == null or not enabled: return
 	for name: String in ["Subject", "Environment"]:
 		_strip(game.get_node("%" + name))
+	# A sentence that ends in a full stop reads as a doubled mark before the " · " separator; drop that stop.
+	var status: Label = game.get_node("%SystemStatus")
+	if status.text.contains(". · "): status.text = status.text.replace(". · ", " · ")
 	# Work-key status lamps: lit amber = current work, green = available, dark = locked.
 	for name: String in WORK_KEYS:
 		var key: Button = game.get_node("%" + name)
@@ -521,10 +532,20 @@ func _process(delta: float) -> void:
 		notice.add_child(_make_dim(0.75))
 		notice.move_child(notice.get_child(notice.get_child_count() - 1), 0)
 		_fade_in(notice)
+	# Rail wording: with spare chances the Experiment key reopens work instead of showing a read-only copy.
+	var experiment_key: Button = game.get_node("%EXPERIMENT")
+	var spare: int = _reopen_chances()
+	if spare > 0 and not experiment_key.disabled and game.get("_presented_work_stage") != 2:
+		var caption: String = "실험\n재개 가능 · %d회 남음" % spare
+		if experiment_key.text != caption: experiment_key.text = caption
+	var containment_key: Button = game.get_node("%CONTAINMENT")
+	if game.get("_current_stage") == 2 and game.get("_presented_work_stage") == 2 and (game.get("_work_screens") as Dictionary).has(3) and not containment_key.disabled:
+		if containment_key.text != "격리\n이어서 진행": containment_key.text = "격리\n이어서 진행"
 	_polish_drawer()
 	var view: Control = game.get("_current_view")
 	if view != null and view.get_script() == CONTAINMENT_SCRIPT:
 		_highlight_comparison(view)
+		_update_reopen_note(view)
 	if view != null and view.get_script() == EXPERIMENT_SCRIPT:
 		_update_experiment_lamps(view)
 		_update_merged_monitor(view)
@@ -535,11 +556,45 @@ func _process(delta: float) -> void:
 
 
 # 720p space: the shell's alert band and a work screen's "current facility conditions" block
+
+
+# While no containment decision exists, spare experiment chances stay usable: the Experiment key reopens the
+# experiments (Main: _can_reopen_experiments). These notes only explain that; they never change state.
+func _reopen_chances() -> int:
+	if game.get("_current_stage") != MAIN_STAGE_CONTAINMENT or game.case_runtime == null or game.current_case == null: return 0
+	if not game.call("_can_reopen_experiments"): return 0
+	return game.case_runtime.get_remaining_experiment_count(game.current_case.experiment_limit)
+
+
+func _add_reopen_note(view: Control, record: Dictionary) -> void:
+	var hint: Label = view.get_node("%ComparisonHint")
+	var note := Label.new()
+	note.name = "ReopenExperimentNote"
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.theme_type_variation = &"InstrumentLabel"
+	note.visible = false
+	hint.get_parent().add_child(note)
+	hint.get_parent().move_child(note, hint.get_index() + 1)
+	record.extra_nodes = record.get("extra_nodes", []) + [note]
+	record.reopen_note = note
+
+
+func _update_reopen_note(view: Control) -> void:
+	var record: Dictionary = views.get(view.get_instance_id(), {})
+	if not record.has("reopen_note") or not is_instance_valid(record.reopen_note): return
+	var left: int = _reopen_chances()
+	var note: Label = record.reopen_note
+	note.visible = left > 0
+	if left > 0:
+		note.text = "실험 기회가 %d회 남았습니다. 격리를 확정하기 전에는 '실험' 키로 돌아가 계속 실험할 수 있고, 확정하면 남은 기회는 사라집니다." % left
 # repeat the same heading. Keep one — the band — and append the block's detail line to it.
 # During incident / broadcast / report the broadcast banner already carries the context.
 func _merge_conditions_into_band(view: Control) -> void:
 	var alerts: Control = shell.layout.get_node("Console/Alerts")
-	if game.get("_current_stage") in [MAIN_STAGE_INCIDENT, MAIN_STAGE_BROADCAST, MAIN_STAGE_INCIDENT_RESULT]:
+	var response: bool = game.get("_current_stage") in [MAIN_STAGE_INCIDENT, MAIN_STAGE_BROADCAST, MAIN_STAGE_INCIDENT_RESULT]
+	# The four work keys are all locked during an incident; hiding them returns their height to the report and the options.
+	shell.layout.get_node("Console/Navigation").visible = not response
+	if response:
 		alerts.visible = false
 		return
 	if view == null or not views.has(view.get_instance_id()): return

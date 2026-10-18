@@ -10,9 +10,9 @@
 | 항목 | 값 |
 |---|---|
 | 현재 브랜치 | `master` (작업 브랜치 `ui-release-theme`와 같은 커밋) |
-| HEAD | `ea40822` Add QA fixes, result report panel, CC0 materials, console frame and sounds |
-| 원격 `origin/main` | `aae16a2`(M5-B T04). **로컬이 3커밋 앞서 있음, 푸시 안 함** |
-| 이번 세션의 커밋 | `45b9143`(출시 Theme 1차·T04 추론 재조정·인계 문서) → `3f87c73`(UI 패스: 가독성·소리·아이콘·타이틀·설정·일시정지·크레딧) → `ea40822`(QA 수정·결과 보고서 패널·CC0 재질·콘솔 프레임·소리) |
+| HEAD | `b42d213` Add story design drafts, CCTV/experiment merged layout prototype and navigation lock fix |
+| 원격 `origin/main` | `b42d213`(2026-10-17 푸시 완료, 로컬과 동일) |
+| 이번 세션의 커밋 | `45b9143`(출시 Theme 1차·T04 추론 재조정·인계 문서) → `3f87c73`(UI 패스: 가독성·소리·아이콘·타이틀·설정·일시정지·크레딧) → `ea40822`(QA 수정·결과 보고서 패널·CC0 재질·콘솔 프레임·소리) → `b42d213`(스토리 설계 문서·통합 화면 프로토타입·입력 잠금 수정) |
 
 **미커밋 변경 (커밋 대상 후보)**
 - `CLAUDE.md`: 출시 범위·이야기·Case 1 승인 기록.
