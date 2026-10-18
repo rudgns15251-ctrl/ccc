@@ -6,6 +6,7 @@ signal resumed
 signal settings_changed(values: Dictionary)
 
 const TITLE_SCENE := "res://scenes/release/title_screen.tscn"
+const CASE1_TITLE_SCENE := "res://scenes/release/title_case1.tscn"
 var _pending: String = ""
 
 
@@ -69,7 +70,7 @@ func _cancel_question() -> void:
 
 
 func _confirm() -> void:
-	if _pending == "title": get_tree().change_scene_to_file(TITLE_SCENE)
+	if _pending == "title": get_tree().change_scene_to_file(CASE1_TITLE_SCENE if OS.has_feature("case1_preview") else TITLE_SCENE)
 	elif _pending == "quit": get_tree().quit()
 
 

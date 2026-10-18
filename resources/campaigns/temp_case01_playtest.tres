@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CampaignData" format=3]
+
+[ext_resource type="Script" path="res://scripts/data/campaign_entry_data.gd" id="1_ddmqo"]
+[ext_resource type="Resource" path="res://resources/cases/temp_case_01.tres" id="2_qdu5j"]
+[ext_resource type="Resource" path="res://resources/cases/temp_t04_case.tres" id="3_0w1lg"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_01.tres" id="4_sv0fl"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_02.tres" id="5_iqmla"]
+[ext_resource type="Resource" path="res://resources/cases/test_case_03.tres" id="6_4fba6"]
+[ext_resource type="Script" path="res://scripts/data/campaign_data.gd" id="7_nhj6w"]
+[ext_resource type="Script" path="res://scripts/data/scripted_interrupt_occurrence_data.gd" id="8_2rv2m"]
+
+[sub_resource type="Resource" id="Resource_5qpbi"]
+script = ExtResource("1_ddmqo")
+entry_id = "CASE01_ENTRY"
+case_data = ExtResource("2_qdu5j")
+
+[sub_resource type="Resource" id="Resource_s742m"]
+script = ExtResource("1_ddmqo")
+entry_id = "CASE01_NEXT_T04"
+case_data = ExtResource("3_0w1lg")
+
+[sub_resource type="Resource" id="Resource_v64y0"]
+script = ExtResource("1_ddmqo")
+entry_id = "CASE01_FOLLOWUP_01"
+case_data = ExtResource("4_sv0fl")
+
+[sub_resource type="Resource" id="Resource_1mg8o"]
+script = ExtResource("1_ddmqo")
+entry_id = "CASE01_FOLLOWUP_02"
+case_data = ExtResource("5_iqmla")
+
+[sub_resource type="Resource" id="Resource_u8id8"]
+script = ExtResource("1_ddmqo")
+entry_id = "CASE01_FOLLOWUP_03"
+case_data = ExtResource("6_4fba6")
+
+[resource]
+script = ExtResource("7_nhj6w")
+campaign_id = "TEMP_CASE01_PLAYTEST"
+display_name = "임시 케이스 1 테스트 / TEMP"
+entries = Array[ExtResource("1_ddmqo")]([SubResource("Resource_5qpbi"), SubResource("Resource_s742m"), SubResource("Resource_v64y0"), SubResource("Resource_1mg8o"), SubResource("Resource_u8id8")])

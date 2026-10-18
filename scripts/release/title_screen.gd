@@ -3,8 +3,8 @@ extends Control
 # Release title screen (TEMP preview front end). Starts or continues the T04 playtest
 # campaign; continuing reuses the campaign's existing save slot through Main.
 const RELEASE_THEME: Theme = preload("res://resources/ui/release_instrument_steel_theme.tres")
-const GAME_SCENE := "res://scenes/playtests/t04_playtest.tscn"
-const CAMPAIGN: CampaignData = preload("res://resources/campaigns/temp_t04_playtest.tres")
+@export_file("*.tscn") var game_scene: String = "res://scenes/playtests/t04_playtest.tscn"
+@export var campaign: CampaignData = preload("res://resources/campaigns/temp_t04_playtest.tres")
 const CLICK: AudioStream = preload("res://assets/ui/release/sfx/ui_key_a.wav")
 const LATCH: AudioStream = preload("res://assets/ui/release/sfx/ui_latch.wav")
 
@@ -17,7 +17,7 @@ func _ready() -> void:
 	_values = ReleaseSettings.load_values()
 	ReleaseSettings.apply_audio(_values)
 	_apply_text_size()
-	var has_save: bool = CampaignSaveStore.read(CAMPAIGN.campaign_id).error.is_empty()
+	var has_save: bool = CampaignSaveStore.read(campaign.campaign_id).error.is_empty()
 	%ContinueButton.disabled = not has_save
 	%ContinueButton.tooltip_text = "" if has_save else "저장된 진행이 없습니다."
 	%NewButton.pressed.connect(_start.bind(false))
@@ -64,4 +64,4 @@ func _start(continuing: bool) -> void:
 	for button: BaseButton in find_children("*", "BaseButton", true, false): button.disabled = true
 	var fade := create_tween()
 	fade.tween_property(self, "modulate:a", 0.0, 0.3)
-	fade.tween_callback(func() -> void: get_tree().change_scene_to_file(GAME_SCENE))
+	fade.tween_callback(func() -> void: get_tree().change_scene_to_file(game_scene))

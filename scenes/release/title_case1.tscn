@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/release/title_screen.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://resources/campaigns/temp_case01_playtest.tres" id="2_campaign"]
+
+[node name="TitleScreen" instance=ExtResource("1_base")]
+game_scene = "res://scenes/playtests/case01_playtest.tscn"
+campaign = ExtResource("2_campaign")
+
+[node name="Footer" parent="." index="2"]
+text = "TEMP BUILD · 임시 케이스 1 프리뷰 · 정식 설정 아님"
