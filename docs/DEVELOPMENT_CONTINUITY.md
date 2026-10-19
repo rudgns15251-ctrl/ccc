@@ -11,6 +11,24 @@
 
 ## 작업 기록 (최신이 위)
 
+### 2026-10-19 — D21 / Case 02(SC-01) 조정: 습도 실험 → 저온 실험 (사용자 결정)
+- ROOM D 유지. 습도 실험(`EXP_SC01_HUMIDITY_HIGH`)을 저온 실험(`EXP_SC01_TEMP_LOW`)으로 교체: 저온에서 근육 긴장과 경직 증가. 합성 프레임 교체.
+- ROOM B(습도 70%)의 오답 근거를 Profile(가습 환경에서도 행동 불변)과 CCTV 관찰 04:20, Research 2개(PROFILE_03, CCTV_03)로 추가.
+- 변경: `tools/build_case_02.gd`, `tools/case02_temp_composite.ps1`, `resources/cases/temp_case_02.tres`(재생성), `assets/temp/case02/generated/`(습도 프레임 삭제, 저온 프레임 추가), 메모·가이드.
+- 검증(마우스 입력): 저온 실험 실행 후 ROOM D 선택 → 다음 사례에서 보고, 정답 ROOM C 경로 정상, verify_project(80). 테스트 전후 저장 폴더는 빈 스냅샷과 동일.
+- 미검증: 사람의 직접 플레이. 남은 질문은 notes 4절 2~7번.
+- Git: 미커밋.
+
+### 2026-10-19 — D20 / 임시 케이스 2(SC-01) 제작 (사용자 제공 설계서·이미지)
+- 입력: SC-01 "압박자" 설계서와 외형 이미지(사용자 제공). TEMP / DRAFT / NON-CANON. 정식 Case 02(소리 → 방음실)와 별개.
+- 신규: `tools/build_case_02.gd`(리소스·캠페인 생성), `resources/cases/temp_case_02.tres`, `tools/case02_temp_composite.ps1`, `assets/temp/case02/`(제공 이미지 PNG 변환본, 원본 WebP, 합성 프레임 6장), `docs/story/case_02_sc01_notes_v1.md`(적용 메모·질문).
+- 수정: `t04_playtest.gd`(추적 사례에 SC-01, 경고 알림 확장 조건), `t04_presentation.gd`(임시 표기 문구), `build_case_01.gd`(캠페인에 Case 02 포함). 캠페인: Case 01 → Case 02 → T04 → 테스트 01~03. `CAP_Case1.exe` 재빌드.
+- 검증(마우스 입력, 1920): ROOM C 성공 → 다음 사례에서 보고, ROOM D 악화 보고, ROOM A/B 경고 → 이탈 → 방송 2문항 → 결과 → 복귀. verify_project(80), M5-B 1280/1920(각 620, 옛 기준 2종), M4·M4.5·M5-A 종료 코드 0. **테스트 전 저장 폴더를 백업했고, 테스트 후 스냅샷 상태(빈 폴더)로 복원**(정확한 파일명만 삭제).
+- 설계서의 공정성 문제: ROOM D의 오답 근거를 알아낼 실험이 없음, 정답 ROOM C 조명이 "중간"인데 최종 가설은 "저조도". 질문은 notes 4절.
+- 미검증: 사람의 직접 플레이, 글자 크기 '크게', 1280 해상도에서의 Case 02 개별 화면.
+- Git: 미커밋.
+- 다음 우선순위 하나: notes 4절 질문 답변 반영, 플레이 메모.
+
 ### 2026-10-18 — D19 / 임시 케이스 1(Case 01) 제작 + 커밋·푸시 (사용자 요청)
 - 커밋·푸시: `023590a`(실험 재개, 방송 화면 수정, 애셋 평가, 플레이 가이드). `master:main` 비강제.
 - 신규: `tools/build_case_01.gd`(Case 01 Resource 생성기), `resources/cases/temp_case_01.tres`, `resources/campaigns/temp_case01_playtest.tres`(Case 01 → T04 → 테스트 사례 01~03), `scenes/playtests/case01_playtest.tscn`, `tools/case01_temp_composite.ps1` + `assets/temp/case01/generated/` 4장(대상 이미지 없음, 위치 표지만 그린 임시 프레임), `scenes/release/title_case1.tscn`, 내보내기 preset 5 "Windows Case1 Preview"(feature `case1_preview`).

@@ -289,12 +289,14 @@ func _build_shell() -> void:
 func _note(_record: Dictionary, _parent: Node, text: String, _first: bool = false) -> void:
 	match text:
 		"TEMP / REPLACEABLE — visual stand-in, not the authored creature or evidence.":
-			text = "T04 사용자 제공 Master / 임시·초안·비정사 / 교체 가능. 사진만으로 절대 신장을 검증하지 않음." if game.current_case.case_id == "TEMP_T04_CASE" else ("임시 사례 01 / 대상 이미지 미제공 / 정식 설정 승인 전" if game.current_case.case_id == "TEMP_CASE_01" else "후속 업무용 기존 임시 사례 / 대상 사진 미제공")
+			text = "T04 사용자 제공 Master / 임시·초안·비정사 / 교체 가능. 사진만으로 절대 신장을 검증하지 않음." if game.current_case.case_id == "TEMP_T04_CASE" else ("임시 사례 01 / 대상 이미지 미제공 / 정식 설정 승인 전" if game.current_case.case_id == "TEMP_CASE_01" else ("SC-01 사용자 제공 외형 이미지 / 임시·초안·비정사 / 교체 가능. 사진만으로 절대 크기를 검증하지 않음." if game.current_case.case_id == "TEMP_CASE_02" else "후속 업무용 기존 임시 사례 / 대상 사진 미제공"))
 		"VISUAL TEST DOCUMENT / existing research rules unchanged":
 			text = "임시 연구 문서 / 정식 설정 승인 전"
 		"TEMP / REPLACEABLE — static reference; observations determine decisions.":
 			if game.current_case.cctv_data.feed_texture == null:
 				text = "CCTV 장면 미제공 / 판단 근거는 실제 관찰문. 전신 Master를 CCTV 증거로 사용하지 않음."
+			elif game.current_case.case_id == "TEMP_CASE_02":
+				text = "TEMP 합성 장면(제공 외형 + 표준 격리실) / 실제 감시 영상 아님 · 판단 근거는 관찰문"
 			elif game.current_case.case_id == "TEMP_CASE_01":
 				text = "TEMP 합성 장면(표준 격리실 + 위치 표지) / 대상 이미지 없음 · 판단 근거는 관찰문"
 			elif game.current_case.case_id == "TEMP_T04_CASE":
@@ -302,7 +304,7 @@ func _note(_record: Dictionary, _parent: Node, text: String, _first: bool = fals
 			else:
 				text = "임시 감시 이미지 / 관찰 기록과 함께 검토"
 		"Experiment-specific result image not supplied. Text is the execution record.":
-			text = "실행한 실험에만 TEMP 합성 프레임 표시 / 실제 실험 사진 아님 · 결과 판단은 실행 기록" if game.current_case.case_id in ["TEMP_T04_CASE", "TEMP_CASE_01"] else "증거 이미지가 없는 실험은 텍스트로 표시 / 결과는 실제 실행 후 공개"
+			text = "실행한 실험에만 TEMP 합성 프레임 표시 / 실제 실험 사진 아님 · 결과 판단은 실행 기록" if game.current_case.case_id in ["TEMP_T04_CASE", "TEMP_CASE_01", "TEMP_CASE_02"] else "증거 이미지가 없는 실험은 텍스트로 표시 / 결과는 실제 실행 후 공개"
 		"TEMP environment reference / shared illustration, not a candidate configuration.":
 			text = "격리 후보별 환경 이미지 미제공 / 각 후보의 조도·외부 차음·내부 잔향은 설명으로 비교" if game.environment_reference == null else "공통 공간 참고 이미지 / 후보별 실제 조건은 설명으로 비교"
 	if not _notices.has(text):

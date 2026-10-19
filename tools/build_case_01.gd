@@ -75,15 +75,17 @@ func _initialize() -> void:
 
 	var campaign := CampaignData.new()
 	campaign.campaign_id = "TEMP_CASE01_PLAYTEST"
-	campaign.display_name = "임시 케이스 1 테스트 / TEMP"
+	campaign.display_name = "임시 케이스 1·2 테스트 / TEMP"
 	var order: Array = [
 		["CASE01_ENTRY", "res://resources/cases/temp_case_01.tres"],
+		["CASE02_ENTRY", "res://resources/cases/temp_case_02.tres"],
 		["CASE01_NEXT_T04", "res://resources/cases/temp_t04_case.tres"],
 		["CASE01_FOLLOWUP_01", "res://resources/cases/test_case_01.tres"],
 		["CASE01_FOLLOWUP_02", "res://resources/cases/test_case_02.tres"],
 		["CASE01_FOLLOWUP_03", "res://resources/cases/test_case_03.tres"],
 	]
 	for row: Array in order:
+		if not ResourceLoader.exists(row[1]): continue
 		var entry := CampaignEntryData.new()
 		entry.entry_id = row[0]
 		entry.case_data = load(row[1])

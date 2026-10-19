@@ -4,11 +4,13 @@ extends "res://scripts/main/m5_a_visual_playtest.gd"
 # cases run; every tracked case below gets its delayed containment result revealed the same way.
 const T04: CaseData = preload("res://resources/cases/temp_t04_case.tres")
 const CASE01: CaseData = preload("res://resources/cases/temp_case_01.tres")
-const TRACKED: Array[CaseData] = [CASE01, T04]
-const LABELS := {"TEMP_T04_CASE": "T04", "TEMP_CASE_01": "01"}
+const CASE02: CaseData = preload("res://resources/cases/temp_case_02.tres")
+const TRACKED: Array[CaseData] = [CASE01, CASE02, T04]
+const LABELS := {"TEMP_T04_CASE": "T04", "TEMP_CASE_01": "01", "TEMP_CASE_02": "SC-01"}
 const INITIAL_HINTS := {
 	"TEMP_T04_CASE": "초기 관찰: 직립 정지와 팔끝의 미세 움직임. 초기 정지만으로 장기 결과를 판단하지 않는다.",
 	"TEMP_CASE_01": "초기 관찰: 확인 시점의 상태는 안정적으로 보인다. 장기 결과는 이후 업무 중 후속 관찰로 확인된다.",
+	"TEMP_CASE_02": "초기 관찰: 확인 시점에는 웅크린 채 머리를 누르는 정지 상태다. 초기 정지만으로 장기 결과를 판단하지 않는다.",
 }
 
 func _create_facility_control() -> Node:
@@ -33,7 +35,7 @@ func _try_present_candidate_disturbance(source_case_id: String) -> bool:
 
 func _show_disturbance_notice(disturbance: EnvironmentalDisturbanceData, reaction: CaseDisturbanceReactionData) -> void:
 	super._show_disturbance_notice(disturbance, reaction)
-	if disturbance.disturbance_id != "DIST_T04_STRUCTURE" or not is_instance_valid(_disturbance_notice):
+	if not disturbance.disturbance_id in ["DIST_T04_STRUCTURE", "DIST_SC01_VENT"] or not is_instance_valid(_disturbance_notice):
 		return
 	# T04's chronological text needs a reading panel, not an 88px status strip.
 	var banner: Control = _disturbance_notice.get_node("%Banner")
